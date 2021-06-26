@@ -1,0 +1,29 @@
+<%- include('partials/header.ejs') %>
+<div class="container">
+    <div class="row">
+        <div class="col s4 offset-s4 offset-m4 m4">
+            <div class="card">
+                <div class="card-image">
+                    <i class="material-icons success">check_circle</i>
+                </div>
+                <div class="card-content">
+                    <span class="card-title">
+                        <%= translate('ALREADY_PRIORITY_QUEUE_TITLE') %>
+                    </span>
+                    <p>
+                        <%= translate('ALREADY_PRIORITY_QUEUE_DESCRIPTION') %>
+                    </p>
+                    <div>
+                        <label><%= translate('ALREADY_PRIORITY_QUEUE_STEAM_ID') %></label>
+                        <div><%= user.steam.id %></div>
+                    </div>
+                    <div>
+                        <label><%= translate('ALREADY_PRIORITY_QUEUE_UNTIL') %></label>
+                        <div><%= until %></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<%- include('partials/footer.ejs') %>

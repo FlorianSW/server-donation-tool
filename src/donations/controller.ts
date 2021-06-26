@@ -1,43 +1,89 @@
 import {requireAuthentication} from '../auth';
 import {paypalClient} from './sdk';
 import {Request, Response, Router} from 'express';
+import {CFToolsClient, DuplicateResourceCreation, SteamId64} from 'cftools-sdk';
 
 const paypal = require('@paypal/checkout-server-sdk');
 
 export class DonationController {
     public readonly router: Router = Router();
 
-    constructor() {
+    constructor(private cftools: CFToolsClient) {
         this.router.post('/donations', requireAuthentication, this.createOrder.bind(this));
         this.router.get('/:orderId', requireAuthentication, this.afterDonation.bind(this));
+        this.router.get('/:orderId/redeem', requireAuthentication, this.redeem.bind(this));
         this.router.get('/donations/:orderId', requireAuthentication, this.getOrderDetails.bind(this));
     }
 
-    private async afterDonation(req: Request, res: Response) {
+    private async fetchOrderDetails(req: Request, res: Response): Promise<any> {
         const request = new paypal.orders.OrdersGetRequest(req.params.orderId);
 
-        try {
-            const order = await paypalClient().execute(request);
+        const order = await paypalClient().execute(request);
 
-            const intendedSteamId = order.result.purchase_units[0].custom_id;
-            // @ts-ignore
-            if (intendedSteamId !== req.user.steam.id) {
-                res.render('payment_steam_mismatch', {
-                    paymentSteamId: intendedSteamId,
-                    // @ts-ignore
-                    userSteamId: req.user.steam.id,
+        const intendedSteamId = order.result.purchase_units[0].custom_id;
+        // @ts-ignore
+        const userSteamId = req.user.steam.id;
+        if (intendedSteamId !== userSteamId) {
+            res.render('payment_steam_mismatch', {
+                paymentSteamId: intendedSteamId,
+                userSteamId: userSteamId,
+            });
+            throw Error('steamIdMismatch');
+        }
+        if (order.result.status !== 'COMPLETED') {
+            res.render('index', {
+                user: req.user,
+                paymentStatus: 'INCOMPLETE',
+                redeemStatus: 'UNSTARTED',
+            });
+            throw new Error('orderNotCompleted');
+        }
+
+        return order;
+    }
+
+    private async afterDonation(req: Request, res: Response) {
+        try {
+            await this.fetchOrderDetails(req, res);
+
+            res.render('index', {
+                user: req.user,
+                paymentStatus: 'COMPLETE',
+                redeemStatus: 'UNSTARTED',
+            });
+        } catch (err) {
+            console.error(err);
+            return res.send(500);
+        }
+    }
+
+    private async redeem(req: Request, res: Response) {
+        try {
+            const order = await this.fetchOrderDetails(req, res);
+            const startTime = new Date(order.result.create_time);
+            const expiration = new Date(startTime.valueOf());
+            expiration.setDate(startTime.getDate() + 30);
+
+            try {
+                await this.cftools.putPriorityQueue({
+                    id: SteamId64.of(order.result.purchase_units[0].custom_id),
+                    expires: expiration,
+                    comment: 'Created by CFTools Server Donation bot'
                 });
-            } else if (order.result.status === 'COMPLETED') {
-                res.render('index', {
-                    user: req.user,
-                    paymentStatus: 'COMPLETE',
-                });
-            } else {
-                res.render('index', {
-                    user: req.user,
-                    paymentStatus: 'INCOMPLETE',
-                });
+            } catch (e) {
+                if (e instanceof DuplicateResourceCreation) {
+                    res.redirect('/');
+                    return;
+                }
+                throw e;
             }
+
+            res.render('index', {
+                user: req.user,
+                paymentStatus: 'COMPLETE',
+                redeemStatus: 'COMPLETE',
+                priorityUntil: expiration,
+            });
         } catch (err) {
             console.error(err);
             return res.send(500);
