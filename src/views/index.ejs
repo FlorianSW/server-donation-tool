@@ -7,8 +7,8 @@
                     <img src="/assets/images/steam.png">
                 </div>
                 <div class="card-content">
-                    <span class="card-title">Steam Account</span>
-                    <div class="id">
+                    <span class="card-title"><%= translate('STEAM_ACCOUNT_TITLE') %></span>
+                    <div class="status">
                         <i class="material-icons success">check_circle</i> <%= user.steam.name %> (<%= user.steam.id %>)
                     </div>
                     <br>
@@ -24,14 +24,54 @@
                     <img src="/assets/images/paypal.svg">
                 </div>
                 <div class="card-content">
-                    <span class="card-title">PayPal donation</span>
+                    <span class="card-title"><%= translate('PAYPAL_DONATION_TITLE') %></span>
                     <p>
                         <%- translate('PAYPAL_DESCRIPTION') %>
                     </p>
+                    <div class="status">
+                        <% if (paymentStatus === 'UNSTARTED') { %>
+                            <i class="material-icons pending">pending</i> <%= translate('PAYPAL_UNSTARTED') %>
+                        <% } else if (paymentStatus === 'COMPLETE') { %>
+                            <i class="material-icons success">check_circle</i> <%= translate('PAYPAL_COMPLETE') %>
+                        <% } else if (paymentStatus === 'ERROR') { %>
+                            <i class="material-icons error">highlight_off</i> <%= translate('PAYPAL_ERROR') %>
+                        <% } %>
+                    </div>
                 </div>
-                <div class="card-action">
-                    <a href="#">This is a link</a>
-                </div>
+                <% if (paymentStatus === 'UNSTARTED') { %>
+                    <script src="https://www.paypal.com/sdk/js?client-id=<%= paypalClientId %>"></script>
+                    <div class="card-action" id="paypal-button-container"></div>
+                    <script>
+                        paypal.Buttons({
+                            createOrder: function () {
+                                return fetch('/donations', {
+                                    method: 'post',
+                                    headers: {
+                                        'content-type': 'application/json'
+                                    },
+                                    body: JSON.stringify({
+                                        steamId: '<%= user.steam.id %>'
+                                    })
+                                }).then(function (res) {
+                                    return res.json();
+                                }).then(function (data) {
+                                    return data.orderId;
+                                });
+                            },
+                            onApprove: function (data) {
+                                return fetch('/donations/' + data.orderID, {
+                                    headers: {
+                                        'content-type': 'application/json'
+                                    }
+                                }).then(function (res) {
+                                    return res.json();
+                                }).then(function (details) {
+                                    window.location.href = `/${details.orderId}/`;
+                                })
+                            }
+                        }).render('#paypal-button-container');
+                    </script>
+                <% } %>
             </div>
         </div>
         <div class="col s4 m4">
@@ -40,10 +80,14 @@
                     <img src="/assets/images/priority_queue.png">
                 </div>
                 <div class="card-content">
-                    <span class="card-title">Priority Queue setup</span>
-                    <p>I am a very simple card. I am good at containing small bits of information.
-                        I am convenient because I require little markup to use effectively.</p>
+                    <span class="card-title"><%= translate('PRIORITY_QUEUE_TITLE') %></span>
+                    <p><%= translate('PRIORITY_QUEUE_DESCRIPTION') %></p>
                 </div>
+                <% if (paymentStatus === 'COMPLETE') { %>
+                    <div class="card-action">
+                        <a href="./redeem"><%= translate('PRIORITY_QUEUE_REDEEM') %></a>
+                    </div>
+                <% } %>
             </div>
         </div>
     </div>

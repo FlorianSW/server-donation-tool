@@ -1,42 +1,25 @@
-import express, {NextFunction, Request, Response} from 'express';
+import express from 'express';
 import dotenv from 'dotenv';
 import path from 'path';
-import passport from 'passport';
-import {Strategy as DiscordStrategy} from 'passport-discord';
 import session from 'express-session';
 import {translate} from './translations';
+import bodyParser from 'body-parser';
+import {Authentication, requireAuthentication} from './auth';
+import {DonationController} from './donations/controller';
+import passport from 'passport';
 
 dotenv.config();
 
 const app = express();
 const port = process.env.PORT;
+const donations = new DonationController();
+const authentication = new Authentication();
 
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 app.use('/assets', express.static(__dirname + '/assets'));
-
-passport.serializeUser(function (user, done) {
-    done(null, user);
-});
-passport.deserializeUser(function (obj, done) {
-    done(null, obj);
-});
-
-passport.use(new DiscordStrategy({
-        clientID: process.env.DISCORD_CLIENT_ID,
-        clientSecret: process.env.DISCORD_CLIENT_SECRET,
-        callbackURL: 'http://localhost:8080/auth/callback',
-        scope: ['identify', 'connections']
-    }, (accessToken, refreshToken, profile, cb) => {
-        const connection = profile.connections.find((c) => c.type === 'steam');
-        cb(null, {
-            username: profile.username,
-            steam: connection,
-        });
-    })
-);
-
 app.locals.translate = translate;
+app.use(bodyParser.json());
 app.use(session({
     secret: process.env.SESSION_SECRET,
     resave: false,
@@ -44,20 +27,15 @@ app.use(session({
 }));
 app.use(passport.initialize());
 app.use(passport.session());
-app.get('/auth/redirect', passport.authenticate('discord'));
-app.get('/auth/error', (req, res) => {
-    res.render('login_error');
-});
-app.get('/auth/callback', passport.authenticate('discord', {failureRedirect: '/auth/error'}), (req, res) => res.redirect('/'));
 
-function checkAuth(req: Request, res: Response, next: NextFunction) {
-    if (req.isAuthenticated()) return next();
-    res.redirect('/auth/redirect')
-}
+app.use('/', donations.router);
+app.use('/', authentication.router);
 
-app.get('/', checkAuth, (req, res) => {
+app.get('/', requireAuthentication, (req, res) => {
     res.render('index', {
-        user: req.user
+        user: req.user,
+        paypalClientId: process.env.PAYPAL_CLIENT_ID,
+        paymentStatus: 'UNSTARTED',
     });
 });
 

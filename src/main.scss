@@ -12,18 +12,31 @@ body {
     .card-image {
       padding: 16px;
       background-color: white;
-    }
 
-    &.steam {
-      .id {
+      .error {
+        font-size: 142px;
         display: flex;
-        align-items: center;
-        gap: 8px;
+        justify-content: center;
       }
     }
 
+    .status {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
     i.success {
-      color: #4caf50;
+      color: #43a047;
+    }
+
+    i.pending {
+      color: #fdd835;
+    }
+
+    i.error {
+      color: #e53935;
     }
   }
 }

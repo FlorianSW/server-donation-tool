@@ -8,14 +8,19 @@
                 </div>
                 <div class="card-content">
                     <span class="card-title">
-                        <%= translate('ERROR_LOGIN') %>
+                        <%= translate('ERROR_STEAM_ID_MISMATCH_TITLE') %>
                     </span>
                     <p>
-                        <%= translate('ERROR_LOGIN_DESCRIPTION') %>
+                        <%= translate('ERROR_STEAM_ID_MISMATCH_DESCRIPTION') %>
                     </p>
-                </div>
-                <div class="card-action">
-                    <a href="/"><%= translate('ERROR_LOGIN_AGAIN') %></a>
+                    <div>
+                        <label><%= translate('ERROR_STEAM_ID_MISMATCH_ORDER_LABEL') %></label>
+                        <div><%= paymentSteamId %></div>
+                    </div>
+                    <div>
+                        <label><%= translate('ERROR_STEAM_ID_MISMATCH_USER_LABEL') %></label>
+                        <div><%= userSteamId %></div>
+                    </div>
                 </div>
             </div>
         </div>
