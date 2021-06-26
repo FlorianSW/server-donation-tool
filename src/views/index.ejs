@@ -1,0 +1,51 @@
+<%- include('partials/header.ejs') %>
+<div class="container">
+    <div class="row">
+        <div class="col s4 m4">
+            <div class="card steam">
+                <div class="card-image">
+                    <img src="/assets/images/steam.png">
+                </div>
+                <div class="card-content">
+                    <span class="card-title">Steam Account</span>
+                    <div class="id">
+                        <i class="material-icons success">check_circle</i> <%= user.steam.name %> (<%= user.steam.id %>)
+                    </div>
+                    <br>
+                    <p>
+                        <%- translate('STEAM_FROM_DISCORD') %>
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="col s4 m4">
+            <div class="card paypal">
+                <div class="card-image">
+                    <img src="/assets/images/paypal.svg">
+                </div>
+                <div class="card-content">
+                    <span class="card-title">PayPal donation</span>
+                    <p>
+                        <%- translate('PAYPAL_DESCRIPTION') %>
+                    </p>
+                </div>
+                <div class="card-action">
+                    <a href="#">This is a link</a>
+                </div>
+            </div>
+        </div>
+        <div class="col s4 m4">
+            <div class="card">
+                <div class="card-image">
+                    <img src="/assets/images/priority_queue.png">
+                </div>
+                <div class="card-content">
+                    <span class="card-title">Priority Queue setup</span>
+                    <p>I am a very simple card. I am good at containing small bits of information.
+                        I am convenient because I require little markup to use effectively.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<%- include('partials/footer.ejs') %>

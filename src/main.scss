@@ -1,0 +1,29 @@
+body {
+  background-color: #212121;
+  color: #fff;
+
+  nav {
+    background-color: #616161;
+  }
+
+  .card {
+    background-color: #616161;
+
+    .card-image {
+      padding: 16px;
+      background-color: white;
+    }
+
+    &.steam {
+      .id {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+    }
+
+    i.success {
+      color: #4caf50;
+    }
+  }
+}
