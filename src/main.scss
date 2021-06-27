@@ -33,6 +33,12 @@ body {
       }
     }
 
+    &.paypal {
+      .card-action {
+        text-align: center;
+      }
+    }
+
     i.success {
       color: #43a047;
     }
