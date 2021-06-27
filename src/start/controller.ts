@@ -7,6 +7,7 @@ export class StartController {
     public readonly router: Router = Router();
 
     constructor(private readonly cftools: CFToolsClient, private readonly config: AppConfig) {
+        this.router.get('/missingSteamConnection', requireAuthentication, this.missingSteamConnection.bind(this));
         this.router.get('/', requireAuthentication, this.populatePriorityQueue.bind(this), this.startPage.bind(this));
     }
 
@@ -21,6 +22,10 @@ export class StartController {
             availablePerks: availablePerks,
             step: 'PERK_SELECTION',
         });
+    }
+
+    private async missingSteamConnection(req: Request, res: Response) {
+        res.render('missing_steam_connection');
     }
 
     private async populatePriorityQueue(req: Request, res: Response, next: NextFunction): Promise<void> {

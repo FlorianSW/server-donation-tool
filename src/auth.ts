@@ -42,6 +42,14 @@ export class Authentication {
 }
 
 export function requireAuthentication(req: Request, res: Response, next: NextFunction) {
-    if (req.isAuthenticated()) return next();
-    res.redirect('/auth/redirect');
+    if (!req.isAuthenticated()) {
+        res.redirect('/auth/redirect');
+        return;
+    }
+    // @ts-ignore
+    if (!req.user.steam && req.path !== '/missingSteamConnection') {
+        res.redirect('/missingSteamConnection');
+        return;
+    }
+    return next();
 }

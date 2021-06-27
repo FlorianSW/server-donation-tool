@@ -36,6 +36,10 @@ const messages: { [key: string]: string } = {
     ERROR_LOGIN: 'Login error',
     ERROR_LOGIN_DESCRIPTION: 'The login was not successful. Please make sure you complete the login on the Discord page.',
     ERROR_LOGIN_AGAIN: 'Login again',
+
+    ERROR_MISSING_STEAM_TITLE: 'Discord profile has no Steam connection',
+    ERROR_MISSING_STEAM_DESCRIPTION: 'We offer perks to our donators, like Priority queue. In order for you to be able to redeem your donator perk, we need to know your Steam account you usually play with. Currently, the only supported method to provide this Steam account is by connecting it with your Discord profile (which you used to login here). You can even hide the connection from the public in your Discord profile settings, it just need to exist.<br><br>Please go to your Discord, connect your Steam account and try again.',
+    ERROR_MISSING_STEAM_TRY_AGAIN: 'Done! Try again',
 };
 
 export interface TranslateOptions {
