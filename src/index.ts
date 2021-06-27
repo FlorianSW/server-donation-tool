@@ -7,7 +7,7 @@ import bodyParser from 'body-parser';
 import {Authentication, requireAuthentication} from './auth';
 import {DonationController} from './donations/controller';
 import passport from 'passport';
-import {CFToolsClientBuilder, SteamId64} from 'cftools-sdk';
+import {CFToolsClientBuilder, PriorityQueueItem, SteamId64} from 'cftools-sdk';
 
 dotenv.config();
 
@@ -37,12 +37,19 @@ app.use(passport.session());
 app.use('/', donations.router);
 app.use('/', authentication.router);
 
+function isExpired(p: PriorityQueueItem): boolean {
+    if (p.expiration === 'Permanent') {
+        return false;
+    }
+    return p.expiration.getTime() <= new Date().getTime();
+}
+
 app.get('/', requireAuthentication, async (req, res) => {
     const entry = await cftools.getPriorityQueue({
         // @ts-ignore
         playerId: SteamId64.of(req.user.steam.id)
     });
-    if (entry) {
+    if (entry && !isExpired(entry)) {
         res.render('priority_already', {
             user: req.user,
             until: entry.expiration,
