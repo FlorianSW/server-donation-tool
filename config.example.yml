@@ -3,6 +3,13 @@ app:
   # Secret used to sign the client-side session cookie (with which the session of the user is identified). Generate
   # a secure string of reasonable length.
   sessionSecret:
+  # Optional customisation of the website
+  community:
+    # The title will be shown in the top navigation bar as well as in the title of the page (visible in the tab or window name)
+    title: our community
+    # An optional logo, which is used as an icon in the top navigation bar. Place the file into the /src/assets/custom folder
+    # and simply name the file here (without the path).
+    logo:
 discord:
   # The OAuth credentials of the application (https://discord.com/developers/applications) used to sign users in. You
   # find these values in the app settings in the section 'OAuth2' -> 'Client information'

@@ -1,4 +1,6 @@
 const messages: { [key: string]: string } = {
+    HEADER_DONATE: 'Donate to {{community}}',
+
     INFO_TITLE: 'Donate',
     INFO_DESCRIPTION: 'Thanks for considering a donation to our community. Please follow this simple process to donate and get rewarded with getting a slot on our priority queue. Once the priority queue entry is created, it will take until the next server restart to be available.',
 

@@ -31,6 +31,10 @@ const donations = new DonationController(cftools, config);
 const authentication = new Authentication(config);
 
 app.locals.translate = translate;
+app.locals.community = {
+    title: config.app.community.title,
+    logoUrl: `/assets/custom/${config.app.community.logo}`
+}
 app.locals.nameFromServerApiId = (serverApiId: string) => {
     return config.serverNames[serverApiId] || serverApiId;
 };

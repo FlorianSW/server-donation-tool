@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8"/>
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Donate to Server</title>
+    <title>Donations - <%= community.title %></title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" href="/assets/css/materialize.min.css">
@@ -14,7 +14,10 @@
     <div class="nav-wrapper">
         <div class="row">
             <div class="col s12">
-                <div class="brand-logo">Donate</div>
+                <div class="brand-logo">
+                    <% if (community.logoUrl) { %><img src="<%= community.logoUrl %>"><% } %>
+                    <span><%= translate('HEADER_DONATE', {params: {community: community.title}}) %></span>
+                </div>
                 <ul id="nav-mobile" class="right hide-on-med-and-down">
                     <li><a href="/auth/logout">Logout</a></li>
                 </ul>

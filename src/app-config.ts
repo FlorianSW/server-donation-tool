@@ -16,6 +16,10 @@ export interface AppConfig {
     app: {
         port: number,
         sessionSecret: string,
+        community: {
+            title: string,
+            logo: string,
+        }
     },
     discord: {
         clientId: string,

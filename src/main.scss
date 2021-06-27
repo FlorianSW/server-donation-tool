@@ -4,6 +4,16 @@ body {
 
   nav, .page-footer {
     background-color: #616161;
+
+    .brand-logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      img {
+        max-height: 64px;
+      }
+    }
   }
 
   .card {
