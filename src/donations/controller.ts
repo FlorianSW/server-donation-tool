@@ -34,7 +34,7 @@ export class DonationController {
         this.router.get('/donate', requireAuthentication, this.prepareDonation.bind(this));
         this.router.get('/donate/:orderId', requireAuthentication, this.prepareRedeem.bind(this));
         this.router.get('/donate/:orderId/redeem', requireAuthentication, this.redeem.bind(this));
-        this.router.get('/donations/:orderId', requireAuthentication, this.getOrderDetails.bind(this));
+        this.router.get('/donations/:orderId', requireAuthentication, this.captureOrder.bind(this));
     }
 
     private async selectPerk(req: Request, res: Response) {
@@ -129,7 +129,9 @@ export class DonationController {
                     id: SteamId64.of(id.steamId),
                     expires: expiration,
                     comment: `Created by CFTools Server Donation bot.
+PayPal Transaction ID: ${order.result.purchase_units[0]?.payments?.captures[0]?.id}
 PayPal Order ID: ${order.result.id}
+PayPal Custom ID: ${id.asString()}
 Selected product: ${id.perk.name}`
                 });
             } catch (e) {
@@ -180,7 +182,7 @@ Selected product: ${id.perk.name}`
         }
     }
 
-    private async getOrderDetails(req: Request, res: Response) {
+    private async captureOrder(req: Request, res: Response) {
         const orderID = req.params.orderId;
 
         const request = new paypal.orders.OrdersCaptureRequest(orderID);
