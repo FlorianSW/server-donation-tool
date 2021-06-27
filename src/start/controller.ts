@@ -8,6 +8,7 @@ export class StartController {
 
     constructor(private readonly cftools: CFToolsClient, private readonly config: AppConfig) {
         this.router.get('/missingSteamConnection', requireAuthentication, this.missingSteamConnection.bind(this));
+        this.router.post('/selectPerk', requireAuthentication, this.selectPerk.bind(this));
         this.router.get('/', requireAuthentication, this.populatePriorityQueue.bind(this), this.startPage.bind(this));
     }
 
@@ -22,6 +23,20 @@ export class StartController {
             availablePerks: availablePerks,
             step: 'PERK_SELECTION',
         });
+    }
+
+    private async selectPerk(req: Request, res: Response) {
+        const selectedPerk = this.config.perks.find((p) => p.id === parseInt(req.body.perk));
+        if (selectedPerk) {
+            // @ts-ignore
+            req.session.selectedPerk = selectedPerk;
+            res.redirect('/donate');
+        } else {
+            res.render('index', {
+                user: req.user,
+                step: 'PERK_SELECTION',
+            });
+        }
     }
 
     private async missingSteamConnection(req: Request, res: Response) {

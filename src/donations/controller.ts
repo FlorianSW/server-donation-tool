@@ -29,26 +29,11 @@ export class DonationController {
 
     constructor(private readonly cftools: CFToolsClient, private readonly config: AppConfig) {
         this.router.post('/donations', requireAuthentication, this.createOrder.bind(this));
+        this.router.get('/donations/:orderId', requireAuthentication, this.captureOrder.bind(this));
 
-        this.router.post('/selectPerk', requireAuthentication, this.selectPerk.bind(this));
         this.router.get('/donate', requireAuthentication, this.prepareDonation.bind(this));
         this.router.get('/donate/:orderId', requireAuthentication, this.prepareRedeem.bind(this));
         this.router.get('/donate/:orderId/redeem', requireAuthentication, this.redeem.bind(this));
-        this.router.get('/donations/:orderId', requireAuthentication, this.captureOrder.bind(this));
-    }
-
-    private async selectPerk(req: Request, res: Response) {
-        const selectedPerk = this.config.perks.find((p) => p.id === parseInt(req.body.perk));
-        if (selectedPerk) {
-            // @ts-ignore
-            req.session.selectedPerk = selectedPerk;
-            res.redirect('/donate');
-        } else {
-            res.render('index', {
-                user: req.user,
-                step: 'PERK_SELECTION',
-            });
-        }
     }
 
     private async fetchOrderDetails(req: Request, res: Response): Promise<any> {
