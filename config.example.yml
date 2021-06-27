@@ -10,6 +10,7 @@ paypal:
 cftools:
   applicationId:
   secret:
+serverNames:
 perks:
   - name: 30 Days Priority queue
     id: 1

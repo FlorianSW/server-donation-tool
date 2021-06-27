@@ -7,7 +7,7 @@
                 <% if (redeemStatus === 'COMPLETE') { %>
                     <i class="material-icons success">check_circle</i> <%= translate('PRIORITY_QUEUE_REDEEM_COMPLETE', {
                         params: {
-                            until: priorityUntil
+                            until: priorityUntil.toLocaleString()
                         }
                     }) %>
                 <% } %>

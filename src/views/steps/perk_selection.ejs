@@ -3,33 +3,30 @@
         <div class="card perk">
             <div class="card-content">
                 <span class="card-title"><%= translate('PERK_SELECTION_TITLE') %></span>
-                <% if (!locals.selectedPerk) { %>
-                    <% const availablePerks = perks.filter((p) => !user.priorityQueue[p.id].active); %>
+                <ul class="collection">
                     <% availablePerks.forEach(function (perk, index) { %>
-                        <ul class="collection">
-                            <li class="collection-item">
-                                <label>
-                                    <input class="with-gap" type="radio" name="perk" value="<%= perk.id %>"
-                                           <% if (index === 0) { %>checked
-                                            <% } %>
-                                    >
-                                    <span><%= perk.name %> (<%= perk.price.currency %> <%= perk.price.amount %>)</span>
-                                </label>
-                            </li>
-                        </ul>
+                        <li class="collection-item">
+                            <label>
+                                <input class="with-gap" type="radio" name="perk" value="<%= perk.id %>"
+                                       <% if (index === 0) { %>checked
+                                        <% } %>
+                                >
+                                <span><%= perk.name %> (<%= perk.price.currency %> <%= perk.price.amount %>)</span>
+                            </label>
+                        </li>
                     <% }); %>
-                    <% if (availablePerks.length === 0) { %>
-                        <%= translate('PERK_NO_AVAILABLE') %>
-                    <% } %>
-                <% } else { %>
-                    <div class="status">
-                        <i class="material-icons success">check_circle</i> <%= selectedPerk.name %>
-                        (<%= selectedPerk.price.currency %> <%= selectedPerk.price.amount %>)
-                    </div>
+                </ul>
+                <% if (availablePerks.length === 0) { %>
+                    <%= translate('PERK_NO_AVAILABLE') %>
                 <% } %>
             </div>
             <div class="card-action">
-                <button class="btn waves-effect waves-light" type="submit" name="action">Select</button>
+                <button class="btn waves-effect waves-light" type="submit" name="action"
+                <% if (availablePerks.length === 0) { %>
+                        disabled
+                        <% } %>
+                >Select
+                </button>
             </div>
         </div>
     </div>

@@ -32,6 +32,9 @@ const donations = new DonationController(cftools, config);
 const authentication = new Authentication(config);
 
 app.locals.translate = translate;
+app.locals.nameFromServerApiId = (serverApiId: string) => {
+    return config.serverNames[serverApiId] || serverApiId;
+};
 app.locals.perks = config.perks;
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
@@ -61,19 +64,21 @@ function isExpired(p: PriorityQueueItem): boolean {
 async function populatePriorityQueue(req: Request, res: Response, next: NextFunction): Promise<void> {
     // @ts-ignore
     const steamId = SteamId64.of(req.user.steam.id);
-    let priority: { [key: number]: any | undefined } = {};
-    for (let perk of config.perks) {
+    const servers = new Set(config.perks.map((p) => p.cftools.serverApiId));
+
+    let priority: { [key: string]: any | undefined } = {};
+    for (let server of servers) {
         const entry = await cftools.getPriorityQueue({
             playerId: steamId,
-            serverApiId: ServerApiId.of(perk.cftools.serverApiId),
+            serverApiId: ServerApiId.of(server),
         });
         if (entry === null) {
-            priority[perk.id] = {
+            priority[server] = {
                 active: false,
             };
             continue;
         }
-        priority[perk.id] = {
+        priority[server] = {
             active: !isExpired(entry),
             expires: entry.expiration,
         }
@@ -84,8 +89,14 @@ async function populatePriorityQueue(req: Request, res: Response, next: NextFunc
 }
 
 app.get('/', requireAuthentication, populatePriorityQueue, async (req, res) => {
+    // @ts-ignore
+    const availablePerks = config.perks.filter((p) => !req.user.priorityQueue[p.cftools.serverApiId].active);
+    // @ts-ignore
+    const serversWithPrio = Object.entries(req.user.priorityQueue).filter((s: [string, object]) => s[1].active);
     res.render('index', {
         user: req.user,
+        serversWithPrio: serversWithPrio,
+        availablePerks: availablePerks,
         step: 'PERK_SELECTION',
     });
 });

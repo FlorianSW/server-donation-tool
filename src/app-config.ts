@@ -30,5 +30,8 @@ export interface AppConfig {
         applicationId: string,
         secret: string,
     },
+    serverNames: {
+        [serverApiId: string]: string
+    }
     perks: Perk[]
 }

@@ -2,6 +2,9 @@ const messages: { [key: string]: string } = {
     INFO_TITLE: 'Donate',
     INFO_DESCRIPTION: 'Thanks for considering a donation to our community. Please follow this simple process to donate and get rewarded with getting a slot on our priority queue. Once the priority queue entry is created, it will take until the next server restart to be available.',
 
+    SERVERS_WITH_PRIORITY_QUEUE: 'Servers you have priority queue on',
+    SERVERS_WITH_PRIORITY_QUEUE_UNTIL: 'until: ',
+
     STEAM_ACCOUNT_TITLE: 'Steam Account',
     STEAM_FROM_DISCORD: 'This Steam account is linked with your Discord user.',
 

@@ -27,6 +27,12 @@ body {
       margin-top: 8px;
     }
 
+    &.perk {
+      .collection-item label {
+        color: white;
+      }
+    }
+
     i.success {
       color: #43a047;
     }
@@ -38,5 +44,21 @@ body {
     i.error {
       color: #e53935;
     }
+  }
+
+  .collection {
+    .collection-item {
+      background-color: transparent;
+    }
+  }
+
+  .collection.with-header {
+    .collection-header {
+      background-color: transparent;
+    }
+  }
+
+  [type="radio"]:not(:checked)+span:before, [type="radio"]:not(:checked)+span:after {
+    border-color: white;
   }
 }
