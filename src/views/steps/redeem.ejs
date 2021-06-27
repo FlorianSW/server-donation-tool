@@ -13,10 +13,12 @@
                 <% } %>
             </div>
         </div>
-        <% if (redeemStatus !== 'COMPLETE') { %>
-            <div class="card-action">
+        <div class="card-action">
+            <% if (redeemStatus !== 'COMPLETE') { %>
                 <a href="./redeem"><%= translate('PRIORITY_QUEUE_REDEEM') %></a>
-            </div>
-        <% } %>
+            <% } else { %>
+                <a href="/"><%= translate('PRIORITY_QUEUE_BACK') %></a>
+            <% } %>
+        </div>
     </div>
 </div>

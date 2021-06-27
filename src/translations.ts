@@ -22,6 +22,7 @@ const messages: { [key: string]: string } = {
     PRIORITY_QUEUE_REDEEM: 'Redeem',
     PRIORITY_QUEUE_REDEEM_PENDING: 'Redeem pending',
     PRIORITY_QUEUE_REDEEM_COMPLETE: 'Your priority queue slot was created successfully. It will expire at: {{until}}',
+    PRIORITY_QUEUE_BACK: 'Back to Start',
 
     ALREADY_PRIORITY_QUEUE_TITLE: 'Already Priority Queue',
     ALREADY_PRIORITY_QUEUE_DESCRIPTION: 'Your Steam ID, which is connected to your Discord user, already has priority queue. Thanks for your donation!',
