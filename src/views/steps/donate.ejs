@@ -39,7 +39,7 @@
                         }).then(function (res) {
                             return res.json();
                         }).then(function (details) {
-                            window.location.href = `/${details.orderId}/`;
+                            window.location.href = `/donate/${details.orderId}/`;
                         })
                     }
                 }).render('#paypal-button-container');

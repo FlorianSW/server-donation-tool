@@ -32,8 +32,8 @@ export class DonationController {
 
         this.router.post('/selectPerk', requireAuthentication, this.selectPerk.bind(this));
         this.router.get('/donate', requireAuthentication, this.prepareDonation.bind(this));
-        this.router.get('/:orderId', requireAuthentication, this.prepareRedeem.bind(this));
-        this.router.get('/:orderId/redeem', requireAuthentication, this.redeem.bind(this));
+        this.router.get('/donate/:orderId', requireAuthentication, this.prepareRedeem.bind(this));
+        this.router.get('/donate/:orderId/redeem', requireAuthentication, this.redeem.bind(this));
         this.router.get('/donations/:orderId', requireAuthentication, this.getOrderDetails.bind(this));
     }
 
