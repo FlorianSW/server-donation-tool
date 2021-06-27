@@ -1,5 +1,4 @@
 import express from 'express';
-import dotenv from 'dotenv';
 import path from 'path';
 import session from 'express-session';
 import {translate} from './translations';
@@ -13,9 +12,7 @@ import * as yaml from 'js-yaml';
 import {AppConfig} from './app-config';
 import {StartController} from './start/controller';
 
-dotenv.config();
 let config: AppConfig;
-
 try {
     config = yaml.load(fs.readFileSync('config.yml', 'utf8')) as AppConfig;
 } catch (e) {
