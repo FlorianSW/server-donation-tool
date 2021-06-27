@@ -33,6 +33,10 @@ export class Authentication {
             res.render('login_error');
         });
         this.router.get('/auth/callback', passport.authenticate('discord', {failureRedirect: '/auth/error'}), (req, res) => res.redirect('/'));
+        this.router.get('/auth/logout', (req, res) => {
+            req.logout();
+            res.redirect('/');
+        });
     }
 
 }
