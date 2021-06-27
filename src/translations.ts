@@ -14,8 +14,8 @@ const messages: { [key: string]: string } = {
     PAYPAL_COMPLETE: 'Donation was completed',
     PAYPAL_ERROR: 'Something went wrong with your donation.',
 
-    PRIORITY_QUEUE_TITLE: 'Priority Queue setup',
-    PRIORITY_QUEUE_DESCRIPTION: 'Once your donation is completed, you can redeem your priority queue slot.',
+    PRIORITY_QUEUE_TITLE: 'Thank you for your donation',
+    PRIORITY_QUEUE_DESCRIPTION: 'You can now redeem your perk to profit from the benefits it includes.',
     PRIORITY_QUEUE_REDEEM: 'Redeem',
     PRIORITY_QUEUE_REDEEM_PENDING: 'Redeem pending',
     PRIORITY_QUEUE_REDEEM_COMPLETE: 'Your priority queue slot was created successfully. It will expire at: {{until}}',

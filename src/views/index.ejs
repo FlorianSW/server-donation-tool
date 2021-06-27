@@ -11,7 +11,7 @@
         </div>
     </div>
     <div class="row">
-        <div class="col s12 m6 l3">
+        <div class="col s12 m3 l3">
             <div class="card steam">
                 <div class="card-image">
                     <img src="/assets/images/steam.png">
@@ -19,7 +19,7 @@
                 <div class="card-content">
                     <span class="card-title"><%= translate('STEAM_ACCOUNT_TITLE') %></span>
                     <div class="status">
-                        <i class="material-icons success">check_circle</i> <%= user.steam.name %> (<%= user.steam.id %>)
+                        <%= user.steam.name %> (<%= user.steam.id %>)
                     </div>
                     <br>
                     <p>
@@ -28,118 +28,17 @@
                 </div>
             </div>
         </div>
-        <div class="col s12 m6 l3">
-            <div class="card perk">
-                <div class="card-content">
-                    <span class="card-title"><%= translate('PERK_SELECTION_TITLE') %></span>
-                    <% if (!locals.selectedPerk) { %>
-                        <% const availablePerks = perks.filter((p) => !user.priorityQueue[p.id].active); %>
-                        <% availablePerks.forEach(function (perk, index) { %>
-                            <ul class="collection">
-                                <li class="collection-item">
-                                    <label>
-                                        <input class="with-gap" type="radio" name="perk" value="<%= perk.id %>"
-                                               <% if (index === 0) { %>checked
-                                                <% } %>
-                                        >
-                                        <span><%= perk.name %> (<%= perk.price.currency %> <%= perk.price.amount %>)</span>
-                                    </label>
-                                </li>
-                            </ul>
-                        <% }); %>
-                        <% if (availablePerks.length === 0) { %>
-                            <%= translate('PERK_NO_AVAILABLE') %>
-                        <% } %>
-                    <% } else { %>
-                        <div class="status">
-                            <i class="material-icons success">check_circle</i> <%= selectedPerk.name %>
-                            (<%= selectedPerk.price.currency %> <%= selectedPerk.price.amount %>)
-                        </div>
-                    <% } %>
-                </div>
-            </div>
-        </div>
-        <div class="col s12 m6 l3">
-            <div class="card paypal">
-                <div class="card-image">
-                    <img src="/assets/images/paypal.svg">
-                </div>
-                <div class="card-content">
-                    <span class="card-title"><%= translate('PAYPAL_DONATION_TITLE') %></span>
-                    <p>
-                        <%- translate('PAYPAL_DESCRIPTION') %>
-                    </p>
-                    <div class="status">
-                        <% if (paymentStatus === 'UNSTARTED') { %>
-                            <i class="material-icons pending">pending</i> <%= translate('PAYPAL_UNSTARTED') %>
-                        <% } else if (paymentStatus === 'COMPLETE') { %>
-                            <i class="material-icons success">check_circle</i> <%= translate('PAYPAL_COMPLETE') %>
-                        <% } else if (paymentStatus === 'ERROR') { %>
-                            <i class="material-icons error">highlight_off</i> <%= translate('PAYPAL_ERROR') %>
-                        <% } %>
-                    </div>
-                </div>
-                <% if (paymentStatus === 'UNSTARTED') { %>
-                    <script src="https://www.paypal.com/sdk/js?client-id=<%= paypalClientId %>"></script>
-                    <div class="card-action" id="paypal-button-container"></div>
-                    <script>
-                        paypal.Buttons({
-                            createOrder: function () {
-                                return fetch('/donations', {
-                                    method: 'post',
-                                    headers: {
-                                        'content-type': 'application/json'
-                                    },
-                                    body: JSON.stringify({
-                                        steamId: '<%= user.steam.id %>',
-                                        perkId: document.querySelector('input[name=perk]:checked').value
-                                    })
-                                }).then(function (res) {
-                                    return res.json();
-                                }).then(function (data) {
-                                    return data.orderId;
-                                });
-                            },
-                            onApprove: function (data) {
-                                return fetch('/donations/' + data.orderID, {
-                                    headers: {
-                                        'content-type': 'application/json'
-                                    }
-                                }).then(function (res) {
-                                    return res.json();
-                                }).then(function (details) {
-                                    window.location.href = `/${details.orderId}/`;
-                                })
-                            }
-                        }).render('#paypal-button-container');
-                    </script>
-                <% } %>
-            </div>
-        </div>
-        <div class="col s12 m6 l3">
-            <div class="card">
-                <div class="card-content">
-                    <span class="card-title"><%= translate('PRIORITY_QUEUE_TITLE') %></span>
-                    <p><%= translate('PRIORITY_QUEUE_DESCRIPTION') %></p>
-                    <div class="status">
-                        <% if (redeemStatus !== 'COMPLETE') { %>
-                            <i class="material-icons pending">pending</i> <%= translate('PRIORITY_QUEUE_REDEEM_PENDING') %>
-                        <% } else { %>
-                            <i class="material-icons success">check_circle</i> <%= translate('PRIORITY_QUEUE_REDEEM_COMPLETE', {
-                                params: {
-                                    until: priorityUntil
-                                }
-                            }) %>
-                        <% } %>
-                    </div>
-                </div>
-                <% if (paymentStatus === 'COMPLETE' && redeemStatus !== 'COMPLETE') { %>
-                    <div class="card-action">
-                        <a href="./redeem"><%= translate('PRIORITY_QUEUE_REDEEM') %></a>
-                    </div>
-                <% } %>
-            </div>
-        </div>
+        <% switch (step) {
+        case "PERK_SELECTION": %>
+        <%- include('steps/perk_selection.ejs'); %>
+        <% break;
+        case "DONATE": %>
+        <%- include('steps/donate.ejs'); %>
+        <% break;
+        case "REDEEM": %>
+        <%- include('steps/redeem.ejs'); %>
+        <% break;
+        } %>
     </div>
 </div>
 <%- include('partials/footer.ejs') %>

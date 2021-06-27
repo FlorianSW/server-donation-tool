@@ -1,0 +1,49 @@
+<div class="col s12 m9 l9">
+    <div class="card paypal">
+        <div class="card-content">
+            <span class="card-title"><%= translate('PAYPAL_DONATION_TITLE') %></span>
+            <p>
+                <%- translate('PAYPAL_DESCRIPTION') %>
+            </p>
+            <div class="status">
+                <% if (paymentStatus === 'ERROR') { %>
+                    <i class="material-icons error">highlight_off</i> <%= translate('PAYPAL_ERROR') %>
+                <% } %>
+            </div>
+        </div>
+        <% if (paymentStatus === 'UNSTARTED') { %>
+            <script src="https://www.paypal.com/sdk/js?client-id=<%= paypalClientId %>"></script>
+            <div class="card-action" id="paypal-button-container"></div>
+            <script>
+                paypal.Buttons({
+                    createOrder: function () {
+                        return fetch('/donations', {
+                            method: 'post',
+                            headers: {
+                                'content-type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                steamId: '<%= user.steam.id %>'
+                            })
+                        }).then(function (res) {
+                            return res.json();
+                        }).then(function (data) {
+                            return data.orderId;
+                        });
+                    },
+                    onApprove: function (data) {
+                        return fetch('/donations/' + data.orderID, {
+                            headers: {
+                                'content-type': 'application/json'
+                            }
+                        }).then(function (res) {
+                            return res.json();
+                        }).then(function (details) {
+                            window.location.href = `/${details.orderId}/`;
+                        })
+                    }
+                }).render('#paypal-button-container');
+            </script>
+        <% } %>
+    </div>
+</div>

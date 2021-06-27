@@ -1,11 +1,12 @@
 import {Express, NextFunction, Request, Response, Router} from 'express';
 import passport from 'passport';
 import {Strategy as DiscordStrategy} from 'passport-discord';
+import {AppConfig} from './app-config';
 
 export class Authentication {
     public readonly router: Router = Router();
 
-    constructor() {
+    constructor(config: AppConfig) {
         passport.serializeUser((user, done) => {
             done(null, user);
         });
@@ -14,9 +15,9 @@ export class Authentication {
         });
 
         passport.use(new DiscordStrategy({
-                clientID: process.env.DISCORD_CLIENT_ID,
-                clientSecret: process.env.DISCORD_CLIENT_SECRET,
-                callbackURL: 'http://localhost:8080/auth/callback',
+                clientID: config.discord.clientId,
+                clientSecret: config.discord.clientSecret,
+                callbackURL: config.discord.redirectUrl,
                 scope: ['identify', 'connections']
             }, (accessToken, refreshToken, profile, cb) => {
                 const connection = profile.connections.find((c) => c.type === 'steam');

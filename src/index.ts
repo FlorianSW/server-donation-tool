@@ -29,7 +29,7 @@ const cftools = new CFToolsClientBuilder()
 const app = express();
 const port = config.app.port;
 const donations = new DonationController(cftools, config);
-const authentication = new Authentication();
+const authentication = new Authentication(config);
 
 app.locals.translate = translate;
 app.locals.perks = config.perks;
@@ -37,6 +37,9 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 app.use('/assets', express.static(__dirname + '/assets'));
 app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({
+    extended: false,
+}));
 app.use(session({
     secret: config.app.sessionSecret,
     resave: false,
@@ -83,9 +86,7 @@ async function populatePriorityQueue(req: Request, res: Response, next: NextFunc
 app.get('/', requireAuthentication, populatePriorityQueue, async (req, res) => {
     res.render('index', {
         user: req.user,
-        paypalClientId: config.paypal.clientId,
-        paymentStatus: 'UNSTARTED',
-        redeemStatus: 'UNSTARTED',
+        step: 'PERK_SELECTION',
     });
 });
 

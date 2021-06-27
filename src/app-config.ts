@@ -20,6 +20,7 @@ export interface AppConfig {
     discord: {
         clientId: string,
         clientSecret: string,
+        redirectUrl: string,
     },
     paypal: {
         clientId: string,

@@ -29,9 +29,26 @@ export class DonationController {
 
     constructor(private readonly cftools: CFToolsClient, private readonly config: AppConfig) {
         this.router.post('/donations', requireAuthentication, this.createOrder.bind(this));
-        this.router.get('/:orderId', requireAuthentication, this.afterDonation.bind(this));
+
+        this.router.post('/selectPerk', requireAuthentication, this.selectPerk.bind(this));
+        this.router.get('/donate', requireAuthentication, this.prepareDonation.bind(this));
+        this.router.get('/:orderId', requireAuthentication, this.prepareRedeem.bind(this));
         this.router.get('/:orderId/redeem', requireAuthentication, this.redeem.bind(this));
         this.router.get('/donations/:orderId', requireAuthentication, this.getOrderDetails.bind(this));
+    }
+
+    private async selectPerk(req: Request, res: Response) {
+        const selectedPerk = this.config.perks.find((p) => p.id === parseInt(req.body.perk));
+        if (selectedPerk) {
+            // @ts-ignore
+            req.session.selectedPerk = selectedPerk;
+            res.redirect('/donate');
+        } else {
+            res.render('index', {
+                user: req.user,
+                step: 'PERK_SELECTION',
+            });
+        }
     }
 
     private async fetchOrderDetails(req: Request, res: Response): Promise<any> {
@@ -52,6 +69,7 @@ export class DonationController {
         }
         if (order.result.status !== 'COMPLETED') {
             res.render('index', {
+                step: 'DONATE',
                 user: req.user,
                 paymentStatus: 'INCOMPLETE',
                 redeemStatus: 'UNSTARTED',
@@ -62,7 +80,16 @@ export class DonationController {
         return order;
     }
 
-    private async afterDonation(req: Request, res: Response) {
+    private async prepareDonation(req: Request, res: Response) {
+        res.render('index', {
+            step: 'DONATE',
+            user: req.user,
+            paypalClientId: this.config.paypal.clientId,
+            paymentStatus: 'UNSTARTED',
+        })
+    }
+
+    private async prepareRedeem(req: Request, res: Response) {
         try {
             const order = await this.fetchOrderDetails(req, res);
 
@@ -74,9 +101,9 @@ export class DonationController {
 
             res.render('index', {
                 user: req.user,
+                step: 'REDEEM',
+                redeemStatus: 'PENDING',
                 selectedPerk: id.perk,
-                paymentStatus: 'COMPLETE',
-                redeemStatus: 'UNSTARTED',
             });
         } catch (err) {
             console.error(err);
@@ -101,7 +128,9 @@ export class DonationController {
                     serverApiId: ServerApiId.of(id.perk.cftools.serverApiId),
                     id: SteamId64.of(id.steamId),
                     expires: expiration,
-                    comment: 'Created by CFTools Server Donation bot'
+                    comment: `Created by CFTools Server Donation bot.
+PayPal Order ID: ${order.result.id}
+Selected product: ${id.perk.name}`
                 });
             } catch (e) {
                 if (e instanceof DuplicateResourceCreation) {
@@ -113,8 +142,7 @@ export class DonationController {
 
             res.render('index', {
                 user: req.user,
-                selectedPerk: id.perk,
-                paymentStatus: 'COMPLETE',
+                step: 'REDEEM',
                 redeemStatus: 'COMPLETE',
                 priorityUntil: expiration,
             });
@@ -125,11 +153,8 @@ export class DonationController {
     }
 
     private async createOrder(req: Request, res: Response) {
-        const selectedPerk = this.config.perks.find((p) => p.id === parseInt(req.body.perkId));
-        if (!selectedPerk) {
-            res.sendStatus(400);
-            return;
-        }
+        // @ts-ignore
+        const selectedPerk = req.session.selectedPerk;
         const request = new paypal.orders.OrdersCreateRequest();
         request.prefer('return=representation');
         request.requestBody({
