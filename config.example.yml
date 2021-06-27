@@ -1,16 +1,46 @@
 app:
   port: 8080
+  # Secret used to sign the client-side session cookie (with which the session of the user is identified). Generate
+  # a secure string of reasonable length.
   sessionSecret:
 discord:
+  # The OAuth credentials of the application (https://discord.com/developers/applications) used to sign users in. You
+  # find these values in the app settings in the section 'OAuth2' -> 'Client information'
   clientId:
   clientSecret:
 paypal:
+  # The access credentials of your PayPal application to process payments. You can either use the sandbox credentials
+  # to test the application. In order to process real funds, you need to have a paypal business account and use
+  # credentials of a live app.
+  # You can create these in the PayPal developer portal: https://developer.paypal.com/developer/applications/
   clientId:
   clientSecret:
 cftools:
+  # Credentials of a CFTools application from https://developer.cftools.cloud/applications
+  # Make sure you have granted this app permission to all servers listed in the perks section (cftools.serverApiId) in
+  # order to allow the website to manage the priority queue entries.
   applicationId:
   secret:
+# A mapping between serverApiId and a human readable server name. This information is used on the overview page where
+# a potential donator sees the servers they have priority queue already. I suggest to use a name your donators will
+# easily recognize.
 serverNames:
+  aServerApiId: some name
+# Perks are the available prices and benefits a donator gets when donating that amount. Each perk has the following information
+# - name: A human readable name, which is displayed in the perk selection screen as well as on the PayPal receipt (choose
+#   a name which is not too long, but still descriptive); do not put the price in it
+# - id: A unique id over the lifetime of the website. It needs to be unique even _after_ you want to remove the perk.
+#   Do not re-use an ID from a previous perk. The easiest thing would be to simply count up by one. Needs to be a number
+#   and will also be available in your PayPal dashboard in the 'custom' reference.
+# - price: The price of the perk, as an object of currency and amount. The currency needs to be a supported string from
+#   PayPal (see https://developer.paypal.com/docs/reports/reference/paypal-supported-currencies/). The amount is a
+#   string (make sure to quote the value) with a number with two decimals.
+# - type: The type of the perk. The only currently supported value is PRIORITY_QUEUE. The value is currently unused.
+# - amountInDays: The amount of priority queue days the donator should get.
+# - cftools: The cftools serverApiId (in the object with the key serverApiId) of the server the donator will get the perk
+#   for. Is the server api ID of the server in the CFTools Dashboard (Manage -> Settings -> API Key section)
+#
+# You should have at least one perk available, and as many as you want to have.
 perks:
   - name: 30 Days Priority queue
     id: 1
