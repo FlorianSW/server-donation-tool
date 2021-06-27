@@ -1,3 +1,5 @@
+import {AppConfig} from '../app-config';
+
 const paypal = require('@paypal/checkout-server-sdk');
 
 /**
@@ -6,8 +8,8 @@ const paypal = require('@paypal/checkout-server-sdk');
  * credentials context. Use this instance to invoke PayPal APIs, provided the
  * credentials have access.
  */
-export function paypalClient() {
-    return new paypal.core.PayPalHttpClient(environment());
+export function paypalClient(config: AppConfig) {
+    return new paypal.core.PayPalHttpClient(environment(config));
 }
 
 /**
@@ -16,8 +18,6 @@ export function paypalClient() {
  * This sample uses SandboxEnvironment. In production, use LiveEnvironment.
  *
  */
-function environment() {
-    return new paypal.core.SandboxEnvironment(
-        process.env.PAYPAL_CLIENT_ID, process.env.PAYPAL_CLIENT_SECRET
-    );
+function environment(config: AppConfig) {
+    return new paypal.core.SandboxEnvironment(config.paypal.clientId, config.paypal.clientSecret);
 }

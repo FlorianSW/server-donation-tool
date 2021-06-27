@@ -1,0 +1,31 @@
+app:
+  port: 8080
+  sessionSecret:
+discord:
+  clientId:
+  clientSecret:
+paypal:
+  clientId:
+  clientSecret:
+cftools:
+  applicationId:
+  secret:
+perks:
+  - name: 30 Days Priority queue
+    id: 1
+    price:
+      currency: USD
+      amount: '1.00'
+    type: PRIORITY_QUEUE
+    amountInDays: 30
+    cftools:
+      serverApiId:
+  - name: 7 Days Priority queue
+    id: 2
+    price:
+      currency: USD
+      amount: '1.00'
+    type: PRIORITY_QUEUE
+    amountInDays: 30
+    cftools:
+      serverApiId:

@@ -1,4 +1,4 @@
-import express from 'express';
+import express, {NextFunction, Request, Response} from 'express';
 import dotenv from 'dotenv';
 import path from 'path';
 import session from 'express-session';
@@ -7,27 +7,38 @@ import bodyParser from 'body-parser';
 import {Authentication, requireAuthentication} from './auth';
 import {DonationController} from './donations/controller';
 import passport from 'passport';
-import {CFToolsClientBuilder, PriorityQueueItem, SteamId64} from 'cftools-sdk';
+import {CFToolsClientBuilder, PriorityQueueItem, ServerApiId, SteamId64} from 'cftools-sdk';
+import * as fs from 'fs';
+import * as yaml from 'js-yaml';
+import {AppConfig} from './app-config';
 
 dotenv.config();
+let config: AppConfig;
+
+try {
+    config = yaml.load(fs.readFileSync('config.yml', 'utf8')) as AppConfig;
+} catch (e) {
+    console.log('Could not load configuration', e);
+    process.exit(1);
+}
 
 const cftools = new CFToolsClientBuilder()
-    .withServerApiId(process.env.CFTOOLS_SERVER_API_ID)
-    .withCredentials(process.env.CFTOOLS_APPLICATION_ID, process.env.CFTOOLS_SECRET)
+    .withCredentials(config.cftools.applicationId, config.cftools.secret)
     .build();
 
 const app = express();
-const port = process.env.PORT;
-const donations = new DonationController(cftools);
+const port = config.app.port;
+const donations = new DonationController(cftools, config);
 const authentication = new Authentication();
 
+app.locals.translate = translate;
+app.locals.perks = config.perks;
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 app.use('/assets', express.static(__dirname + '/assets'));
-app.locals.translate = translate;
 app.use(bodyParser.json());
 app.use(session({
-    secret: process.env.SESSION_SECRET,
+    secret: config.app.sessionSecret,
     resave: false,
     saveUninitialized: true,
 }));
@@ -44,24 +55,38 @@ function isExpired(p: PriorityQueueItem): boolean {
     return p.expiration.getTime() <= new Date().getTime();
 }
 
-app.get('/', requireAuthentication, async (req, res) => {
-    const entry = await cftools.getPriorityQueue({
-        // @ts-ignore
-        playerId: SteamId64.of(req.user.steam.id)
-    });
-    if (entry && !isExpired(entry)) {
-        res.render('priority_already', {
-            user: req.user,
-            until: entry.expiration,
+async function populatePriorityQueue(req: Request, res: Response, next: NextFunction): Promise<void> {
+    // @ts-ignore
+    const steamId = SteamId64.of(req.user.steam.id);
+    let priority: { [key: number]: any | undefined } = {};
+    for (let perk of config.perks) {
+        const entry = await cftools.getPriorityQueue({
+            playerId: steamId,
+            serverApiId: ServerApiId.of(perk.cftools.serverApiId),
         });
-    } else {
-        res.render('index', {
-            user: req.user,
-            paypalClientId: process.env.PAYPAL_CLIENT_ID,
-            paymentStatus: 'UNSTARTED',
-            redeemStatus: 'UNSTARTED',
-        });
+        if (entry === null) {
+            priority[perk.id] = {
+                active: false,
+            };
+            continue;
+        }
+        priority[perk.id] = {
+            active: !isExpired(entry),
+            expires: entry.expiration,
+        }
     }
+    // @ts-ignore
+    req.user.priorityQueue = priority;
+    next();
+}
+
+app.get('/', requireAuthentication, populatePriorityQueue, async (req, res) => {
+    res.render('index', {
+        user: req.user,
+        paypalClientId: config.paypal.clientId,
+        paymentStatus: 'UNSTARTED',
+        redeemStatus: 'UNSTARTED',
+    });
 });
 
 app.listen(port, () => {

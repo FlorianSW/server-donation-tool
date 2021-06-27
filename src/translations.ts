@@ -5,6 +5,9 @@ const messages: { [key: string]: string } = {
     STEAM_ACCOUNT_TITLE: 'Steam Account',
     STEAM_FROM_DISCORD: 'This Steam account is linked with your Discord user.',
 
+    PERK_SELECTION_TITLE: 'Select perk',
+    PERK_NO_AVAILABLE: 'There is no perk available. You may already have all available perks.',
+
     PAYPAL_DONATION_TITLE: 'PayPal Donation',
     PAYPAL_DESCRIPTION: 'We use PayPal to process your donation. Proceed to PayPal in order to complete the transaction.',
     PAYPAL_UNSTARTED: 'Choose the payment method to proceed',

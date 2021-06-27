@@ -11,7 +11,7 @@
         </div>
     </div>
     <div class="row">
-        <div class="col s12 m6 l4">
+        <div class="col s12 m6 l3">
             <div class="card steam">
                 <div class="card-image">
                     <img src="/assets/images/steam.png">
@@ -28,7 +28,38 @@
                 </div>
             </div>
         </div>
-        <div class="col s12 m6 l4">
+        <div class="col s12 m6 l3">
+            <div class="card perk">
+                <div class="card-content">
+                    <span class="card-title"><%= translate('PERK_SELECTION_TITLE') %></span>
+                    <% if (!locals.selectedPerk) { %>
+                        <% const availablePerks = perks.filter((p) => !user.priorityQueue[p.id].active); %>
+                        <% availablePerks.forEach(function (perk, index) { %>
+                            <ul class="collection">
+                                <li class="collection-item">
+                                    <label>
+                                        <input class="with-gap" type="radio" name="perk" value="<%= perk.id %>"
+                                               <% if (index === 0) { %>checked
+                                                <% } %>
+                                        >
+                                        <span><%= perk.name %> (<%= perk.price.currency %> <%= perk.price.amount %>)</span>
+                                    </label>
+                                </li>
+                            </ul>
+                        <% }); %>
+                        <% if (availablePerks.length === 0) { %>
+                            <%= translate('PERK_NO_AVAILABLE') %>
+                        <% } %>
+                    <% } else { %>
+                        <div class="status">
+                            <i class="material-icons success">check_circle</i> <%= selectedPerk.name %>
+                            (<%= selectedPerk.price.currency %> <%= selectedPerk.price.amount %>)
+                        </div>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+        <div class="col s12 m6 l3">
             <div class="card paypal">
                 <div class="card-image">
                     <img src="/assets/images/paypal.svg">
@@ -60,7 +91,8 @@
                                         'content-type': 'application/json'
                                     },
                                     body: JSON.stringify({
-                                        steamId: '<%= user.steam.id %>'
+                                        steamId: '<%= user.steam.id %>',
+                                        perkId: document.querySelector('input[name=perk]:checked').value
                                     })
                                 }).then(function (res) {
                                     return res.json();
@@ -84,7 +116,7 @@
                 <% } %>
             </div>
         </div>
-        <div class="col s12 m6 l4">
+        <div class="col s12 m6 l3">
             <div class="card">
                 <div class="card-content">
                     <span class="card-title"><%= translate('PRIORITY_QUEUE_TITLE') %></span>
