@@ -42,17 +42,8 @@ export class DonationController {
         const order = await paypalClient(this.config).execute(request);
 
         const id = CustomId.fromString(order.result.purchase_units[0].custom_id, this.config.perks);
-        const intendedSteamId = id.steamId;
-        // @ts-ignore
-        const userSteamId = req.user.steam.id;
-        if (intendedSteamId !== userSteamId) {
-            res.render('payment_steam_mismatch', {
-                paymentSteamId: intendedSteamId,
-                userSteamId: userSteamId,
-            });
-            throw Error('steamIdMismatch');
-        }
-        if (order.result.status !== 'COMPLETED') {
+
+        if (!id || order.result.status !== 'COMPLETED') {
             res.render('index', {
                 step: 'DONATE',
                 user: req.user,
@@ -60,6 +51,16 @@ export class DonationController {
                 redeemStatus: 'UNSTARTED',
             });
             throw new Error('orderNotCompleted');
+        }
+
+        // @ts-ignore
+        const userSteamId = req.user.steam.id;
+        if (id && id.steamId !== userSteamId) {
+            res.render('payment_steam_mismatch', {
+                paymentSteamId: id.steamId,
+                userSteamId: userSteamId,
+            });
+            throw Error('steamIdMismatch');
         }
 
         return order;

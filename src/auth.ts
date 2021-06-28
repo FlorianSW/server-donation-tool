@@ -32,7 +32,15 @@ export class Authentication {
         this.router.get('/auth/error', (req: Request, res: Response) => {
             res.render('login_error');
         });
-        this.router.get('/auth/callback', passport.authenticate('discord', {failureRedirect: '/auth/error'}), (req, res) => res.redirect('/'));
+        this.router.get('/auth/callback', passport.authenticate('discord', {failureRedirect: '/auth/error'}), (req, res) => {
+            // @ts-ignore
+            const afterLoginTarget = req.session.target;
+            if (afterLoginTarget) {
+                res.redirect(afterLoginTarget);
+            } else {
+                res.redirect('/');
+            }
+        });
         this.router.get('/auth/logout', (req, res) => {
             req.logout();
             res.redirect('/');
@@ -43,6 +51,8 @@ export class Authentication {
 
 export function requireAuthentication(req: Request, res: Response, next: NextFunction) {
     if (!req.isAuthenticated()) {
+        // @ts-ignore
+        req.session.target = req.path;
         res.redirect('/auth/redirect');
         return;
     }
