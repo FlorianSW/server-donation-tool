@@ -2,6 +2,7 @@ import {AppConfig, Perk} from '../app-config';
 import {NextFunction, Request, Response, Router} from 'express';
 import {requireAuthentication} from '../auth';
 import {CFToolsClient, PriorityQueueItem, ServerApiId, SteamId64} from 'cftools-sdk';
+import {translate} from '../translations';
 
 export class StartController {
     public readonly router: Router = Router();
@@ -20,7 +21,19 @@ export class StartController {
             serversWithPrio: serversWithPrio,
             availablePackages: this.config.packages,
             step: 'PACKAGE_SELECTION',
+            perkToString: this.perkToString.bind(this)
         });
+    }
+
+    private perkToString(p: Perk): string {
+        if (p.type === 'PRIORITY_QUEUE') {
+            return translate('PERK_PRIORITY_QUEUE_DESCRIPTION', {
+                params: {
+                    serverName: this.config.serverNames[p.cftools.serverApiId],
+                    amountInDays: p.amountInDays.toString(10)
+                }
+            })
+        }
     }
 
     private async selectPackage(req: Request, res: Response) {
@@ -30,10 +43,7 @@ export class StartController {
             req.session.selectedPackage = selectedPackage;
             res.redirect('/donate');
         } else {
-            res.render('index', {
-                user: req.user,
-                step: 'PACKAGE_SELECTION',
-            });
+            res.redirect('/');
         }
     }
 

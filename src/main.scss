@@ -36,9 +36,25 @@ body {
       gap: 8px;
     }
 
-    &.perk {
-      .collection-item label {
-        color: white;
+    &.package {
+      .collection-item {
+        .perks {
+          display: none;
+          padding-left: 35px;
+
+          span {
+            display: list-item;
+            list-style: square inside;
+          }
+        }
+
+        input[type="radio"][name="package"]:checked ~ .perks {
+          display: block;
+        }
+
+        label {
+          color: white;
+        }
       }
     }
 
@@ -100,7 +116,7 @@ body {
     }
   }
 
-  [type="radio"]:not(:checked)+span:before, [type="radio"]:not(:checked)+span:after {
+  [type="radio"]:not(:checked) + span:before, [type="radio"]:not(:checked) + span:after {
     border-color: white;
   }
 }

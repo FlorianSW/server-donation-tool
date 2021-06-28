@@ -10,8 +10,8 @@ const messages: { [key: string]: string } = {
     STEAM_ACCOUNT_TITLE: 'Steam Account',
     STEAM_FROM_DISCORD: 'This Steam account is linked with your Discord user.',
 
-    PERK_SELECTION_TITLE: 'Select perk',
-    PERK_NO_AVAILABLE: 'There is no perk available. You may already have all available perks.',
+    PERK_SELECTION_TITLE: 'Select package',
+    PERK_NO_AVAILABLE: 'There is no package available. You may already have all available perks.',
 
     PAYPAL_DONATION_TITLE: 'PayPal Donation',
     PAYPAL_DESCRIPTION: 'We use PayPal to process your donation. Proceed to PayPal in order to complete the transaction.',
@@ -30,6 +30,9 @@ const messages: { [key: string]: string } = {
     ALREADY_PRIORITY_QUEUE_DESCRIPTION: 'Your Steam ID, which is connected to your Discord user, already has priority queue. Thanks for your donation!',
     ALREADY_PRIORITY_QUEUE_STEAM_ID: 'Your Steam ID',
     ALREADY_PRIORITY_QUEUE_UNTIL: 'Priority Queue until',
+
+    PERK_INCLUDED: 'Includes following perks:',
+    PERK_PRIORITY_QUEUE_DESCRIPTION: 'Priority Queue on {{serverName}} for {{amountInDays}} days',
 
     ERROR_STEAM_ID_MISMATCH_TITLE: 'Steam ID mismatch',
     ERROR_STEAM_ID_MISMATCH_DESCRIPTION: 'The Steam ID for this donation is different from the one connected with your profile.',

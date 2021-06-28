@@ -1,17 +1,23 @@
 <form action="/selectPackage" method="post">
     <div class="col s12 m6 l9">
-        <div class="card perk">
+        <div class="card package">
             <div class="card-content">
                 <span class="card-title"><%= translate('PERK_SELECTION_TITLE') %></span>
                 <ul class="collection">
-                    <% availablePackages.forEach(function (package, index) { %>
+                    <% availablePackages.forEach(function (pack, index) { %>
                         <li class="collection-item">
                             <label>
-                                <input class="with-gap" type="radio" name="package" value="<%= package.id %>"
+                                <input class="with-gap" type="radio" name="package" value="<%= pack.id %>"
                                        <% if (index === 0) { %>checked
                                         <% } %>
                                 >
-                                <span><%= package.name %> (<%= package.price.currency %> <%= package.price.amount %>)</span>
+                                <span><%= pack.name %> (<%= pack.price.currency %> <%= pack.price.amount %>)</span>
+                                <div class="perks">
+                                    <%= translate('PERK_INCLUDED') %>
+                                    <% pack.perks.forEach(function (p) { %>
+                                        <span><%= perkToString(p) %></span>
+                                    <% }); %>
+                                </div>
                             </label>
                         </li>
                     <% }); %>
