@@ -23,8 +23,8 @@ const messages: { [key: string]: string } = {
     PRIORITY_QUEUE_DESCRIPTION: 'You can now redeem your perk to profit from the benefits it includes.',
     PRIORITY_QUEUE_REDEEM: 'Redeem',
     PRIORITY_QUEUE_REDEEM_PENDING: 'Redeem pending',
-    PRIORITY_QUEUE_REDEEM_COMPLETE: 'Your priority queue slot was created successfully. It will expire at: {{until}}',
     PRIORITY_QUEUE_BACK: 'Back to Start',
+    PRIORITY_QUEUE_REDEEM_COMPLETE: 'Your priority queue slot for {{serverName}} was created successfully. It will expire at: {{until}}',
 
     ALREADY_PRIORITY_QUEUE_TITLE: 'Already Priority Queue',
     ALREADY_PRIORITY_QUEUE_DESCRIPTION: 'Your Steam ID, which is connected to your Discord user, already has priority queue. Thanks for your donation!',
@@ -44,6 +44,8 @@ const messages: { [key: string]: string } = {
     ERROR_MISSING_STEAM_DESCRIPTION: 'We offer perks to our donators, like Priority queue. In order for you to be able to redeem your donator perk, we need to know your Steam account you usually play with. Currently, the only supported method to provide this Steam account is by connecting it with your Discord profile (which you used to login here). You can even hide the connection from the public in your Discord profile settings, it just need to exist.<br><br>Please go to your Discord, connect your Steam account and try again.',
     ERROR_MISSING_STEAM_TRY_AGAIN: 'Done! Try again',
 };
+
+export type TranslateParams = [string, TranslateOptions];
 
 export interface TranslateOptions {
     params: { [key: string]: string }

@@ -11,6 +11,7 @@ import * as fs from 'fs';
 import * as yaml from 'js-yaml';
 import {AppConfig} from './app-config';
 import {StartController} from './start/controller';
+import {PriorityQueuePerk} from './donations/priority-queue-perk';
 
 let config: AppConfig;
 try {
@@ -24,10 +25,12 @@ const cftools = new CFToolsClientBuilder()
     .withCredentials(config.cftools.applicationId, config.cftools.secret)
     .build();
 
+const priorityQueuePerk = new PriorityQueuePerk(cftools, config.serverNames);
+
 const app = express();
 const port = config.app.port;
 const start = new StartController(cftools, config);
-const donations = new DonationController(cftools, config);
+const donations = new DonationController([priorityQueuePerk], config);
 const authentication = new Authentication(config);
 
 app.locals.translate = translate;
@@ -38,7 +41,6 @@ app.locals.community = {
 app.locals.nameFromServerApiId = (serverApiId: string) => {
     return config.serverNames[serverApiId] || serverApiId;
 };
-app.locals.perks = config.perks;
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 app.use('/assets', express.static(__dirname + '/assets'));

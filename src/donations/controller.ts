@@ -1,33 +1,33 @@
 import {requireAuthentication} from '../auth';
 import {paypalClient} from './sdk';
 import {Request, Response, Router} from 'express';
-import {CFToolsClient, DuplicateResourceCreation, ServerApiId, SteamId64} from 'cftools-sdk';
-import {AppConfig, Perk} from '../app-config';
+import {AppConfig, Package, Perk} from '../app-config';
+import {RedeemPerk} from './types';
 
 const paypal = require('@paypal/checkout-server-sdk');
 
 class CustomId {
-    constructor(public readonly steamId: string, public readonly perk: Perk) {
+    constructor(public readonly steamId: string, public readonly p: Package) {
+    }
+
+    static fromString(s: string, packages: Package[]): CustomId | undefined {
+        const ids = s.split('#');
+        const selectedPackage = packages.find((p) => p.id === parseInt(ids[1]));
+        if (!selectedPackage) {
+            return;
+        }
+        return new CustomId(ids[0], selectedPackage);
     }
 
     asString() {
-        return `${this.steamId}#${this.perk.id}`
-    }
-
-    static fromString(s: string, perks: Perk[]): CustomId | undefined {
-        const ids = s.split('#');
-        const selectedPerk = perks.find((p) => p.id === parseInt(ids[1]));
-        if (!selectedPerk) {
-            return;
-        }
-        return new CustomId(ids[0], selectedPerk);
+        return `${this.steamId}#${this.p.id}`
     }
 }
 
 export class DonationController {
     public readonly router: Router = Router();
 
-    constructor(private readonly cftools: CFToolsClient, private readonly config: AppConfig) {
+    constructor(private readonly redeems: RedeemPerk[], private readonly config: AppConfig) {
         this.router.post('/donations', requireAuthentication, this.createOrder.bind(this));
         this.router.get('/donations/:orderId', requireAuthentication, this.captureOrder.bind(this));
 
@@ -41,7 +41,7 @@ export class DonationController {
 
         const order = await paypalClient(this.config).execute(request);
 
-        const id = CustomId.fromString(order.result.purchase_units[0].custom_id, this.config.perks);
+        const id = CustomId.fromString(order.result.purchase_units[0].custom_id, this.config.packages);
 
         if (!id || order.result.status !== 'COMPLETED') {
             res.render('index', {
@@ -79,7 +79,7 @@ export class DonationController {
         try {
             const order = await this.fetchOrderDetails(req, res);
 
-            const id = CustomId.fromString(order.result.purchase_units[0].custom_id, this.config.perks);
+            const id = CustomId.fromString(order.result.purchase_units[0].custom_id, this.config.packages);
             if (!id) {
                 res.sendStatus(400);
                 return;
@@ -89,7 +89,6 @@ export class DonationController {
                 user: req.user,
                 step: 'REDEEM',
                 redeemStatus: 'PENDING',
-                selectedPerk: id.perk,
             });
         } catch (err) {
             console.error(err);
@@ -97,42 +96,37 @@ export class DonationController {
         }
     }
 
+    private perkProviders(perks: Perk[]): Map<string, RedeemPerk> {
+        return new Map(perks.map((p) => {
+            const r = this.redeems.find((r) => r.canRedeem(p));
+            if (r === undefined) {
+                throw new Error('No available provider can redeem perk: ' + p.type);
+            }
+            return [p.type, r];
+        }));
+    }
+
     private async redeem(req: Request, res: Response) {
         try {
             const order = await this.fetchOrderDetails(req, res);
-            const id = CustomId.fromString(order.result.purchase_units[0].custom_id, this.config.perks);
+            const id = CustomId.fromString(order.result.purchase_units[0].custom_id, this.config.packages);
             if (!id) {
                 res.sendStatus(400);
                 return;
             }
-            const startTime = new Date(order.result.create_time);
-            const expiration = new Date(startTime.valueOf());
-            expiration.setDate(startTime.getDate() + id.perk.amountInDays);
 
-            try {
-                await this.cftools.putPriorityQueue({
-                    serverApiId: ServerApiId.of(id.perk.cftools.serverApiId),
-                    id: SteamId64.of(id.steamId),
-                    expires: expiration,
-                    comment: `Created by CFTools Server Donation bot.
-PayPal Transaction ID: ${order.result.purchase_units[0]?.payments?.captures[0]?.id}
-PayPal Order ID: ${order.result.id}
-PayPal Custom ID: ${id.asString()}
-Selected product: ${id.perk.name}`
-                });
-            } catch (e) {
-                if (e instanceof DuplicateResourceCreation) {
-                    res.redirect('/');
-                    return;
-                }
-                throw e;
+            const provider = this.perkProviders(id.p.perks);
+            const result = [];
+            for (let perk of id.p.perks) {
+                const r = provider.get(perk.type);
+                result.push(await r.redeem(id.p, perk, {steamId: id.steamId}, order.result));
             }
 
             res.render('index', {
                 user: req.user,
                 step: 'REDEEM',
                 redeemStatus: 'COMPLETE',
-                priorityUntil: expiration,
+                results: result,
             });
         } catch (err) {
             console.error(err);
@@ -142,17 +136,17 @@ Selected product: ${id.perk.name}`
 
     private async createOrder(req: Request, res: Response) {
         // @ts-ignore
-        const selectedPerk = req.session.selectedPerk;
+        const selectedPackage = req.session.selectedPackage;
         const request = new paypal.orders.OrdersCreateRequest();
         request.prefer('return=representation');
         request.requestBody({
             intent: 'CAPTURE',
             purchase_units: [{
-                custom_id: new CustomId(req.body.steamId, selectedPerk).asString(),
-                description: selectedPerk.name,
+                custom_id: new CustomId(req.body.steamId, selectedPackage).asString(),
+                description: selectedPackage.name,
                 amount: {
-                    currency_code: selectedPerk.price.currency,
-                    value: selectedPerk.price.amount
+                    currency_code: selectedPackage.price.currency,
+                    value: selectedPackage.price.amount
                 }
             }]
         });

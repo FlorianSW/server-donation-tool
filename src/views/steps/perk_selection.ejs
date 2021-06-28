@@ -1,28 +1,28 @@
-<form action="/selectPerk" method="post">
+<form action="/selectPackage" method="post">
     <div class="col s12 m6 l9">
         <div class="card perk">
             <div class="card-content">
                 <span class="card-title"><%= translate('PERK_SELECTION_TITLE') %></span>
                 <ul class="collection">
-                    <% availablePerks.forEach(function (perk, index) { %>
+                    <% availablePackages.forEach(function (package, index) { %>
                         <li class="collection-item">
                             <label>
-                                <input class="with-gap" type="radio" name="perk" value="<%= perk.id %>"
+                                <input class="with-gap" type="radio" name="package" value="<%= package.id %>"
                                        <% if (index === 0) { %>checked
                                         <% } %>
                                 >
-                                <span><%= perk.name %> (<%= perk.price.currency %> <%= perk.price.amount %>)</span>
+                                <span><%= package.name %> (<%= package.price.currency %> <%= package.price.amount %>)</span>
                             </label>
                         </li>
                     <% }); %>
                 </ul>
-                <% if (availablePerks.length === 0) { %>
+                <% if (availablePackages.length === 0) { %>
                     <%= translate('PERK_NO_AVAILABLE') %>
                 <% } %>
             </div>
             <div class="card-action">
                 <button class="btn waves-effect waves-light" type="submit" name="action"
-                <% if (availablePerks.length === 0) { %>
+                <% if (availablePackages.length === 0) { %>
                         disabled
                         <% } %>
                 >Select

@@ -33,7 +33,7 @@ cftools:
 # easily recognize.
 serverNames:
   aServerApiId: some name
-# Perks are the available prices and benefits a donator gets when donating that amount. Each perk has the following information
+# Packages are the available prices and benefits a donator gets when donating that amount. Each perk has the following information
 # - name: A human readable name, which is displayed in the perk selection screen as well as on the PayPal receipt (choose
 #   a name which is not too long, but still descriptive); do not put the price in it
 # - id: A unique id over the lifetime of the website. It needs to be unique even _after_ you want to remove the perk.
@@ -42,28 +42,32 @@ serverNames:
 # - price: The price of the perk, as an object of currency and amount. The currency needs to be a supported string from
 #   PayPal (see https://developer.paypal.com/docs/reports/reference/paypal-supported-currencies/). The amount is a
 #   string (make sure to quote the value) with a number with two decimals.
-# - type: The type of the perk. The only currently supported value is PRIORITY_QUEUE. The value is currently unused.
-# - amountInDays: The amount of priority queue days the donator should get.
-# - cftools: The cftools serverApiId (in the object with the key serverApiId) of the server the donator will get the perk
-#   for. Is the server api ID of the server in the CFTools Dashboard (Manage -> Settings -> API Key section)
+# - perks: Each perk describes a specific benefit a donator earns. A perk consists of the following configuration:
+#   * type: The type of the perk. The only currently supported value is PRIORITY_QUEUE. The value is currently unused.
+#   * amountInDays: The amount of priority queue days the donator should get.
+#   * cftools: The cftools serverApiId (in the object with the key serverApiId) of the server the donator will get the perk
+#     for. Is the server api ID of the server in the CFTools Dashboard (Manage -> Settings -> API Key section).
+#     This setting is only used for the following types: PRIORITY_QUEUE
 #
 # You should have at least one perk available, and as many as you want to have.
-perks:
-  - name: 30 Days Priority queue
+packages:
+  - name: Allpass EU
     id: 1
     price:
       currency: USD
       amount: '1.00'
-    type: PRIORITY_QUEUE
-    amountInDays: 30
-    cftools:
-      serverApiId:
-  - name: 7 Days Priority queue
+    perks:
+      - type: PRIORITY_QUEUE
+        amountInDays: 30
+        cftools:
+          serverApiId:
+  - name: Fastpass HH1
     id: 2
     price:
       currency: USD
       amount: '1.00'
-    type: PRIORITY_QUEUE
-    amountInDays: 30
-    cftools:
-      serverApiId:
+    perks:
+      - type: PRIORITY_QUEUE
+        amountInDays: 30
+        cftools:
+          serverApiId:

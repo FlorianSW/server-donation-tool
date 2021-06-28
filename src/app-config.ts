@@ -1,16 +1,24 @@
 export interface Perk {
+    type: string,
+    amountInDays: number,
+    cftools?: {
+        serverApiId: string,
+    }
+}
+
+export interface Package {
     name: string,
     id: number,
     price: {
         currency: string,
         amount: string,
     },
-    type: string,
-    amountInDays: number,
-    cftools: {
-        serverApiId: string,
-    }
+    perks: Perk[]
 }
+
+export type ServerNames = {
+    [serverApiId: string]: string
+};
 
 export interface AppConfig {
     app: {
@@ -34,8 +42,6 @@ export interface AppConfig {
         applicationId: string,
         secret: string,
     },
-    serverNames: {
-        [serverApiId: string]: string
-    }
-    perks: Perk[]
+    serverNames: ServerNames,
+    packages: Package[],
 }

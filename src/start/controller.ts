@@ -1,4 +1,4 @@
-import {AppConfig} from '../app-config';
+import {AppConfig, Perk} from '../app-config';
 import {NextFunction, Request, Response, Router} from 'express';
 import {requireAuthentication} from '../auth';
 import {CFToolsClient, PriorityQueueItem, ServerApiId, SteamId64} from 'cftools-sdk';
@@ -8,35 +8,37 @@ export class StartController {
 
     constructor(private readonly cftools: CFToolsClient, private readonly config: AppConfig) {
         this.router.get('/missingSteamConnection', requireAuthentication, this.missingSteamConnection.bind(this));
-        this.router.post('/selectPerk', requireAuthentication, this.selectPerk.bind(this));
+        this.router.post('/selectPackage', requireAuthentication, this.selectPackage.bind(this));
         this.router.get('/', requireAuthentication, this.populatePriorityQueue.bind(this), this.startPage.bind(this));
     }
 
     private async startPage(req: Request, res: Response) {
         // @ts-ignore
-        const availablePerks = this.config.perks.filter((p) => !req.user.priorityQueue[p.cftools.serverApiId].active);
-        // @ts-ignore
         const serversWithPrio = Object.entries(req.user.priorityQueue).filter((s: [string, object]) => s[1].active);
         res.render('index', {
             user: req.user,
             serversWithPrio: serversWithPrio,
-            availablePerks: availablePerks,
-            step: 'PERK_SELECTION',
+            availablePackages: this.config.packages,
+            step: 'PACKAGE_SELECTION',
         });
     }
 
-    private async selectPerk(req: Request, res: Response) {
-        const selectedPerk = this.config.perks.find((p) => p.id === parseInt(req.body.perk));
-        if (selectedPerk) {
+    private async selectPackage(req: Request, res: Response) {
+        const selectedPackage = this.config.packages.find((p) => p.id === parseInt(req.body.package));
+        if (selectedPackage) {
             // @ts-ignore
-            req.session.selectedPerk = selectedPerk;
+            req.session.selectedPackage = selectedPackage;
             res.redirect('/donate');
         } else {
             res.render('index', {
                 user: req.user,
-                step: 'PERK_SELECTION',
+                step: 'PACKAGE_SELECTION',
             });
         }
+    }
+
+    private perks(): Perk[] {
+        return this.config.packages.map((p) => p.perks).reduce((l, p) => l.concat(p));
     }
 
     private async missingSteamConnection(req: Request, res: Response) {
@@ -46,7 +48,7 @@ export class StartController {
     private async populatePriorityQueue(req: Request, res: Response, next: NextFunction): Promise<void> {
         // @ts-ignore
         const steamId = SteamId64.of(req.user.steam.id);
-        const servers = new Set(this.config.perks.map((p) => p.cftools.serverApiId));
+        const servers = new Set(this.perks().map((p) => p.cftools.serverApiId));
 
         let priority: { [key: string]: any | undefined } = {};
         for (let server of servers) {

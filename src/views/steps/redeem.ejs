@@ -1,17 +1,18 @@
 <div class="col s12 m9 l9">
-    <div class="card">
+    <div class="card redeem">
         <div class="card-content">
             <span class="card-title"><%= translate('PRIORITY_QUEUE_TITLE') %></span>
-            <p><%= translate('PRIORITY_QUEUE_DESCRIPTION') %></p>
-            <div class="status">
-                <% if (redeemStatus === 'COMPLETE') { %>
-                    <i class="material-icons success">check_circle</i> <%= translate('PRIORITY_QUEUE_REDEEM_COMPLETE', {
-                        params: {
-                            until: priorityUntil.toLocaleString()
-                        }
-                    }) %>
-                <% } %>
-            </div>
+            <% if (redeemStatus === 'COMPLETE') { %>
+                <ul class="collection">
+                    <% results.forEach(function (r) { %>
+                        <li class="collection-item status">
+                            <i class="material-icons success">check_circle</i> <%= translate(...r) %>
+                        </li>
+                    <% }); %>
+                </ul>
+            <% } else { %>
+                <p><%= translate('PRIORITY_QUEUE_DESCRIPTION') %></p>
+            <% } %>
         </div>
         <div class="card-action">
             <% if (redeemStatus !== 'COMPLETE') { %>
