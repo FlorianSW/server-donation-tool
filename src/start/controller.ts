@@ -3,6 +3,7 @@ import {NextFunction, Request, Response, Router} from 'express';
 import {requireAuthentication} from '../auth';
 import {CFToolsClient, PriorityQueueItem, ServerApiId, SteamId64} from 'cftools-sdk';
 import {translate} from '../translations';
+import {PriorityQueue} from '../domain';
 
 export class StartController {
     public readonly router: Router = Router();
@@ -14,8 +15,7 @@ export class StartController {
     }
 
     private async startPage(req: Request, res: Response) {
-        // @ts-ignore
-        const serversWithPrio = Object.entries(req.user.priorityQueue).filter((s: [string, object]) => s[1].active);
+        const serversWithPrio = Object.entries(req.user.priorityQueue).filter((s: [string, PriorityQueue]) => s[1].active);
         res.render('index', {
             user: req.user,
             serversWithPrio: serversWithPrio,
@@ -39,7 +39,6 @@ export class StartController {
     private async selectPackage(req: Request, res: Response) {
         const selectedPackage = this.config.packages.find((p) => p.id === parseInt(req.body.package));
         if (selectedPackage) {
-            // @ts-ignore
             req.session.selectedPackage = selectedPackage;
             res.redirect('/donate');
         } else {
@@ -56,7 +55,6 @@ export class StartController {
     }
 
     private async populatePriorityQueue(req: Request, res: Response, next: NextFunction): Promise<void> {
-        // @ts-ignore
         const steamId = SteamId64.of(req.user.steam.id);
         const servers = new Set(this.perks().map((p) => p.cftools.serverApiId));
 
@@ -77,7 +75,6 @@ export class StartController {
                 expires: entry.expiration,
             }
         }
-        // @ts-ignore
         req.user.priorityQueue = priority;
         next();
     }

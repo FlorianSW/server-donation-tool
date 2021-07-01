@@ -1,7 +1,8 @@
-import {Express, NextFunction, Request, Response, Router} from 'express';
+import {NextFunction, Request, Response, Router} from 'express';
 import passport from 'passport';
 import {Strategy as DiscordStrategy} from 'passport-discord';
 import {AppConfig} from './app-config';
+import {User} from './domain';
 
 export class Authentication {
     public readonly router: Router = Router();
@@ -10,7 +11,7 @@ export class Authentication {
         passport.serializeUser((user, done) => {
             done(null, user);
         });
-        passport.deserializeUser((obj, done) => {
+        passport.deserializeUser<User>((obj, done) => {
             done(null, obj);
         });
 
@@ -23,7 +24,10 @@ export class Authentication {
                 const connection = profile.connections.find((c) => c.type === 'steam');
                 cb(null, {
                     username: profile.username,
-                    steam: connection,
+                    steam: {
+                        id: connection.id
+                    },
+                    priorityQueue: {},
                 });
             })
         );
@@ -33,8 +37,7 @@ export class Authentication {
             res.render('login_error');
         });
         this.router.get('/auth/callback', passport.authenticate('discord', {failureRedirect: '/auth/error'}), (req, res) => {
-            // @ts-ignore
-            const afterLoginTarget = req.session.target;
+            const afterLoginTarget = req.session.afterLoginTarget;
             if (afterLoginTarget) {
                 res.redirect(afterLoginTarget);
             } else {
@@ -51,12 +54,10 @@ export class Authentication {
 
 export function requireAuthentication(req: Request, res: Response, next: NextFunction) {
     if (!req.isAuthenticated()) {
-        // @ts-ignore
-        req.session.target = req.path;
+        req.session.afterLoginTarget = req.path;
         res.redirect('/auth/redirect');
         return;
     }
-    // @ts-ignore
     if (!req.user.steam && req.path !== '/missingSteamConnection') {
         res.redirect('/missingSteamConnection');
         return;

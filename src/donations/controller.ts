@@ -53,7 +53,6 @@ export class DonationController {
             throw new Error('orderNotCompleted');
         }
 
-        // @ts-ignore
         const userSteamId = req.user.steam.id;
         if (id && id.steamId !== userSteamId) {
             res.render('payment_steam_mismatch', {
@@ -135,7 +134,6 @@ export class DonationController {
     }
 
     private async createOrder(req: Request, res: Response) {
-        // @ts-ignore
         const selectedPackage = req.session.selectedPackage;
         const request = new paypal.orders.OrdersCreateRequest();
         request.prefer('return=representation');
