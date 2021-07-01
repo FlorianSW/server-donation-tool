@@ -1,8 +1,7 @@
 import {requireAuthentication} from '../auth';
 import {paypalClient} from './sdk';
 import {Request, Response, Router} from 'express';
-import {AppConfig, Package, Perk} from '../app-config';
-import {RedeemPerk} from './types';
+import {AppConfig, Package} from '../domain';
 
 const paypal = require('@paypal/checkout-server-sdk');
 
@@ -27,7 +26,7 @@ class CustomId {
 export class DonationController {
     public readonly router: Router = Router();
 
-    constructor(private readonly redeems: RedeemPerk[], private readonly config: AppConfig) {
+    constructor(private readonly config: AppConfig) {
         this.router.post('/donations', requireAuthentication, this.createOrder.bind(this));
         this.router.get('/donations/:orderId', requireAuthentication, this.captureOrder.bind(this));
 
@@ -95,16 +94,6 @@ export class DonationController {
         }
     }
 
-    private perkProviders(perks: Perk[]): Map<string, RedeemPerk> {
-        return new Map(perks.map((p) => {
-            const r = this.redeems.find((r) => r.canRedeem(p));
-            if (r === undefined) {
-                throw new Error('No available provider can redeem perk: ' + p.type);
-            }
-            return [p.type, r];
-        }));
-    }
-
     private async redeem(req: Request, res: Response) {
         try {
             const order = await this.fetchOrderDetails(req, res);
@@ -114,11 +103,9 @@ export class DonationController {
                 return;
             }
 
-            const provider = this.perkProviders(id.p.perks);
             const result = [];
             for (let perk of id.p.perks) {
-                const r = provider.get(perk.type);
-                result.push(await r.redeem(id.p, perk, {steamId: id.steamId}, order.result));
+                result.push(await perk.redeem(req.user, order.result));
             }
 
             res.render('index', {
@@ -134,7 +121,7 @@ export class DonationController {
     }
 
     private async createOrder(req: Request, res: Response) {
-        const selectedPackage = req.session.selectedPackage;
+        const selectedPackage = this.config.packages.find((p) => req.session.selectedPackageId === p.id);
         const request = new paypal.orders.OrdersCreateRequest();
         request.prefer('return=representation');
         request.requestBody({

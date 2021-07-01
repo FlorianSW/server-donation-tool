@@ -1,20 +1,20 @@
 import {PriorityQueuePerk} from './priority-queue-perk';
 import {CFToolsClient, SteamId64} from 'cftools-sdk';
-import {Perk} from '../app-config';
 import {InMemoryCFToolsClient} from './testhelper';
+import {Package, User} from '../domain';
 
 const aSteamId = '76561198012102485';
 const aServerApiId = 'c10a80c6-ad46-477e-971d-614370ec173e';
-const aPriorityQueuePerk: Perk = {
-    type: 'PRIORITY_QUEUE',
-    cftools: {
-        serverApiId: aServerApiId,
+const aUser: User = {
+    steam: {
+        id: aSteamId
     },
-    amountInDays: 30,
+    username: 'A_USERNAME',
+    priorityQueue: {},
 };
-const aPackage = {
+const aPackage: Package = {
     id: 1,
-    perks: [aPriorityQueuePerk],
+    perks: [],
     name: 'A_PACKAGE',
     price: {
         currency: 'USD',
@@ -39,32 +39,26 @@ describe('PriorityQueuePerk', () => {
 
     beforeEach(() => {
         client = new InMemoryCFToolsClient();
-        perk = new PriorityQueuePerk(client as CFToolsClient, {aServerApiId: 'A_NAME'});
-    });
-
-    describe('canRedeem', () => {
-        it('redeems for PRIORITY_QUEUE', () => {
-            expect(perk.canRedeem(aPriorityQueuePerk)).toBe(true);
-        });
-
-        it('does not redeem for another type', () => {
-            expect(perk.canRedeem({
-                ...aPriorityQueuePerk,
-                type: 'ANOTHER_TYPE'
-            })).toBe(false);
-        });
+        perk = Object.assign(
+            new PriorityQueuePerk(client as CFToolsClient, {aServerApiId: 'A_NAME'}),
+            {
+                inPackage: aPackage,
+                cftools: {
+                    serverApiId: aServerApiId
+                },
+                amountInDays: 30,
+            }
+        );
     });
 
     describe('redeem', () => {
         it('creates priority queue entry', async () => {
-            await perk.redeem(aPackage, aPriorityQueuePerk, {
-                steamId: aSteamId
-            }, anOrder);
+            await perk.redeem(aUser, anOrder);
 
             const result = await client.getPriorityQueue(SteamId64.of(aSteamId));
             const expiration = result.expiration as Date;
             const expected = new Date();
-            expected.setDate(expected.getDate() + aPriorityQueuePerk.amountInDays);
+            expected.setDate(expected.getDate() + perk.amountInDays);
             expect(expiration.toLocaleString().slice(0, -2)).toBe(expected.toLocaleString().slice(0, -2));
             expect(result.comment).toContain('A_PACKAGE');
             expect(result.comment).toContain('SOME_ORDER_ID');
@@ -78,9 +72,7 @@ describe('PriorityQueuePerk', () => {
                 expires: 'Permanent'
             });
 
-            await perk.redeem(aPackage, aPriorityQueuePerk, {
-                steamId: aSteamId
-            }, anOrder);
+            await perk.redeem(aUser, anOrder);
 
             const result = await client.getPriorityQueue(SteamId64.of(aSteamId));
             expect(result.expiration).toBe('Permanent');
@@ -95,9 +87,7 @@ describe('PriorityQueuePerk', () => {
                 expires: veryLateExpiration,
             });
 
-            await perk.redeem(aPackage, aPriorityQueuePerk, {
-                steamId: aSteamId
-            }, anOrder);
+            await perk.redeem(aUser, anOrder);
 
             const result = await client.getPriorityQueue(SteamId64.of(aSteamId));
             expect(result.expiration).toEqual(veryLateExpiration);
@@ -112,14 +102,12 @@ describe('PriorityQueuePerk', () => {
                 expires: earlyExpiration,
             });
 
-            await perk.redeem(aPackage, aPriorityQueuePerk, {
-                steamId: aSteamId
-            }, anOrder);
+            await perk.redeem(aUser, anOrder);
 
             const result = await client.getPriorityQueue(SteamId64.of(aSteamId));
             const expiration = result.expiration as Date;
             const expected = new Date();
-            expected.setDate(expected.getDate() + aPriorityQueuePerk.amountInDays);
+            expected.setDate(expected.getDate() + perk.amountInDays);
             expect(expiration.toLocaleString().slice(0, -2)).toBe(expected.toLocaleString().slice(0, -2));
             expect(result.comment).toContain('A_PACKAGE');
         });

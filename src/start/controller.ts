@@ -1,9 +1,9 @@
-import {AppConfig, Perk} from '../app-config';
 import {NextFunction, Request, Response, Router} from 'express';
 import {requireAuthentication} from '../auth';
 import {CFToolsClient, PriorityQueueItem, ServerApiId, SteamId64} from 'cftools-sdk';
 import {translate} from '../translations';
-import {PriorityQueue} from '../domain';
+import {AppConfig, Perk, PriorityQueue} from '../domain';
+import {PriorityQueuePerk} from '../donations/priority-queue-perk';
 
 export class StartController {
     public readonly router: Router = Router();
@@ -26,7 +26,7 @@ export class StartController {
     }
 
     private perkToString(p: Perk): string {
-        if (p.type === 'PRIORITY_QUEUE') {
+        if (p instanceof PriorityQueuePerk) {
             return translate('PERK_PRIORITY_QUEUE_DESCRIPTION', {
                 params: {
                     serverName: this.config.serverNames[p.cftools.serverApiId],
@@ -39,7 +39,7 @@ export class StartController {
     private async selectPackage(req: Request, res: Response) {
         const selectedPackage = this.config.packages.find((p) => p.id === parseInt(req.body.package));
         if (selectedPackage) {
-            req.session.selectedPackage = selectedPackage;
+            req.session.selectedPackageId = selectedPackage.id;
             res.redirect('/donate');
         } else {
             res.redirect('/');
@@ -56,7 +56,9 @@ export class StartController {
 
     private async populatePriorityQueue(req: Request, res: Response, next: NextFunction): Promise<void> {
         const steamId = SteamId64.of(req.user.steam.id);
-        const servers = new Set(this.perks().map((p) => p.cftools.serverApiId));
+        const servers = new Set(this.perks()
+            .filter((p) => p instanceof PriorityQueuePerk)
+            .map((p: PriorityQueuePerk) => p.cftools.serverApiId));
 
         let priority: { [key: string]: any | undefined } = {};
         for (let server of servers) {

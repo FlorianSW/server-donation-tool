@@ -1,30 +1,36 @@
 import {CFToolsClient, DuplicateResourceCreation, ServerApiId, SteamId64} from 'cftools-sdk';
-import {Package, Perk, ServerNames} from '../app-config';
-import {Identifier, Order, RedeemPerk} from './types';
 import {TranslateParams} from '../translations';
+import {Order, Package, Perk, ServerNames, User} from '../domain';
 
-export class PriorityQueuePerk implements RedeemPerk {
-    constructor(private readonly cftools: CFToolsClient, private readonly serverNames: ServerNames) {
+export class PriorityQueuePerk implements Perk {
+    inPackage: Package;
+    type: string;
+
+    readonly cftools: {
+        serverApiId: string,
+    };
+    readonly amountInDays: number;
+
+    constructor(
+        private readonly client: CFToolsClient,
+        private readonly serverNames: ServerNames,
+    ) {
     }
 
-    canRedeem(perk: Perk): boolean {
-        return perk.type === 'PRIORITY_QUEUE';
-    }
-
-    async redeem(p: Package, perk: Perk, id: Identifier, order: Order): Promise<TranslateParams> {
-        const steamId = SteamId64.of(id.steamId)
+    async redeem(forUser: User, order: Order): Promise<TranslateParams> {
+        const steamId = SteamId64.of(forUser.steam.id)
 
         const successParams: TranslateParams = ['PRIORITY_QUEUE_REDEEM_COMPLETE', {
             params: {
-                until: this.expiration(order, perk).toLocaleString(),
-                serverName: this.serverNames[perk.cftools.serverApiId],
+                until: this.expiration(order).toLocaleString(),
+                serverName: this.serverNames[this.cftools.serverApiId],
             }
         }];
         try {
-            await this.createPriority(steamId, perk, p, order);
+            await this.createPriority(steamId, order);
         } catch (e) {
             if (e instanceof DuplicateResourceCreation) {
-                await this.replacePriorityIfOlder(steamId, perk, p, order);
+                await this.replacePriorityIfOlder(steamId, order);
                 return successParams;
             }
             throw e;
@@ -32,15 +38,15 @@ export class PriorityQueuePerk implements RedeemPerk {
         return successParams;
     }
 
-    private async replacePriorityIfOlder(steamId: SteamId64, perk: Perk, p: Package, order: Order): Promise<void> {
-        const newExpiration = this.expiration(order, perk);
+    private async replacePriorityIfOlder(steamId: SteamId64, order: Order): Promise<void> {
+        const newExpiration = this.expiration(order);
         const request = {
-            serverApiId: ServerApiId.of(perk.cftools.serverApiId),
+            serverApiId: ServerApiId.of(this.cftools.serverApiId),
             playerId: steamId,
         };
-        const item = await this.cftools.getPriorityQueue(request);
+        const item = await this.client.getPriorityQueue(request);
         if (!item) {
-            return await this.createPriority(steamId, perk, p, order);
+            return await this.createPriority(steamId, order);
         }
         if (item.expiration === 'Permanent') {
             return;
@@ -48,28 +54,28 @@ export class PriorityQueuePerk implements RedeemPerk {
         if (item.expiration.getTime() > newExpiration.getTime()) {
             return;
         }
-        await this.cftools.deletePriorityQueue(request);
+        await this.client.deletePriorityQueue(request);
 
-        return await this.createPriority(steamId, perk, p, order);
+        return await this.createPriority(steamId, order);
     }
 
-    private expiration(order: Order, perk: Perk): Date {
+    private expiration(order: Order): Date {
         const orderTime = new Date(order.create_time);
         const expiration = new Date(orderTime.valueOf());
-        expiration.setDate(orderTime.getDate() + perk.amountInDays);
+        expiration.setDate(orderTime.getDate() + this.amountInDays);
 
         return expiration;
     }
 
-    private async createPriority(steamId: SteamId64, perk: Perk, p: Package, order: Order): Promise<void> {
-        await this.cftools.putPriorityQueue({
-            serverApiId: ServerApiId.of(perk.cftools.serverApiId),
+    private async createPriority(steamId: SteamId64, order: Order): Promise<void> {
+        await this.client.putPriorityQueue({
+            serverApiId: ServerApiId.of(this.cftools.serverApiId),
             id: steamId,
-            expires: this.expiration(order, perk),
+            expires: this.expiration(order),
             comment: `Created by CFTools Server Donation bot.
 PayPal Transaction ID: ${order.purchase_units[0]?.payments?.captures[0]?.id}
 PayPal Order ID: ${order.id}
-Selected product: ${p.name}`
+Selected product: ${this.inPackage.name}`
         });
     }
 }

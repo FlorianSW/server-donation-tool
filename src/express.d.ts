@@ -1,5 +1,4 @@
-import {User as DomainUser} from './domain';
-import {Package} from './app-config';
+import {Package, User as DomainUser} from './domain';
 
 declare global {
     namespace Express {
@@ -14,7 +13,7 @@ declare global {
 
 declare module 'express-session' {
     interface SessionData {
-        selectedPackage: Package;
+        selectedPackageId: number;
         afterLoginTarget: string;
     }
 }

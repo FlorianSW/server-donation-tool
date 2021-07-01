@@ -1,4 +1,4 @@
-import {AppConfig} from '../app-config';
+import {AppConfig} from '../domain';
 
 const paypal = require('@paypal/checkout-server-sdk');
 

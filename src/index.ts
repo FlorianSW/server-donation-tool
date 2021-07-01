@@ -6,31 +6,25 @@ import bodyParser from 'body-parser';
 import {Authentication} from './auth';
 import {DonationController} from './donations/controller';
 import passport from 'passport';
-import {CFToolsClientBuilder} from 'cftools-sdk';
 import * as fs from 'fs';
 import * as yaml from 'js-yaml';
-import {AppConfig} from './app-config';
 import {StartController} from './start/controller';
-import {PriorityQueuePerk} from './donations/priority-queue-perk';
+import {AppConfig} from './domain';
+import {parseConfig} from './app-config';
 
 let config: AppConfig;
 try {
-    config = yaml.load(fs.readFileSync('config.yml', 'utf8')) as AppConfig;
+    config = parseConfig(yaml.load(fs.readFileSync('config.yml', 'utf8')));
 } catch (e) {
     console.log('Could not load configuration', e);
     process.exit(1);
 }
 
-const cftools = new CFToolsClientBuilder()
-    .withCredentials(config.cftools.applicationId, config.cftools.secret)
-    .build();
-
-const priorityQueuePerk = new PriorityQueuePerk(cftools, config.serverNames);
-
+const cftools = config.cfToolscClient();
 const app = express();
 const port = config.app.port;
 const start = new StartController(cftools, config);
-const donations = new DonationController([priorityQueuePerk], config);
+const donations = new DonationController(config);
 const authentication = new Authentication(config);
 
 app.locals.translate = translate;
