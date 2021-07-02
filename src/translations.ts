@@ -25,9 +25,13 @@ const messages: { [key: string]: string } = {
     PRIORITY_QUEUE_REDEEM_PENDING: 'Redeem pending',
     PRIORITY_QUEUE_BACK: 'Back to Start',
     PRIORITY_QUEUE_REDEEM_COMPLETE: 'Your priority queue slot for {{serverName}} was created successfully. It will expire at: {{until}}',
+    PRIORITY_QUEUE_REDEEM_ERROR: 'Could not setup priority queue for {{serverName}}. Error: {{reason}}',
 
     DISCORD_ROLE_REDEEM_COMPLETE: 'You got assigned the following discord roles: {{roles}}',
+    DISCORD_ROLE_REDEEM_ERROR: 'Could not assign discord roles. Error: {{reason}}',
     ASSIGNED_DISCORD_ROLE: 'Discord roles you have already',
+
+    REDEEM_RETRY: 'Retry',
 
     ALREADY_PRIORITY_QUEUE_TITLE: 'Already Priority Queue',
     ALREADY_PRIORITY_QUEUE_DESCRIPTION: 'Your Steam ID, which is connected to your Discord user, already has priority queue. Thanks for your donation!',

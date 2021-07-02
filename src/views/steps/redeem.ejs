@@ -4,6 +4,11 @@
             <span class="card-title"><%= translate('PRIORITY_QUEUE_TITLE') %></span>
             <% if (redeemStatus === 'COMPLETE') { %>
                 <ul class="collection">
+                    <% errors.forEach(function (r) { %>
+                        <li class="collection-item status">
+                            <i class="material-icons error">error</i> <%= translate(...r) %>
+                        </li>
+                    <% }); %>
                     <% results.forEach(function (r) { %>
                         <li class="collection-item status">
                             <i class="material-icons success">check_circle</i> <%= translate(...r) %>
@@ -17,6 +22,8 @@
         <div class="card-action">
             <% if (redeemStatus !== 'COMPLETE') { %>
                 <a href="./redeem"><%= translate('PRIORITY_QUEUE_REDEEM') %></a>
+            <% } else if (errors.length !== 0) { %>
+                <a href="#" onclick="window.location.reload();"><%= translate('REDEEM_RETRY') %></a>
             <% } else { %>
                 <a href="/"><%= translate('PRIORITY_QUEUE_BACK') %></a>
             <% } %>

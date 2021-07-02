@@ -1,7 +1,8 @@
 import {requireAuthentication} from '../auth';
 import {paypalClient} from './sdk';
 import {Request, Response, Router} from 'express';
-import {AppConfig, Package} from '../domain';
+import {AppConfig, Package, RedeemError} from '../domain';
+import {TranslateParams} from '../translations';
 
 const paypal = require('@paypal/checkout-server-sdk');
 
@@ -103,9 +104,18 @@ export class DonationController {
                 return;
             }
 
-            const result = [];
+            const result: TranslateParams[] = [];
+            const errors: TranslateParams[] = [];
             for (let perk of id.p.perks) {
-                result.push(await perk.redeem(req.user, order.result));
+                try {
+                    result.push(await perk.redeem(req.user, order.result));
+                } catch (e) {
+                    if (e instanceof RedeemError) {
+                        errors.push(e.params);
+                    } else {
+                        throw e;
+                    }
+                }
             }
 
             res.render('index', {
@@ -113,6 +123,7 @@ export class DonationController {
                 step: 'REDEEM',
                 redeemStatus: 'COMPLETE',
                 results: result,
+                errors: errors,
             });
         } catch (err) {
             console.error(err);

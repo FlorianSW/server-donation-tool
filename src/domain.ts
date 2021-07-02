@@ -9,6 +9,13 @@ export interface Perk {
     redeem(forUser: User, order: Order): Promise<TranslateParams>
 }
 
+export class RedeemError extends Error {
+    constructor(public readonly params: TranslateParams) {
+        super('RedeemError');
+        Object.setPrototypeOf(this, RedeemError.prototype);
+    }
+}
+
 export class Package {
     name: string;
     id: number;

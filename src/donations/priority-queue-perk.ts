@@ -1,6 +1,6 @@
 import {CFToolsClient, DuplicateResourceCreation, ServerApiId, SteamId64} from 'cftools-sdk';
 import {TranslateParams} from '../translations';
-import {Order, Package, Perk, ServerNames, User} from '../domain';
+import {Order, Package, Perk, RedeemError, ServerNames, User} from '../domain';
 
 export class PriorityQueuePerk implements Perk {
     inPackage: Package;
@@ -33,7 +33,12 @@ export class PriorityQueuePerk implements Perk {
                 await this.replacePriorityIfOlder(steamId, order);
                 return successParams;
             }
-            throw e;
+            throw new RedeemError(['PRIORITY_QUEUE_REDEEM_ERROR', {
+                params: {
+                    serverName: this.serverNames[this.cftools.serverApiId],
+                    reason: e.message,
+                }
+            }]);
         }
         return successParams;
     }
