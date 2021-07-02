@@ -1,7 +1,7 @@
 <div class="col s12 m9 l9">
     <div class="card redeem">
         <div class="card-content">
-            <span class="card-title"><%= translate('PRIORITY_QUEUE_TITLE') %></span>
+            <span class="card-title"><%= translate('REDEEM_TITLE') %></span>
             <% if (redeemStatus === 'COMPLETE') { %>
                 <ul class="collection">
                     <% errors.forEach(function (r) { %>
@@ -16,16 +16,16 @@
                     <% }); %>
                 </ul>
             <% } else { %>
-                <p><%= translate('PRIORITY_QUEUE_DESCRIPTION') %></p>
+                <p><%= translate('REDEEM_DESCRIPTION') %></p>
             <% } %>
         </div>
         <div class="card-action">
             <% if (redeemStatus !== 'COMPLETE') { %>
-                <a href="./redeem"><%= translate('PRIORITY_QUEUE_REDEEM') %></a>
+                <a href="./redeem"><%= translate('REDEEM_SUBMIT') %></a>
             <% } else if (errors.length !== 0) { %>
                 <a href="#" onclick="window.location.reload();"><%= translate('REDEEM_RETRY') %></a>
             <% } else { %>
-                <a href="/"><%= translate('PRIORITY_QUEUE_BACK') %></a>
+                <a href="/"><%= translate('REDEEM_BACK') %></a>
             <% } %>
         </div>
     </div>
