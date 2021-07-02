@@ -73,10 +73,15 @@ export interface ServerPriorityQueue {
 
 export interface User {
     steam: SteamConnection;
+    discord: DiscordConnection;
     username: string;
     priorityQueue: ServerPriorityQueue;
 }
 
 export interface SteamConnection {
+    id: string;
+}
+
+export interface DiscordConnection {
     id: string;
 }

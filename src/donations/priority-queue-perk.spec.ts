@@ -9,6 +9,9 @@ const aUser: User = {
     steam: {
         id: aSteamId
     },
+    discord: {
+        id: '',
+    },
     username: 'A_USERNAME',
     priorityQueue: {},
 };

@@ -23,6 +23,9 @@ export class Authentication {
                 const connection = profile.connections.find((c) => c.type === 'steam');
                 cb(null, {
                     username: profile.username,
+                    discord: {
+                        id: profile.id,
+                    },
                     steam: {
                         id: connection.id
                     },
