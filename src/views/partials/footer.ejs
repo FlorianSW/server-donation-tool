@@ -3,9 +3,22 @@
         <div class="row">
             <div class="col l6 s12">
                 <h5 class="white-text">Logos</h5>
-                <p class="grey-text text-lighten-4">©2021 Valve Corporation. Steam and the Steam logo are trademarks and/or registered trademarks of Valve Corporation in the U.S. and/or other countries.</p>
+                <p class="grey-text text-lighten-4">©2021 Valve Corporation. Steam and the Steam logo are trademarks
+                    and/or registered trademarks of Valve Corporation in the U.S. and/or other countries.</p>
                 <p class="grey-text text-lighten-4">The PayPal logo provided by the logo-center of PayPal.</p>
             </div>
+            <% if (community.discordUrl) { %>
+                <div class="col l4 offset-l2 s12">
+                    <h5 class="white-text">Community</h5>
+                    <ul class="links">
+                        <li>
+                            <a class="grey-text text-lighten-3" href="<%= community.discordUrl %>">
+                                <img src="/assets/images/discord_with_text.svg">
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            <% } %>
         </div>
     </div>
     <div class="footer-copyright">

@@ -10,6 +10,9 @@ app:
     # An optional logo, which is used as an icon in the top navigation bar. Place the file into the /src/assets/custom folder
     # and simply name the file here (without the path).
     logo:
+    # The discord invite link of your community. Will be listed in the footer and might be helpful in case the donator as an
+    # issue they want to discuss with you.
+    discord:
 discord:
   # The OAuth credentials of the application (https://discord.com/developers/applications) used to sign users in. You
   # find these values in the app settings in the section 'OAuth2' -> 'Client information'

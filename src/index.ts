@@ -24,8 +24,9 @@ try {
 
         app.locals.translate = translate;
         app.locals.community = {
-            title: config.app.community.title,
-            logoUrl: `/assets/custom/${config.app.community.logo}`
+            title: config.app.community?.title,
+            logoUrl: config.app.community ? `/assets/custom/${config.app.community?.logo}` : undefined,
+            discordUrl: config.app.community?.discord,
         }
         app.locals.nameFromServerApiId = (serverApiId: string) => {
             return config.serverNames[serverApiId] || serverApiId;
