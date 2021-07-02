@@ -26,6 +26,9 @@ const messages: { [key: string]: string } = {
     PRIORITY_QUEUE_BACK: 'Back to Start',
     PRIORITY_QUEUE_REDEEM_COMPLETE: 'Your priority queue slot for {{serverName}} was created successfully. It will expire at: {{until}}',
 
+    DISCORD_ROLE_REDEEM_COMPLETE: 'You got assigned the following discord roles: {{roles}}',
+    ASSIGNED_DISCORD_ROLE: 'Discord roles you have already',
+
     ALREADY_PRIORITY_QUEUE_TITLE: 'Already Priority Queue',
     ALREADY_PRIORITY_QUEUE_DESCRIPTION: 'Your Steam ID, which is connected to your Discord user, already has priority queue. Thanks for your donation!',
     ALREADY_PRIORITY_QUEUE_STEAM_ID: 'Your Steam ID',
@@ -33,6 +36,7 @@ const messages: { [key: string]: string } = {
 
     PERK_INCLUDED: 'Includes following perks:',
     PERK_PRIORITY_QUEUE_DESCRIPTION: 'Priority Queue on {{serverName}} for {{amountInDays}} days',
+    PERK_DISCORD_ROLE_DESCRIPTION: 'These discord roles will be assigned to your user: {{roles}}',
 
     ERROR_STEAM_ID_MISMATCH_TITLE: 'Steam ID mismatch',
     ERROR_STEAM_ID_MISMATCH_DESCRIPTION: 'The Steam ID for this donation is different from the one connected with your profile.',

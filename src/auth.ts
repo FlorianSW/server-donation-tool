@@ -30,6 +30,7 @@ export class Authentication {
                         id: connection.id
                     },
                     priorityQueue: {},
+                    discordRoles: [],
                 });
             })
         );

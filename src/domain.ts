@@ -1,5 +1,6 @@
 import {TranslateParams} from './translations';
 import {CFToolsClient} from 'cftools-sdk';
+import {Client} from 'discord.js';
 
 export interface Perk {
     inPackage: Package;
@@ -35,6 +36,10 @@ export interface AppConfig {
         clientId: string,
         clientSecret: string,
         redirectUrl: string,
+        bot?: {
+            token: string,
+            guildId: string,
+        }
     },
     paypal: {
         clientId: string,
@@ -48,6 +53,8 @@ export interface AppConfig {
     packages: Package[],
 
     cfToolscClient(): CFToolsClient;
+    discordClient(): Promise<Client>;
+    destroy(): void;
 }
 
 export interface Order {
@@ -76,6 +83,7 @@ export interface User {
     discord: DiscordConnection;
     username: string;
     priorityQueue: ServerPriorityQueue;
+    discordRoles: string[];
 }
 
 export interface SteamConnection {

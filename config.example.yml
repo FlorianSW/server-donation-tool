@@ -15,6 +15,26 @@ discord:
   # find these values in the app settings in the section 'OAuth2' -> 'Client information'
   clientId:
   clientSecret:
+  # Optional settings for Discord bot actions. Configuring this section is needed when you want to offer Discord related
+  # perks to your donators.
+  bot:
+    # The token of the discord app to use to manage your discord related perks in your discord server. It may or may not
+    # be the same discord bot you use for your users to login to this website. The discord bot needs to have a bot user
+    # in your discord server. In order to provide the bot user the necessary permissions, make sure to at least select the
+    # following permissions when inviting the bot into your server:
+    # - Manage Roles
+    # After you invited the bot, make sure it holds at least one role, which is ranked higher then the highest role of
+    # the perks you offer. If you fail to do that, your users will not get the discord perks you offer.
+    token:
+    # The ID of the Discord server (Guild) your perks should be applied to. You can retrieve this ID with the following steps:
+    # - Open your discord and and and click on the little cog item next to your user in the bottom left
+    # - Go to the App Settings -> Advanced section
+    # - Enable the developer mode
+    # - Go back to the main Discord view (with all your servers)
+    # - Right-click on the server you want to have managed by this website
+    # - Click 'Copy ID' (should be the last option)
+    # The ID is now in your clipboard, simply paste it here.
+    guildId:
 paypal:
   # The access credentials of your PayPal application to process payments. You can either use the sandbox credentials
   # to test the application. In order to process real funds, you need to have a paypal business account and use
@@ -42,16 +62,31 @@ serverNames:
 # - price: The price of the perk, as an object of currency and amount. The currency needs to be a supported string from
 #   PayPal (see https://developer.paypal.com/docs/reports/reference/paypal-supported-currencies/). The amount is a
 #   string (make sure to quote the value) with a number with two decimals.
-# - perks: Each perk describes a specific benefit a donator earns. A perk consists of the following configuration:
+# - perks: Each perk describes a specific benefit a donator earns. A perk consists of the following mandatory configuration:
 #   * type: The type of the perk. The only currently supported value is PRIORITY_QUEUE. The value is currently unused.
-#   * amountInDays: The amount of priority queue days the donator should get.
-#   * cftools: The cftools serverApiId (in the object with the key serverApiId) of the server the donator will get the perk
-#     for. Is the server api ID of the server in the CFTools Dashboard (Manage -> Settings -> API Key section).
-#     This setting is only used for the following types: PRIORITY_QUEUE
+#   Each perk may have additional configuration, see the below list of available perks for more details.
 #
 # You should have at least one perk available, and as many as you want to have.
+#
+# Available perks:
+#
+# - PRIORITY_QUEUE
+# This perk provides a specific amount of days of priority queue for one server, which needs to be registered in CFTools
+# Cloud. It requires the following configuration:
+# * amountInDays: The amount of priority queue days the donator should get.
+# * cftools: The cftools serverApiId (in the object with the key serverApiId) of the server the donator will get the perk
+#   for. Is the server api ID of the server in the CFTools Dashboard (Manage -> Settings -> API Key section).
+#   This setting is only used for the following types: PRIORITY_QUEUE
+#
+# - DISCORD_ROLE
+# A perk which will grant the donator one or more specific roles in your discord server (see the discord.bot settings for
+# detailed information on how to setup and configure your discord bot correctly). This perk requires the following
+# configuration:
+# * roles: An array of discord role IDs (NOT names) to assign when the donation succeeded. You can retrieve the role IDs
+#   the same way as you did with the guild ID, just right click on the role you want to assign to a donator to copy the ID
+#   from the context menu.
 packages:
-  - name: Allpass EU
+  - name: Allpass
     id: 1
     price:
       currency: USD
@@ -61,7 +96,13 @@ packages:
         amountInDays: 30
         cftools:
           serverApiId:
-  - name: Fastpass HH1
+      - type: DISCORD_ROLE
+        roles:
+          # Donator
+          - '0000000000000'
+          # DayZ
+          - '1111111111111'
+  - name: Fastpass
     id: 2
     price:
       currency: USD

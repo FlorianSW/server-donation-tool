@@ -1,38 +1,48 @@
 import {NextFunction, Request, Response, Router} from 'express';
 import {requireAuthentication} from '../auth';
-import {CFToolsClient, PriorityQueueItem, ServerApiId, SteamId64} from 'cftools-sdk';
+import {PriorityQueueItem, ServerApiId, SteamId64} from 'cftools-sdk';
 import {translate} from '../translations';
 import {AppConfig, Perk, PriorityQueue} from '../domain';
 import {PriorityQueuePerk} from '../donations/priority-queue-perk';
+import {DiscordRolePerk} from '../donations/discord-role-perk';
+import {Guild} from 'discord.js';
 
 export class StartController {
     public readonly router: Router = Router();
 
-    constructor(private readonly cftools: CFToolsClient, private readonly config: AppConfig) {
+    constructor(private readonly config: AppConfig) {
         this.router.get('/missingSteamConnection', requireAuthentication, this.missingSteamConnection.bind(this));
         this.router.post('/selectPackage', requireAuthentication, this.selectPackage.bind(this));
-        this.router.get('/', requireAuthentication, this.populatePriorityQueue.bind(this), this.startPage.bind(this));
+        this.router.get('/', requireAuthentication, this.populatePriorityQueue.bind(this), this.populateDiscordRoles.bind(this), this.startPage.bind(this));
     }
 
     private async startPage(req: Request, res: Response) {
         const serversWithPrio = Object.entries(req.user.priorityQueue).filter((s: [string, PriorityQueue]) => s[1].active);
+        const client = await this.config.discordClient();
+        const guild = await client.guilds.fetch(this.config.discord.bot.guildId);
         res.render('index', {
             user: req.user,
             serversWithPrio: serversWithPrio,
             availablePackages: this.config.packages,
             step: 'PACKAGE_SELECTION',
-            perkToString: this.perkToString.bind(this)
+            perkToString: this.perkToString.bind(this, guild)
         });
     }
 
-    private perkToString(p: Perk): string {
+    private perkToString(guild: Guild, p: Perk): string {
         if (p instanceof PriorityQueuePerk) {
             return translate('PERK_PRIORITY_QUEUE_DESCRIPTION', {
                 params: {
                     serverName: this.config.serverNames[p.cftools.serverApiId],
                     amountInDays: p.amountInDays.toString(10)
                 }
-            })
+            });
+        } else if (p instanceof DiscordRolePerk) {
+            return translate('PERK_DISCORD_ROLE_DESCRIPTION', {
+                params: {
+                    roles: p.roles.map((r) => guild.roles.cache.get(r).name).join(', '),
+                }
+            });
         }
     }
 
@@ -62,7 +72,7 @@ export class StartController {
 
         let priority: { [key: string]: any | undefined } = {};
         for (let server of servers) {
-            const entry = await this.cftools.getPriorityQueue({
+            const entry = await this.config.cfToolscClient().getPriorityQueue({
                 playerId: steamId,
                 serverApiId: ServerApiId.of(server),
             });
@@ -86,5 +96,18 @@ export class StartController {
             return false;
         }
         return p.expiration.getTime() <= new Date().getTime();
+    }
+
+    private async populateDiscordRoles(req: Request, res: Response, next: NextFunction): Promise<void> {
+        const client = await this.config.discordClient();
+        const guild = await client.guilds.fetch(this.config.discord.bot.guildId);
+        const guildMember = await guild.members.fetch(req.user.discord.id);
+        const perkRoles = this.perks()
+            .filter((p) => p instanceof DiscordRolePerk)
+            .map((p) => (p as DiscordRolePerk).roles)
+            .reduce((l, p) => l.concat(p));
+
+        req.user.discordRoles = guildMember.roles.cache.filter((r) => perkRoles.includes(r.id)).map((r) => r.name);
+        next();
     }
 }
