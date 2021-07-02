@@ -104,6 +104,39 @@ body {
     }
   }
 
+  .perk-list {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    flex-wrap: wrap;
+
+    > div {
+      width: 190px;
+      min-width: 190px;
+      max-width: 190px;
+      text-align: center;
+      background-color: transparent;
+      box-shadow: none;
+
+      .card-image {
+        margin-top: 16px;
+        background-color: transparent;
+        border: 2px solid white;
+        border-radius: 100%;
+        display: inline-block;
+
+        img {
+          height: 38px;
+          width: 38px;
+        }
+      }
+
+      .card-content {
+        padding: 16px;
+      }
+    }
+  }
+
   .collection {
     .collection-item {
       background-color: transparent;

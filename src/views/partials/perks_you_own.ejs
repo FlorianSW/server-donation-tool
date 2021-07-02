@@ -1,0 +1,20 @@
+<% if (step === 'PACKAGE_SELECTION' && (serversWithPrio.length !== 0 || user.discordRoles.length !== 0)) { %>
+    <h4><%= translate('PERKS_OWNED_TITLE') %></h4>
+    <div class="perk-list">
+        <% serversWithPrio.forEach(function (prio) { %>
+            <div class="owned-perk card">
+                <div class="card-image"><img src="/assets/images/rocket-svgrepo-com.svg"/></div>
+                <div class="card-content">
+                    <%= nameFromServerApiId(prio[0]) %>
+                    (<%= translate('PERKS_OWNED_PRIORITY_QUEUE_UNTIL') %> <%= prio[1].expires.toLocaleString() %>)
+                </div>
+            </div>
+        <% }); %>
+        <% user.discordRoles.forEach(function (r) { %>
+            <div class="owned-perk card">
+                <div class="card-image"><img src="/assets/images/discord.svg"/></div>
+                <div class="card-content"><%= translate('PERKS_OWNED_DISCORD_ROLE', {params: {role: r}}) %></div>
+            </div>
+        <% }); %>
+    </div>
+<% } %>
