@@ -4,11 +4,12 @@ import {TranslateParams} from '../../translations';
 import {RedeemError} from '../../domain/package';
 import {AppConfig} from '../../domain/app-config';
 import {Order, OrderNotCompleted, Payment, SteamIdMismatch} from '../../domain/payment';
+import {Logger} from 'winston';
 
 export class DonationController {
     public readonly router: Router = Router();
 
-    constructor(private readonly config: AppConfig, private readonly payment: Payment) {
+    constructor(private readonly config: AppConfig, private readonly payment: Payment, private readonly logger: Logger) {
         this.router.post('/donations', requireAuthentication, this.createOrder.bind(this));
         this.router.get('/donations/:orderId', requireAuthentication, this.captureOrder.bind(this));
 
@@ -82,6 +83,7 @@ export class DonationController {
                 try {
                     result.push(await perk.redeem(req.user, order));
                 } catch (e) {
+                    this.logger.error(`Could not redeem perk ${perk.type}: `, e);
                     if (e instanceof RedeemError) {
                         errors.push(e.params);
                     } else {

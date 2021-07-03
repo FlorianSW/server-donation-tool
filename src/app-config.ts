@@ -4,6 +4,9 @@ import {AppConfig, ServerNames} from './domain/app-config';
 import {Package} from './domain/package';
 import {DiscordRolePerk} from './adapter/perk/discord-role-perk';
 import {PriorityQueuePerk} from './adapter/perk/priority-queue-perk';
+import {Logger} from 'winston';
+import * as fs from 'fs';
+import * as yaml from 'js-yaml';
 
 class YamlAppConfig implements AppConfig {
     app: { port: number; sessionSecret: string; community: { title: string; logo: string } };
@@ -21,6 +24,7 @@ class YamlAppConfig implements AppConfig {
     paypal: { clientId: string; clientSecret: string };
     serverNames: ServerNames;
 
+    private logger: Logger;
     private _cfToolsClient: CFToolsClient;
     private _discordClient: Client;
 
@@ -39,7 +43,7 @@ class YamlAppConfig implements AppConfig {
         this._cfToolsClient = new CFToolsClientBuilder()
             .withCredentials(this.cftools.applicationId, this.cftools.secret)
             .build();
-        const hasDiscordPerk = this.packages.find((p) => p.perks.find((perk) => perk instanceof DiscordRolePerk));
+        const hasDiscordPerk = this.packages.find((p) => p.perks.find((perk) => perk.type === 'DISCORD_ROLE'));
 
         if (this.discord.bot?.token) {
             this._discordClient = new Client({
@@ -52,7 +56,7 @@ class YamlAppConfig implements AppConfig {
                     resolve(undefined);
                 });
                 this._discordClient.on('error', (error) => {
-                    console.log('Error in discord client occurred', error);
+                    this.logger.error('Error in discord client occurred', error);
                     reject(error);
                 });
                 await this._discordClient.login(this.discord.bot.token);
@@ -69,10 +73,13 @@ class YamlAppConfig implements AppConfig {
     }
 }
 
-export async function parseConfig(config: Object): Promise<AppConfig> {
-    const intermediate = Object.assign(new YamlAppConfig(), config);
+export async function parseConfig(logger: Logger): Promise<AppConfig> {
+    logger.info('Reading app configuration from config.yml');
+    const config = yaml.load(fs.readFileSync('config.yml', 'utf8'));
+    const intermediate: YamlAppConfig = Object.assign(new YamlAppConfig(), config, {logger: logger});
     await intermediate.initialize();
 
+    logger.info('Validating package and perk configuration');
     for (const p of intermediate.packages) {
         Object.setPrototypeOf(p, Package.prototype);
         for (let i = 0; i < p.perks.length; i++) {
