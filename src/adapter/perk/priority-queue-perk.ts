@@ -1,9 +1,9 @@
 import {CFToolsClient, DuplicateResourceCreation, ServerApiId, SteamId64} from 'cftools-sdk';
-import {TranslateParams} from '../translations';
-import {Package, Perk, RedeemError} from '../domain/package';
-import {ServerNames} from '../domain/app-config';
-import {User} from '../domain/user';
-import {Order} from '../domain/payment';
+import {TranslateParams} from '../../translations';
+import {Package, Perk, RedeemError} from '../../domain/package';
+import {ServerNames} from '../../domain/app-config';
+import {User} from '../../domain/user';
+import {Order} from '../../domain/payment';
 
 export class PriorityQueuePerk implements Perk {
     inPackage: Package;

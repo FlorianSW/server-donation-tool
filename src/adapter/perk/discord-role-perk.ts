@@ -1,8 +1,8 @@
-import {TranslateParams} from '../translations';
+import {TranslateParams} from '../../translations';
 import {Client} from 'discord.js';
-import {Package, Perk, RedeemError} from '../domain/package';
-import {User} from '../domain/user';
-import {Order} from '../domain/payment';
+import {Package, Perk, RedeemError} from '../../domain/package';
+import {User} from '../../domain/user';
+import {Order} from '../../domain/payment';
 
 export class DiscordRolePerk implements Perk {
     inPackage: Package;

@@ -4,14 +4,14 @@ import session from 'express-session';
 import {translate} from './translations';
 import bodyParser from 'body-parser';
 import {Authentication} from './auth';
-import {DonationController} from './donations/controller';
 import passport from 'passport';
 import * as fs from 'fs';
 import * as yaml from 'js-yaml';
-import {StartController} from './start/controller';
 import {parseConfig} from './app-config';
 import {AppConfig} from './domain/app-config';
 import {PaypalPayment} from './adapter/paypal-payment';
+import {StartController} from './adapter/controller/start';
+import {DonationController} from './adapter/controller/donations';
 
 let appConfig: AppConfig;
 try {

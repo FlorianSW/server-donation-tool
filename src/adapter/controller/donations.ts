@@ -1,9 +1,9 @@
-import {requireAuthentication} from '../auth';
+import {requireAuthentication} from '../../auth';
 import {Request, Response, Router} from 'express';
-import {TranslateParams} from '../translations';
-import {RedeemError} from '../domain/package';
-import {AppConfig} from '../domain/app-config';
-import {Order, OrderNotCompleted, Payment, SteamIdMismatch} from '../domain/payment';
+import {TranslateParams} from '../../translations';
+import {RedeemError} from '../../domain/package';
+import {AppConfig} from '../../domain/app-config';
+import {Order, OrderNotCompleted, Payment, SteamIdMismatch} from '../../domain/payment';
 
 export class DonationController {
     public readonly router: Router = Router();
