@@ -1,4 +1,4 @@
-import {Package, User as DomainUser} from './domain';
+import {User as DomainUser} from './domain/user';
 
 declare global {
     namespace Express {

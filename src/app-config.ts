@@ -1,8 +1,9 @@
-import {AppConfig, Package, ServerNames} from './domain';
 import {PriorityQueuePerk} from './donations/priority-queue-perk';
 import {CFToolsClient, CFToolsClientBuilder} from 'cftools-sdk';
 import {Client} from 'discord.js';
 import {DiscordRolePerk} from './donations/discord-role-perk';
+import {AppConfig, ServerNames} from './domain/app-config';
+import {Package} from './domain/package';
 
 class YamlAppConfig implements AppConfig {
     app: { port: number; sessionSecret: string; community: { title: string; logo: string } };

@@ -2,10 +2,12 @@ import {NextFunction, Request, Response, Router} from 'express';
 import {requireAuthentication} from '../auth';
 import {PriorityQueueItem, ServerApiId, SteamId64} from 'cftools-sdk';
 import {translate} from '../translations';
-import {AppConfig, Perk, PriorityQueue} from '../domain';
 import {PriorityQueuePerk} from '../donations/priority-queue-perk';
 import {DiscordRolePerk} from '../donations/discord-role-perk';
 import {Guild} from 'discord.js';
+import {AppConfig} from '../domain/app-config';
+import {PriorityQueue} from '../domain/user';
+import {Perk} from '../domain/package';
 
 export class StartController {
     public readonly router: Router = Router();

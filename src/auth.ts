@@ -1,7 +1,8 @@
 import {NextFunction, Request, Response, Router} from 'express';
 import passport from 'passport';
 import {Strategy as DiscordStrategy} from 'passport-discord';
-import {AppConfig, User} from './domain';
+import {AppConfig} from './domain/app-config';
+import {User} from './domain/user';
 
 export class Authentication {
     public readonly router: Router = Router();

@@ -1,7 +1,9 @@
 import {PriorityQueuePerk} from './priority-queue-perk';
 import {CFToolsClient, SteamId64} from 'cftools-sdk';
 import {InMemoryCFToolsClient} from './testhelper';
-import {Package, User} from '../domain';
+import {User} from '../domain/user';
+import {Package} from '../domain/package';
+import {Reference, Order} from '../domain/payment';
 
 const aSteamId = '76561198012102485';
 const aServerApiId = 'c10a80c6-ad46-477e-971d-614370ec173e';
@@ -25,16 +27,11 @@ const aPackage: Package = {
         amount: '1.00'
     }
 };
-const anOrder = {
+const anOrder: Order = {
     id: 'SOME_ORDER_ID',
-    create_time: new Date().toISOString(),
-    purchase_units: [{
-        payments: {
-            captures: [{
-                id: 'A_TRANSACTION_ID'
-            }]
-        }
-    }]
+    created: new Date(),
+    transactionId: 'A_TRANSACTION_ID',
+    reference: new Reference(aSteamId, aPackage),
 };
 
 describe('PriorityQueuePerk', () => {

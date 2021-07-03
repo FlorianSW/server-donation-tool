@@ -10,16 +10,18 @@ import * as fs from 'fs';
 import * as yaml from 'js-yaml';
 import {StartController} from './start/controller';
 import {parseConfig} from './app-config';
-import {AppConfig} from './domain';
+import {AppConfig} from './domain/app-config';
+import {PaypalPayment} from './adapter/paypal-payment';
 
 let appConfig: AppConfig;
 try {
     parseConfig(yaml.load(fs.readFileSync('config.yml', 'utf8'))).then((config) => {
         appConfig = config;
+        const payment = new PaypalPayment(config);
         const app = express();
         const port = config.app.port;
         const start = new StartController(config);
-        const donations = new DonationController(config);
+        const donations = new DonationController(config, payment);
         const authentication = new Authentication(config);
 
         app.locals.translate = translate;

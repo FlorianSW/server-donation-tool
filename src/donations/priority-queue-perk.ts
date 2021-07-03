@@ -1,6 +1,9 @@
 import {CFToolsClient, DuplicateResourceCreation, ServerApiId, SteamId64} from 'cftools-sdk';
 import {TranslateParams} from '../translations';
-import {Order, Package, Perk, RedeemError, ServerNames, User} from '../domain';
+import {Package, Perk, RedeemError} from '../domain/package';
+import {ServerNames} from '../domain/app-config';
+import {User} from '../domain/user';
+import {Order} from '../domain/payment';
 
 export class PriorityQueuePerk implements Perk {
     inPackage: Package;
@@ -65,9 +68,8 @@ export class PriorityQueuePerk implements Perk {
     }
 
     private expiration(order: Order): Date {
-        const orderTime = new Date(order.create_time);
-        const expiration = new Date(orderTime.valueOf());
-        expiration.setDate(orderTime.getDate() + this.amountInDays);
+        const expiration = new Date(order.created.valueOf());
+        expiration.setDate(order.created.getDate() + this.amountInDays);
 
         return expiration;
     }
@@ -78,7 +80,7 @@ export class PriorityQueuePerk implements Perk {
             id: steamId,
             expires: this.expiration(order),
             comment: `Created by CFTools Server Donation bot.
-PayPal Transaction ID: ${order.purchase_units[0]?.payments?.captures[0]?.id}
+PayPal Transaction ID: ${order.transactionId}
 PayPal Order ID: ${order.id}
 Selected product: ${this.inPackage.name}`
         });

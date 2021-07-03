@@ -1,33 +1,14 @@
 import {requireAuthentication} from '../auth';
-import {paypalClient} from './sdk';
 import {Request, Response, Router} from 'express';
-import {AppConfig, Package, RedeemError} from '../domain';
 import {TranslateParams} from '../translations';
-
-const paypal = require('@paypal/checkout-server-sdk');
-
-class CustomId {
-    constructor(public readonly steamId: string, public readonly p: Package) {
-    }
-
-    static fromString(s: string, packages: Package[]): CustomId | undefined {
-        const ids = s.split('#');
-        const selectedPackage = packages.find((p) => p.id === parseInt(ids[1]));
-        if (!selectedPackage) {
-            return;
-        }
-        return new CustomId(ids[0], selectedPackage);
-    }
-
-    asString() {
-        return `${this.steamId}#${this.p.id}`
-    }
-}
+import {RedeemError} from '../domain/package';
+import {AppConfig} from '../domain/app-config';
+import {Order, OrderNotCompleted, Payment, SteamIdMismatch} from '../domain/payment';
 
 export class DonationController {
     public readonly router: Router = Router();
 
-    constructor(private readonly config: AppConfig) {
+    constructor(private readonly config: AppConfig, private readonly payment: Payment) {
         this.router.post('/donations', requireAuthentication, this.createOrder.bind(this));
         this.router.get('/donations/:orderId', requireAuthentication, this.captureOrder.bind(this));
 
@@ -36,33 +17,26 @@ export class DonationController {
         this.router.get('/donate/:orderId/redeem', requireAuthentication, this.redeem.bind(this));
     }
 
-    private async fetchOrderDetails(req: Request, res: Response): Promise<any> {
-        const request = new paypal.orders.OrdersGetRequest(req.params.orderId);
-
-        const order = await paypalClient(this.config).execute(request);
-
-        const id = CustomId.fromString(order.result.purchase_units[0].custom_id, this.config.packages);
-
-        if (!id || order.result.status !== 'COMPLETED') {
-            res.render('index', {
-                step: 'DONATE',
-                user: req.user,
-                paymentStatus: 'INCOMPLETE',
-                redeemStatus: 'UNSTARTED',
-            });
-            throw new Error('orderNotCompleted');
+    private async fetchOrderDetails(req: Request, res: Response): Promise<Order> {
+        try {
+            return await this.payment.orderDetails(req.params.orderId, req.user);
+        } catch (e) {
+            if (e instanceof OrderNotCompleted) {
+                res.render('index', {
+                    step: 'DONATE',
+                    user: req.user,
+                    paymentStatus: 'INCOMPLETE',
+                    redeemStatus: 'UNSTARTED',
+                });
+            }
+            if (e instanceof SteamIdMismatch) {
+                res.render('payment_steam_mismatch', {
+                    paymentSteamId: e.expected,
+                    userSteamId: e.fromUser,
+                });
+            }
+            throw e;
         }
-
-        const userSteamId = req.user.steam.id;
-        if (id && id.steamId !== userSteamId) {
-            res.render('payment_steam_mismatch', {
-                paymentSteamId: id.steamId,
-                userSteamId: userSteamId,
-            });
-            throw Error('steamIdMismatch');
-        }
-
-        return order;
     }
 
     private async prepareDonation(req: Request, res: Response) {
@@ -78,8 +52,7 @@ export class DonationController {
         try {
             const order = await this.fetchOrderDetails(req, res);
 
-            const id = CustomId.fromString(order.result.purchase_units[0].custom_id, this.config.packages);
-            if (!id) {
+            if (!order.reference) {
                 res.sendStatus(400);
                 return;
             }
@@ -98,17 +71,16 @@ export class DonationController {
     private async redeem(req: Request, res: Response) {
         try {
             const order = await this.fetchOrderDetails(req, res);
-            const id = CustomId.fromString(order.result.purchase_units[0].custom_id, this.config.packages);
-            if (!id) {
+            if (!order.reference) {
                 res.sendStatus(400);
                 return;
             }
 
             const result: TranslateParams[] = [];
             const errors: TranslateParams[] = [];
-            for (let perk of id.p.perks) {
+            for (let perk of order.reference.p.perks) {
                 try {
-                    result.push(await perk.redeem(req.user, order.result));
+                    result.push(await perk.redeem(req.user, order));
                 } catch (e) {
                     if (e instanceof RedeemError) {
                         errors.push(e.params);
@@ -133,24 +105,14 @@ export class DonationController {
 
     private async createOrder(req: Request, res: Response) {
         const selectedPackage = this.config.packages.find((p) => req.session.selectedPackageId === p.id);
-        const request = new paypal.orders.OrdersCreateRequest();
-        request.prefer('return=representation');
-        request.requestBody({
-            intent: 'CAPTURE',
-            purchase_units: [{
-                custom_id: new CustomId(req.body.steamId, selectedPackage).asString(),
-                description: selectedPackage.name,
-                amount: {
-                    currency_code: selectedPackage.price.currency,
-                    value: selectedPackage.price.amount
-                }
-            }]
-        });
 
         try {
-            const order = await paypalClient(this.config).execute(request);
+            const order = await this.payment.createPaymentOrder({
+                forPackage: selectedPackage,
+                steamId: req.body.steamId
+            });
             res.status(200).json({
-                orderId: order.result.id
+                orderId: order.id
             });
         } catch (err) {
             console.error(err);
@@ -159,15 +121,12 @@ export class DonationController {
     }
 
     private async captureOrder(req: Request, res: Response) {
-        const orderID = req.params.orderId;
-
-        const request = new paypal.orders.OrdersCaptureRequest(orderID);
-        request.requestBody({});
-
         try {
-            const capture = await paypalClient(this.config).execute(request);
+            const capture = await this.payment.capturePayment({
+                orderId: req.params.orderId
+            });
             res.status(200).json({
-                orderId: capture.result.id,
+                orderId: capture.id,
             });
         } catch (err) {
             console.error(err);
