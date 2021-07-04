@@ -40,6 +40,14 @@ const messages: { [key: string]: string } = {
     PERK_PRIORITY_QUEUE_DESCRIPTION: 'Priority Queue on {{serverName}} for {{amountInDays}} days',
     PERK_DISCORD_ROLE_DESCRIPTION: 'These discord roles will be assigned to your user: {{roles}}',
 
+    NOTIFICATIONS_REDEEM_SUCCESSFUL_TITLE: 'Donation redeemed',
+    NOTIFICATIONS_REDEEM_SUCCESSFUL_DESCRIPTION: 'A donator redeemed perks of the package they donated for.',
+    NOTIFICATIONS_REDEEM_SUCCESSFUL_USERNAME: 'Username',
+    NOTIFICATIONS_REDEEM_SUCCESSFUL_STEAM_ID: 'Steam ID',
+    NOTIFICATIONS_REDEEM_SUCCESSFUL_PACKAGE: 'Package name',
+    NOTIFICATIONS_REDEEM_SUCCESSFUL_TRANSACTION: 'Transaction details',
+    NOTIFICATIONS_REDEEM_ERROR_TITLE: 'Redeem of perk errored',
+
     ERROR_STEAM_ID_MISMATCH_TITLE: 'Steam ID mismatch',
     ERROR_STEAM_ID_MISMATCH_DESCRIPTION: 'The Steam ID for this donation is different from the one connected with your profile.',
     ERROR_STEAM_ID_MISMATCH_ORDER_LABEL: 'Steam ID of donation',

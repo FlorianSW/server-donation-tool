@@ -1,6 +1,7 @@
 import {Package} from './package';
 import {CFToolsClient} from 'cftools-sdk';
 import {Client} from 'discord.js';
+import {Notifier} from './notifier';
 
 export type ServerNames = {
     [serverApiId: string]: string
@@ -39,6 +40,8 @@ export interface AppConfig {
     cfToolscClient(): CFToolsClient;
 
     discordClient(): Promise<Client>;
+
+    notifier(): Notifier;
 
     destroy(): void;
 }

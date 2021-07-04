@@ -7,6 +7,9 @@ import {PriorityQueuePerk} from './adapter/perk/priority-queue-perk';
 import {Logger} from 'winston';
 import * as fs from 'fs';
 import * as yaml from 'js-yaml';
+import {DiscordNotification, DiscordNotifier} from './adapter/discord-notifier';
+import {NoopNotifier} from './adapter/noop-notifier';
+import {Notifier} from './domain/notifier';
 
 class YamlAppConfig implements AppConfig {
     app: { port: number; sessionSecret: string; community: { title: string; logo: string } };
@@ -18,7 +21,8 @@ class YamlAppConfig implements AppConfig {
         bot?: {
             token: string,
             guildId: string,
-        }
+        },
+        notifications?: DiscordNotification[]
     };
     packages: Package[];
     paypal: { clientId: string; clientSecret: string };
@@ -27,6 +31,7 @@ class YamlAppConfig implements AppConfig {
     private logger: Logger;
     private _cfToolsClient: CFToolsClient;
     private _discordClient: Client;
+    private _notifier: Notifier;
 
     cfToolscClient(): CFToolsClient {
         return this._cfToolsClient;
@@ -37,6 +42,10 @@ class YamlAppConfig implements AppConfig {
             return Promise.reject('Discord bot not configured');
         }
         return Promise.resolve(this._discordClient);
+    }
+
+    notifier(): Notifier {
+        return this._notifier;
     }
 
     async initialize(): Promise<void> {
@@ -63,6 +72,11 @@ class YamlAppConfig implements AppConfig {
             });
         } else if (hasDiscordPerk) {
             throw new Error('At least one discord perk is configured but no valid discord configuration was found.');
+        }
+        if (this.discord.notifications && this.discord.notifications.length !== 0) {
+            this._notifier = new DiscordNotifier(this.discord.notifications);
+        } else {
+            this._notifier = new NoopNotifier();
         }
     }
 

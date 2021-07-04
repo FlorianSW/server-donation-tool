@@ -47,7 +47,7 @@ parseConfig(log).then((config) => {
     const app = express();
     const port = config.app.port;
     const start = new StartController(config);
-    const donations = new DonationController(config, payment, log);
+    const donations = new DonationController(config, payment, appConfig.notifier(), log);
     const authentication = new Authentication(config);
 
     app.locals.translate = translate;

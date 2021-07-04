@@ -38,6 +38,26 @@ discord:
     # - Click 'Copy ID' (should be the last option)
     # The ID is now in your clipboard, simply paste it here.
     guildId:
+  # Optional notifications from the website to your discord. During the process of donating, the tool emits events for
+  # specific actions and errors, which you can opt in to get a notification into a discord channel using a webhook. The
+  # webhook DOES NOT necessarily need to be in the same discord server your other discord settings relate to (e.g. the
+  # bot.guildId). You can even create multiple notification rules to, e.g., route one type to another channel as another
+  # type (or split errors from successful donations to add an alert rule for one channel).
+  # Make sure that you properly protect the channel you send notifications to. Nearly every message type contains
+  # information that are not supposed to be seen by the public (e.g. the transaction ID of a specific donation, the
+  # identifiers of the donator like the Steam ID and discord username).
+  notifications:
+    # he webhook URL to send notifications to (see https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks
+    # for how to setup a webhook)
+    - webhookUrl:
+      # A list of types to send notifications for. This list shows all currently available types.
+      types:
+        # Send whenever a donator redeems perks of a package after the donation. This event may occur more often then
+        # the number of donations the donator made.
+        - SUCCESSFUL_REDEEM
+        # Sent whenever a perk of a package could not be redeemed (the error message will contain more information on
+        # what happened)
+        - REDEEM_ERROR
 paypal:
   # The access credentials of your PayPal application to process payments. You can either use the sandbox credentials
   # to test the application. In order to process real funds, you need to have a paypal business account and use

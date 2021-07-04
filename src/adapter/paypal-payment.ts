@@ -15,7 +15,8 @@ interface OrderResult {
     result: {
         id: string,
         status: string,
-        create_time: string,
+        create_time?: string,
+        update_time: string,
         purchase_units: {
             custom_id: string,
             payments?: {
@@ -60,7 +61,7 @@ export class PaypalPayment implements Payment {
 
         return {
             id: order.result.id,
-            created: new Date(order.result.create_time),
+            created: new Date(order.result.create_time || order.result.update_time),
             transactionId: order.result.purchase_units[0]?.payments?.captures[0]?.id,
             reference: Reference.fromString(order.result.purchase_units[0].custom_id, this.config.packages),
         };
