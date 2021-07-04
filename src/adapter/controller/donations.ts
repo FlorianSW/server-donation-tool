@@ -65,7 +65,7 @@ export class DonationController {
                 redeemStatus: 'PENDING',
             });
         } catch (err) {
-            console.error(err);
+            this.logger.error('Could not render successful donation page', err);
             return res.sendStatus(500);
         }
     }
@@ -103,7 +103,7 @@ export class DonationController {
                 errors: errors,
             });
         } catch (err) {
-            console.error(err);
+            this.logger.error('Could not redeem perks of package', err);
             return res.send(500);
         }
     }
@@ -120,7 +120,7 @@ export class DonationController {
                 orderId: order.id
             });
         } catch (err) {
-            console.error(err);
+            this.logger.error('Could not create order', err);
             return res.sendStatus(500);
         }
     }
@@ -134,7 +134,7 @@ export class DonationController {
                 orderId: capture.id,
             });
         } catch (err) {
-            console.error(err);
+            this.logger.error('Could not capture order', err);
             return res.sendStatus(500);
         }
     }
