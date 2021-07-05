@@ -1,4 +1,4 @@
-import express from 'express';
+import express, {ErrorRequestHandler, NextFunction, Request, Response} from 'express';
 import path from 'path';
 import session from 'express-session';
 import {translate} from './translations';
@@ -12,6 +12,7 @@ import {StartController} from './adapter/controller/start';
 import {DonationController} from './adapter/controller/donations';
 import {errorLogger, logger} from 'express-winston';
 import winston from 'winston';
+import 'express-async-errors';
 
 let consoleFormat = winston.format.combine(
     winston.format.colorize(),
@@ -38,6 +39,25 @@ const log = winston.createLogger({
         })
     ],
 });
+
+const errorHandler: ErrorRequestHandler = (err: any, req: Request, res: Response, next: NextFunction) => {
+    console.log(err);
+    res.render('error', {
+        status: err.status || 500,
+        supportInfo: JSON.stringify({
+            status: err.status || 500,
+            selectedPackage: req.session.selectedPackageId,
+            user: {
+                steamId: req.user.steam.id,
+                discordId: req.user.discord.id,
+            },
+            lastOrder: {
+                id: req.session.lastOrder?.id,
+                transactionId: req.session.lastOrder?.transactionId,
+            }
+        })
+    });
+};
 
 let appConfig: AppConfig;
 parseConfig(log).then((config) => {
@@ -78,7 +98,7 @@ parseConfig(log).then((config) => {
         winstonInstance: log,
         statusLevels: {
             success: 'debug',
-            warn: 'warning',
+            warn: 'warn',
             error: 'error'
         }
     }));
@@ -87,6 +107,8 @@ parseConfig(log).then((config) => {
     app.use('/', donations.router);
     app.use('/', authentication.router);
 
+
+    app.use(errorHandler);
     app.use(errorLogger({
         winstonInstance: log,
     }));

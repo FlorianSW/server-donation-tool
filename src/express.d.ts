@@ -14,6 +14,10 @@ declare global {
 declare module 'express-session' {
     interface SessionData {
         selectedPackageId: number;
-        afterLoginTarget: string;
+        afterLoginTarget?: string;
+        lastOrder?: {
+            id: string,
+            transactionId: string,
+        };
     }
 }

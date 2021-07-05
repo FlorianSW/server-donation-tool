@@ -21,7 +21,12 @@ export class DonationController {
 
     private async fetchOrderDetails(req: Request, res: Response): Promise<Order> {
         try {
-            return await this.payment.orderDetails(req.params.orderId, req.user);
+            const result = await this.payment.orderDetails(req.params.orderId, req.user);
+            req.session.lastOrder = {
+                id: result.id,
+                transactionId: result.transactionId,
+            };
+            return result;
         } catch (e) {
             if (e instanceof OrderNotCompleted) {
                 res.render('index', {
@@ -51,91 +56,71 @@ export class DonationController {
     }
 
     private async prepareRedeem(req: Request, res: Response) {
-        try {
-            const order = await this.fetchOrderDetails(req, res);
+        const order = await this.fetchOrderDetails(req, res);
 
-            if (!order.reference) {
-                res.sendStatus(400);
-                return;
-            }
-
-            res.render('index', {
-                user: req.user,
-                step: 'REDEEM',
-                redeemStatus: 'PENDING',
-            });
-        } catch (err) {
-            this.logger.error('Could not render successful donation page', err);
-            return res.sendStatus(500);
+        if (!order.reference) {
+            res.sendStatus(400);
+            return;
         }
+
+        res.render('index', {
+            user: req.user,
+            step: 'REDEEM',
+            redeemStatus: 'PENDING',
+        });
     }
 
     private async redeem(req: Request, res: Response) {
-        try {
-            const order = await this.fetchOrderDetails(req, res);
-            if (!order.reference) {
-                res.sendStatus(400);
-                return;
-            }
+        const order = await this.fetchOrderDetails(req, res);
+        if (!order.reference) {
+            res.sendStatus(400);
+            return;
+        }
 
-            const result: TranslateParams[] = [];
-            const errors: TranslateParams[] = [];
-            for (let perk of order.reference.p.perks) {
-                try {
-                    result.push(await perk.redeem(req.user, order));
-                } catch (e) {
-                    this.logger.error(`Could not redeem perk ${perk.type}: `, e);
-                    if (e instanceof RedeemError) {
-                        errors.push(e.params);
-                        this.notifier.onFailedRedeemPerk(req.user, order, e).then();
-                    } else {
-                        throw e;
-                    }
+        const result: TranslateParams[] = [];
+        const errors: TranslateParams[] = [];
+        for (let perk of order.reference.p.perks) {
+            try {
+                result.push(await perk.redeem(req.user, order));
+            } catch (e) {
+                this.logger.error(`Could not redeem perk ${perk.type}: `, e);
+                if (e instanceof RedeemError) {
+                    errors.push(e.params);
+                    this.notifier.onFailedRedeemPerk(req.user, order, e).then();
+                } else {
+                    throw e;
                 }
             }
-
-            this.notifier.onSuccessfulRedeem(req.user, order).then();
-            res.render('index', {
-                user: req.user,
-                step: 'REDEEM',
-                redeemStatus: 'COMPLETE',
-                results: result,
-                errors: errors,
-            });
-        } catch (err) {
-            this.logger.error('Could not redeem perks of package', err);
-            return res.send(500);
         }
+
+        this.notifier.onSuccessfulRedeem(req.user, order).then();
+        res.render('index', {
+            user: req.user,
+            step: 'REDEEM',
+            redeemStatus: 'COMPLETE',
+            results: result,
+            errors: errors,
+        });
     }
 
     private async createOrder(req: Request, res: Response) {
         const selectedPackage = this.config.packages.find((p) => req.session.selectedPackageId === p.id);
 
-        try {
-            const order = await this.payment.createPaymentOrder({
-                forPackage: selectedPackage,
-                steamId: req.body.steamId
-            });
-            res.status(200).json({
-                orderId: order.id
-            });
-        } catch (err) {
-            this.logger.error('Could not create order', err);
-            return res.sendStatus(500);
-        }
+        const order = await this.payment.createPaymentOrder({
+            forPackage: selectedPackage,
+            steamId: req.body.steamId
+        });
+        res.status(200).json({
+            orderId: order.id
+        });
     }
 
     private async captureOrder(req: Request, res: Response) {
-        try {
-            const capture = await this.payment.capturePayment({
-                orderId: req.params.orderId
-            });
-            res.status(200).json({
-                orderId: capture.id,
-            });
-        } catch (err) {
-            this.logger.error('Could not capture order', err);
-            return res.sendStatus(500);
-        }
+        const capture = await this.payment.capturePayment({
+            orderId: req.params.orderId
+        });
+        res.status(200).json({
+            orderId: capture.id,
+        });
     }
 }
