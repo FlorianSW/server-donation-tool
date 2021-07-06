@@ -18,6 +18,8 @@ discord:
   # find these values in the app settings in the section 'OAuth2' -> 'Client information'
   clientId:
   clientSecret:
+  # The absolute redirect URL of your website. Should be the public facing URL of your website ending on /auth/discord/callback
+  redirectUrl: '/auth/discord/callback'
   # Optional settings for Discord bot actions. Configuring this section is needed when you want to offer Discord related
   # perks to your donators.
   bot:
@@ -58,6 +60,14 @@ discord:
         # Sent whenever a perk of a package could not be redeemed (the error message will contain more information on
         # what happened)
         - REDEEM_ERROR
+steam:
+  # The absolute redirect URL of your website. Should be the public facing URL of your website ending on /auth/steam/callback
+  redirectUrl: '/auth/steam/callback'
+  # The base URL of your website, including protocol and port. If your Redirect URL looks like 'https://example.com/auth/steam/callback'
+  # then your realm should look like 'http://example.com'
+  realm: http://localhost:8080
+  # Your steam api key from https://steamcommunity.com/dev/apikey
+  apiKey: 5AFD5B0031A3830FE62D52520EAE77C4
 paypal:
   # The access credentials of your PayPal application to process payments. You can either use the sandbox credentials
   # to test the application. In order to process real funds, you need to have a paypal business account and use

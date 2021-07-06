@@ -1,7 +1,7 @@
 <%- include('partials/header.ejs') %>
 <div class="container">
     <div class="row">
-        <div class="col s10 offset-s1">
+        <div class="col s8 offset-s0">
             <div class="card missing-steam-connection">
                 <div class="card-image">
                     <img class="image" src="/assets/images/discord.svg">
@@ -19,6 +19,24 @@
                 </div>
                 <div class="card-action">
                     <a href="/auth/logout"><%= translate('ERROR_MISSING_STEAM_TRY_AGAIN') %></a>
+                </div>
+            </div>
+        </div>
+        <div class="col s4 offset-s0">
+            <div class="card steam-login">
+                <div class="card-image">
+                    <img class="image" src="/assets/images/steam.png">
+                </div>
+                <div class="card-content">
+                    <span class="card-title">
+                        <%= translate('ERROR_MISSING_STEAM_LOGIN_TITLE') %>
+                    </span>
+                    <p>
+                        <%- translate('ERROR_MISSING_STEAM_LOGIN_DESCRIPTION') %>
+                    </p>
+                </div>
+                <div class="card-action">
+                    <a href="/auth/steam/redirect"><%= translate('ERROR_MISSING_STEAM_LOGIN') %></a>
                 </div>
             </div>
         </div>

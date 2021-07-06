@@ -24,6 +24,11 @@ class YamlAppConfig implements AppConfig {
         },
         notifications?: DiscordNotification[]
     };
+    steam?: {
+        apiKey: string;
+        redirectUrl: string;
+        realm: string;
+    };
     packages: Package[];
     paypal: { clientId: string; clientSecret: string };
     serverNames: ServerNames;

@@ -6,6 +6,8 @@ const messages: { [key: string]: string } = {
 
     STEAM_ACCOUNT_TITLE: 'Steam Account',
     STEAM_FROM_DISCORD: 'This Steam account is linked with your Discord user.',
+    STEAM_FROM_STEAM: 'You logged in with this Steam account.',
+    STEAM_LOGIN_ANOTHER: 'Login with another account',
 
     PERK_SELECTION_TITLE: 'Select package',
     PERK_NO_AVAILABLE: 'There is no package available. You may already have all available perks.',
@@ -62,8 +64,11 @@ const messages: { [key: string]: string } = {
     ERROR_GENERIC_SUPPORT: 'Support information bundle:',
 
     ERROR_MISSING_STEAM_TITLE: 'Discord profile has no Steam connection',
-    ERROR_MISSING_STEAM_DESCRIPTION: 'We offer perks to our donators, like Priority queue. In order for you to be able to redeem your donator perk, we need to know your Steam account you usually play with. Currently, the only supported method to provide this Steam account is by connecting it with your Discord profile (which you used to login here). You can even hide the connection from the public in your Discord profile settings, it just need to exist.<br><br>Please go to your Discord, connect your Steam account and try again.',
+    ERROR_MISSING_STEAM_DESCRIPTION: 'We offer perks to our donators, like Priority queue. In order for you to be able to redeem your donator perk, we need to know your Steam account you usually play with. Ideally we would like to get your Steam account connected to your Discord profile (which you used to login here). You can even hide the connection from the public in your Discord profile settings, it just need to exist.<br><br>Please go to your Discord, connect your Steam account and try again.',
     ERROR_MISSING_STEAM_TRY_AGAIN: 'Done! Try again',
+    ERROR_MISSING_STEAM_LOGIN_TITLE: 'Alternatively login with steam',
+    ERROR_MISSING_STEAM_LOGIN_DESCRIPTION: 'You do not necessarily need to link your Steam account with your Steam profile. As an alternative, you can login with your Steam account on this Website. To do so, click the login link.',
+    ERROR_MISSING_STEAM_LOGIN: 'Login with Steam',
 };
 
 export type TranslateParams = [string, TranslateOptions];

@@ -13,7 +13,6 @@ export class StartController {
     public readonly router: Router = Router();
 
     constructor(private readonly config: AppConfig) {
-        this.router.get('/missingSteamConnection', requireAuthentication, this.missingSteamConnection.bind(this));
         this.router.post('/selectPackage', requireAuthentication, this.selectPackage.bind(this));
         this.router.get('/', requireAuthentication, this.populatePriorityQueue.bind(this), this.populateDiscordRoles.bind(this), this.startPage.bind(this));
     }
@@ -60,10 +59,6 @@ export class StartController {
 
     private perks(): Perk[] {
         return this.config.packages.map((p) => p.perks).reduce((l, p) => l.concat(p));
-    }
-
-    private async missingSteamConnection(req: Request, res: Response) {
-        res.render('missing_steam_connection');
     }
 
     private async populatePriorityQueue(req: Request, res: Response, next: NextFunction): Promise<void> {

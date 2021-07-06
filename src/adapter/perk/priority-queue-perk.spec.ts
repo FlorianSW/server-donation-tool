@@ -9,7 +9,9 @@ const aSteamId = '76561198012102485';
 const aServerApiId = 'c10a80c6-ad46-477e-971d-614370ec173e';
 const aUser: User = {
     steam: {
-        id: aSteamId
+        id: aSteamId,
+        source: 'DISCORD',
+        name: 'Test',
     },
     discord: {
         id: '',

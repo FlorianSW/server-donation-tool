@@ -26,6 +26,11 @@ export interface AppConfig {
             guildId: string,
         }
     },
+    steam?: {
+        realm: string,
+        redirectUrl: string,
+        apiKey: string,
+    },
     paypal: {
         clientId: string,
         clientSecret: string,
