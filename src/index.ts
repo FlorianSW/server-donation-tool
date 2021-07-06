@@ -73,7 +73,7 @@ parseConfig(log).then((config) => {
     app.locals.translate = translate;
     app.locals.community = {
         title: config.app.community?.title,
-        logoUrl: config.app.community ? `/assets/custom/${config.app.community?.logo}` : undefined,
+        logoUrl: config.app.community?.logo ? `/assets/custom/${config.app.community?.logo}` : undefined,
         discordUrl: config.app.community?.discord,
     }
     app.locals.nameFromServerApiId = (serverApiId: string) => {
