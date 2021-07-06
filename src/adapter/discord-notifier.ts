@@ -20,6 +20,23 @@ export class DiscordNotifier implements Notifier {
     constructor(private readonly notifications: DiscordNotification[]) {
     }
 
+    async onSuccessfulPayment(user: User, order: Order): Promise<void> {
+        this.notifications
+            .filter((n) => n.types.includes(Type.DONATED))
+            .forEach((d) => {
+                webhookClient(d).send({
+                    username: d.username || 'Donations',
+                    embeds: [
+                        new MessageEmbed()
+                            .setColor('DARK_BLUE')
+                            .setTitle(translate('NOTIFICATIONS_PAYMENT_SUCCESSFUL_TITLE'))
+                            .setDescription(translate('NOTIFICATIONS_PAYMENT_SUCCESSFUL_DESCRIPTION'))
+                            .addFields(this.metaFields(user, order))
+                    ],
+                });
+            });
+    }
+
     async onSuccessfulRedeem(user: User, order: Order): Promise<void> {
         this.notifications
             .filter((n) => n.types.includes(Type.SUCCESSFUL_REDEEM))

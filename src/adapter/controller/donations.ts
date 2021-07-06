@@ -122,5 +122,10 @@ export class DonationController {
         res.status(200).json({
             orderId: capture.id,
         });
+
+        setTimeout(async () => {
+            const order = await this.fetchOrderDetails(req, res);
+            this.notifier.onSuccessfulPayment(req.user, order).then();
+        });
     }
 }

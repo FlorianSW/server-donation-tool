@@ -54,10 +54,13 @@ discord:
     - webhookUrl:
       # A list of types to send notifications for. This list shows all currently available types.
       types:
+        # Send when the payment was successfully processed by PayPal (the transaction is completed), but before the donator
+        # redeemed their perks.
+        - DONATED
         # Send whenever a donator redeems perks of a package after the donation. This event may occur more often then
         # the number of donations the donator made.
         - SUCCESSFUL_REDEEM
-        # Sent whenever a perk of a package could not be redeemed (the error message will contain more information on
+        # Send whenever a perk of a package could not be redeemed (the error message will contain more information on
         # what happened)
         - REDEEM_ERROR
 steam:

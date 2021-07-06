@@ -4,6 +4,9 @@ import {Order} from '../domain/payment';
 import {RedeemError} from '../domain/package';
 
 export class NoopNotifier implements Notifier {
+    async onSuccessfulPayment(user: User, order: Order): Promise<void> {
+    }
+
     async onSuccessfulRedeem(user: User, order: Order): Promise<void> {
     }
 
