@@ -30,7 +30,14 @@ discord:
     # following permissions when inviting the bot into your server:
     # - Manage Roles
     # After you invited the bot, make sure it holds at least one role, which is ranked higher then the highest role of
-    # the perks you offer. If you fail to do that, your users will not get the discord perks you offer.
+    # the possible donators of that tool. If you fail to do that, your users will not get the discord perks you offer.
+    #
+    # The bot user will also use privileged gateway intents, which need to be allowed in the developer portal for that specific
+    # bot user. For that, go to your app in the Discord Developer portal -> Bot -> Privileged Gateway Intents. Activate at least the
+    # "Server Members Intent". The bot uses this intent in order to track manual roles assignment and removal of roles which
+    # would otherwise be managed by this tool.
+    # You may want to look into https://github.com/FlorianSW/cftools-server-donation/issues/2 to get more information about
+    # how and why this tool uses this intent.
     token:
     # The ID of the Discord server (Guild) your perks should be applied to. You can retrieve this ID with the following steps:
     # - Open your discord and and and click on the little cog item next to your user in the bottom left
