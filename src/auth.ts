@@ -1,8 +1,27 @@
 import {NextFunction, Request, Response, Router} from 'express';
 import passport from 'passport';
-import {ConnectionInfo, Strategy as DiscordStrategy} from 'passport-discord';
+import {ConnectionInfo, Profile, Strategy as DiscordStrategy} from 'passport-discord';
 import {AppConfig} from './domain/app-config';
 import {User} from './domain/user';
+import {VerifyCallback} from 'passport-oauth2';
+
+export function discordUserCallback(accessToken: string, refreshToken: string, profile: Profile, done: VerifyCallback) {
+    const connection: ConnectionInfo | undefined = profile.connections.find((c) => c.type === 'steam');
+    const user: User = {
+        username: profile.username,
+        discord: {
+            id: profile.id,
+        },
+        priorityQueue: {},
+        discordRoles: [],
+    };
+    if (connection) {
+        user.steam = {
+            id: connection.id,
+        };
+    }
+    done(null, user);
+}
 
 export class Authentication {
     public readonly router: Router = Router();
@@ -16,28 +35,11 @@ export class Authentication {
         });
 
         passport.use(new DiscordStrategy({
-                clientID: config.discord.clientId,
-                clientSecret: config.discord.clientSecret,
-                callbackURL: config.discord.redirectUrl,
-                scope: ['identify', 'connections']
-            }, (accessToken, refreshToken, profile, cb) => {
-                const connection: ConnectionInfo | undefined = profile.connections.find((c) => c.type === 'steam');
-                const user: User = {
-                    username: profile.username,
-                    discord: {
-                        id: profile.id,
-                    },
-                    priorityQueue: {},
-                    discordRoles: [],
-                };
-                if (connection) {
-                    user.steam = {
-                        id: connection.id,
-                    };
-                }
-                cb(null, user);
-            })
-        );
+            clientID: config.discord.clientId,
+            clientSecret: config.discord.clientSecret,
+            callbackURL: config.discord.redirectUrl,
+            scope: ['identify', 'connections']
+        }, discordUserCallback));
 
         this.router.get('/auth/redirect', passport.authenticate('discord'));
         this.router.get('/auth/error', (req: Request, res: Response) => {
