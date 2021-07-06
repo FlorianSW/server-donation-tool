@@ -16,6 +16,7 @@ app:
 discord:
   # The OAuth credentials of the application (https://discord.com/developers/applications) used to sign users in. You
   # find these values in the app settings in the section 'OAuth2' -> 'Client information'
+  # The value needs to be a string (wrapped in ').
   clientId:
   clientSecret:
   # The absolute redirect URL of your website. Should be the public facing URL of your website ending on /auth/discord/callback
@@ -38,7 +39,8 @@ discord:
     # - Go back to the main Discord view (with all your servers)
     # - Right-click on the server you want to have managed by this website
     # - Click 'Copy ID' (should be the last option)
-    # The ID is now in your clipboard, simply paste it here.
+    # The ID is now in your clipboard, simply paste it here and wrap it with ''.
+    # The value needs to be a string (wrapped in ').
     guildId:
   # Optional notifications from the website to your discord. During the process of donating, the tool emits events for
   # specific actions and errors, which you can opt in to get a notification into a discord channel using a webhook. The
@@ -134,6 +136,7 @@ packages:
           serverApiId:
       - type: DISCORD_ROLE
         roles:
+          # These values need to be strings (wrapped in ').
           # Donator
           - '0000000000000'
           # DayZ

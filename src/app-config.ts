@@ -92,12 +92,22 @@ class YamlAppConfig implements AppConfig {
     }
 }
 
+function warnYamlNumber(name: string, value: string) {
+    return `Found ${name} to be a number (${value}), which is most likely not the same representation as you assume. Please change the config to be a string (wrapped in ').`;
+}
+
 export async function parseConfig(logger: Logger): Promise<AppConfig> {
     logger.info('Reading app configuration from config.yml');
     const config = yaml.load(fs.readFileSync('config.yml', 'utf8'));
     const intermediate: YamlAppConfig = Object.assign(new YamlAppConfig(), config, {logger: logger});
     await intermediate.initialize();
 
+    if (typeof intermediate.discord.clientId === 'number') {
+        logger.warn(warnYamlNumber('discord client ID', intermediate.discord.clientId));
+    }
+    if (typeof intermediate.discord.bot.guildId === 'number') {
+        logger.warn(warnYamlNumber('discord bot GuildID', intermediate.discord.bot.guildId));
+    }
     logger.info('Validating package and perk configuration');
     for (const p of intermediate.packages) {
         Object.setPrototypeOf(p, Package.prototype);
@@ -108,7 +118,12 @@ export async function parseConfig(logger: Logger): Promise<AppConfig> {
             if (perk.type === 'PRIORITY_QUEUE') {
                 p.perks[i] = Object.assign(new PriorityQueuePerk(intermediate.cfToolscClient(), intermediate.serverNames), perk);
             } else if (perk.type === 'DISCORD_ROLE') {
-                p.perks[i] = Object.assign(new DiscordRolePerk(await intermediate.discordClient(), intermediate.discord.bot.guildId), perk)
+                p.perks[i] = Object.assign(new DiscordRolePerk(await intermediate.discordClient(), intermediate.discord.bot.guildId), perk);
+                (p.perks[i] as DiscordRolePerk).roles.forEach((r) => {
+                    if (typeof r === 'number') {
+                        logger.warn(warnYamlNumber(`discord role perk role`, r));
+                    }
+                })
             } else {
                 throw new Error('No available provider can redeem perk: ' + perk.type);
             }
