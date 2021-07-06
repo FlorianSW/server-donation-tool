@@ -8,6 +8,7 @@ import {PriorityQueue} from '../../domain/user';
 import {Perk} from '../../domain/package';
 import {PriorityQueuePerk} from '../perk/priority-queue-perk';
 import {DiscordRolePerk} from '../perk/discord-role-perk';
+import {FreetextPerk} from '../perk/freetext-perk';
 
 export class StartController {
     public readonly router: Router = Router();
@@ -44,6 +45,8 @@ export class StartController {
                     roles: p.roles.map((r) => guild.roles.cache.get(r).name).join(', '),
                 }
             });
+        } else if (p instanceof FreetextPerk) {
+            return p.text;
         }
     }
 

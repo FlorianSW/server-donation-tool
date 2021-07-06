@@ -123,6 +123,14 @@ serverNames:
 # * roles: An array of discord role IDs (NOT names) to assign when the donation succeeded. You can retrieve the role IDs
 #   the same way as you did with the guild ID, just right click on the role you want to assign to a donator to copy the ID
 #   from the context menu.
+#
+# - FREETEXT_ONLY
+# A perk that is not managed by this application. This website is basically not provisioning anything for the donator
+# when the donation is done. This perk is mainly meant to mention perks the donator earns, which will be handled/granted
+# in another way then with this website. There's only one configuration option, which is the text that will be shown to
+# the donator:
+# * text: The text to show to the donator. There's no strict length limitation, however, for the sake of simplicity and
+#   ease of use, you should try to keep it short (other than this documentation ;)).
 packages:
   - name: Allpass
     id: 1
@@ -141,6 +149,8 @@ packages:
           - '0000000000000'
           # DayZ
           - '1111111111111'
+      - tpye: FREETEXT_ONLY
+        text: Some text to show to the donator
   - name: Fastpass
     id: 2
     price:

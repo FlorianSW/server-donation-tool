@@ -10,6 +10,7 @@ import * as yaml from 'js-yaml';
 import {DiscordNotification, DiscordNotifier} from './adapter/discord-notifier';
 import {NoopNotifier} from './adapter/noop-notifier';
 import {Notifier} from './domain/notifier';
+import {FreetextPerk} from './adapter/perk/freetext-perk';
 
 class YamlAppConfig implements AppConfig {
     app: { port: number; sessionSecret: string; community: { title: string; logo: string } };
@@ -123,7 +124,9 @@ export async function parseConfig(logger: Logger): Promise<AppConfig> {
                     if (typeof r === 'number') {
                         logger.warn(warnYamlNumber(`discord role perk role`, r));
                     }
-                })
+                });
+            } else if (perk.type === 'FREETEXT_ONLY') {
+                p.perks[i] = Object.assign(new FreetextPerk(), perk);
             } else {
                 throw new Error('No available provider can redeem perk: ' + perk.type);
             }
