@@ -8,7 +8,7 @@ export interface ServerPriorityQueue {
 }
 
 export interface User {
-    steam: SteamConnection;
+    steam?: SteamConnection;
     discord: DiscordConnection;
     username: string;
     priorityQueue: ServerPriorityQueue;

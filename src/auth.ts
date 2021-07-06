@@ -1,6 +1,6 @@
 import {NextFunction, Request, Response, Router} from 'express';
 import passport from 'passport';
-import {Strategy as DiscordStrategy} from 'passport-discord';
+import {ConnectionInfo, Strategy as DiscordStrategy} from 'passport-discord';
 import {AppConfig} from './domain/app-config';
 import {User} from './domain/user';
 
@@ -21,18 +21,21 @@ export class Authentication {
                 callbackURL: config.discord.redirectUrl,
                 scope: ['identify', 'connections']
             }, (accessToken, refreshToken, profile, cb) => {
-                const connection = profile.connections.find((c) => c.type === 'steam');
-                cb(null, {
+                const connection: ConnectionInfo | undefined = profile.connections.find((c) => c.type === 'steam');
+                const user: User = {
                     username: profile.username,
                     discord: {
                         id: profile.id,
                     },
-                    steam: {
-                        id: connection.id
-                    },
                     priorityQueue: {},
                     discordRoles: [],
-                });
+                };
+                if (connection) {
+                    user.steam = {
+                        id: connection.id,
+                    };
+                }
+                cb(null, user);
             })
         );
 
