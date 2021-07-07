@@ -15,6 +15,7 @@ export interface AppConfig {
         sessionStore: {
             filename: string,
         },
+        compressResponse: boolean,
         community?: {
             title?: string,
             logo?: string,

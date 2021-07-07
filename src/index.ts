@@ -11,6 +11,7 @@ import {PaypalPayment} from './adapter/paypal-payment';
 import {StartController} from './adapter/controller/start';
 import {DonationController} from './adapter/controller/donations';
 import {errorLogger, logger} from 'express-winston';
+import compression from 'compression';
 import winston from 'winston';
 import 'express-async-errors';
 
@@ -81,6 +82,13 @@ parseConfig(log).then(async (config) => {
     };
     app.set('views', path.join(__dirname, 'views'));
     app.set('view engine', 'ejs');
+    if (config.app.compressResponse) {
+        app.use(compression({
+            threshold: 500
+        }));
+    } else {
+        log.warn('Compression disabled as configured');
+    }
     app.use('/assets', express.static(__dirname + '/assets'));
     app.use(bodyParser.json());
     app.use(bodyParser.urlencoded({

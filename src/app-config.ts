@@ -25,6 +25,7 @@ class YamlAppConfig implements AppConfig {
         sessionStore: {
             filename: string;
         },
+        compressResponse: boolean;
         community: {
             title: string;
             logo: string

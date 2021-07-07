@@ -9,6 +9,9 @@ app:
     # the setup) and saves the data in a database file. Multiple app instances are still able to read and write from the
     # store.
     filename: ./sessions.sqlite
+  # Defines if the app should compress responses itself. This option should generally be enabled, unless you plan to serve
+  # traffic to the app using a reverse proxy which is doing the compression on-the-fly.
+  compressResponse: true
   # Optional customisation of the website
   community:
     # The title will be shown in the top navigation bar as well as in the title of the page (visible in the tab or window name)
