@@ -2,6 +2,7 @@ import {Package} from './package';
 import {CFToolsClient} from 'cftools-sdk';
 import {Client} from 'discord.js';
 import {Notifier} from './notifier';
+import {Store} from 'express-session';
 
 export type ServerNames = {
     [serverApiId: string]: string
@@ -11,6 +12,9 @@ export interface AppConfig {
     app: {
         port: number,
         sessionSecret: string,
+        sessionStore: {
+            filename: string,
+        },
         community?: {
             title?: string,
             logo?: string,
@@ -47,6 +51,8 @@ export interface AppConfig {
     discordClient(): Promise<Client>;
 
     notifier(): Notifier;
+
+    sessionStore(): Promise<Store>;
 
     destroy(): void;
 }

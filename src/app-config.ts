@@ -11,9 +11,25 @@ import {DiscordNotification, DiscordNotifier} from './adapter/discord-notifier';
 import {NoopNotifier} from './adapter/noop-notifier';
 import {Notifier} from './domain/notifier';
 import {FreetextPerk} from './adapter/perk/freetext-perk';
+import session, {Store} from 'express-session';
+import {StoreFactory} from 'connect-session-knex';
+import Knex from 'knex';
+
+const initSessionStore = require('connect-session-knex');
+const sessionStore: StoreFactory = initSessionStore(session);
 
 class YamlAppConfig implements AppConfig {
-    app: { port: number; sessionSecret: string; community: { title: string; logo: string } };
+    app: {
+        port: number;
+        sessionSecret: string;
+        sessionStore: {
+            filename: string;
+        },
+        community: {
+            title: string;
+            logo: string
+        }
+    };
     cftools: { applicationId: string; secret: string };
     discord: {
         clientId: string;
@@ -84,6 +100,25 @@ class YamlAppConfig implements AppConfig {
         } else {
             this._notifier = new NoopNotifier();
         }
+    }
+
+    async sessionStore(): Promise<Store> {
+        this.logger.info('Initializing session store');
+        const knex = Knex({
+            client: 'sqlite3',
+            connection: {
+                filename: this.app.sessionStore.filename,
+            },
+            useNullAsDefault: true,
+        });
+        const result = await knex.raw('PRAGMA journal_mode=WAL;');
+        const journalMode = result[0]?.journal_mode;
+        if (journalMode !== 'wal') {
+            this.logger.warn(`Could not set session store's journal mode to WAL, which might decrease performance on multiple concurrent requests. Store runs in mode: ${journalMode}`);
+        }
+        return new sessionStore({
+            knex: knex
+        })
     }
 
     destroy(): void {

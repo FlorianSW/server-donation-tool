@@ -3,6 +3,12 @@ app:
   # Secret used to sign the client-side session cookie (with which the session of the user is identified). Generate
   # a secure string of reasonable length.
   sessionSecret:
+  # Configuration for the session store. The default values should generally be good enough.
+  sessionStore:
+    # The filename where the session database should be saved to. The only included session store is sqlite3 (which eases
+    # the setup) and saves the data in a database file. Multiple app instances are still able to read and write from the
+    # store.
+    filename: ./sessions.sqlite
   # Optional customisation of the website
   community:
     # The title will be shown in the top navigation bar as well as in the title of the page (visible in the tab or window name)

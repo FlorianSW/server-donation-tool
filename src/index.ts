@@ -60,7 +60,7 @@ const errorHandler: ErrorRequestHandler = (err: any, req: Request, res: Response
 };
 
 let appConfig: AppConfig;
-parseConfig(log).then((config) => {
+parseConfig(log).then(async (config) => {
     appConfig = config;
     log.info('Starting server');
     const payment = new PaypalPayment(config);
@@ -86,10 +86,12 @@ parseConfig(log).then((config) => {
     app.use(bodyParser.urlencoded({
         extended: false,
     }));
+
     app.use(session({
         secret: config.app.sessionSecret,
         resave: false,
         saveUninitialized: true,
+        store: await appConfig.sessionStore(),
     }));
     app.use(passport.initialize());
     app.use(passport.session());
