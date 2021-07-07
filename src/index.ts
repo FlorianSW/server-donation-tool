@@ -41,6 +41,10 @@ const log = winston.createLogger({
     ],
 });
 
+if (process.env.NODE_ENV !== 'production') {
+    log.warn('Running in DEVELOPMENT mode. For better performance, run the application with the environment variable NODE_ENV set to production.');
+}
+
 const errorHandler: ErrorRequestHandler = (err: any, req: Request, res: Response, next: NextFunction) => {
     console.log(err);
     res.render('error', {
