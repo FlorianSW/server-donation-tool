@@ -103,6 +103,12 @@ parseConfig(log).then(async (config) => {
         secret: config.app.sessionSecret,
         resave: false,
         saveUninitialized: true,
+        cookie: {
+            path: '/',
+            httpOnly: true,
+            maxAge: 30 * 60 * 1000, // 30 minutes
+            sameSite: 'lax',
+        },
         store: await appConfig.sessionStore(),
     }));
     app.use(passport.initialize());
