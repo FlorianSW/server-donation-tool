@@ -21,6 +21,6 @@ It seamlessly integrates with different platforms in order to automatically prov
 
 The `config.example.yml` provides extensive documentation for each configuration options.
 
-Additionally, the [Getting Started Guide](blob/main/docs/getting-started.md) will provide an easy-to-use step-by-step guide for a first-time setup.
+Additionally, the [Getting Started Guide](/docs/getting-started.md) will provide an easy-to-use step-by-step guide for a first-time setup.
 
-In the [docs/ directory](tree/main/docs/) of this repository you will also find extensive documentation about the single features and concepts of this donation tool.
+In the [docs/ directory](/docs/) of this repository you will also find extensive documentation about the single features and concepts of this donation tool.
