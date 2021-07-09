@@ -49,7 +49,7 @@ discord:
     # how and why this tool uses this intent.
     token:
     # The ID of the Discord server (Guild) your perks should be applied to. You can retrieve this ID with the following steps:
-    # - Open your discord and and and click on the little cog item next to your user in the bottom left
+    # - Open your discord and click on the little cog item next to your user in the bottom left
     # - Go to the App Settings -> Advanced section
     # - Enable the developer mode
     # - Go back to the main Discord view (with all your servers)
