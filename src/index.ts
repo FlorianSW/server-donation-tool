@@ -84,6 +84,7 @@ parseConfig(log).then(async (config) => {
     app.locals.nameFromServerApiId = (serverApiId: string) => {
         return config.serverNames[serverApiId] || serverApiId;
     };
+    app.locals.supportsSteamLogin = appConfig.steam?.apiKey !== undefined;
     app.set('views', path.join(__dirname, 'views'));
     app.set('view engine', 'ejs');
     if (config.app.compressResponse) {

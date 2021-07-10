@@ -101,6 +101,10 @@ class YamlAppConfig implements AppConfig {
         } else {
             this._notifier = new NoopNotifier();
         }
+
+        if (this.steam !== undefined && (!this.steam.realm || !this.steam.apiKey || !this.steam.redirectUrl)) {
+            throw new Error('Not all required configuration for Steam login are set. Refer to the documentation to fix this error.');
+        }
     }
 
     async sessionStore(): Promise<Store> {
