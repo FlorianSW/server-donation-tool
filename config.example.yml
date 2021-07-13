@@ -90,6 +90,10 @@ steam:
   # Your steam api key from https://steamcommunity.com/dev/apikey
   apiKey: 5AFD5B0031A3830FE62D52520EAE77C4
 paypal:
+  # The environment of PayPal which match to the credentials you configure in the next settings. If you use sandbox
+  # credentials, use 'sandbox', if you use live credentials, use 'production'.
+  # Allowed values: sandbox, production
+  environment: sandbox
   # The access credentials of your PayPal application to process payments. You can either use the sandbox credentials
   # to test the application. In order to process real funds, you need to have a paypal business account and use
   # credentials of a live app.

@@ -1,15 +1,21 @@
 import {
     CapturePaymentRequest,
     CreatePaymentOrderRequest,
-    Reference,
-    Order, OrderNotCompleted,
+    Order,
+    OrderNotCompleted,
     Payment,
-    PaymentCapture, SteamIdMismatch
+    PaymentCapture,
+    Reference,
+    SteamIdMismatch
 } from '../domain/payment';
 import {AppConfig} from '../domain/app-config';
 import {User} from '../domain/user';
 
 const paypal = require('@paypal/checkout-server-sdk');
+
+export enum Environment {
+    PRODUCTION = 'production', SANDBOX = 'sandbox'
+}
 
 interface OrderResult {
     result: {
@@ -109,5 +115,9 @@ function paypalClient(config: AppConfig) {
  *
  */
 function environment(config: AppConfig) {
-    return new paypal.core.SandboxEnvironment(config.paypal.clientId, config.paypal.clientSecret);
+    if (config.paypal.environment === Environment.PRODUCTION) {
+        return new paypal.core.LiveEnvironment(config.paypal.clientId, config.paypal.clientSecret);
+    } else {
+        return new paypal.core.SandboxEnvironment(config.paypal.clientId, config.paypal.clientSecret);
+    }
 }

@@ -37,6 +37,7 @@ export interface AppConfig {
         apiKey: string,
     },
     paypal: {
+        environment: string,
         clientId: string,
         clientSecret: string,
     },

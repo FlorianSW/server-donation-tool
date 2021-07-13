@@ -14,6 +14,7 @@ import {FreetextPerk} from './adapter/perk/freetext-perk';
 import session, {Store} from 'express-session';
 import {StoreFactory} from 'connect-session-knex';
 import Knex from 'knex';
+import {Environment} from './adapter/paypal-payment';
 
 const initSessionStore = require('connect-session-knex');
 const sessionStore: StoreFactory = initSessionStore(session);
@@ -48,7 +49,11 @@ class YamlAppConfig implements AppConfig {
         realm: string;
     };
     packages: Package[];
-    paypal: { clientId: string; clientSecret: string };
+    paypal: {
+        environment: Environment;
+        clientId: string;
+        clientSecret: string
+    };
     serverNames: ServerNames;
 
     private logger: Logger;
@@ -104,6 +109,11 @@ class YamlAppConfig implements AppConfig {
 
         if (this.steam !== undefined && (!this.steam.realm || !this.steam.apiKey || !this.steam.redirectUrl)) {
             throw new Error('Not all required configuration for Steam login are set. Refer to the documentation to fix this error.');
+        }
+
+        if (this.paypal.environment === undefined) {
+            this.logger.warn('PayPal environment not set. Sandbox credentials are assumed, which might not be intended.');
+            this.paypal.environment = Environment.SANDBOX;
         }
     }
 
