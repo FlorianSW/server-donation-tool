@@ -5,14 +5,26 @@ body {
   nav, .page-footer {
     background-color: #616161;
 
+    .nav-wrapper {
+      .row {
+        height: 100%;
+      }
+    }
+
     .brand-logo {
       display: flex;
+      height: 100%;
       align-items: center;
       gap: 8px;
 
-      img {
-        max-height: 64px;
+      img, a {
+        max-height: 100%;
+        height: 100%;
       }
+    }
+
+    ul.left {
+      margin-left: 64px;
     }
 
     .container .links {

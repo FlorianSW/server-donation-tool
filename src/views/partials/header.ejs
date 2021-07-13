@@ -14,17 +14,22 @@
     <div class="nav-wrapper">
         <div class="row">
             <div class="col s12">
-                <div class="brand-logo">
-                    <% if (community.logoUrl) { %><img src="<%= community.logoUrl %>">
-                    <% } %>
-                    <span>
-                        <% if (community.title) { %>
-                            <%= community.title %>
-                        <% } else { %>
-                            <%= translate('HEADER_DONATE') %>
-                        <% } %>
-                    </span>
-                </div>
+                <% if (community.logoUrl) { %>
+                    <div class="brand-logo">
+                        <a href="/"><img src="<%= community.logoUrl %>"></a>
+                    </div>
+                <% } %>
+                <ul id="nav-mobile" class="left hide-on-med-and-down">
+                    <li>
+                        <a href="/">
+                            <% if (community.title) { %>
+                                <%= community.title %>
+                            <% } else { %>
+                                <%= translate('HEADER_DONATE') %>
+                            <% } %>
+                        </a>
+                    </li>
+                </ul>
                 <ul id="nav-mobile" class="right hide-on-med-and-down">
                     <li><a href="/auth/logout">Logout</a></li>
                 </ul>
