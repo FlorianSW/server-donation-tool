@@ -15,6 +15,7 @@ import session, {Store} from 'express-session';
 import {StoreFactory} from 'connect-session-knex';
 import Knex from 'knex';
 import {Environment} from './adapter/paypal-payment';
+import settings from './translations';
 
 const initSessionStore = require('connect-session-knex');
 const sessionStore: StoreFactory = initSessionStore(session);
@@ -27,6 +28,7 @@ class YamlAppConfig implements AppConfig {
             filename: string;
         },
         compressResponse: boolean;
+        language?: string;
         community: {
             title: string;
             logo: string
@@ -114,6 +116,10 @@ class YamlAppConfig implements AppConfig {
         if (this.paypal.environment === undefined) {
             this.logger.warn('PayPal environment not set. Sandbox credentials are assumed, which might not be intended.');
             this.paypal.environment = Environment.SANDBOX;
+        }
+
+        if (this.app.language) {
+            settings.language = this.app.language;
         }
     }
 

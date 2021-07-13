@@ -1,0 +1,6 @@
+# Copy this file to string_overrides.yml to overwrite translated strings in the donation tool.
+# You can then re-define what message/text is shown to the user when a specific message key is requested within
+# the application.
+# You can find available message keys in the messages object within the src/translations.ts file.
+messages:
+  A_MESSAGE_KEY: A_MESSAGE_VALUE

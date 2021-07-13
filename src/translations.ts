@@ -1,3 +1,25 @@
+import * as yaml from 'js-yaml';
+import fs from 'fs';
+
+const overridesFile = 'string_overrides.yml';
+
+interface TranslationSettings {
+    language: string;
+};
+
+interface MessageOverrides {
+    messages: { [key: string]: string };
+}
+
+let overrides: MessageOverrides;
+if (fs.existsSync(overridesFile)) {
+    overrides = yaml.load(fs.readFileSync(overridesFile, 'utf8')) as MessageOverrides;
+} else {
+    overrides = {
+        messages: {}
+    };
+}
+
 const messages: { [key: string]: string } = {
     HEADER_DONATE: 'Donate',
 
@@ -81,8 +103,15 @@ export interface TranslateOptions {
 
 export function translate(key: string, options?: TranslateOptions): string {
     let message = messages[key];
-    if (message === undefined) {
-        return key;
+    if (overrides.messages.hasOwnProperty(key)) {
+        message = overrides.messages[key];
+    }
+    if (settings.language === 'qqx' || message === undefined) {
+        if (options?.params !== undefined) {
+            const paramNames = Object.keys(options.params).join(', ');
+            return `{${key}:${paramNames}}`;
+        }
+        return `{${key}}`;
     }
     if (options?.params !== undefined) {
         for (const param in options.params) {
@@ -91,3 +120,8 @@ export function translate(key: string, options?: TranslateOptions): string {
     }
     return message;
 }
+
+const settings: TranslationSettings = {
+    language: 'en',
+};
+export default settings;
