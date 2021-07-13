@@ -32,6 +32,7 @@ const messages: { [key: string]: string } = {
     STEAM_LOGIN_ANOTHER: 'Login with another account',
 
     PERK_SELECTION_TITLE: 'Select package',
+    PERK_SELECTION_SELECT: 'Select',
     PERK_NO_AVAILABLE: 'There is no package available. You may already have all available perks.',
 
     PAYPAL_DONATION_TITLE: 'PayPal Donation',
