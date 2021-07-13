@@ -3,7 +3,7 @@
 [![Discord](https://img.shields.io/discord/729467994832371813?color=7289da&label=Discord&logo=discord&logoColor=ffffff&style=flat-square)](https://go2tech.de/discord)
 
 <p align="center">
-    <img src="https://github.com/FlorianSW/cftools-server-donation/raw/main/.github/screenshot.png" alt="Main view of the website">
+    <img src="https://github.com/FlorianSW/cftools-server-donation/raw/main/.github/screenshot.png" alt="Main view of the website" width="420px">
 </p>
 
 This server donation tool is meant to make it easier for gaming communities to allow their members to donate and earn differnet perks for their donation.
@@ -23,4 +23,25 @@ The `config.example.yml` provides extensive documentation for each configuration
 
 Additionally, the [Getting Started Guide](/docs/getting-started.md) will provide an easy-to-use step-by-step guide for a first-time setup.
 
-In the [docs/ directory](/docs/) of this repository you will also find extensive documentation about the single features and concepts of this donation tool.
+More topics to read about:
+
+* Configuration
+    * [Getting Started](/docs/getting-started.md)
+    * [Setup Additional Steam Login](/docs/steam-login.md)
+    * [Packages and Perks](/docs/packages-and-perks.md)
+* Security
+    * [Setup/Use https/secure connections](/docs/secure-connections.md)
+* Customization
+    * [Overwrite messages](/docs/message-overrides.md)
+
+## Support and Collaboration
+
+If you have a question regarding the use or the setup of this tool, feel free to join my Discord and get the `Tools` role.
+I'll be happy to assist you if I can with your question there :)
+
+Given you think you found a bug, a missing feature or something that can be improved, I encourage you to open an issue in [this Github repository](https://github.com/FlorianSW/cftools-server-donation).
+Please, do not use issues for your questions or for getting support.
+
+Given you're a developer and want to contribute code to this project, feel free to do so.
+Simply fork the project, make your code changes and open a pull request against this repository.
+I appreciate your help and support and will try to review your pull request as soon as I can.
