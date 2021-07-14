@@ -8,7 +8,7 @@ app:
     # The filename where the session database should be saved to. The only included session store is sqlite3 (which eases
     # the setup) and saves the data in a database file. Multiple app instances are still able to read and write from the
     # store.
-    filename: ./sessions.sqlite
+    filename: ./db/sessions.sqlite
   # Defines if the app should compress responses itself. This option should generally be enabled, unless you plan to serve
   # traffic to the app using a reverse proxy which is doing the compression on-the-fly.
   compressResponse: true
