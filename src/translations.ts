@@ -32,7 +32,7 @@ const messages: { [key: string]: string } = {
     STEAM_LOGIN_ANOTHER: 'Login with another account',
 
     PERK_SELECTION_TITLE: 'Select package',
-    PERK_SELECTION_VARIABLE_LABEL: 'Donation amount in {{currency}}',
+    PERK_SELECTION_VARIABLE_LABEL: 'Choose your desired amount in {{currency}}',
     PERK_SELECTION_VARIABLE_TITLE: 'An amount with two optional decimal fractions. Examples: 10 or 7.51',
     PERK_SELECTION_SELECT: 'Select',
     PERK_NO_AVAILABLE: 'There is no package available. You may already have all available perks.',
