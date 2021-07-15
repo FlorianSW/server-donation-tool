@@ -78,15 +78,24 @@ class YamlAppConfig implements AppConfig {
         return this._notifier;
     }
 
-    async initialize(): Promise<void> {
-        this._cfToolsClient = new CFToolsClientBuilder()
-            .withCredentials(this.cftools.applicationId, this.cftools.secret)
-            .build();
+    private assertValidPackages() {
+        const packageIds = new Set<number>();
         this.packages.forEach((p) => {
             if (p.perks === undefined) {
                 p.perks = [];
             }
+            if (packageIds.has(p.id)) {
+                throw new Error('Package ID ' + p.id + ' is configured multiple times. Each package needs to have a unique ID.');
+            }
+            packageIds.add(p.id);
         });
+    }
+
+    async initialize(): Promise<void> {
+        this._cfToolsClient = new CFToolsClientBuilder()
+            .withCredentials(this.cftools.applicationId, this.cftools.secret)
+            .build();
+        this.assertValidPackages();
         const hasDiscordPerk = this.packages.find((p) => p.perks.find((perk) => perk.type === 'DISCORD_ROLE'));
 
         if (this.discord.bot?.token) {
