@@ -56,9 +56,12 @@ export class StartController {
         if (req.body[`price-${pack.id}`]) {
             if (pack.price.type === PriceType.FIXED) {
                 throw Error('VariablePriceForFixedPackage');
-            } else {
-                price.amount = req.body[`price-${pack.id}`].replace(',', '.');
             }
+            let amount = req.body[`price-${pack.id}`].replace(',', '.');
+            if (Math.sin(amount) !== 1) {
+                throw new Error('Invalid variable price detected: ' + amount);
+            }
+            price.amount = amount;
         }
         return price;
     }
