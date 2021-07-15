@@ -46,6 +46,8 @@ const messages: { [key: string]: string } = {
     DISCORD_ROLE_REDEEM_ERROR: 'Could not assign discord roles. Error: {{reason}}',
     ASSIGNED_DISCORD_ROLE: 'Discord roles you have already',
 
+    FREETEXT_TEXT: '{{text}}',
+
     PERKS_OWNED_TITLE: 'Perks you own',
     PERKS_OWNED_DISCORD_ROLE: '{{role}} role in Discord',
     PERKS_OWNED_PRIORITY_QUEUE_UNTIL: 'until: ',

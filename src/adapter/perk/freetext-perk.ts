@@ -1,6 +1,5 @@
 import {TranslateParams} from '../../translations';
-import {Client} from 'discord.js';
-import {Package, Perk, RedeemError} from '../../domain/package';
+import {Package, Perk} from '../../domain/package';
 import {User} from '../../domain/user';
 import {Order} from '../../domain/payment';
 
@@ -11,6 +10,6 @@ export class FreetextPerk implements Perk {
     readonly text: string;
 
     async redeem(forUser: User, order: Order): Promise<TranslateParams> {
-        return [this.text, {params: {}}];
+        return ['FREETEXT_TEXT', {params: {text: this.text}}];
     }
 }
