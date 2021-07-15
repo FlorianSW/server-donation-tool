@@ -119,7 +119,8 @@ serverNames:
 #   and will also be available in your PayPal dashboard in the 'custom' reference.
 # - price: The price of the perk, as an object of currency and amount. The currency needs to be a supported string from
 #   PayPal (see https://developer.paypal.com/docs/reports/reference/paypal-supported-currencies/). The amount is a
-#   string (make sure to quote the value) with a number with two decimals.
+#   string (make sure to quote the value) with a number with two decimals. Optionally, you can specify the type of the price.
+#   It can be either FIXED or VARIABLE, while FIXED is the default value if omitted.
 # - perks: Zero, one or more perks; each perk describes a specific benefit a donator earns. A perk consists of the
 #   following mandatory configuration:
 #   * type: The type of the perk. The only currently supported value is PRIORITY_QUEUE. The value is currently unused.
@@ -156,7 +157,6 @@ packages:
   - name: Allpass
     id: 1
     price:
-      type: FIXED
       currency: USD
       amount: '1.00'
     perks:

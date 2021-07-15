@@ -15,6 +15,35 @@ It holds the information of a unique ID, in order to reference the package durin
 The package will also has a price tag, which a donator will need to pay.
 The most important part of a package is a collection (0 or more) of perks, that a donator gets access to when a donation was successful.
 
+#### Packages with a variable price
+
+The default setting for a package is, that it has a fixed price tag.
+That means, a donator can select the package in order to earn the perks of it, but has to donate the fixed amount of money the server hoster defined as a price.
+Alternatively, the type of the package (with the `type` parameter in the price object) can be `VARIABLE`.
+Setting the price to variable allows your donators to donate an amount they see as appropriate, starting from any positive value greater than 0 (even 0.01).
+
+This feature is intended to support packages where you want your donators to donate less amounts then your pre-packages allow.
+However, keep in mind that the donators will still earn the perks configured for the package, for whatever price they choose, even one cent only.
+
+To configure a package with a variable price, which will grant the donator a role in the discord, use this example:
+
+```yaml
+packages:
+  - name: 'Perk #1'
+    id: 1
+    price:
+      type: VARIABLE
+      currency: USD
+      amount: '1.00'
+    perks:
+      - type: DISCORD_ROLE
+        roles:
+          # Donator
+          - '0000000000000'
+```
+
+The `amount` in the `price` object will be used as a default value in the tet field, which a donator can change.
+
 ### Perk
 
 A perk is a single _item_ a donator will be granted when a donation for a package was successful.
