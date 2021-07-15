@@ -48,13 +48,18 @@ export class DonationController {
     }
 
     private async prepareDonation(req: Request, res: Response) {
-        if (!this.selectedPackage(req.session)) {
+        const selectedPackage = this.selectedPackage(req.session);
+        if (!selectedPackage) {
             res.redirect('/');
             return;
         }
         res.render('index', {
             step: 'DONATE',
             user: req.user,
+            selectedPackage: {
+                name: selectedPackage.name,
+                price: req.session.selectedPackage.price,
+            },
             paypalClientId: this.config.paypal.clientId,
             paymentStatus: 'UNSTARTED',
         })

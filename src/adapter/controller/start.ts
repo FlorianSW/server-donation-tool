@@ -58,7 +58,7 @@ export class StartController {
                 throw Error('VariablePriceForFixedPackage');
             }
             let amount = req.body[`price-${pack.id}`].replace(',', '.');
-            if (Math.sin(amount) !== 1) {
+            if (Math.sign(amount) !== 1) {
                 throw new Error('Invalid variable price detected: ' + amount);
             }
             price.amount = amount;

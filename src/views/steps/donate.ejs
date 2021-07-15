@@ -5,6 +5,11 @@
             <p>
                 <%- translate('PAYPAL_DESCRIPTION') %>
             </p>
+            <h5><%= translate('PAYPAL_SELECTED_PACKAGE') %></h5>
+            <p>
+                <%= selectedPackage.name %><br>
+                <%= selectedPackage.price.currency + ' ' + selectedPackage.price.amount %>
+            </p>
             <div class="status">
                 <% if (paymentStatus === 'ERROR') { %>
                     <i class="material-icons error">highlight_off</i> <%= translate('PAYPAL_ERROR') %>
