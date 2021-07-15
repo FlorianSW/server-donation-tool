@@ -156,6 +156,7 @@ packages:
   - name: Allpass
     id: 1
     price:
+      type: FIXED
       currency: USD
       amount: '1.00'
     perks:
@@ -175,6 +176,7 @@ packages:
   - name: Fastpass
     id: 2
     price:
+      type: VARIABLE
       currency: USD
       amount: '1.00'
     perks:

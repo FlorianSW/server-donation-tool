@@ -2,8 +2,8 @@ import {PriorityQueuePerk} from './priority-queue-perk';
 import {CFToolsClient, SteamId64} from 'cftools-sdk';
 import {InMemoryCFToolsClient} from './testhelper';
 import {User} from '../../domain/user';
-import {Package} from '../../domain/package';
-import {Reference, Order} from '../../domain/payment';
+import {Package, PriceType} from '../../domain/package';
+import {Order, Reference} from '../../domain/payment';
 
 const aSteamId = '76561198012102485';
 const aServerApiId = 'c10a80c6-ad46-477e-971d-614370ec173e';
@@ -25,6 +25,7 @@ const aPackage: Package = {
     perks: [],
     name: 'A_PACKAGE',
     price: {
+        type: PriceType.FIXED,
         currency: 'USD',
         amount: '1.00'
     }

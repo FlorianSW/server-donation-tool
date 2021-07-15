@@ -111,12 +111,18 @@ export class DonationController {
     }
 
     private selectedPackage(session: Partial<SessionData>): Package {
-        return this.config.packages.find((p) => session.selectedPackageId === p.id);
+        return this.config.packages.find((p) => session.selectedPackage.id === p.id);
     }
 
     private async createOrder(req: Request, res: Response) {
         const order = await this.payment.createPaymentOrder({
-            forPackage: this.selectedPackage(req.session),
+            forPackage: {
+                ...this.selectedPackage(req.session),
+                price: {
+                    ...this.selectedPackage(req.session).price,
+                    ...req.session.selectedPackage.price
+                }
+            },
             steamId: req.body.steamId
         });
         res.status(200).json({

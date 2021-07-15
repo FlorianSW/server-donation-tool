@@ -34,6 +34,10 @@ body {
     }
   }
 
+  input[type="text"] {
+    color: white;
+  }
+
   .card {
     background-color: #616161;
 
@@ -56,7 +60,7 @@ body {
 
     &.package {
       .collection-item {
-        .perks {
+        .package-information {
           display: none;
           padding-left: 35px;
 
@@ -66,7 +70,7 @@ body {
           }
         }
 
-        input[type="radio"][name="package"]:checked ~ .perks {
+        input[type="radio"][name="package"]:checked ~ .package-information {
           display: block;
         }
 

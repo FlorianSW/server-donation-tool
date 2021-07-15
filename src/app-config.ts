@@ -1,7 +1,7 @@
 import {CFToolsClient, CFToolsClientBuilder} from 'cftools-sdk';
 import {Client} from 'discord.js';
 import {AppConfig, ServerNames} from './domain/app-config';
-import {Package} from './domain/package';
+import {Package, PriceType} from './domain/package';
 import {DiscordRolePerk} from './adapter/perk/discord-role-perk';
 import {PriorityQueuePerk} from './adapter/perk/priority-queue-perk';
 import {Logger} from 'winston';
@@ -82,6 +82,9 @@ class YamlAppConfig implements AppConfig {
     private assertValidPackages() {
         const packageIds = new Set<number>();
         this.packages.forEach((p) => {
+            if (p.price.type === undefined) {
+                p.price.type = PriceType.FIXED;
+            }
             if (p.perks === undefined) {
                 p.perks = [];
             }

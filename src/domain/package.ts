@@ -9,6 +9,16 @@ export interface Perk {
     redeem(forUser: User, order: Order): Promise<TranslateParams>
 }
 
+export enum PriceType {
+    FIXED = 'FIXED', VARIABLE = 'VARIABLE'
+}
+
+export interface Price {
+    type: PriceType;
+    currency: string;
+    amount: string;
+}
+
 export class RedeemError extends Error {
     constructor(public readonly params: TranslateParams) {
         super('RedeemError');
@@ -19,9 +29,6 @@ export class RedeemError extends Error {
 export class Package {
     name: string;
     id: number;
-    price: {
-        currency: string,
-        amount: string,
-    };
+    price: Price;
     perks: Perk[];
 }

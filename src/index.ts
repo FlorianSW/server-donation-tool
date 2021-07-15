@@ -51,7 +51,7 @@ const errorHandler: ErrorRequestHandler = (err: any, req: Request, res: Response
         status: err.status || 500,
         supportInfo: JSON.stringify({
             status: err.status || 500,
-            selectedPackage: req.session.selectedPackageId,
+            selectedPackage: req.session.selectedPackage.id,
             user: {
                 steamId: req.user.steam.id,
                 discordId: req.user.discord.id,
@@ -71,7 +71,7 @@ parseConfig(log).then(async (config) => {
     const payment = new PaypalPayment(config);
     const app = express();
     const port = config.app.port;
-    const start = new StartController(config);
+    const start = new StartController(config, log);
     const donations = new DonationController(config, payment, appConfig.notifier(), log);
     const authentication = new Authentication(config);
 

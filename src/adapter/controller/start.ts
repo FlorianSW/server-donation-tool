@@ -5,15 +5,16 @@ import {translate} from '../../translations';
 import {Guild} from 'discord.js';
 import {AppConfig} from '../../domain/app-config';
 import {PriorityQueue} from '../../domain/user';
-import {Perk} from '../../domain/package';
+import {Package, Perk, Price, PriceType} from '../../domain/package';
 import {PriorityQueuePerk} from '../perk/priority-queue-perk';
 import {DiscordRolePerk} from '../perk/discord-role-perk';
 import {FreetextPerk} from '../perk/freetext-perk';
+import {Logger} from 'winston';
 
 export class StartController {
     public readonly router: Router = Router();
 
-    constructor(private readonly config: AppConfig) {
+    constructor(private readonly config: AppConfig, private readonly log: Logger) {
         this.router.post('/selectPackage', requireAuthentication, this.selectPackage.bind(this));
         this.router.get('/', requireAuthentication, this.populatePriorityQueue.bind(this), this.populateDiscordRoles.bind(this), this.startPage.bind(this));
     }
@@ -50,13 +51,37 @@ export class StartController {
         }
     }
 
+    private price(req: Request, pack: Package): Price {
+        const price = pack.price;
+        if (req.body[`price-${pack.id}`]) {
+            if (pack.price.type === PriceType.FIXED) {
+                throw Error('VariablePriceForFixedPackage');
+            } else {
+                price.amount = req.body[`price-${pack.id}`].replace(',', '.');
+            }
+        }
+        return price;
+    }
+
     private async selectPackage(req: Request, res: Response) {
         const selectedPackage = this.config.packages.find((p) => p.id === parseInt(req.body.package));
-        if (selectedPackage) {
-            req.session.selectedPackageId = selectedPackage.id;
-            res.redirect('/donate');
-        } else {
+        if (!selectedPackage) {
             res.redirect('/');
+        }
+
+        try {
+            req.session.selectedPackage = {
+                id: selectedPackage.id,
+                price: this.price(req, selectedPackage),
+            };
+            res.redirect('/donate');
+        } catch (e) {
+            if (e.message === 'VariablePriceForFixedPackage') {
+                this.log.warn(`Discord user ${req.user.discord.id} requested variable price for fixed package.`);
+                res.redirect('/');
+            } else {
+                throw e;
+            }
         }
     }
 

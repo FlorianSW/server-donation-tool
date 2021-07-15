@@ -1,4 +1,5 @@
 import {User as DomainUser} from './domain/user';
+import {Price} from './domain/package';
 
 declare global {
     namespace Express {
@@ -13,7 +14,10 @@ declare global {
 
 declare module 'express-session' {
     interface SessionData {
-        selectedPackageId: number;
+        selectedPackage: {
+            id: number;
+            price: Price;
+        };
         afterLoginTarget?: string;
         lastOrder?: {
             id: string,
