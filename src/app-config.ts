@@ -31,7 +31,8 @@ class YamlAppConfig implements AppConfig {
         language?: string;
         community: {
             title: string;
-            logo: string
+            logo: string;
+            discord?: string;
         }
     };
     cftools: { applicationId: string; secret: string };
@@ -91,11 +92,7 @@ class YamlAppConfig implements AppConfig {
         });
     }
 
-    async initialize(): Promise<void> {
-        this._cfToolsClient = new CFToolsClientBuilder()
-            .withCredentials(this.cftools.applicationId, this.cftools.secret)
-            .build();
-        this.assertValidPackages();
+    private async configureDiscord() {
         const hasDiscordPerk = this.packages.find((p) => p.perks.find((perk) => perk.type === 'DISCORD_ROLE'));
 
         if (this.discord.bot?.token) {
@@ -117,10 +114,27 @@ class YamlAppConfig implements AppConfig {
         } else if (hasDiscordPerk) {
             throw new Error('At least one discord perk is configured but no valid discord configuration was found.');
         }
+    }
+
+    private configureNotifications() {
         if (this.discord.notifications && this.discord.notifications.length !== 0) {
             this._notifier = new DiscordNotifier(this.discord.notifications);
         } else {
             this._notifier = new NoopNotifier();
+        }
+    }
+
+    async initialize(): Promise<void> {
+        this._cfToolsClient = new CFToolsClientBuilder()
+            .withCredentials(this.cftools.applicationId, this.cftools.secret)
+            .build();
+        this.assertValidPackages();
+        await this.configureDiscord();
+        this.configureNotifications();
+
+        if (this.app.community?.discord !== undefined && !this.app.community.discord.startsWith('http')) {
+            this.logger.warn('Community Discord link needs to be an absolute URL. This is invalid: ' + this.app.community.discord);
+            this.app.community.discord = '';
         }
 
         if (this.steam !== undefined && (!this.steam.realm || !this.steam.apiKey || !this.steam.redirectUrl)) {
