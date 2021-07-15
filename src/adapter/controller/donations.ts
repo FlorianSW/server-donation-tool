@@ -48,6 +48,10 @@ export class DonationController {
     }
 
     private async prepareDonation(req: Request, res: Response) {
+        if (!this.selectedPackage(req.session)) {
+            res.redirect('/');
+            return;
+        }
         res.render('index', {
             step: 'DONATE',
             user: req.user,
