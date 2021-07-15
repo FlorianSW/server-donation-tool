@@ -51,7 +51,8 @@ const messages: { [key: string]: string } = {
     PERKS_OWNED_PRIORITY_QUEUE_UNTIL: 'until: ',
 
     REDEEM_TITLE: 'Thank you for your donation',
-    REDEEM_DESCRIPTION: 'You can now redeem your perk to profit from the benefits it includes.',
+    REDEEM_DESCRIPTION_WITH_PERKS: 'You can now redeem your perk to profit from the benefits it includes.',
+    REDEEM_DESCRIPTION_WITHOUT_PERKS: 'We appreciate your support to our community.',
     REDEEM_SUBMIT: 'Redeem',
     REDEEM_BACK: 'Back to Start',
     REDEEM_RETRY: 'Retry',

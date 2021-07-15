@@ -13,7 +13,7 @@ It is also the key element for server hosters to individualise what they offer t
 A package in the donation tool can be seen as a container.
 It holds the information of a unique ID, in order to reference the package during the donation process, as well as afterwards (e.g. in case of a refund or issue).
 The package will also has a price tag, which a donator will need to pay.
-The most important part of a package is a collection (0 or more) of perks, that a donator is granted access to, when a donation was successfully done.
+The most important part of a package is a collection (0 or more) of perks, that a donator gets access to when a donation was successful.
 
 ### Perk
 

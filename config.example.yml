@@ -111,7 +111,7 @@ cftools:
 # easily recognize.
 serverNames:
   aServerApiId: some name
-# Packages are the available prices and benefits a donator gets when donating that amount. Each perk has the following information
+# Packages are the available prices and benefits a donator gets when donating that amount. Each package has the following information
 # - name: A human readable name, which is displayed in the perk selection screen as well as on the PayPal receipt (choose
 #   a name which is not too long, but still descriptive); do not put the price in it
 # - id: A unique id over the lifetime of the website. It needs to be unique even _after_ you want to remove the perk.
@@ -120,7 +120,8 @@ serverNames:
 # - price: The price of the perk, as an object of currency and amount. The currency needs to be a supported string from
 #   PayPal (see https://developer.paypal.com/docs/reports/reference/paypal-supported-currencies/). The amount is a
 #   string (make sure to quote the value) with a number with two decimals.
-# - perks: Each perk describes a specific benefit a donator earns. A perk consists of the following mandatory configuration:
+# - perks: Zero, one or more perks; each perk describes a specific benefit a donator earns. A perk consists of the
+#   following mandatory configuration:
 #   * type: The type of the perk. The only currently supported value is PRIORITY_QUEUE. The value is currently unused.
 #   Each perk may have additional configuration, see the below list of available perks for more details.
 #

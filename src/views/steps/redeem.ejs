@@ -15,12 +15,14 @@
                         </li>
                     <% }); %>
                 </ul>
+            <% } else if (hasPerks) { %>
+                <p><%= translate('REDEEM_DESCRIPTION_WITH_PERKS') %></p>
             <% } else { %>
-                <p><%= translate('REDEEM_DESCRIPTION') %></p>
+                <p><%= translate('REDEEM_DESCRIPTION_WITHOUT_PERKS') %></p>
             <% } %>
         </div>
         <div class="card-action">
-            <% if (redeemStatus !== 'COMPLETE') { %>
+            <% if (redeemStatus !== 'COMPLETE' && hasPerks) { %>
                 <a href="./redeem"><%= translate('REDEEM_SUBMIT') %></a>
             <% } else if (errors.length !== 0) { %>
                 <a href="#" onclick="window.location.reload();"><%= translate('REDEEM_RETRY') %></a>

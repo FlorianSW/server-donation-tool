@@ -82,6 +82,11 @@ class YamlAppConfig implements AppConfig {
         this._cfToolsClient = new CFToolsClientBuilder()
             .withCredentials(this.cftools.applicationId, this.cftools.secret)
             .build();
+        this.packages.forEach((p) => {
+            if (p.perks === undefined) {
+                p.perks = [];
+            }
+        });
         const hasDiscordPerk = this.packages.find((p) => p.perks.find((perk) => perk.type === 'DISCORD_ROLE'));
 
         if (this.discord.bot?.token) {

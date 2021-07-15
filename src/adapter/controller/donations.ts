@@ -1,11 +1,12 @@
 import {requireAuthentication} from '../../auth';
 import {Request, Response, Router} from 'express';
 import {TranslateParams} from '../../translations';
-import {RedeemError} from '../../domain/package';
+import {Package, RedeemError} from '../../domain/package';
 import {AppConfig} from '../../domain/app-config';
 import {Order, OrderNotCompleted, Payment, SteamIdMismatch} from '../../domain/payment';
 import {Logger} from 'winston';
 import {Notifier} from '../../domain/notifier';
+import {Session, SessionData} from 'express-session';
 
 export class DonationController {
     public readonly router: Router = Router();
@@ -67,6 +68,8 @@ export class DonationController {
             user: req.user,
             step: 'REDEEM',
             redeemStatus: 'PENDING',
+            hasPerks: this.selectedPackage(req.session).perks.length !== 0,
+            errors: []
         });
     }
 
@@ -103,11 +106,13 @@ export class DonationController {
         });
     }
 
-    private async createOrder(req: Request, res: Response) {
-        const selectedPackage = this.config.packages.find((p) => req.session.selectedPackageId === p.id);
+    private selectedPackage(session: Partial<SessionData>): Package {
+        return this.config.packages.find((p) => session.selectedPackageId === p.id);
+    }
 
+    private async createOrder(req: Request, res: Response) {
         const order = await this.payment.createPaymentOrder({
-            forPackage: selectedPackage,
+            forPackage: this.selectedPackage(req.session),
             steamId: req.body.steamId
         });
         res.status(200).json({
