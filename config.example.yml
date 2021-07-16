@@ -88,7 +88,7 @@ steam:
   # then your realm should look like 'http://example.com'
   realm: http://localhost:8080
   # Your steam api key from https://steamcommunity.com/dev/apikey
-  apiKey: 5AFD5B0031A3830FE62D52520EAE77C4
+  apiKey: 'SOME_API_KEY'
 paypal:
   # The environment of PayPal which match to the credentials you configure in the next settings. If you use sandbox
   # credentials, use 'sandbox', if you use live credentials, use 'production'.
