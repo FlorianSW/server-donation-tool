@@ -135,7 +135,7 @@ class YamlAppConfig implements AppConfig {
         await this.configureDiscord();
         this.configureNotifications();
 
-        if (this.app.community?.discord !== undefined && !this.app.community.discord.startsWith('http')) {
+        if (this.app.community?.discord && !this.app.community.discord.startsWith('http')) {
             this.logger.warn('Community Discord link needs to be an absolute URL. This is invalid: ' + this.app.community.discord);
             this.app.community.discord = '';
         }
