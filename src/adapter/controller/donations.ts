@@ -6,7 +6,7 @@ import {AppConfig} from '../../domain/app-config';
 import {Order, OrderNotCompleted, Payment, SteamIdMismatch} from '../../domain/payment';
 import {Logger} from 'winston';
 import {Notifier} from '../../domain/notifier';
-import {Session, SessionData} from 'express-session';
+import {SessionData} from 'express-session';
 
 export class DonationController {
     public readonly router: Router = Router();
