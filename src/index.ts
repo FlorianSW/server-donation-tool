@@ -121,6 +121,9 @@ parseConfig(log).then(async (config) => {
             success: 'debug',
             warn: 'warn',
             error: 'error'
+        },
+        skip: (req, res) => {
+            return [404].includes(res.statusCode);
         }
     }));
 
