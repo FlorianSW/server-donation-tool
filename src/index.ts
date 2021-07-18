@@ -51,7 +51,7 @@ const errorHandler: ErrorRequestHandler = (err: any, req: Request, res: Response
         status: err.status || 500,
         supportInfo: JSON.stringify({
             status: err.status || 500,
-            selectedPackage: req.session.selectedPackage.id,
+            selectedPackage: req.session.selectedPackage?.id,
             user: {
                 steamId: req.user.steam.id,
                 discordId: req.user.discord.id,
