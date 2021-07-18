@@ -140,3 +140,15 @@ To configure the tool, follow these steps:
 * You should now go through each of the configuration options and fill them out with the information you gathered above
 * If you do not have a value for one of the configuration, remove it, or keep the default value, if it has one
 * Also, take a look into the comments of the configuration option, which may give additional details and context to what this option does and if you should change it
+
+## Start the tool
+
+Once you've done the above setup and steps, you can go ahead and start the donation tool.
+For that:
+
+* press [WIN] + [R]
+* type `cmd`
+* hit [ENTER]
+* Navigate to the downloaded source code: `cd C:\apps\cftools-server-donation`
+* Start the tool: `npm start`
+* It will now be served from the configured port :)
