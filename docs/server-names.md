@@ -10,9 +10,11 @@ The `serverNames` configuration option is a map which maps the CFTools Server ID
 For example, let's suppose your community operates two DayZ Servers with the following data:
 Name: My Awesome Server 1
 Server ID: 123-456-789
+(Server ID from the CFTools Dashboard -> Manage -> Settings -> API Key section)
 
 Name: My Awesome Server 2
 Server ID: 987-654-321
+(Server ID from the CFTools Dashboard -> Manage -> Settings -> API Key section)
 
 You can configure the `serverNames` mapping as follows:
 ```yaml
