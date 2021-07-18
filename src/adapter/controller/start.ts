@@ -2,7 +2,7 @@ import {NextFunction, Request, Response, Router} from 'express';
 import {requireAuthentication} from '../../auth';
 import {PriorityQueueItem, ResourceNotFound, ServerApiId, SteamId64} from 'cftools-sdk';
 import {translate} from '../../translations';
-import {Guild} from 'discord.js';
+import {APIErrors, Constants, DiscordAPIError, Guild} from 'discord.js';
 import {AppConfig} from '../../domain/app-config';
 import {PriorityQueue} from '../../domain/user';
 import {Package, Perk, Price, PriceType} from '../../domain/package';
@@ -134,7 +134,18 @@ export class StartController {
     private async populateDiscordRoles(req: Request, res: Response, next: NextFunction): Promise<void> {
         const client = await this.config.discordClient();
         const guild = await client.guilds.fetch(this.config.discord.bot.guildId);
-        const guildMember = await guild.members.fetch(req.user.discord.id);
+
+        let guildMember;
+        try {
+            guildMember = await guild.members.fetch(req.user.discord.id);
+        } catch (e) {
+            if (e instanceof DiscordAPIError && e.code === Constants.APIErrors.UNKNOWN_MEMBER && this.config.app.community?.discord) {
+                res.redirect(this.config.app.community.discord);
+                return;
+            }
+            throw e;
+        }
+
         const perkRoles = this.perks()
             .filter((p) => p instanceof DiscordRolePerk)
             .map((p) => (p as DiscordRolePerk).roles)
