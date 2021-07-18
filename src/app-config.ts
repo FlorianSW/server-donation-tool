@@ -20,6 +20,15 @@ import settings from './translations';
 const initSessionStore = require('connect-session-knex');
 const sessionStore: StoreFactory = initSessionStore(session);
 
+function isWebUrl(urlAsString: string): boolean {
+    try {
+        const url = new URL(urlAsString);
+        return url.protocol === 'http:' || url.protocol === 'https:';
+    } catch (e) {
+        return false;
+    }
+}
+
 class YamlAppConfig implements AppConfig {
     app: {
         port: number;
@@ -79,54 +88,6 @@ class YamlAppConfig implements AppConfig {
         return this._notifier;
     }
 
-    private assertValidPackages() {
-        const packageIds = new Set<number>();
-        this.packages.forEach((p) => {
-            if (p.price.type === undefined) {
-                p.price.type = PriceType.FIXED;
-            }
-            if (p.perks === undefined) {
-                p.perks = [];
-            }
-            if (packageIds.has(p.id)) {
-                throw new Error('Package ID ' + p.id + ' is configured multiple times. Each package needs to have a unique ID.');
-            }
-            packageIds.add(p.id);
-        });
-    }
-
-    private async configureDiscord() {
-        const hasDiscordPerk = this.packages.find((p) => p.perks.find((perk) => perk.type === 'DISCORD_ROLE'));
-
-        if (this.discord.bot?.token) {
-            this._discordClient = new Client({
-                ws: {
-                    intents: ['GUILD_MEMBERS', 'GUILDS']
-                }
-            });
-            await new Promise(async (resolve, reject) => {
-                this._discordClient.on('ready', () => {
-                    resolve(undefined);
-                });
-                this._discordClient.on('error', (error) => {
-                    this.logger.error('Error in discord client occurred', error);
-                    reject(error);
-                });
-                await this._discordClient.login(this.discord.bot.token);
-            });
-        } else if (hasDiscordPerk) {
-            throw new Error('At least one discord perk is configured but no valid discord configuration was found.');
-        }
-    }
-
-    private configureNotifications() {
-        if (this.discord.notifications && this.discord.notifications.length !== 0) {
-            this._notifier = new DiscordNotifier(this.discord.notifications);
-        } else {
-            this._notifier = new NoopNotifier();
-        }
-    }
-
     async initialize(): Promise<void> {
         this._cfToolsClient = new CFToolsClientBuilder()
             .withCredentials(this.cftools.applicationId, this.cftools.secret)
@@ -176,9 +137,67 @@ class YamlAppConfig implements AppConfig {
         });
     }
 
+    logoUrl(): string {
+        if (!this.app.community?.logo) {
+            return;
+        }
+        if (isWebUrl(this.app.community.logo)) {
+            return this.app.community.logo;
+        }
+        return `/assets/custom/${this.app.community?.logo}`;
+    }
+
     destroy(): void {
         if (this._discordClient) {
             this._discordClient.destroy();
+        }
+    }
+
+    private assertValidPackages() {
+        const packageIds = new Set<number>();
+        this.packages.forEach((p) => {
+            if (p.price.type === undefined) {
+                p.price.type = PriceType.FIXED;
+            }
+            if (p.perks === undefined) {
+                p.perks = [];
+            }
+            if (packageIds.has(p.id)) {
+                throw new Error('Package ID ' + p.id + ' is configured multiple times. Each package needs to have a unique ID.');
+            }
+            packageIds.add(p.id);
+        });
+    }
+
+    private async configureDiscord() {
+        const hasDiscordPerk = this.packages.find((p) => p.perks.find((perk) => perk.type === 'DISCORD_ROLE'));
+
+        if (this.discord.bot?.token) {
+            this._discordClient = new Client({
+                ws: {
+                    intents: ['GUILD_MEMBERS', 'GUILDS']
+                }
+            });
+            await new Promise(async (resolve, reject) => {
+                this._discordClient.on('ready', () => {
+                    resolve(undefined);
+                });
+                this._discordClient.on('error', (error) => {
+                    this.logger.error('Error in discord client occurred', error);
+                    reject(error);
+                });
+                await this._discordClient.login(this.discord.bot.token);
+            });
+        } else if (hasDiscordPerk) {
+            throw new Error('At least one discord perk is configured but no valid discord configuration was found.');
+        }
+    }
+
+    private configureNotifications() {
+        if (this.discord.notifications && this.discord.notifications.length !== 0) {
+            this._notifier = new DiscordNotifier(this.discord.notifications);
+        } else {
+            this._notifier = new NoopNotifier();
         }
     }
 }

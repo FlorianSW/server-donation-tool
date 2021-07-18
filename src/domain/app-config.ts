@@ -57,5 +57,7 @@ export interface AppConfig {
 
     sessionStore(): Promise<Store>;
 
+    logoUrl(): string;
+
     destroy(): void;
 }

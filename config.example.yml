@@ -18,7 +18,8 @@ app:
     # The title will be shown in the top navigation bar as well as in the title of the page (visible in the tab or window name)
     title: our community
     # An optional logo, which is used as an icon in the top navigation bar. Place the file into the /src/assets/custom folder
-    # and simply name the file here (without the path).
+    # and simply name the file here (without the path). Alternatively, you can use an absolute URL when you host your logo somewhere
+    # else (like https://example.com/assets/logo.png)
     logo:
     # The discord invite link of your community. Will be listed in the footer and might be helpful in case the donator as an
     # issue they want to discuss with you.
