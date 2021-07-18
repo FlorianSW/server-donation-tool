@@ -33,6 +33,7 @@ More topics to read about:
     * [Setup/Use https/secure connections](/docs/secure-connections.md)
 * Customization
     * [Overwrite messages](/docs/message-overrides.md)
+    * [Human-readable server names (CFTools)](/docs/server-names.md)
 
 ## Support and Collaboration
 
