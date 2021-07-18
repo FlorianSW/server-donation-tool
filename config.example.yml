@@ -171,7 +171,7 @@ packages:
           - '0000000000000'
           # DayZ
           - '1111111111111'
-      - tpye: FREETEXT_ONLY
+      - type: FREETEXT_ONLY
         text: Some text to show to the donator
   - name: Fastpass
     id: 2
