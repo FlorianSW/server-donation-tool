@@ -228,12 +228,14 @@ export async function parseConfig(logger: Logger): Promise<AppConfig> {
             if (perk.type === 'PRIORITY_QUEUE') {
                 p.perks[i] = Object.assign(new PriorityQueuePerk(intermediate.cfToolscClient(), intermediate.serverNames), perk);
             } else if (perk.type === 'DISCORD_ROLE') {
-                p.perks[i] = Object.assign(new DiscordRolePerk(await intermediate.discordClient(), intermediate.discord.bot.guildId), perk);
-                (p.perks[i] as DiscordRolePerk).roles.forEach((r) => {
+                const discordPerk: DiscordRolePerk = Object.assign(new DiscordRolePerk(await intermediate.discordClient(), intermediate.discord.bot.guildId), perk);
+                discordPerk.roles.forEach((r) => {
                     if (typeof r === 'number') {
                         logger.warn(warnYamlNumber(`discord role perk role`, r));
                     }
                 });
+                await discordPerk.initialize();
+                p.perks[i] = discordPerk;
             } else if (perk.type === 'FREETEXT_ONLY') {
                 p.perks[i] = Object.assign(new FreetextPerk(), perk);
             } else {

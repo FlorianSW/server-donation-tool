@@ -6,7 +6,9 @@ export interface Perk {
     inPackage: Package;
     type: string;
 
-    redeem(forUser: User, order: Order): Promise<TranslateParams>
+    redeem(forUser: User, order: Order): Promise<TranslateParams>;
+
+    asTranslatedString(): string;
 }
 
 export enum PriceType {

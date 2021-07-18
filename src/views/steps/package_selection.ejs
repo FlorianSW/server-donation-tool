@@ -30,7 +30,7 @@
                                     <% if (pack.perks.length !== 0) { %>
                                         <%= translate('PERK_INCLUDED') %>
                                         <% pack.perks.forEach(function (p) { %>
-                                            <span><%= perkToString(p) %></span>
+                                            <span><%= p.asTranslatedString() %></span>
                                         <% }); %>
                                     <% } %>
                                 </div>

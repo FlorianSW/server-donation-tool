@@ -1,5 +1,5 @@
 import {CFToolsClient, DuplicateResourceCreation, ServerApiId, SteamId64} from 'cftools-sdk';
-import {TranslateParams} from '../../translations';
+import {translate, TranslateParams} from '../../translations';
 import {Package, Perk, RedeemError} from '../../domain/package';
 import {ServerNames} from '../../domain/app-config';
 import {User} from '../../domain/user';
@@ -84,5 +84,14 @@ PayPal Transaction ID: ${order.transactionId}
 PayPal Order ID: ${order.id}
 Selected product: ${this.inPackage.name}`
         });
+    }
+
+    asTranslatedString(): string {
+        return translate('PERK_PRIORITY_QUEUE_DESCRIPTION', {
+            params: {
+                serverName: this.serverNames[this.cftools.serverApiId],
+                amountInDays: this.amountInDays.toString(10),
+            }
+        })
     }
 }

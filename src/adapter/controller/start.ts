@@ -1,14 +1,12 @@
 import {NextFunction, Request, Response, Router} from 'express';
 import {requireAuthentication} from '../../auth';
-import {PriorityQueueItem, ResourceNotFound, ServerApiId, SteamId64} from 'cftools-sdk';
-import {translate} from '../../translations';
-import {APIErrors, Constants, DiscordAPIError, Guild} from 'discord.js';
+import {PriorityQueueItem, ServerApiId, SteamId64} from 'cftools-sdk';
+import {Constants, DiscordAPIError} from 'discord.js';
 import {AppConfig} from '../../domain/app-config';
 import {PriorityQueue} from '../../domain/user';
 import {Package, Perk, Price, PriceType} from '../../domain/package';
 import {PriorityQueuePerk} from '../perk/priority-queue-perk';
 import {DiscordRolePerk} from '../perk/discord-role-perk';
-import {FreetextPerk} from '../perk/freetext-perk';
 import {Logger} from 'winston';
 
 export class StartController {
@@ -21,34 +19,13 @@ export class StartController {
 
     private async startPage(req: Request, res: Response) {
         const serversWithPrio = Object.entries(req.user.priorityQueue).filter((s: [string, PriorityQueue]) => s[1].active);
-        const client = await this.config.discordClient();
-        const guild = await client.guilds.fetch(this.config.discord.bot.guildId);
+
         res.render('index', {
             user: req.user,
             serversWithPrio: serversWithPrio,
             availablePackages: this.config.packages,
             step: 'PACKAGE_SELECTION',
-            perkToString: this.perkToString.bind(this, guild)
         });
-    }
-
-    private perkToString(guild: Guild, p: Perk): string {
-        if (p instanceof PriorityQueuePerk) {
-            return translate('PERK_PRIORITY_QUEUE_DESCRIPTION', {
-                params: {
-                    serverName: this.config.serverNames[p.cftools.serverApiId],
-                    amountInDays: p.amountInDays.toString(10)
-                }
-            });
-        } else if (p instanceof DiscordRolePerk) {
-            return translate('PERK_DISCORD_ROLE_DESCRIPTION', {
-                params: {
-                    roles: p.roles.map((r) => guild.roles.cache.get(r).name).join(', '),
-                }
-            });
-        } else if (p instanceof FreetextPerk) {
-            return p.text;
-        }
     }
 
     private price(req: Request, pack: Package): Price {

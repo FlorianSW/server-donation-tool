@@ -1,5 +1,5 @@
-import {TranslateParams} from '../../translations';
-import {Client} from 'discord.js';
+import {translate, TranslateParams} from '../../translations';
+import {Client, Guild} from 'discord.js';
 import {Package, Perk, RedeemError} from '../../domain/package';
 import {User} from '../../domain/user';
 import {Order} from '../../domain/payment';
@@ -9,11 +9,19 @@ export class DiscordRolePerk implements Perk {
     type: string;
 
     readonly roles: string[];
+    private guild: Guild;
 
     constructor(
         private readonly client: Client,
         private readonly guildId: string,
     ) {
+    }
+
+    async initialize(): Promise<void> {
+        this.guild = await this.client.guilds.fetch(this.guildId);
+        for (const r of this.roles) {
+            await this.guild.roles.fetch(r);
+        }
     }
 
     async redeem(forUser: User, order: Order): Promise<TranslateParams> {
@@ -45,5 +53,19 @@ export class DiscordRolePerk implements Perk {
             roles: addedRoles.join(', '),
         };
         return successParams;
+    }
+
+    asTranslatedString(): string {
+        return translate('PERK_DISCORD_ROLE_DESCRIPTION', {
+            params: {
+                roles: this.roles.map((r) => {
+                    const role = this.guild.roles.cache.get(r);
+                    if (role) {
+                        return role.name;
+                    }
+                    return r;
+                }).join(', '),
+            }
+        })
     }
 }

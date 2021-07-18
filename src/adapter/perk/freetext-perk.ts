@@ -12,4 +12,8 @@ export class FreetextPerk implements Perk {
     async redeem(forUser: User, order: Order): Promise<TranslateParams> {
         return ['FREETEXT_TEXT', {params: {text: this.text}}];
     }
+
+    asTranslatedString(): string {
+        return this.text;
+    }
 }
