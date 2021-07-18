@@ -73,6 +73,7 @@ To do so, follow these steps:
 * Note down the `CLIENT ID` and `CLIENT SECRET` values, you'll need these values in the "Configuration" section
 * In the Redirects list of URLs, add a new URL and put in your redirect URL
   * The redirect URL consists of the Domain you own (e.g. example.com), or the IP address of the server, whatever you choose
+  * It needs to be the domain/URL your donators will use to access the donation tool website later on (including the correct protocol, like http/https)
   * Additionally, add `/auth/discord/callback` to it
   * The full redirect URL might look like: `https://example.com/auth/discord/callback`
 * Save the changes and continue
