@@ -1,7 +1,8 @@
 app:
   port: 8080
   # Secret used to sign the client-side session cookie (with which the session of the user is identified). Generate
-  # a secure string of reasonable length.
+  # a secure string of reasonable length. E.g. a 32 character, random string including numbers and uppercase and lowercase chars.
+  # You may want to use a random string generator in the internet or your local computer to generate that string.
   sessionSecret:
   # Configuration for the session store. The default values should generally be good enough.
   sessionStore:

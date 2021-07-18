@@ -156,6 +156,9 @@ class YamlAppConfig implements AppConfig {
 
     async sessionStore(): Promise<Store> {
         this.logger.info('Initializing session store');
+        if (!this.app.sessionSecret || this.app.sessionSecret.length === 0) {
+            throw new Error('app.sessionSecret can not be an empty string. Choose an individual, random, secure string');
+        }
         const knex = Knex({
             client: 'sqlite3',
             connection: {
@@ -170,7 +173,7 @@ class YamlAppConfig implements AppConfig {
         }
         return new sessionStore({
             knex: knex
-        })
+        });
     }
 
     destroy(): void {
