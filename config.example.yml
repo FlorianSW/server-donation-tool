@@ -137,7 +137,8 @@ serverNames:
 # Cloud. It requires the following configuration:
 # * amountInDays: The amount of priority queue days the donator should get.
 # * cftools: The cftools serverApiId (in the object with the key serverApiId) of the server the donator will get the perk
-#   for. Is the server api ID of the server in the CFTools Dashboard (Manage -> Settings -> API Key section).
+#   for. Is the Server ID of the server in the CFTools Dashboard (Manage -> Settings -> API Key section). Do not use the API
+#   key as the ID, it will throw an error that it is unknown.
 #   This setting is only used for the following types: PRIORITY_QUEUE
 #
 # - DISCORD_ROLE

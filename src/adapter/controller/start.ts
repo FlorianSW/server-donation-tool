@@ -1,6 +1,6 @@
 import {NextFunction, Request, Response, Router} from 'express';
 import {requireAuthentication} from '../../auth';
-import {PriorityQueueItem, ServerApiId, SteamId64} from 'cftools-sdk';
+import {PriorityQueueItem, ResourceNotFound, ServerApiId, SteamId64} from 'cftools-sdk';
 import {translate} from '../../translations';
 import {Guild} from 'discord.js';
 import {AppConfig} from '../../domain/app-config';
@@ -100,19 +100,24 @@ export class StartController {
 
         let priority: { [key: string]: any | undefined } = {};
         for (let server of servers) {
-            const entry = await this.config.cfToolscClient().getPriorityQueue({
-                playerId: steamId,
-                serverApiId: ServerApiId.of(server),
-            });
-            if (entry === null) {
+            try {
+                const entry = await this.config.cfToolscClient().getPriorityQueue({
+                    playerId: steamId,
+                    serverApiId: ServerApiId.of(server),
+                });
+                if (entry === null) {
+                    priority[server] = {
+                        active: false,
+                    };
+                    continue;
+                }
                 priority[server] = {
-                    active: false,
-                };
-                continue;
-            }
-            priority[server] = {
-                active: !this.isExpired(entry),
-                expires: entry.expiration,
+                    active: !this.isExpired(entry),
+                    expires: entry.expiration,
+                }
+            } catch (e) {
+                this.log.error(`Could not request Priority queue information for server API ID: ${server}. Error: ` + e);
+                throw e;
             }
         }
         req.user.priorityQueue = priority;
