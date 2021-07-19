@@ -67,6 +67,23 @@ describe('PriorityQueuePerk', () => {
             expect(result.comment).toContain('A_TRANSACTION_ID');
         });
 
+        it('creates permanent priority queue entry', async () => {
+            perk = Object.assign(
+                new PriorityQueuePerk(client as CFToolsClient, {aServerApiId: 'A_NAME'}),
+                {
+                    inPackage: aPackage,
+                    cftools: {
+                        serverApiId: aServerApiId
+                    },
+                    permanent: true,
+                }
+            );
+            await perk.redeem(aUser, anOrder);
+
+            const result = await client.getPriorityQueue(SteamId64.of(aSteamId));
+            expect(result.expiration).toContain('Permanent');
+        });
+
         it('does not recreate permanent priority queue', async () => {
             await client.putPriorityQueue({
                 id: SteamId64.of(aSteamId),

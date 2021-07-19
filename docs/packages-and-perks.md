@@ -115,6 +115,8 @@ This perk requires the following additional configuration options:
 
 * **amountInDays**: A number with the amount of days the priority queue slot should be setup for.
   E.g. `30` for 30 days, or `14` for 14 days and so on.
+* **permanent**: When set to `true`, the priority queue slot will never expire (a permanent priority queue). This option
+  overrides the `amountInDays` option.
 * **cftools**: An object of required information to work with CFTools Cloud.
   The only required parameter for now is `serverApiId` which is the `Server Id`.
   You find this ID in the server you want the Priority Queue setup for.

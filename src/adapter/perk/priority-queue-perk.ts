@@ -12,7 +12,8 @@ export class PriorityQueuePerk implements Perk {
     readonly cftools: {
         serverApiId: string,
     };
-    readonly amountInDays: number;
+    readonly amountInDays?: number;
+    readonly permanent = false;
 
     constructor(
         private readonly client: CFToolsClient,
@@ -59,7 +60,7 @@ export class PriorityQueuePerk implements Perk {
         if (item.expiration === 'Permanent') {
             return;
         }
-        if (item.expiration.getTime() > newExpiration.getTime()) {
+        if (newExpiration !== 'Permanent' && item.expiration.getTime() > newExpiration.getTime()) {
             return;
         }
         await this.client.deletePriorityQueue(request);
@@ -67,7 +68,10 @@ export class PriorityQueuePerk implements Perk {
         return await this.createPriority(steamId, order);
     }
 
-    private expiration(order: Order): Date {
+    private expiration(order: Order): Date | 'Permanent' {
+        if (this.permanent) {
+            return 'Permanent';
+        }
         const expiration = new Date(order.created.valueOf());
         expiration.setDate(order.created.getDate() + this.amountInDays);
 
@@ -87,6 +91,13 @@ Selected product: ${this.inPackage.name}`
     }
 
     asTranslatedString(): string {
+        if (this.permanent) {
+            return translate('PERK_PRIORITY_QUEUE_PERMANENT_DESCRIPTION', {
+                params: {
+                    serverName: this.serverNames[this.cftools.serverApiId],
+                }
+            });
+        }
         return translate('PERK_PRIORITY_QUEUE_DESCRIPTION', {
             params: {
                 serverName: this.serverNames[this.cftools.serverApiId],

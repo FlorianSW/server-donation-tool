@@ -138,6 +138,8 @@ serverNames:
 # This perk provides a specific amount of days of priority queue for one server, which needs to be registered in CFTools
 # Cloud. It requires the following configuration:
 # * amountInDays: The amount of priority queue days the donator should get.
+# * permanent: Boolean field, should be set to true when the donator should get a permanent priority queue slot. Should not
+#   be set together with amountInDays.
 # * cftools: The cftools serverApiId (in the object with the key serverApiId) of the server the donator will get the perk
 #   for. Is the Server ID of the server in the CFTools Dashboard (Manage -> Settings -> API Key section). Do not use the API
 #   key as the ID, it will throw an error that it is unknown.

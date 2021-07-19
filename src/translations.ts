@@ -69,6 +69,7 @@ const messages: { [key: string]: string } = {
 
     PERK_INCLUDED: 'Includes following perks:',
     PERK_PRIORITY_QUEUE_DESCRIPTION: 'Priority Queue on {{serverName}} for {{amountInDays}} days',
+    PERK_PRIORITY_QUEUE_PERMANENT_DESCRIPTION: 'Permanent Priority Queue on {{serverName}}',
     PERK_DISCORD_ROLE_DESCRIPTION: 'These discord roles will be assigned to your user: {{roles}}',
 
     NOTIFICATIONS_REDEEM_SUCCESSFUL_TITLE: 'Donation redeemed',
