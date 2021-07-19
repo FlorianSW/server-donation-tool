@@ -75,6 +75,7 @@ const messages: { [key: string]: string } = {
     NOTIFICATIONS_REDEEM_SUCCESSFUL_TITLE: 'Donation redeemed',
     NOTIFICATIONS_REDEEM_SUCCESSFUL_DESCRIPTION: 'A donator redeemed perks of the package they donated for.',
     NOTIFICATIONS_REDEEM_SUCCESSFUL_USERNAME: 'Username',
+    NOTIFICATIONS_REDEEM_SUCCESSFUL_DISCORD_ID: 'Discord ID',
     NOTIFICATIONS_REDEEM_SUCCESSFUL_STEAM_ID: 'Steam ID',
     NOTIFICATIONS_REDEEM_SUCCESSFUL_PACKAGE: 'Package name',
     NOTIFICATIONS_REDEEM_SUCCESSFUL_TRANSACTION: 'Transaction details',

@@ -78,6 +78,7 @@ export class DiscordNotifier implements Notifier {
                 value: `<@${user.discord.id}> (${user.username})`,
                 inline: true
             },
+            {name: translate('NOTIFICATIONS_REDEEM_SUCCESSFUL_DISCORD_ID'), value: user.discord.id, inline: true},
             {name: translate('NOTIFICATIONS_REDEEM_SUCCESSFUL_STEAM_ID'), value: user.steam.id, inline: true},
             {name: translate('NOTIFICATIONS_REDEEM_SUCCESSFUL_PACKAGE'), value: order.reference.p.name, inline: true},
             {
