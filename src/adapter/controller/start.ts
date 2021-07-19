@@ -69,34 +69,36 @@ export class StartController {
         return this.config.packages.map((p) => p.perks).reduce((l, p) => l.concat(p));
     }
 
-    private async populatePriorityQueue(req: Request, res: Response, next: NextFunction): Promise<void> {
-        const steamId = SteamId64.of(req.user.steam.id);
-        const servers = new Set(this.perks()
-            .filter((p) => p instanceof PriorityQueuePerk)
-            .map((p: PriorityQueuePerk) => p.cftools.serverApiId));
-
-        let priority: { [key: string]: any | undefined } = {};
-        for (let server of servers) {
-            try {
-                const entry = await this.config.cfToolscClient().getPriorityQueue({
-                    playerId: steamId,
-                    serverApiId: ServerApiId.of(server),
-                });
-                if (entry === null) {
-                    priority[server] = {
-                        active: false,
-                    };
-                    continue;
-                }
-                priority[server] = {
-                    active: !this.isExpired(entry),
-                    expires: entry.expiration,
-                }
-            } catch (e) {
-                this.log.error(`Could not request Priority queue information for server API ID: ${server}. Error: ` + e);
-                throw e;
+    private async fetchPriorityQueue(req: Request, server: string): Promise<PriorityQueue> {
+        try {
+            const entry = await this.config.cfToolscClient().getPriorityQueue({
+                playerId: SteamId64.of(req.user.steam.id),
+                serverApiId: ServerApiId.of(server),
+            });
+            if (entry === null) {
+                return {
+                    active: false,
+                };
             }
+            return {
+                active: !this.isExpired(entry),
+                expires: entry.expiration,
+            }
+        } catch (e) {
+            this.log.error(`Could not request Priority queue information for server API ID: ${server}. Error: ` + e);
+            throw e;
         }
+    }
+
+    private async populatePriorityQueue(req: Request, res: Response, next: NextFunction): Promise<void> {
+        const priority: { [key: string]: PriorityQueue } = {};
+        await Promise.all(this.perks()
+            .filter((p) => p instanceof PriorityQueuePerk)
+            .map((p: PriorityQueuePerk) => p.cftools.serverApiId)
+            .map(async (server) => {
+                priority[server] = await this.fetchPriorityQueue(req, server);
+            }));
+
         req.user.priorityQueue = priority;
         next();
     }
