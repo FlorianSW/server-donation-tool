@@ -17,6 +17,7 @@
                                         (<%= pack.price.currency %> <%= pack.price.amount %>)
                                     <% } %>
                                 </span>
+                                <% if (pack.description) { %><div><%= pack.description %></div><% } %>
                                 <div class="package-information">
                                     <% if (pack.price.type === 'VARIABLE') { %>
                                         <div class="input-field">

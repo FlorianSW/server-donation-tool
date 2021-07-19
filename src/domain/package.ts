@@ -30,6 +30,7 @@ export class RedeemError extends Error {
 
 export class Package {
     name: string;
+    description?: string;
     id: number;
     price: Price;
     perks: Perk[];

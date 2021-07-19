@@ -116,6 +116,8 @@ serverNames:
 # Packages are the available prices and benefits a donator gets when donating that amount. Each package has the following information
 # - name: A human readable name, which is displayed in the perk selection screen as well as on the PayPal receipt (choose
 #   a name which is not too long, but still descriptive); do not put the price in it
+# - description: A freetext, optional description which you can use to give more information about this perk to your donators.
+#   This field can be omitted when it is not used.
 # - id: A unique id over the lifetime of the website. It needs to be unique even _after_ you want to remove the perk.
 #   Do not re-use an ID from a previous perk. The easiest thing would be to simply count up by one. Needs to be a number
 #   and will also be available in your PayPal dashboard in the 'custom' reference.
