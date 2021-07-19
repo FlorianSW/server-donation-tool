@@ -1,4 +1,5 @@
 const {series, dest, src} = require('gulp');
+const uglify = require('gulp-uglify');
 const del = require('del');
 const sass = require('gulp-sass')(require('sass'));
 const rename = require('gulp-rename');
@@ -26,6 +27,12 @@ function assets() {
         .pipe(dest('dist/assets/'));
 }
 
+function scripts() {
+    return src('src/views/**/*.js')
+        .pipe(uglify())
+        .pipe(dest('dist/assets/js/'))
+}
+
 function materialize() {
     return src('node_modules/materialize-css/dist/css/materialize.min.css')
         .pipe(rename('materialize.min.css'))
@@ -38,4 +45,4 @@ function tsc() {
         .js.pipe(dest("dist"));
 }
 
-exports.default = series(clean, tsc, mainCss, views, assets, materialize);
+exports.default = series(clean, tsc, mainCss, views, assets, scripts, materialize);

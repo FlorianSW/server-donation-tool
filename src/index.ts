@@ -14,6 +14,7 @@ import {errorLogger, logger} from 'express-winston';
 import compression from 'compression';
 import winston from 'winston';
 import 'express-async-errors';
+import {DonatorsController} from './adapter/controller/donators';
 
 let consoleFormat = winston.format.combine(
     winston.format.colorize(),
@@ -73,6 +74,7 @@ parseConfig(log).then(async (config) => {
     const port = config.app.port;
     const start = new StartController(config, log);
     const donations = new DonationController(config, payment, appConfig.notifier(), log);
+    const donators = new DonatorsController(config, log);
     const authentication = new Authentication(config);
 
     app.locals.translate = translate;
@@ -129,6 +131,7 @@ parseConfig(log).then(async (config) => {
 
     app.use('/', start.router);
     app.use('/', donations.router);
+    app.use('/', donators.router);
     app.use('/', authentication.router);
 
 

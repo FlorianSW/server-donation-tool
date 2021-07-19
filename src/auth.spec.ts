@@ -18,8 +18,6 @@ describe('Auth', () => {
             expect(user.steam).toBeUndefined();
             expect(user.discord.id).toBe('123456789');
             expect(user.username).toBe('SOME_USERNAME');
-            expect(user.discordRoles).toEqual([]);
-            expect(user.priorityQueue).toEqual({});
             done();
         });
     });

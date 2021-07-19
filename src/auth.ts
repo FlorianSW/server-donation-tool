@@ -13,8 +13,6 @@ export function discordUserCallback(accessToken: string, refreshToken: string, p
         discord: {
             id: profile.id,
         },
-        priorityQueue: {},
-        discordRoles: [],
     };
     if (connection) {
         user.steam = {

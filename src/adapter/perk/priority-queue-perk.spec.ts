@@ -17,8 +17,6 @@ const aUser: User = {
         id: '',
     },
     username: 'A_USERNAME',
-    priorityQueue: {},
-    discordRoles: [],
 };
 const aPackage: Package = {
     id: 1,
