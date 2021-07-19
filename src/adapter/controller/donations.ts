@@ -7,17 +7,20 @@ import {Order, OrderNotCompleted, Payment, SteamIdMismatch} from '../../domain/p
 import {Logger} from 'winston';
 import {Notifier} from '../../domain/notifier';
 import {SessionData} from 'express-session';
+import csrf from 'csurf';
 
 export class DonationController {
     public readonly router: Router = Router();
 
     constructor(private readonly config: AppConfig, private readonly payment: Payment, private readonly notifier: Notifier, private readonly logger: Logger) {
-        this.router.post('/donations', requireAuthentication, this.createOrder.bind(this));
-        this.router.get('/donations/:orderId', requireAuthentication, this.captureOrder.bind(this));
+        const csrfProtection = csrf();
+        this.router.post('/donations', requireAuthentication, csrfProtection, this.createOrder.bind(this));
+        this.router.post('/donations/:orderId', requireAuthentication, csrfProtection, this.captureOrder.bind(this));
 
-        this.router.get('/donate', requireAuthentication, this.prepareDonation.bind(this));
-        this.router.get('/donate/:orderId', requireAuthentication, this.prepareRedeem.bind(this));
-        this.router.get('/donate/:orderId/redeem', requireAuthentication, this.redeem.bind(this));
+        this.router.get('/donate', requireAuthentication, csrfProtection, this.prepareDonation.bind(this));
+        this.router.get('/donate/:orderId', requireAuthentication, csrfProtection, this.prepareRedeem.bind(this));
+        this.router.post('/donate/:orderId/redeem', requireAuthentication, csrfProtection, this.redeem.bind(this));
+        this.router.get('/donate/:orderId/redeem', requireAuthentication, this.redirectToPrepareRedeem.bind(this));
     }
 
     private async fetchOrderDetails(req: Request, res: Response): Promise<Order> {
@@ -55,6 +58,7 @@ export class DonationController {
         }
         res.render('index', {
             step: 'DONATE',
+            csrfToken: req.csrfToken(),
             user: req.user,
             selectedPackage: {
                 name: selectedPackage.name,
@@ -76,10 +80,15 @@ export class DonationController {
         res.render('index', {
             user: req.user,
             step: 'REDEEM',
+            csrfToken: req.csrfToken(),
             redeemStatus: 'PENDING',
             hasPerks: this.selectedPackage(req.session).perks.length !== 0,
             errors: []
         });
+    }
+
+    private async redirectToPrepareRedeem(req: Request, res: Response) {
+        res.redirect(`/donate/${req.params.orderId}`);
     }
 
     private async redeem(req: Request, res: Response) {

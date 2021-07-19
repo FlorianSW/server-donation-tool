@@ -69,8 +69,9 @@ let appConfig: AppConfig;
 parseConfig(log).then(async (config) => {
     appConfig = config;
     log.info('Starting server');
-    const payment = new PaypalPayment(config);
     const app = express();
+
+    const payment = new PaypalPayment(config);
     const port = config.app.port;
     const start = new StartController(config, log);
     const donations = new DonationController(config, payment, appConfig.notifier(), log);

@@ -3,18 +3,22 @@ import {requireAuthentication} from '../../auth';
 import {AppConfig} from '../../domain/app-config';
 import {Package, Price, PriceType} from '../../domain/package';
 import {Logger} from 'winston';
+import csrf from 'csurf';
 
 export class StartController {
     public readonly router: Router = Router();
 
     constructor(private readonly config: AppConfig, private readonly log: Logger) {
-        this.router.post('/selectPackage', requireAuthentication, this.selectPackage.bind(this));
-        this.router.get('/', requireAuthentication, this.startPage.bind(this));
+        const csrfProtection = csrf();
+
+        this.router.post('/selectPackage', requireAuthentication, csrfProtection, this.selectPackage.bind(this));
+        this.router.get('/', requireAuthentication, csrfProtection, this.startPage.bind(this));
     }
 
     private async startPage(req: Request, res: Response) {
         res.render('index', {
             user: req.user,
+            csrfToken: req.csrfToken(),
             availablePackages: this.config.packages,
             step: 'PACKAGE_SELECTION',
         });

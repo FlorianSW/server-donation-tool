@@ -223,4 +223,18 @@ body {
   [type="radio"]:not(:checked) + span:before, [type="radio"]:not(:checked) + span:after {
     border-color: white;
   }
+
+  input[type="submit"].link {
+    border: 0;
+    background: transparent;
+    color: #ffab40;
+    margin-right: 24px;
+    transition: color .3s ease;
+    text-transform: uppercase;
+    cursor: pointer;
+
+    &:hover {
+      color: #ffd8a6;
+    }
+  }
 }
