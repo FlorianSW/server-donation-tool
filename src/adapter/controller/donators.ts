@@ -48,11 +48,10 @@ export class DonatorsController {
         const servers = [...new Set(this.perks(PriorityQueuePerk)
             .map((p: PriorityQueuePerk) => p.cftools.serverApiId)
         )];
-        const priorityQueue = await Promise.all(
+        const priorityQueue = (await Promise.all(
             servers
                 .map(async (server) => await this.fetchPriorityQueue(req, server))
-                .filter((p) => !!p)
-        );
+        )).filter((p) => !!p);
 
         const client = await this.config.discordClient();
         const guild = await client.guilds.fetch(this.config.discord.bot.guildId);

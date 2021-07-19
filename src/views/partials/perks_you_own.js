@@ -26,13 +26,24 @@ function removeLoading() {
     list.querySelectorAll('.loading').forEach((l) => l.remove());
 }
 
+function textCard(text) {
+    const card = document.createElement('div');
+    card.classList.add('card');
+    card.textContent = text;
+    return card;
+}
+
 const list = document.querySelector('.perk-list');
 
 fetch('/donators/@me/perks').then(async (result) => {
     const perks = await result.json();
-    perks.forEach((p) => list.append(perkBubble(p)));
+    if (perks.length === 0) {
+        list.append(textCard('You do not own any perks, yet.'));
+    } else {
+        perks.forEach((p) => list.append(perkBubble(p)));
+    }
     removeLoading();
 }).catch(() => {
-    list.append('Could not load the perks you own :(');
+    list.append(textCard('Could not load the perks you own :('));
     removeLoading();
 });
