@@ -1,22 +1,53 @@
 import {
     Ban,
-    CFToolsClient, CFToolsId,
+    CFToolsClient,
+    CFToolsId,
     DeleteBanRequest,
     DeleteBansRequest,
     DeletePriorityQueueRequest,
-    DeleteWhitelistRequest, DuplicateResourceCreation,
+    DeleteWhitelistRequest,
+    DuplicateResourceCreation,
     GameServerItem,
+    GameSession,
     GenericId,
     GetGameServerDetailsRequest,
     GetLeaderboardRequest,
     GetPlayerDetailsRequest,
-    GetPriorityQueueRequest, GetWhitelistRequest,
-    LeaderboardItem, ListBansRequest,
-    Player, PriorityQueueItem, PutBanRequest, PutPriorityQueueItemRequest, PutWhitelistItemRequest, WhitelistItem
+    GetPriorityQueueRequest,
+    GetServerInfoRequest,
+    GetWhitelistRequest,
+    LeaderboardItem,
+    ListBansRequest,
+    ListGameSessionsRequest,
+    Player,
+    PriorityQueueItem,
+    PutBanRequest,
+    PutPriorityQueueItemRequest,
+    PutWhitelistItemRequest,
+    ServerInfo,
+    SpawnItemRequest,
+    TeleportPlayerRequest,
+    WhitelistItem
 } from 'cftools-sdk';
 
 export class InMemoryCFToolsClient implements CFToolsClient {
     private priorityQueueItems: Map<string, PriorityQueueItem> = new Map();
+
+    getServerInfo(request: GetServerInfoRequest): Promise<ServerInfo> {
+        return Promise.resolve(undefined);
+    }
+
+    listGameSessions(request: ListGameSessionsRequest): Promise<GameSession[]> {
+        return Promise.resolve([]);
+    }
+
+    spawnItem(request: SpawnItemRequest): Promise<void> {
+        return Promise.resolve(undefined);
+    }
+
+    teleport(request: TeleportPlayerRequest): Promise<void> {
+        return Promise.resolve(undefined);
+    }
 
     deleteBan(request: DeleteBanRequest): Promise<void> {
         return Promise.resolve(undefined);
