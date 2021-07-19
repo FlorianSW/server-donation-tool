@@ -3,6 +3,7 @@ import {Client, Guild} from 'discord.js';
 import {Package, Perk, RedeemError} from '../../domain/package';
 import {User} from '../../domain/user';
 import {Order} from '../../domain/payment';
+import {Logger} from 'winston';
 
 export class DiscordRolePerk implements Perk {
     inPackage: Package;
@@ -14,13 +15,17 @@ export class DiscordRolePerk implements Perk {
     constructor(
         private readonly client: Client,
         private readonly guildId: string,
+        private readonly log: Logger,
     ) {
     }
 
     async initialize(): Promise<void> {
         this.guild = await this.client.guilds.fetch(this.guildId);
         for (const r of this.roles) {
-            await this.guild.roles.fetch(r);
+            const role = await this.guild.roles.fetch(r);
+            if (role === null) {
+                this.log.warn(`Discord role with ID ${r} does not exist in the configured guild.`);
+            }
         }
     }
 
