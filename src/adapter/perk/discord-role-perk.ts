@@ -10,6 +10,7 @@ export class DiscordRolePerk implements Perk {
     type: string;
 
     readonly roles: string[];
+    readonly amountInDays?: number;
     private guild: Guild;
 
     constructor(

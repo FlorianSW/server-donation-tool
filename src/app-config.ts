@@ -89,6 +89,10 @@ class YamlAppConfig implements AppConfig {
         return this._eventQueue;
     }
 
+    events(): Events {
+        return this._eventQueue;
+    }
+
     async initialize(): Promise<void> {
         this._cfToolsClient = new CFToolsClientBuilder()
             .withCredentials(this.cftools.applicationId, this.cftools.secret)
@@ -193,7 +197,7 @@ class YamlAppConfig implements AppConfig {
         }
 
         if (this.discord.notifications && this.discord.notifications.length !== 0) {
-            this._notifier = new DiscordNotifier(this._eventQueue, this.discord.notifications);
+            this._notifier = new DiscordNotifier(this.events(), this.discord.notifications);
         }
     }
 }
