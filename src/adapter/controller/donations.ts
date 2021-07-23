@@ -5,14 +5,14 @@ import {Package, RedeemError} from '../../domain/package';
 import {AppConfig} from '../../domain/app-config';
 import {Order, OrderNotCompleted, Payment, SteamIdMismatch} from '../../domain/payment';
 import {Logger} from 'winston';
-import {Notifier} from '../../domain/notifier';
 import {SessionData} from 'express-session';
 import csrf from 'csurf';
+import {EventSource} from '../../domain/events';
 
 export class DonationController {
     public readonly router: Router = Router();
 
-    constructor(private readonly config: AppConfig, private readonly payment: Payment, private readonly notifier: Notifier, private readonly logger: Logger) {
+    constructor(private readonly config: AppConfig, private readonly payment: Payment, private readonly events: EventSource, private readonly logger: Logger) {
         const csrfProtection = csrf();
         this.router.post('/donations', requireAuthentication, csrfProtection, this.createOrder.bind(this));
         this.router.post('/donations/:orderId', requireAuthentication, csrfProtection, this.captureOrder.bind(this));
@@ -107,14 +107,14 @@ export class DonationController {
                 this.logger.error(`Could not redeem perk ${perk.type}: `, e);
                 if (e instanceof RedeemError) {
                     errors.push(e.params);
-                    this.notifier.onFailedRedeemPerk(req.user, order, e).then();
+                    this.events.emit('failedRedeemPerk', req.user, order, e);
                 } else {
                     throw e;
                 }
             }
         }
 
-        this.notifier.onSuccessfulRedeem(req.user, order).then();
+        this.events.emit('successfulRedeem', req.user, order);
         res.render('index', {
             user: req.user,
             step: 'REDEEM',
@@ -154,7 +154,7 @@ export class DonationController {
 
         setTimeout(async () => {
             const order = await this.fetchOrderDetails(req, res);
-            this.notifier.onSuccessfulPayment(req.user, order).then();
+            this.events.emit('successfulPayment', req.user, order);
         });
     }
 }

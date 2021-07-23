@@ -1,9 +1,15 @@
-import {Notifier, Type} from '../domain/notifier';
 import {Order} from '../domain/payment';
 import {User} from '../domain/user';
 import {EmbedFieldData, MessageEmbed, WebhookClient} from 'discord.js';
 import {translate} from '../translations';
 import {RedeemError} from '../domain/package';
+import {Events} from '../domain/events';
+
+export enum Type {
+    SUCCESSFUL_REDEEM = 'SUCCESSFUL_REDEEM',
+    REDEEM_ERROR = 'REDEEM_ERROR',
+    DONATED = 'DONATED',
+}
 
 export interface DiscordNotification {
     webhookUrl: string,
@@ -16,8 +22,11 @@ function webhookClient(notification: DiscordNotification): WebhookClient {
     return new WebhookClient(parts[parts.length - 2], parts[parts.length - 1]);
 }
 
-export class DiscordNotifier implements Notifier {
-    constructor(private readonly notifications: DiscordNotification[]) {
+export class DiscordNotifier {
+    constructor(private readonly events: Events, private readonly notifications: DiscordNotification[]) {
+        events.on('successfulPayment', this.onSuccessfulPayment.bind(this));
+        events.on('successfulRedeem', this.onSuccessfulRedeem.bind(this));
+        events.on('failedRedeemPerk', this.onFailedRedeemPerk.bind(this));
     }
 
     async onSuccessfulPayment(user: User, order: Order): Promise<void> {

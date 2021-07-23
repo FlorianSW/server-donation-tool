@@ -8,14 +8,14 @@ import {Logger} from 'winston';
 import * as fs from 'fs';
 import * as yaml from 'js-yaml';
 import {DiscordNotification, DiscordNotifier} from './adapter/discord-notifier';
-import {NoopNotifier} from './adapter/noop-notifier';
-import {Notifier} from './domain/notifier';
 import {FreetextPerk} from './adapter/perk/freetext-perk';
 import session, {Store} from 'express-session';
 import {StoreFactory} from 'connect-session-knex';
 import Knex from 'knex';
 import {Environment} from './adapter/paypal-payment';
 import settings from './translations';
+import {Events, EventSource} from './domain/events';
+import {EventQueue} from './adapter/event-queue';
 
 const initSessionStore = require('connect-session-knex');
 const sessionStore: StoreFactory = initSessionStore(session);
@@ -71,7 +71,8 @@ class YamlAppConfig implements AppConfig {
     private logger: Logger;
     private _cfToolsClient: CFToolsClient;
     private _discordClient: Client;
-    private _notifier: Notifier;
+    private _notifier: DiscordNotifier | undefined;
+    private _eventQueue: Events & EventQueue = new EventQueue();
 
     cfToolscClient(): CFToolsClient {
         return this._cfToolsClient;
@@ -84,8 +85,8 @@ class YamlAppConfig implements AppConfig {
         return Promise.resolve(this._discordClient);
     }
 
-    notifier(): Notifier {
-        return this._notifier;
+    eventSource(): EventSource {
+        return this._eventQueue;
     }
 
     async initialize(): Promise<void> {
@@ -94,7 +95,6 @@ class YamlAppConfig implements AppConfig {
             .build();
         this.assertValidPackages();
         await this.configureDiscord();
-        this.configureNotifications();
 
         if (this.app.community?.discord && !this.app.community.discord.startsWith('http')) {
             this.logger.warn('Community Discord link needs to be an absolute URL. This is invalid: ' + this.app.community.discord);
@@ -191,13 +191,9 @@ class YamlAppConfig implements AppConfig {
         } else if (hasDiscordPerk) {
             throw new Error('At least one discord perk is configured but no valid discord configuration was found.');
         }
-    }
 
-    private configureNotifications() {
         if (this.discord.notifications && this.discord.notifications.length !== 0) {
-            this._notifier = new DiscordNotifier(this.discord.notifications);
-        } else {
-            this._notifier = new NoopNotifier();
+            this._notifier = new DiscordNotifier(this._eventQueue, this.discord.notifications);
         }
     }
 }

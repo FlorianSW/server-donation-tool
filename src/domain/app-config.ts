@@ -1,8 +1,8 @@
 import {Package} from './package';
 import {CFToolsClient} from 'cftools-sdk';
 import {Client} from 'discord.js';
-import {Notifier} from './notifier';
 import {Store} from 'express-session';
+import {EventSource} from './events';
 
 export type ServerNames = {
     [serverApiId: string]: string
@@ -53,7 +53,7 @@ export interface AppConfig {
 
     discordClient(): Promise<Client>;
 
-    notifier(): Notifier;
+    eventSource(): EventSource;
 
     sessionStore(): Promise<Store>;
 

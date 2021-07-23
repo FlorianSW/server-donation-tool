@@ -29,7 +29,7 @@ parseConfig(log).then(async (config) => {
     const payment = new PaypalPayment(config);
     const port = config.app.port;
     const start = new StartController(config, log);
-    const donations = new DonationController(config, payment, appConfig.notifier(), log);
+    const donations = new DonationController(config, payment, appConfig.eventSource(), log);
     const donators = new DonatorsController(config, log);
     const authentication = new Authentication(config);
 
