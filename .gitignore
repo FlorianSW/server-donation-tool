@@ -3,3 +3,4 @@ dist/
 node_modules/
 config.yml
 string_overrides.yml
+server.log

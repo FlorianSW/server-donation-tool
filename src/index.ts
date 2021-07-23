@@ -1,4 +1,4 @@
-import express, {ErrorRequestHandler, NextFunction, Request, Response} from 'express';
+import express from 'express';
 import path from 'path';
 import session from 'express-session';
 import {translate} from './translations';
@@ -12,58 +12,13 @@ import {StartController} from './adapter/controller/start';
 import {DonationController} from './adapter/controller/donations';
 import {errorLogger, logger} from 'express-winston';
 import compression from 'compression';
-import winston from 'winston';
 import 'express-async-errors';
 import {DonatorsController} from './adapter/controller/donators';
-
-let consoleFormat = winston.format.combine(
-    winston.format.colorize(),
-    winston.format.cli(),
-    winston.format.errors({stack: true}),
-    winston.format.timestamp({
-        format: 'YY-MM-DD HH:MM:SS'
-    }),
-    winston.format.printf((msg) => {
-        const {timestamp, level, message, ...extraMeta} = msg;
-        let result = `[${msg.timestamp}][${msg.level}] ${msg.message}`;
-
-        if (Object.keys(extraMeta).length !== 0) {
-            result += `(${JSON.stringify(extraMeta)})`;
-        }
-        return result;
-    })
-);
-
-const log = winston.createLogger({
-    transports: [
-        new winston.transports.Console({
-            format: consoleFormat
-        })
-    ],
-});
+import {errorHandler, log} from './logging';
 
 if (process.env.NODE_ENV !== 'production') {
     log.warn('Running in DEVELOPMENT mode. For better performance, run the application with the environment variable NODE_ENV set to production.');
 }
-
-const errorHandler: ErrorRequestHandler = (err: any, req: Request, res: Response, next: NextFunction) => {
-    console.log(err);
-    res.render('error', {
-        status: err.status || 500,
-        supportInfo: JSON.stringify({
-            status: err.status || 500,
-            selectedPackage: req.session?.selectedPackage?.id,
-            user: {
-                steamId: req.user?.steam.id,
-                discordId: req.user?.discord.id,
-            },
-            lastOrder: {
-                id: req.session?.lastOrder?.id,
-                transactionId: req.session?.lastOrder?.transactionId,
-            }
-        })
-    });
-};
 
 let appConfig: AppConfig;
 parseConfig(log).then(async (config) => {
@@ -145,7 +100,7 @@ parseConfig(log).then(async (config) => {
         log.info(`Server listening on port ${port}`);
     });
 }).catch((e) => {
-    log.error(`Initializing app failed: ${e}`);
+    log.error('Initializing app failed', e);
     process.exit(1);
 });
 
