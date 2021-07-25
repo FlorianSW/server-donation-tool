@@ -34,17 +34,25 @@ export class PriorityQueuePerk implements Perk {
             await this.createPriority(steamId, order);
         } catch (e) {
             if (e instanceof DuplicateResourceCreation) {
-                await this.replacePriorityIfOlder(steamId, order);
+                try {
+                    await this.replacePriorityIfOlder(steamId, order);
+                } catch (e) {
+                    this.throwRedeemError(e);
+                }
                 return successParams;
             }
-            throw new RedeemError(['PRIORITY_QUEUE_REDEEM_ERROR', {
-                params: {
-                    serverName: this.serverNames[this.cftools.serverApiId],
-                    reason: e.message,
-                }
-            }]);
+            this.throwRedeemError(e);
         }
         return successParams;
+    }
+
+    private throwRedeemError(e: Error) {
+        throw new RedeemError(['PRIORITY_QUEUE_REDEEM_ERROR', {
+            params: {
+                serverName: this.serverNames[this.cftools.serverApiId],
+                reason: e.message,
+            }
+        }]);
     }
 
     private async replacePriorityIfOlder(steamId: SteamId64, order: Order): Promise<void> {

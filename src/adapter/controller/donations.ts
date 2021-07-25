@@ -104,7 +104,7 @@ export class DonationController {
             try {
                 result.push(await perk.redeem(req.user, order));
             } catch (e) {
-                this.logger.error(`Could not redeem perk ${perk.type}: `, e);
+                this.logger.error(`Could not redeem perk ${perk.type}:`, e);
                 if (e instanceof RedeemError) {
                     errors.push(e.params);
                     this.events.emit('failedRedeemPerk', req.user, order, e);
