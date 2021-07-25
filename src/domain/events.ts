@@ -6,6 +6,10 @@ export interface Events {
     on(event: 'successfulPayment', listener: (user: User, order: Order) => void): this;
     on(event: 'successfulRedeem', listener: (user: User, order: Order) => void): this;
     on(event: 'failedRedeemPerk', listener: (user: User, order: Order, error: RedeemError) => void): this;
+
+    off(event: 'successfulPayment', listener: (user: User, order: Order) => void): this;
+    off(event: 'successfulRedeem', listener: (user: User, order: Order) => void): this;
+    off(event: 'failedRedeemPerk', listener: (user: User, order: Order, error: RedeemError) => void): this;
 }
 
 export interface EventSource {

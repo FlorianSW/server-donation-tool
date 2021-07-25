@@ -30,6 +30,7 @@ export interface AppConfig {
         bot?: {
             token: string,
             guildId: string,
+            expireRolesEvery?: number,
         }
     },
     steam?: {
@@ -59,5 +60,5 @@ export interface AppConfig {
 
     logoUrl(): string;
 
-    destroy(): void;
+    destroy(): Promise<void>;
 }

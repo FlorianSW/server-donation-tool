@@ -104,8 +104,8 @@ parseConfig(log).then(async (config) => {
     process.exit(1);
 });
 
-process.on('SIGINT', () => {
+process.on('SIGINT', async () => {
     log.info('App is shutting down on user event');
-    appConfig.destroy();
+    await appConfig.destroy();
     process.exit(0);
 });

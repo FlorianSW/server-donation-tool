@@ -60,6 +60,13 @@ discord:
     # The ID is now in your clipboard, simply paste it here and wrap it with ''.
     # The value needs to be a string (wrapped in ').
     guildId:
+    # Uncomment this option if you want to configure the interval in which the tool checks if given discord roles should be removed.
+    # The time is in milliseconds. Whenever the interval is reached, the tool will evaluate all temporarily given discord roles
+    # to your donators to remove the ones which are now expired. Given they are expired, they will be removed from the donator.
+    # You should not need to configure this interval and should avoid changing this configuration if not definitely needed.
+    # Changing this property may decrease the overall performance of the application.
+    # When this option is disabled (a comment), the default value (1 hours) is used.
+    # expireRolesEvery: 60000
   # Optional notifications from the website to your discord. During the process of donating, the tool emits events for
   # specific actions and errors, which you can opt in to get a notification into a discord channel using a webhook. The
   # webhook DOES NOT necessarily need to be in the same discord server your other discord settings relate to (e.g. the
@@ -152,6 +159,7 @@ serverNames:
 # * roles: An array of discord role IDs (NOT names) to assign when the donation succeeded. You can retrieve the role IDs
 #   the same way as you did with the guild ID, just right click on the role you want to assign to a donator to copy the ID
 #   from the context menu.
+# * amountInDays: The amount of days the donator should have the discord roles.
 #
 # - FREETEXT_ONLY
 # A perk that is not managed by this application. This website is basically not provisioning anything for the donator

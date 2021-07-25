@@ -136,6 +136,9 @@ Then, right-click on the role you want to grant in the role management of the se
 This perk requires the following additional configuration options:
 
 * **roles**: A list of strings (not numbers, so please quote the IDs from Discord with ') of the Discord roles you want to give to the donator.
+* **amountInDays**: *(Optional)* A number with the amount of days the priority queue slot should be setup for.
+  E.g. `30` for 30 days, or `14` for 14 days and so on.
+  If you omit this option, the roles will be assigned permanently (you can still remove them manually, though).
 
 ### Free text
 

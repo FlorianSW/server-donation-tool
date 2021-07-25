@@ -16,6 +16,10 @@ import {Environment} from './adapter/paypal-payment';
 import settings from './translations';
 import {Events, EventSource} from './domain/events';
 import {EventQueue} from './adapter/event-queue';
+import {DiscordRoleRepository} from './domain/repositories';
+import {DiscordRoleRecorder} from './service/discord-role-recorder';
+import {SQLiteDiscordRoleRepository} from './adapter/discord-role-repository';
+import {ExpireDiscordRole} from './service/expire-discord-role';
 
 const initSessionStore = require('connect-session-knex');
 const sessionStore: StoreFactory = initSessionStore(session);
@@ -26,6 +30,14 @@ function isWebUrl(urlAsString: string): boolean {
         return url.protocol === 'http:' || url.protocol === 'https:';
     } catch (e) {
         return false;
+    }
+}
+
+async function enableSqLiteWal(knex: Knex, log: Logger): Promise<void> {
+    const result = await knex.raw('PRAGMA journal_mode=WAL;');
+    const journalMode = result[0]?.journal_mode;
+    if (journalMode !== 'wal') {
+        this.logger.warn(`Could not set journal mode to WAL, which might decrease performance on multiple concurrent requests. Store runs in mode: ${journalMode}`);
     }
 }
 
@@ -52,6 +64,7 @@ class YamlAppConfig implements AppConfig {
         bot?: {
             token: string,
             guildId: string,
+            expireRolesEvery?: number,
         },
         notifications?: DiscordNotification[]
     };
@@ -73,6 +86,9 @@ class YamlAppConfig implements AppConfig {
     private _discordClient: Client;
     private _notifier: DiscordNotifier | undefined;
     private _eventQueue: Events & EventQueue = new EventQueue();
+    private _discordRoleRepository: DiscordRoleRepository;
+    private _discordRoleRecorder: DiscordRoleRecorder;
+    private _expireDiscordRole: ExpireDiscordRole;
 
     cfToolscClient(): CFToolsClient {
         return this._cfToolsClient;
@@ -99,6 +115,7 @@ class YamlAppConfig implements AppConfig {
             .build();
         this.assertValidPackages();
         await this.configureDiscord();
+        await this.configureExpiringDiscordRoles();
 
         if (this.app.community?.discord && !this.app.community.discord.startsWith('http')) {
             this.logger.warn('Community Discord link needs to be an absolute URL. This is invalid: ' + this.app.community.discord);
@@ -131,11 +148,7 @@ class YamlAppConfig implements AppConfig {
             },
             useNullAsDefault: true,
         });
-        const result = await knex.raw('PRAGMA journal_mode=WAL;');
-        const journalMode = result[0]?.journal_mode;
-        if (journalMode !== 'wal') {
-            this.logger.warn(`Could not set session store's journal mode to WAL, which might decrease performance on multiple concurrent requests. Store runs in mode: ${journalMode}`);
-        }
+        await enableSqLiteWal(knex, this.logger);
         return new sessionStore({
             knex: knex
         });
@@ -151,9 +164,18 @@ class YamlAppConfig implements AppConfig {
         return `/assets/custom/${this.app.community?.logo}`;
     }
 
-    destroy(): void {
+    async destroy(): Promise<void> {
         if (this._discordClient) {
             this._discordClient.destroy();
+        }
+        if (this._discordRoleRecorder) {
+            await this._discordRoleRecorder.close();
+        }
+        if (this._discordRoleRepository) {
+            await this._discordRoleRepository.close();
+        }
+        if (this._expireDiscordRole) {
+            await this._expireDiscordRole.close();
         }
     }
 
@@ -199,6 +221,20 @@ class YamlAppConfig implements AppConfig {
         if (this.discord.notifications && this.discord.notifications.length !== 0) {
             this._notifier = new DiscordNotifier(this.events(), this.discord.notifications);
         }
+    }
+
+    private async configureExpiringDiscordRoles(): Promise<void> {
+        const knex = Knex({
+            client: 'sqlite3',
+            connection: {
+                filename: './db/donations.sqlite',
+            },
+            useNullAsDefault: true,
+        });
+        await enableSqLiteWal(knex, this.logger);
+        this._discordRoleRepository = new SQLiteDiscordRoleRepository(knex);
+        this._discordRoleRecorder = new DiscordRoleRecorder(this._eventQueue, this._discordRoleRepository);
+        this._expireDiscordRole = new ExpireDiscordRole(this._discordRoleRepository, await this.discordClient(), this.discord.bot.guildId, this.discord.bot.expireRolesEvery || 60 * 60 * 1000, this.logger);
     }
 }
 
