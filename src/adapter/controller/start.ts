@@ -25,7 +25,9 @@ export class StartController {
     }
 
     private price(req: Request, pack: Package): Price {
-        const price = pack.price;
+        const price = {
+            ...pack.price
+        };
         if (req.body[`price-${pack.id}`]) {
             if (pack.price.type === PriceType.FIXED) {
                 throw Error('VariablePriceForFixedPackage');
