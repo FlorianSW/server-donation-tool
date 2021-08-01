@@ -2,16 +2,16 @@ import {Package} from './package';
 import {User} from './user';
 
 export class Reference {
-    constructor(public readonly steamId: string, public readonly p: Package) {
+    constructor(public readonly steamId: string, public readonly discordId: string, public readonly p: Package) {
     }
 
-    static fromString(s: string, packages: Package[]): Reference | undefined {
+    static fromString(s: string, d: string, packages: Package[]): Reference | undefined {
         const ids = s.split('#');
         const selectedPackage = packages.find((p) => p.id === parseInt(ids[1]));
         if (!selectedPackage) {
             return;
         }
-        return new Reference(ids[0], selectedPackage);
+        return new Reference(ids[0], d, selectedPackage);
     }
 
     asString() {
@@ -33,6 +33,7 @@ export interface PaymentCapture {
 export interface CreatePaymentOrderRequest {
     forPackage: Package;
     steamId: string;
+    discordId: string;
 }
 
 export interface CapturePaymentRequest {

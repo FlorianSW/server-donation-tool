@@ -32,7 +32,7 @@ const anOrder: Order = {
     id: 'SOME_ORDER_ID',
     created: new Date(),
     transactionId: 'A_TRANSACTION_ID',
-    reference: new Reference(aSteamId, aPackage),
+    reference: new Reference(aSteamId, '11111111111', aPackage),
 };
 
 describe('PriorityQueuePerk', () => {

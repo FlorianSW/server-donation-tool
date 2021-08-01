@@ -137,7 +137,8 @@ export class DonationController {
                     ...req.session.selectedPackage.price
                 }
             },
-            steamId: req.body.steamId
+            steamId: req.body.steamId,
+            discordId: req.user.discord.id,
         });
         res.status(200).json({
             orderId: order.id

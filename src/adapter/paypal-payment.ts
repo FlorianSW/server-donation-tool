@@ -54,7 +54,7 @@ export class PaypalPayment implements Payment {
 
         const order: OrderResult = await this.client.execute(request);
 
-        const id = Reference.fromString(order.result.purchase_units[0].custom_id, this.config.packages);
+        const id = Reference.fromString(order.result.purchase_units[0].custom_id, forUser.discord.id, this.config.packages);
 
         if (!id || order.result.status !== 'COMPLETED') {
             throw new OrderNotCompleted();
@@ -69,7 +69,7 @@ export class PaypalPayment implements Payment {
             id: order.result.id,
             created: new Date(order.result.create_time || order.result.update_time),
             transactionId: order.result.purchase_units[0]?.payments?.captures[0]?.id,
-            reference: Reference.fromString(order.result.purchase_units[0].custom_id, this.config.packages),
+            reference: id,
         };
     }
 
@@ -79,7 +79,7 @@ export class PaypalPayment implements Payment {
         r.requestBody({
             intent: 'CAPTURE',
             purchase_units: [{
-                custom_id: new Reference(request.steamId, request.forPackage).asString(),
+                custom_id: new Reference(request.steamId, request.discordId, request.forPackage).asString(),
                 description: request.forPackage.name,
                 amount: {
                     currency_code: request.forPackage.price.currency,
@@ -93,7 +93,7 @@ export class PaypalPayment implements Payment {
             id: order.result.id,
             created: new Date(order.result.create_time),
             transactionId: order.result.purchase_units[0]?.payments?.captures[0]?.id,
-            reference: Reference.fromString(order.result.purchase_units[0].custom_id, this.config.packages),
+            reference: Reference.fromString(order.result.purchase_units[0].custom_id, request.discordId, this.config.packages),
         };
     }
 }

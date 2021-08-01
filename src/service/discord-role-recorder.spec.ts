@@ -57,7 +57,7 @@ describe('DiscordRoleRecorder', () => {
     it('does not record non-expiring discord role', async () => {
         await recorder.onSuccessfulRedeem(aUser, {
             id: 'SOME_ID',
-            reference: new Reference('7592222222222', {
+            reference: new Reference('7592222222222', '11111111111', {
                 ...aPackage,
                 perks: [notExpiring],
             }),
@@ -71,7 +71,7 @@ describe('DiscordRoleRecorder', () => {
     it('records expiring discord role', async () => {
         await recorder.onSuccessfulRedeem(aUser, {
             id: 'SOME_ID',
-            reference: new Reference('7592222222222', {
+            reference: new Reference('7592222222222', '11111111111', {
                 ...aPackage,
                 perks: [expiring],
             }),
@@ -91,7 +91,7 @@ describe('DiscordRoleRecorder', () => {
     it('does not return not yet expired roles', async () => {
         await recorder.onSuccessfulRedeem(aUser, {
             id: 'SOME_ID',
-            reference: new Reference('7592222222222', {
+            reference: new Reference('7592222222222', '11111111111', {
                 ...aPackage,
                 perks: [expiring],
             }),

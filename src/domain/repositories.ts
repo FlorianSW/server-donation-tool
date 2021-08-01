@@ -1,3 +1,5 @@
+import {Order} from './payment';
+
 export interface ExpiringDiscordRole {
     discordUser: string,
     roleId: string,
@@ -9,4 +11,9 @@ export interface DiscordRoleRepository {
     find(expiresBefore: Date): Promise<ExpiringDiscordRole[]>
     delete(role: ExpiringDiscordRole): Promise<void>
     close(): Promise<void>
+}
+
+export interface OrderRepository {
+    save(order: Order): Promise<void>
+    find(id: string): Promise<Order | undefined>
 }

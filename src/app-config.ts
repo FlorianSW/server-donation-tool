@@ -16,10 +16,12 @@ import {Environment} from './adapter/paypal-payment';
 import settings from './translations';
 import {Events, EventSource} from './domain/events';
 import {EventQueue} from './adapter/event-queue';
-import {DiscordRoleRepository} from './domain/repositories';
+import {DiscordRoleRepository, OrderRepository} from './domain/repositories';
 import {DiscordRoleRecorder} from './service/discord-role-recorder';
 import {SQLiteDiscordRoleRepository} from './adapter/discord-role-repository';
 import {ExpireDiscordRole} from './service/expire-discord-role';
+import {OrderRecorder} from './service/order-recorder';
+import {SQLiteOrderRepository} from './adapter/order-repository';
 
 const initSessionStore = require('connect-session-knex');
 const sessionStore: StoreFactory = initSessionStore(session);
@@ -81,6 +83,14 @@ class YamlAppConfig implements AppConfig {
     };
     serverNames: ServerNames;
 
+    private readonly _donationsDb: Knex = Knex({
+        client: 'sqlite3',
+        connection: {
+            filename: './db/donations.sqlite',
+        },
+        useNullAsDefault: true,
+    });
+
     private logger: Logger;
     private _cfToolsClient: CFToolsClient;
     private _discordClient: Client;
@@ -89,6 +99,8 @@ class YamlAppConfig implements AppConfig {
     private _discordRoleRepository: DiscordRoleRepository;
     private _discordRoleRecorder: DiscordRoleRecorder;
     private _expireDiscordRole: ExpireDiscordRole;
+    private _orderRepository: OrderRepository;
+    private _orderRecorder: OrderRecorder;
 
     cfToolscClient(): CFToolsClient {
         return this._cfToolsClient;
@@ -116,6 +128,7 @@ class YamlAppConfig implements AppConfig {
         this.assertValidPackages();
         await this.configureDiscord();
         await this.configureExpiringDiscordRoles();
+        await this.configureOrderRecorder();
 
         if (this.app.community?.discord && !this.app.community.discord.startsWith('http')) {
             this.logger.warn('Community Discord link needs to be an absolute URL. This is invalid: ' + this.app.community.discord);
@@ -224,17 +237,17 @@ class YamlAppConfig implements AppConfig {
     }
 
     private async configureExpiringDiscordRoles(): Promise<void> {
-        const knex = Knex({
-            client: 'sqlite3',
-            connection: {
-                filename: './db/donations.sqlite',
-            },
-            useNullAsDefault: true,
-        });
-        await enableSqLiteWal(knex, this.logger);
-        this._discordRoleRepository = new SQLiteDiscordRoleRepository(knex);
+        await enableSqLiteWal(this._donationsDb, this.logger);
+        this._discordRoleRepository = new SQLiteDiscordRoleRepository(this._donationsDb);
         this._discordRoleRecorder = new DiscordRoleRecorder(this._eventQueue, this._discordRoleRepository);
         this._expireDiscordRole = new ExpireDiscordRole(this._discordRoleRepository, await this.discordClient(), this.discord.bot.guildId, this.discord.bot.expireRolesEvery || 60 * 60 * 1000, this.logger);
+    }
+
+    private async configureOrderRecorder(): Promise<void> {
+        await enableSqLiteWal(this._donationsDb, this.logger);
+
+        this._orderRepository = new SQLiteOrderRepository(this._donationsDb, this.packages);
+        this._orderRecorder = new OrderRecorder(this._eventQueue, this._orderRepository);
     }
 }
 
