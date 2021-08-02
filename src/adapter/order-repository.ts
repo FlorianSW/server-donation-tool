@@ -47,6 +47,15 @@ export class SQLiteOrderRepository implements OrderRepository {
         this.initialized = undefined;
     }
 
+    private toOrder(o: any): Order {
+        return {
+            id: o[columnOrderId],
+            created: new Date(o[columnCreated]),
+            transactionId: o[columnTransactionId],
+            reference: new Reference(o[columnSteamId], o[columnDiscordId], this.packages.find((p) => p.id === o[columnPackageId])),
+        } as Order;
+    }
+
     async find(id: string): Promise<Order | undefined> {
         await this.initialized;
         return this.con
@@ -54,14 +63,18 @@ export class SQLiteOrderRepository implements OrderRepository {
             .where(columnOrderId, '=', id)
             .then((result) => {
                 if (result.length === 1) {
-                    const o = result[0];
-                    return {
-                        id: o[columnOrderId],
-                        created: new Date(o[columnCreated]),
-                        transactionId: o[columnTransactionId],
-                        reference: new Reference(o[columnSteamId], o[columnDiscordId], this.packages.find((p) => p.id === o[columnPackageId])),
-                    } as Order;
+                    return this.toOrder(result[0]);
                 }
+            });
+    }
+
+    async findCreatedAfter(after: Date): Promise<Order[]> {
+        await this.initialized;
+        return this.con
+            .table(tableName)
+            .where(columnCreated, '>=', after.getTime())
+            .then((result) => {
+                return result.map((o) => this.toOrder(o));
             });
     }
 
@@ -84,6 +97,10 @@ export class InMemoryOrderRepository implements OrderRepository {
 
     async save(order: Order): Promise<void> {
         this.orders.set(order.id, order);
+    }
+
+    async findCreatedAfter(after: Date): Promise<Order[]> {
+        return Array.from(this.orders.values()).filter((o) => o.created.getTime() >= after.getTime());
     }
 
     async close(): Promise<void> {

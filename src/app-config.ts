@@ -52,6 +52,9 @@ class YamlAppConfig implements AppConfig {
             title: string;
             logo: string;
             discord?: string;
+            donationTarget?: {
+                monthly?: number;
+            };
         }
     };
     cftools: { applicationId: string; secret: string };

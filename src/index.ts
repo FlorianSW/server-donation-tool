@@ -23,6 +23,7 @@ import {PaypalPayment} from './adapter/paypal-payment';
 import {DiscordRoleRecorder} from './service/discord-role-recorder';
 import {ExpireDiscordRole} from './service/expire-discord-role';
 import {Logger} from 'winston';
+import {StatisticsController} from './adapter/controller/statistics';
 
 export interface Closeable {
     close(): Promise<void>
@@ -58,6 +59,7 @@ parseConfig(log).then(async (config) => {
     const donations = container.resolve(DonationController);
     const donators = container.resolve(DonatorsController);
     const authentication = container.resolve(Authentication);
+    const statistics = container.resolve(StatisticsController);
 
     app.locals.translate = translate;
     app.locals.community = {
@@ -115,6 +117,7 @@ parseConfig(log).then(async (config) => {
     app.use('/', donations.router);
     app.use('/', donators.router);
     app.use('/', authentication.router);
+    app.use('/', statistics.router);
 
 
     app.use(errorHandler);

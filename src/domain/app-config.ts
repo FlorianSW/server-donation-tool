@@ -19,6 +19,9 @@ export interface AppConfig {
             title?: string,
             logo?: string,
             discord?: string,
+            donationTarget?: {
+                monthly?: number,
+            },
         }
     },
     discord: {
