@@ -10,6 +10,7 @@ import {
 } from '../domain/payment';
 import {AppConfig} from '../domain/app-config';
 import {User} from '../domain/user';
+import {inject, singleton} from 'tsyringe';
 
 const paypal = require('@paypal/checkout-server-sdk');
 
@@ -34,10 +35,11 @@ interface OrderResult {
     }
 }
 
+@singleton()
 export class PaypalPayment implements Payment {
     private readonly client: any;
 
-    constructor(private readonly config: AppConfig) {
+    constructor(@inject('AppConfig') private readonly config: AppConfig) {
         this.client = paypalClient(config);
     }
 

@@ -1,11 +1,12 @@
-import {Events} from '../domain/events';
+import {DonationEvents} from '../domain/events';
 import {User} from '../domain/user';
 import {Order} from '../domain/payment';
-import {DiscordRolePerk} from '../adapter/perk/discord-role-perk';
-import {DiscordRoleRepository, OrderRepository} from '../domain/repositories';
+import {OrderRepository} from '../domain/repositories';
+import {inject, singleton} from 'tsyringe';
 
+@singleton()
 export class OrderRecorder {
-    constructor(private readonly events: Events, private readonly repository: OrderRepository) {
+    constructor(@inject('DonationEvents') private readonly events: DonationEvents, @inject('OrderRepository') private readonly repository: OrderRepository) {
         events.on('successfulPayment', this.onSuccessfulPayment.bind(this));
     }
 

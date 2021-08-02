@@ -1,4 +1,4 @@
-import {CFToolsClient, CFToolsClientBuilder} from 'cftools-sdk';
+import {CFToolsClientBuilder} from 'cftools-sdk';
 import {Client} from 'discord.js';
 import {AppConfig, ServerNames} from './domain/app-config';
 import {Package, PriceType} from './domain/package';
@@ -9,19 +9,15 @@ import * as fs from 'fs';
 import * as yaml from 'js-yaml';
 import {DiscordNotification, DiscordNotifier} from './adapter/discord-notifier';
 import {FreetextPerk} from './adapter/perk/freetext-perk';
-import session, {Store} from 'express-session';
+import session from 'express-session';
 import {StoreFactory} from 'connect-session-knex';
 import Knex from 'knex';
 import {Environment} from './adapter/paypal-payment';
 import settings from './translations';
-import {Events, EventSource} from './domain/events';
-import {EventQueue} from './adapter/event-queue';
-import {DiscordRoleRepository, OrderRepository} from './domain/repositories';
 import {DiscordRoleRecorder} from './service/discord-role-recorder';
-import {SQLiteDiscordRoleRepository} from './adapter/discord-role-repository';
 import {ExpireDiscordRole} from './service/expire-discord-role';
 import {OrderRecorder} from './service/order-recorder';
-import {SQLiteOrderRepository} from './adapter/order-repository';
+import {container, instanceCachingFactory} from 'tsyringe';
 
 const initSessionStore = require('connect-session-knex');
 const sessionStore: StoreFactory = initSessionStore(session);
@@ -39,7 +35,7 @@ async function enableSqLiteWal(knex: Knex, log: Logger): Promise<void> {
     const result = await knex.raw('PRAGMA journal_mode=WAL;');
     const journalMode = result[0]?.journal_mode;
     if (journalMode !== 'wal') {
-        this.logger.warn(`Could not set journal mode to WAL, which might decrease performance on multiple concurrent requests. Store runs in mode: ${journalMode}`);
+        log.warn(`Could not set journal mode to WAL, which might decrease performance on multiple concurrent requests. Store runs in mode: ${journalMode}`);
     }
 }
 
@@ -83,49 +79,28 @@ class YamlAppConfig implements AppConfig {
     };
     serverNames: ServerNames;
 
-    private readonly _donationsDb: Knex = Knex({
-        client: 'sqlite3',
-        connection: {
-            filename: './db/donations.sqlite',
-        },
-        useNullAsDefault: true,
-    });
-
     private logger: Logger;
-    private _cfToolsClient: CFToolsClient;
-    private _discordClient: Client;
-    private _notifier: DiscordNotifier | undefined;
-    private _eventQueue: Events & EventQueue = new EventQueue();
-    private _discordRoleRepository: DiscordRoleRepository;
-    private _discordRoleRecorder: DiscordRoleRecorder;
-    private _expireDiscordRole: ExpireDiscordRole;
-    private _orderRepository: OrderRepository;
-    private _orderRecorder: OrderRecorder;
-
-    cfToolscClient(): CFToolsClient {
-        return this._cfToolsClient;
-    }
-
-    discordClient(): Promise<Client> {
-        if (!this.discord.bot?.token) {
-            return Promise.reject('Discord bot not configured');
-        }
-        return Promise.resolve(this._discordClient);
-    }
-
-    eventSource(): EventSource {
-        return this._eventQueue;
-    }
-
-    events(): Events {
-        return this._eventQueue;
-    }
 
     async initialize(): Promise<void> {
-        this._cfToolsClient = new CFToolsClientBuilder()
+        container.registerInstance('CFToolsClient', new CFToolsClientBuilder()
             .withCredentials(this.cftools.applicationId, this.cftools.secret)
-            .build();
+            .build());
+        container.register('DonationsDB', {
+            useFactory: instanceCachingFactory((c) => {
+                const knex = Knex({
+                    client: 'sqlite3',
+                    connection: {
+                        filename: './db/donations.sqlite',
+                    },
+                    useNullAsDefault: true,
+                });
+                enableSqLiteWal(knex, c.resolve('Logger'));
+                return knex;
+            })
+        });
+
         this.assertValidPackages();
+        await this.configureSessionStore();
         await this.configureDiscord();
         await this.configureExpiringDiscordRoles();
         await this.configureOrderRecorder();
@@ -149,7 +124,17 @@ class YamlAppConfig implements AppConfig {
         }
     }
 
-    async sessionStore(): Promise<Store> {
+    logoUrl(): string {
+        if (!this.app.community?.logo) {
+            return;
+        }
+        if (isWebUrl(this.app.community.logo)) {
+            return this.app.community.logo;
+        }
+        return `/assets/custom/${this.app.community?.logo}`;
+    }
+
+    private async configureSessionStore(): Promise<void> {
         this.logger.info('Initializing session store');
         if (!this.app.sessionSecret || this.app.sessionSecret.length === 0) {
             throw new Error('app.sessionSecret can not be an empty string. Choose an individual, random, secure string');
@@ -162,34 +147,9 @@ class YamlAppConfig implements AppConfig {
             useNullAsDefault: true,
         });
         await enableSqLiteWal(knex, this.logger);
-        return new sessionStore({
+        container.registerInstance('sessionStore', new sessionStore({
             knex: knex
-        });
-    }
-
-    logoUrl(): string {
-        if (!this.app.community?.logo) {
-            return;
-        }
-        if (isWebUrl(this.app.community.logo)) {
-            return this.app.community.logo;
-        }
-        return `/assets/custom/${this.app.community?.logo}`;
-    }
-
-    async destroy(): Promise<void> {
-        if (this._discordClient) {
-            this._discordClient.destroy();
-        }
-        if (this._discordRoleRecorder) {
-            await this._discordRoleRecorder.close();
-        }
-        if (this._discordRoleRepository) {
-            await this._discordRoleRepository.close();
-        }
-        if (this._expireDiscordRole) {
-            await this._expireDiscordRole.close();
-        }
+        }));
     }
 
     private assertValidPackages() {
@@ -212,42 +172,50 @@ class YamlAppConfig implements AppConfig {
         const hasDiscordPerk = this.packages.find((p) => p.perks.find((perk) => perk.type === 'DISCORD_ROLE'));
 
         if (this.discord.bot?.token) {
-            this._discordClient = new Client({
+            const client = new Client({
                 ws: {
                     intents: ['GUILD_MEMBERS', 'GUILDS']
                 }
             });
             await new Promise(async (resolve, reject) => {
-                this._discordClient.on('ready', () => {
+                client.on('ready', () => {
                     resolve(undefined);
                 });
-                this._discordClient.on('error', (error) => {
+                client.on('error', (error) => {
                     this.logger.error('Error in discord client occurred', error);
                     reject(error);
                 });
-                await this._discordClient.login(this.discord.bot.token);
+                await client.login(this.discord.bot.token);
+            });
+            container.registerInstance('discord.Client', client);
+            container.registerInstance('Closeable', {
+                close: () => client.destroy()
             });
         } else if (hasDiscordPerk) {
             throw new Error('At least one discord perk is configured but no valid discord configuration was found.');
         }
 
         if (this.discord.notifications && this.discord.notifications.length !== 0) {
-            this._notifier = new DiscordNotifier(this.events(), this.discord.notifications);
+            container.resolve(DiscordNotifier);
         }
     }
 
     private async configureExpiringDiscordRoles(): Promise<void> {
-        await enableSqLiteWal(this._donationsDb, this.logger);
-        this._discordRoleRepository = new SQLiteDiscordRoleRepository(this._donationsDb);
-        this._discordRoleRecorder = new DiscordRoleRecorder(this._eventQueue, this._discordRoleRepository);
-        this._expireDiscordRole = new ExpireDiscordRole(this._discordRoleRepository, await this.discordClient(), this.discord.bot.guildId, this.discord.bot.expireRolesEvery || 60 * 60 * 1000, this.logger);
+        container.register('discord.guildId', {
+            useValue: this.discord.bot.guildId,
+        });
+        container.register('discord.runEvery', {
+            useValue: this.discord.bot.expireRolesEvery || 60 * 60 * 1000,
+        });
+        container.resolve(DiscordRoleRecorder);
+        container.resolve(ExpireDiscordRole);
     }
 
     private async configureOrderRecorder(): Promise<void> {
-        await enableSqLiteWal(this._donationsDb, this.logger);
-
-        this._orderRepository = new SQLiteOrderRepository(this._donationsDb, this.packages);
-        this._orderRecorder = new OrderRecorder(this._eventQueue, this._orderRepository);
+        container.register('packages', {
+            useValue: this.packages,
+        });
+        container.resolve(OrderRecorder);
     }
 }
 
@@ -259,6 +227,7 @@ export async function parseConfig(logger: Logger): Promise<AppConfig> {
     logger.info('Reading app configuration from config.yml');
     const config = yaml.load(fs.readFileSync('config.yml', 'utf8'));
     const intermediate: YamlAppConfig = Object.assign(new YamlAppConfig(), config, {logger: logger});
+    container.registerInstance('AppConfig', intermediate);
     await intermediate.initialize();
 
     if (typeof intermediate.discord.clientId === 'number') {
@@ -275,9 +244,9 @@ export async function parseConfig(logger: Logger): Promise<AppConfig> {
 
             perk.inPackage = p;
             if (perk.type === 'PRIORITY_QUEUE') {
-                p.perks[i] = Object.assign(new PriorityQueuePerk(intermediate.cfToolscClient(), intermediate.serverNames), perk);
+                p.perks[i] = Object.assign(new PriorityQueuePerk(container.resolve('CFToolsClient'), intermediate.serverNames), perk);
             } else if (perk.type === 'DISCORD_ROLE') {
-                const discordPerk: DiscordRolePerk = Object.assign(new DiscordRolePerk(await intermediate.discordClient(), intermediate.discord.bot.guildId, logger), perk);
+                const discordPerk: DiscordRolePerk = Object.assign(new DiscordRolePerk(container.resolve('discord.Client'), intermediate.discord.bot.guildId, logger), perk);
                 discordPerk.roles.forEach((r) => {
                     if (typeof r === 'number') {
                         logger.warn(warnYamlNumber(`discord role perk role`, r));

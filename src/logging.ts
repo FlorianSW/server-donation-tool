@@ -1,5 +1,6 @@
 import winston from 'winston';
 import {ErrorRequestHandler, NextFunction, Request, Response} from 'express';
+import {container} from 'tsyringe';
 
 export const consoleFormat = winston.format.combine(
     winston.format.colorize(),
@@ -14,7 +15,7 @@ export const consoleFormat = winston.format.combine(
     })
 );
 
-export const log = winston.createLogger({
+const log = winston.createLogger({
     transports: [
         new winston.transports.Console({
             format: consoleFormat
@@ -31,6 +32,8 @@ export const log = winston.createLogger({
         }),
     ],
 });
+
+container.registerInstance('Logger', log);
 
 export const errorHandler: ErrorRequestHandler = (err: any, req: Request, res: Response, next: NextFunction) => {
     log.error(err);

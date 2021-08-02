@@ -1,8 +1,6 @@
 import {Package} from './package';
-import {CFToolsClient} from 'cftools-sdk';
-import {Client} from 'discord.js';
 import {Store} from 'express-session';
-import {EventSource} from './events';
+import {DiscordNotification} from '../adapter/discord-notifier';
 
 export type ServerNames = {
     [serverApiId: string]: string
@@ -31,7 +29,8 @@ export interface AppConfig {
             token: string,
             guildId: string,
             expireRolesEvery?: number,
-        }
+        },
+        notifications?: DiscordNotification[],
     },
     steam?: {
         realm: string,
@@ -50,15 +49,5 @@ export interface AppConfig {
     serverNames: ServerNames,
     packages: Package[],
 
-    cfToolscClient(): CFToolsClient;
-
-    discordClient(): Promise<Client>;
-
-    eventSource(): EventSource;
-
-    sessionStore(): Promise<Store>;
-
     logoUrl(): string;
-
-    destroy(): Promise<void>;
 }

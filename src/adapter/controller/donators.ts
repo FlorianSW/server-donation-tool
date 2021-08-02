@@ -5,14 +5,21 @@ import {AppConfig} from '../../domain/app-config';
 import {Logger} from 'winston';
 import {DiscordRole, OwnedPerk, PriorityQueue} from '../../domain/user';
 import {PriorityQueuePerk} from '../perk/priority-queue-perk';
-import {PriorityQueueItem, ServerApiId, SteamId64} from 'cftools-sdk';
-import {Constants, DiscordAPIError} from 'discord.js';
+import {CFToolsClient, PriorityQueueItem, ServerApiId, SteamId64} from 'cftools-sdk';
+import {Client, Constants, DiscordAPIError} from 'discord.js';
 import {DiscordRolePerk} from '../perk/discord-role-perk';
+import {inject, singleton} from 'tsyringe';
 
+@singleton()
 export class DonatorsController {
     public readonly router: Router = Router();
 
-    constructor(private readonly config: AppConfig, private readonly log: Logger) {
+    constructor(
+        @inject('AppConfig') private readonly config: AppConfig,
+        @inject('CFToolsClient') private readonly cftoolsClient: CFToolsClient,
+        @inject('discord.Client') private readonly discordClient: Client,
+        @inject('Logger') private readonly log: Logger
+    ) {
         this.router.get('/donators/@me/perks', requireAuthentication, this.listOwnedPerks.bind(this));
     }
 
@@ -22,7 +29,7 @@ export class DonatorsController {
 
     private async fetchPriorityQueue(req: Request, server: string): Promise<PriorityQueue> {
         try {
-            const entry = await this.config.cfToolscClient().getPriorityQueue({
+            const entry = await this.cftoolsClient.getPriorityQueue({
                 playerId: SteamId64.of(req.user.steam.id),
                 serverApiId: ServerApiId.of(server),
             });
@@ -53,9 +60,7 @@ export class DonatorsController {
                 .map(async (server) => await this.fetchPriorityQueue(req, server))
         )).filter((p) => !!p);
 
-        const client = await this.config.discordClient();
-        const guild = await client.guilds.fetch(this.config.discord.bot.guildId);
-
+        const guild = await this.discordClient.guilds.fetch(this.config.discord.bot.guildId);
         let guildMember;
         try {
             guildMember = await guild.members.fetch(req.user.discord.id);

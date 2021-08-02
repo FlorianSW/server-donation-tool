@@ -4,11 +4,13 @@ import {AppConfig} from '../../domain/app-config';
 import {Package, Price, PriceType} from '../../domain/package';
 import {Logger} from 'winston';
 import csrf from 'csurf';
+import {inject, singleton} from 'tsyringe';
 
+@singleton()
 export class StartController {
     public readonly router: Router = Router();
 
-    constructor(private readonly config: AppConfig, private readonly log: Logger) {
+    constructor(@inject('AppConfig') private readonly config: AppConfig, @inject('Logger') private readonly log: Logger) {
         const csrfProtection = csrf();
 
         this.router.post('/selectPackage', requireAuthentication, csrfProtection, this.selectPackage.bind(this));

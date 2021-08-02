@@ -1,15 +1,17 @@
 import {DiscordRoleRepository, ExpiringDiscordRole} from '../domain/repositories';
 import Knex from 'knex';
+import {inject, singleton} from 'tsyringe';
 
 const tableName = 'expiring_discord_roles';
 const columnDiscordUser = 'discord_user';
 const columnRoleId = 'role_id';
 const columnExpiresAt = 'expires_at';
 
+@singleton()
 export class SQLiteDiscordRoleRepository implements DiscordRoleRepository {
     private initialized: Promise<boolean>;
 
-    constructor(private readonly con: Knex) {
+    constructor(@inject('DonationsDB') private readonly con: Knex) {
         this.initialized = new Promise((resolve) => {
             con.schema.hasTable(tableName).then((hasTable) => {
                 if (!hasTable) {

@@ -8,11 +8,18 @@ import {Logger} from 'winston';
 import {SessionData} from 'express-session';
 import csrf from 'csurf';
 import {EventSource} from '../../domain/events';
+import {inject, singleton} from 'tsyringe';
 
+@singleton()
 export class DonationController {
     public readonly router: Router = Router();
 
-    constructor(private readonly config: AppConfig, private readonly payment: Payment, private readonly events: EventSource, private readonly logger: Logger) {
+    constructor(
+        @inject('AppConfig') private readonly config: AppConfig,
+        @inject('Payment') private readonly payment: Payment,
+        @inject('EventSource') private readonly events: EventSource,
+        @inject('Logger') private readonly logger: Logger
+    ) {
         const csrfProtection = csrf();
         this.router.post('/donations', requireAuthentication, csrfProtection, this.createOrder.bind(this));
         this.router.post('/donations/:orderId', requireAuthentication, csrfProtection, this.captureOrder.bind(this));

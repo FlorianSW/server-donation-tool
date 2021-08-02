@@ -2,7 +2,7 @@ import {User} from './user';
 import {Order} from './payment';
 import {RedeemError} from './package';
 
-export interface Events {
+export interface DonationEvents {
     on(event: 'successfulPayment', listener: (user: User, order: Order) => void): this;
     on(event: 'successfulRedeem', listener: (user: User, order: Order) => void): this;
     on(event: 'failedRedeemPerk', listener: (user: User, order: Order, error: RedeemError) => void): this;

@@ -2,6 +2,7 @@ import {OrderRepository} from '../domain/repositories';
 import Knex from 'knex';
 import {Order, Reference} from '../domain/payment';
 import {Package} from '../domain/package';
+import {inject, singleton} from 'tsyringe';
 
 const tableName = 'order_repository';
 const columnOrderId = 'order_id';
@@ -11,10 +12,11 @@ const columnSteamId = 'steam_id';
 const columnDiscordId = 'discord_id';
 const columnPackageId = 'package_id';
 
+@singleton()
 export class SQLiteOrderRepository implements OrderRepository {
     private initialized: Promise<boolean>;
 
-    constructor(private readonly con: Knex, private readonly packages: Package[]) {
+    constructor(@inject('DonationsDB') private readonly con: Knex, @inject('packages') private readonly packages: Package[]) {
         this.initialized = new Promise((resolve) => {
             con.schema.hasTable(tableName).then((hasTable) => {
                 if (!hasTable) {
@@ -84,4 +86,6 @@ export class InMemoryOrderRepository implements OrderRepository {
         this.orders.set(order.id, order);
     }
 
+    async close(): Promise<void> {
+    }
 }

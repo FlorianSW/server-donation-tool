@@ -1,4 +1,5 @@
 import {Order} from './payment';
+import {Closeable} from '../index';
 
 export interface ExpiringDiscordRole {
     discordUser: string,
@@ -6,14 +7,13 @@ export interface ExpiringDiscordRole {
     expiresAt: Date,
 }
 
-export interface DiscordRoleRepository {
+export interface DiscordRoleRepository extends Closeable {
     save(role: ExpiringDiscordRole): Promise<void>
     find(expiresBefore: Date): Promise<ExpiringDiscordRole[]>
     delete(role: ExpiringDiscordRole): Promise<void>
-    close(): Promise<void>
 }
 
-export interface OrderRepository {
+export interface OrderRepository extends Closeable {
     save(order: Order): Promise<void>
     find(id: string): Promise<Order | undefined>
 }

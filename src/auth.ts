@@ -5,6 +5,7 @@ import {Strategy as SteamStrategy} from 'passport-steam';
 import {AppConfig} from './domain/app-config';
 import {User} from './domain/user';
 import {VerifyCallback} from 'passport-oauth2';
+import {inject, singleton} from 'tsyringe';
 
 export function discordUserCallback(accessToken: string, refreshToken: string, profile: Profile, done: VerifyCallback) {
     const connection: ConnectionInfo | undefined = profile.connections.find((c) => c.type === 'steam');
@@ -29,10 +30,11 @@ interface SteamProfile {
     displayName: string,
 }
 
+@singleton()
 export class Authentication {
     public readonly router: Router = Router();
 
-    constructor(config: AppConfig) {
+    constructor(@inject('AppConfig') config: AppConfig) {
         passport.serializeUser((user, done) => {
             done(null, user);
         });

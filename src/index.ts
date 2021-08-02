@@ -1,3 +1,4 @@
+import 'reflect-metadata';
 import express from 'express';
 import path from 'path';
 import session from 'express-session';
@@ -7,18 +8,44 @@ import {Authentication} from './auth';
 import passport from 'passport';
 import {parseConfig} from './app-config';
 import {AppConfig} from './domain/app-config';
-import {PaypalPayment} from './adapter/paypal-payment';
 import {StartController} from './adapter/controller/start';
 import {DonationController} from './adapter/controller/donations';
 import {errorLogger, logger} from 'express-winston';
 import compression from 'compression';
 import 'express-async-errors';
 import {DonatorsController} from './adapter/controller/donators';
-import {errorHandler, log} from './logging';
+import {errorHandler} from './logging';
+import {container} from 'tsyringe';
+import {EventQueue} from './adapter/event-queue';
+import {SQLiteDiscordRoleRepository} from './adapter/discord-role-repository';
+import {SQLiteOrderRepository} from './adapter/order-repository';
+import {PaypalPayment} from './adapter/paypal-payment';
+import {DiscordRoleRecorder} from './service/discord-role-recorder';
+import {ExpireDiscordRole} from './service/expire-discord-role';
+import {Logger} from 'winston';
 
+export interface Closeable {
+    close(): Promise<void>
+}
+
+const log = container.resolve<Logger>('Logger');
 if (process.env.NODE_ENV !== 'production') {
     log.warn('Running in DEVELOPMENT mode. For better performance, run the application with the environment variable NODE_ENV set to production.');
 }
+
+container.register('DonationEvents', {
+    useFactory: (c) => c.resolve(EventQueue)
+});
+container.register('EventSource', {
+    useFactory: (c) => c.resolve(EventQueue)
+});
+container.registerType('DiscordRoleRepository', SQLiteDiscordRoleRepository);
+container.registerType('Closeable', SQLiteDiscordRoleRepository);
+container.registerType('OrderRepository', SQLiteOrderRepository);
+container.registerType('Closeable', SQLiteOrderRepository);
+container.registerType('Payment', PaypalPayment);
+container.registerType('Closeable', DiscordRoleRecorder);
+container.registerType('Closeable', ExpireDiscordRole);
 
 let appConfig: AppConfig;
 parseConfig(log).then(async (config) => {
@@ -26,12 +53,11 @@ parseConfig(log).then(async (config) => {
     log.info('Starting server');
     const app = express();
 
-    const payment = new PaypalPayment(config);
     const port = config.app.port;
-    const start = new StartController(config, log);
-    const donations = new DonationController(config, payment, appConfig.eventSource(), log);
-    const donators = new DonatorsController(config, log);
-    const authentication = new Authentication(config);
+    const start = container.resolve(StartController);
+    const donations = container.resolve(DonationController);
+    const donators = container.resolve(DonatorsController);
+    const authentication = container.resolve(Authentication);
 
     app.locals.translate = translate;
     app.locals.community = {
@@ -68,7 +94,7 @@ parseConfig(log).then(async (config) => {
             maxAge: 30 * 60 * 1000, // 30 minutes
             sameSite: 'lax',
         },
-        store: await appConfig.sessionStore(),
+        store: container.resolve('sessionStore'),
     }));
     app.use(passport.initialize());
     app.use(passport.session());
@@ -106,6 +132,10 @@ parseConfig(log).then(async (config) => {
 
 process.on('SIGINT', async () => {
     log.info('App is shutting down on user event');
-    await appConfig.destroy();
+    if (container.isRegistered('Closeable')) {
+        for (const closeable of container.resolveAll<Closeable>('Closeable')) {
+            await closeable.close();
+        }
+    }
     process.exit(0);
 });

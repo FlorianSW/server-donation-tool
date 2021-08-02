@@ -1,16 +1,19 @@
 import {DiscordRoleRepository} from '../domain/repositories';
 import {Client, DiscordAPIError, GuildMember} from 'discord.js';
 import {Logger} from 'winston';
+import {inject, singleton} from 'tsyringe';
+import {Closeable} from '../index';
 
-export class ExpireDiscordRole {
+@singleton()
+export class ExpireDiscordRole implements Closeable {
     private readonly interval: NodeJS.Timer;
 
     constructor(
-        private readonly repository: DiscordRoleRepository,
-        private readonly client: Client,
-        private readonly guildId: string,
-        private readonly runEvery: number,
-        private readonly log: Logger
+        @inject('DiscordRoleRepository') private readonly repository: DiscordRoleRepository,
+        @inject('discord.Client') private readonly client: Client,
+        @inject('discord.guildId') private readonly guildId: string,
+        @inject('discord.runEvery') private readonly runEvery: number,
+        @inject('Logger') private readonly log: Logger
     ) {
         this.interval = setInterval(this.expire.bind(this), runEvery);
     }

@@ -32,7 +32,9 @@
     "passport": "^0.4.1",
     "passport-discord": "^0.1.4",
     "passport-steam": "^1.0.15",
+    "reflect-metadata": "^0.1.13",
     "sqlite3": "^5.0.2",
+    "tsyringe": "^4.6.0",
     "winston": "^3.3.3"
   },
   "devDependencies": {
@@ -58,6 +60,9 @@
   },
   "jest": {
     "testEnvironment": "node",
+    "setupFilesAfterEnv": [
+      "<rootDir>/src/setupJest.ts"
+    ],
     "modulePathIgnorePatterns": [
       "<rootDir>/lib/"
     ],

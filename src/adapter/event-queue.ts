@@ -1,5 +1,10 @@
 import EventEmitter from 'events';
-import {Events, EventSource} from '../domain/events';
+import {DonationEvents, EventSource} from '../domain/events';
+import {singleton} from 'tsyringe';
 
-export class EventQueue extends EventEmitter implements Events, EventSource {
+@singleton()
+export class EventQueue extends EventEmitter implements DonationEvents, EventSource {
+    constructor() {
+        super();
+    }
 }
