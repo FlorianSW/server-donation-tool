@@ -19,7 +19,8 @@ It seamlessly integrates with different platforms in order to automatically prov
 
 ## Installation & Configuration
 
-The `config.example.yml` provides extensive documentation for each configuration options.
+The `config.full.yml` provides extensive documentation for each configuration option.
+With the `config.example.yml`, there is a minimum configuration file, where you just need to replace the placeholder values to get started (it does not contain all the possible configuration values).
 
 Additionally, the [Getting Started Guide](/docs/getting-started.md) will provide an easy-to-use step-by-step guide for a first-time setup.
 

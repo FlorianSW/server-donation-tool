@@ -1,203 +1,45 @@
+# This is an example configuration, which can be used as a basis with the minimal settings.
+# You still need to go through this and replace the placeholder values with the real ones. See
+# the getting started guide (./docs/getting-started.md) for more info.
 app:
   port: 8080
-  # Secret used to sign the client-side session cookie (with which the session of the user is identified). Generate
-  # a secure string of reasonable length. E.g. a 32 character, random string including numbers and uppercase and lowercase chars.
-  # You may want to use a random string generator in the internet or your local computer to generate that string.
-  sessionSecret:
-  # Configuration for the session store. The default values should generally be good enough.
+  # Put in an auto-generated value (e.g. from https://www.random.org/strings/)
+  sessionSecret: SOME_SECRET
   sessionStore:
-    # The filename where the session database should be saved to. The only included session store is sqlite3 (which eases
-    # the setup) and saves the data in a database file. Multiple app instances are still able to read and write from the
-    # store.
     filename: ./db/sessions.sqlite
-  # Defines if the app should compress responses itself. This option should generally be enabled, unless you plan to serve
-  # traffic to the app using a reverse proxy which is doing the compression on-the-fly.
   compressResponse: true
-  # Optional customisation of the website
   community:
-    # The title will be shown in the top navigation bar as well as in the title of the page (visible in the tab or window name)
-    title: our community
-    # An optional logo, which is used as an icon in the top navigation bar. Place the file into the /src/assets/custom folder
-    # and simply name the file here (without the path). Alternatively, you can use an absolute URL when you host your logo somewhere
-    # else (like https://example.com/assets/logo.png)
-    logo:
-    # The discord invite link of your community. Will be listed in the footer and might be helpful in case the donator as an
-    # issue they want to discuss with you.
-    discord:
-    # donationTarget:
-      # monthly:
+    # Fill in the values that describe your community (replacing the existing ones)
+    title: Whitelabel Community
+    discord: https://discord.gg/8EyQ5d7xjc
 discord:
-  # The OAuth credentials of the application (https://discord.com/developers/applications) used to sign users in. You
-  # find these values in the app settings in the section 'OAuth2' -> 'Client information'
-  # The value needs to be a string (wrapped in ').
-  clientId:
-  clientSecret:
-  # The absolute redirect URL of your website. Should be the public facing URL of your website ending on /auth/discord/callback
-  redirectUrl: '/auth/discord/callback'
-  # Optional settings for Discord bot actions. Configuring this section is needed when you want to offer Discord related
-  # perks to your donators.
+  clientId: '000000000000'
+  clientSecret: client-secret-from-discord-developer-portal
+  redirectUrl: 'https://donate.example.com/auth/discord/callback'
   bot:
-    # The token of the discord app to use to manage your discord related perks in your discord server. It may or may not
-    # be the same discord bot you use for your users to login to this website. The discord bot needs to have a bot user
-    # in your discord server. In order to provide the bot user the necessary permissions, make sure to at least select the
-    # following permissions when inviting the bot into your server:
-    # - Manage Roles
-    # After you invited the bot, make sure it holds at least one role, which is ranked higher then the highest role of
-    # the possible donators of that tool. If you fail to do that, your users will not get the discord perks you offer.
-    #
-    # The bot user will also use privileged gateway intents, which need to be allowed in the developer portal for that specific
-    # bot user. For that, go to your app in the Discord Developer portal -> Bot -> Privileged Gateway Intents. Activate at least the
-    # "Server Members Intent". The bot uses this intent in order to track manual roles assignment and removal of roles which
-    # would otherwise be managed by this tool.
-    # You may want to look into https://github.com/FlorianSW/cftools-server-donation/issues/2 to get more information about
-    # how and why this tool uses this intent.
-    token:
-    # The ID of the Discord server (Guild) your perks should be applied to. You can retrieve this ID with the following steps:
-    # - Open your discord and click on the little cog item next to your user in the bottom left
-    # - Go to the App Settings -> Advanced section
-    # - Enable the developer mode
-    # - Go back to the main Discord view (with all your servers)
-    # - Right-click on the server you want to have managed by this website
-    # - Click 'Copy ID' (should be the last option)
-    # The ID is now in your clipboard, simply paste it here and wrap it with ''.
-    # The value needs to be a string (wrapped in ').
-    guildId:
-    # Uncomment this option if you want to configure the interval in which the tool checks if given discord roles should be removed.
-    # The time is in milliseconds. Whenever the interval is reached, the tool will evaluate all temporarily given discord roles
-    # to your donators to remove the ones which are now expired. Given they are expired, they will be removed from the donator.
-    # You should not need to configure this interval and should avoid changing this configuration if not definitely needed.
-    # Changing this property may decrease the overall performance of the application.
-    # When this option is disabled (a comment), the default value (1 hours) is used.
-    # expireRolesEvery: 60000
-  # Optional notifications from the website to your discord. During the process of donating, the tool emits events for
-  # specific actions and errors, which you can opt in to get a notification into a discord channel using a webhook. The
-  # webhook DOES NOT necessarily need to be in the same discord server your other discord settings relate to (e.g. the
-  # bot.guildId). You can even create multiple notification rules to, e.g., route one type to another channel as another
-  # type (or split errors from successful donations to add an alert rule for one channel).
-  # Make sure that you properly protect the channel you send notifications to. Nearly every message type contains
-  # information that are not supposed to be seen by the public (e.g. the transaction ID of a specific donation, the
-  # identifiers of the donator like the Steam ID and discord username).
-  notifications:
-    # he webhook URL to send notifications to (see https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks
-    # for how to setup a webhook)
-    - webhookUrl:
-      # A list of types to send notifications for. This list shows all currently available types.
-      types:
-        # Send when the payment was successfully processed by PayPal (the transaction is completed), but before the donator
-        # redeemed their perks.
-        - DONATED
-        # Send whenever a donator redeems perks of a package after the donation. This event may occur more often then
-        # the number of donations the donator made.
-        - SUCCESSFUL_REDEEM
-        # Send whenever a perk of a package could not be redeemed (the error message will contain more information on
-        # what happened)
-        - REDEEM_ERROR
-steam:
-  # The absolute redirect URL of your website. Should be the public facing URL of your website ending on /auth/steam/callback
-  redirectUrl: '/auth/steam/callback'
-  # The base URL of your website, including protocol and port. If your Redirect URL looks like 'https://example.com/auth/steam/callback'
-  # then your realm should look like 'http://example.com'
-  realm: http://localhost:8080
-  # Your steam api key from https://steamcommunity.com/dev/apikey
-  apiKey: 'SOME_API_KEY'
+    token: bot-token-from-discord-developer-portal
+    guildId: '11111111111111'
 paypal:
-  # The environment of PayPal which match to the credentials you configure in the next settings. If you use sandbox
-  # credentials, use 'sandbox', if you use live credentials, use 'production'.
-  # Allowed values: sandbox, production
-  environment: sandbox
-  # The access credentials of your PayPal application to process payments. You can either use the sandbox credentials
-  # to test the application. In order to process real funds, you need to have a paypal business account and use
-  # credentials of a live app.
-  # You can create these in the PayPal developer portal: https://developer.paypal.com/developer/applications/
-  clientId:
-  clientSecret:
+  environment: production
+  clientId: client-id-from-paypal-developer-portal
+  clientSecret: client-secret-from-paypal-developer-portal
 cftools:
-  # Credentials of a CFTools application from https://developer.cftools.cloud/applications
-  # Make sure you have granted this app permission to all servers listed in the perks section (cftools.serverApiId) in
-  # order to allow the website to manage the priority queue entries.
-  applicationId:
-  secret:
-# A mapping between serverApiId and a human readable server name. This information is used on the overview page where
-# a potential donator sees the servers they have priority queue already. I suggest to use a name your donators will
-# easily recognize.
+  applicationId: application-id-from-cftools-developer-portal
+  secret: application-secret-from-cftools-developer-portal
 serverNames:
-  aServerApiId: some name
-# Packages are the available prices and benefits a donator gets when donating that amount. Each package has the following information
-# - name: A human readable name, which is displayed in the perk selection screen as well as on the PayPal receipt (choose
-#   a name which is not too long, but still descriptive); do not put the price in it
-# - description: A freetext, optional description which you can use to give more information about this perk to your donators.
-#   This field can be omitted when it is not used.
-# - id: A unique id over the lifetime of the website. It needs to be unique even _after_ you want to remove the perk.
-#   Do not re-use an ID from a previous perk. The easiest thing would be to simply count up by one. Needs to be a number
-#   and will also be available in your PayPal dashboard in the 'custom' reference.
-# - price: The price of the perk, as an object of currency and amount. The currency needs to be a supported string from
-#   PayPal (see https://developer.paypal.com/docs/reports/reference/paypal-supported-currencies/). The amount is a
-#   string (make sure to quote the value) with a number with two decimals. Optionally, you can specify the type of the price.
-#   It can be either FIXED or VARIABLE, while FIXED is the default value if omitted.
-# - perks: Zero, one or more perks; each perk describes a specific benefit a donator earns. A perk consists of the
-#   following mandatory configuration:
-#   * type: The type of the perk. The only currently supported value is PRIORITY_QUEUE. The value is currently unused.
-#   Each perk may have additional configuration, see the below list of available perks for more details.
-#
-# You should have at least one perk available, and as many as you want to have.
-#
-# Available perks:
-#
-# - PRIORITY_QUEUE
-# This perk provides a specific amount of days of priority queue for one server, which needs to be registered in CFTools
-# Cloud. It requires the following configuration:
-# * amountInDays: The amount of priority queue days the donator should get.
-# * permanent: Boolean field, should be set to true when the donator should get a permanent priority queue slot. Should not
-#   be set together with amountInDays.
-# * cftools: The cftools serverApiId (in the object with the key serverApiId) of the server the donator will get the perk
-#   for. Is the Server ID of the server in the CFTools Dashboard (Manage -> Settings -> API Key section). Do not use the API
-#   key as the ID, it will throw an error that it is unknown.
-#   This setting is only used for the following types: PRIORITY_QUEUE
-#
-# - DISCORD_ROLE
-# A perk which will grant the donator one or more specific roles in your discord server (see the discord.bot settings for
-# detailed information on how to setup and configure your discord bot correctly). This perk requires the following
-# configuration:
-# * roles: An array of discord role IDs (NOT names) to assign when the donation succeeded. You can retrieve the role IDs
-#   the same way as you did with the guild ID, just right click on the role you want to assign to a donator to copy the ID
-#   from the context menu.
-# * amountInDays: The amount of days the donator should have the discord roles.
-#
-# - FREETEXT_ONLY
-# A perk that is not managed by this application. This website is basically not provisioning anything for the donator
-# when the donation is done. This perk is mainly meant to mention perks the donator earns, which will be handled/granted
-# in another way then with this website. There's only one configuration option, which is the text that will be shown to
-# the donator:
-# * text: The text to show to the donator. There's no strict length limitation, however, for the sake of simplicity and
-#   ease of use, you should try to keep it short (other than this documentation ;)).
+  28d94fe2-7dc1-4508-a906-65f7a2431171: Your Awesome server name
 packages:
-  - name: Allpass
+  - name: 'Whitelabel Package #1'
     id: 1
     price:
       currency: USD
-      amount: '1.00'
+      amount: '10.00'
     perks:
-      - type: PRIORITY_QUEUE
-        amountInDays: 30
-        cftools:
-          serverApiId:
       - type: DISCORD_ROLE
         roles:
-          # These values need to be strings (wrapped in ').
           # Donator
-          - '0000000000000'
-          # DayZ
-          - '1111111111111'
-      - type: FREETEXT_ONLY
-        text: Some text to show to the donator
-  - name: Fastpass
-    id: 2
-    price:
-      type: VARIABLE
-      currency: USD
-      amount: '1.00'
-    perks:
+          - '2222222222222222'
       - type: PRIORITY_QUEUE
         amountInDays: 30
         cftools:
-          serverApiId:
+          serverApiId: 28d94fe2-7dc1-4508-a906-65f7a2431171
