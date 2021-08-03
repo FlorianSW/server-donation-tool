@@ -41,9 +41,9 @@ container.register('EventSource', {
     useFactory: (c) => c.resolve(EventQueue)
 });
 container.registerType('DiscordRoleRepository', SQLiteDiscordRoleRepository);
-container.registerType('Closeable', SQLiteDiscordRoleRepository);
+container.registerSingleton('Closeable', 'DiscordRoleRepository');
 container.registerType('OrderRepository', SQLiteOrderRepository);
-container.registerType('Closeable', SQLiteOrderRepository);
+container.registerSingleton('Closeable', 'OrderRepository');
 container.registerType('Payment', PaypalPayment);
 container.registerType('Closeable', DiscordRoleRecorder);
 container.registerType('Closeable', ExpireDiscordRole);

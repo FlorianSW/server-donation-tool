@@ -1,5 +1,4 @@
 import {Package} from './package';
-import {Store} from 'express-session';
 import {DiscordNotification} from '../adapter/discord-notifier';
 
 export type ServerNames = {
