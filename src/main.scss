@@ -62,7 +62,7 @@ body {
       padding: 16px;
       background-color: white;
 
-      .error, .success {
+      .error, .success, .info {
         font-size: 142px;
         display: flex;
         justify-content: center;
@@ -139,6 +139,10 @@ body {
 
     i.error {
       color: #e53935;
+    }
+
+    i.info {
+      color: #000;
     }
   }
 

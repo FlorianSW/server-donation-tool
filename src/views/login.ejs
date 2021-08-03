@@ -1,0 +1,22 @@
+<%- include('partials/header.ejs') %>
+<div class="container">
+    <div class="row">
+        <div class="col s12 m12 l12">
+            <div class="card">
+                <div class="card-image">
+                    <i class="material-icons info">account_circle</i>
+                </div>
+                <div class="card-content">
+                    <span class="card-title"><%= translate('LOGIN_TITLE') %></span>
+                    <p>
+                        <%= translate('LOGIN_DESCRIPTION') %>
+                    </p>
+                </div>
+                <div class="card-action">
+                    <a href="<%= loginRedirect %>"><%= translate('LOGIN_REDIRECT') %></a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<%- include('partials/footer.ejs') %>

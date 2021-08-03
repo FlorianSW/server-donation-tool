@@ -6,6 +6,20 @@
     <% if (locals.csrfToken) { %>
         <meta name="csrf-token" content="<%= csrfToken %>">
     <% } %>
+    <% if (locals.withOpenGraph) { %>
+        <meta property="og:type" content="website">
+        <meta property="og:site_name" content="Server Donation Tool">
+        <% if (community.title) { %>
+            <meta property="og:title" content="Easily donate to <%= community.title %> and get rewarded">
+        <% } else { %>
+            <meta property="og:title" content="Easily donate to our community and get rewarded">
+        <% } %>
+        <meta property="og:description" content="With this server donation tool, donating to this community is easily done in a fraction of your time. We appreciate your support!">
+        <% if (locals.absoluteLogoUrl) { %>
+            <meta property="og:image" content="<%= absoluteLogoUrl %>">
+        <% } %>
+        <meta name="twitter:card" content="summary">
+    <% } %>
     <title>Donations - <%= community.title %></title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">

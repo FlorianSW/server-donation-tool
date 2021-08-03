@@ -24,6 +24,7 @@ import {DiscordRoleRecorder} from './service/discord-role-recorder';
 import {ExpireDiscordRole} from './service/expire-discord-role';
 import {Logger} from 'winston';
 import {StatisticsController} from './adapter/controller/statistics';
+import {LoginController} from './adapter/controller/login';
 
 export interface Closeable {
     close(): Promise<void>
@@ -60,6 +61,7 @@ parseConfig(log).then(async (config) => {
     const donators = container.resolve(DonatorsController);
     const authentication = container.resolve(Authentication);
     const statistics = container.resolve(StatisticsController);
+    const login = container.resolve(LoginController);
 
     app.locals.translate = translate;
     app.locals.community = {
@@ -72,6 +74,7 @@ parseConfig(log).then(async (config) => {
     };
     app.locals.supportsSteamLogin = appConfig.steam?.apiKey !== undefined;
     app.set('views', path.join(__dirname, 'views'));
+    app.set('trust proxy', 'loopback');
     app.set('view engine', 'ejs');
     if (config.app.compressResponse) {
         app.use(compression({
@@ -118,7 +121,7 @@ parseConfig(log).then(async (config) => {
     app.use('/', donators.router);
     app.use('/', authentication.router);
     app.use('/', statistics.router);
-
+    app.use('/', login.router);
 
     app.use(errorHandler);
     app.use(errorLogger({

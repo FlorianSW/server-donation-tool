@@ -1,5 +1,6 @@
 import {Package} from './package';
 import {DiscordNotification} from '../adapter/discord-notifier';
+import {Request} from 'express';
 
 export type ServerNames = {
     [serverApiId: string]: string
@@ -51,5 +52,5 @@ export interface AppConfig {
     serverNames: ServerNames,
     packages: Package[],
 
-    logoUrl(): string;
+    logoUrl(root?: Request): string;
 }

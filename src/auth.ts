@@ -101,7 +101,7 @@ export class Authentication {
 export function requireAuthentication(req: Request, res: Response, next: NextFunction) {
     if (!req.isAuthenticated()) {
         req.session.afterLoginTarget = req.path;
-        res.redirect('/auth/discord/redirect');
+        res.redirect('/login');
         return;
     }
     if (!req.user.steam) {

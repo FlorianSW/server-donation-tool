@@ -18,6 +18,7 @@ import {DiscordRoleRecorder} from './service/discord-role-recorder';
 import {ExpireDiscordRole} from './service/expire-discord-role';
 import {OrderRecorder} from './service/order-recorder';
 import {container, instanceCachingFactory} from 'tsyringe';
+import {Request} from 'express';
 
 const initSessionStore = require('connect-session-knex');
 const sessionStore: StoreFactory = initSessionStore(session);
@@ -127,12 +128,17 @@ class YamlAppConfig implements AppConfig {
         }
     }
 
-    logoUrl(): string {
+    logoUrl(root?: Request): string {
         if (!this.app.community?.logo) {
             return;
         }
         if (isWebUrl(this.app.community.logo)) {
             return this.app.community.logo;
+        }
+        if (root) {
+            const logoUrl = new URL(root.protocol + '://' + root.hostname);
+            logoUrl.pathname = `/assets/custom/${this.app.community?.logo}`;
+            return logoUrl.toString();
         }
         return `/assets/custom/${this.app.community?.logo}`;
     }
