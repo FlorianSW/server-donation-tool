@@ -38,8 +38,10 @@ More topics to read about:
 
 ## Support and Collaboration
 
-If you have a question regarding the use or the setup of this tool, feel free to [join my Discord](https://go2tech.de/discord) and get the `Tools` role.
+If you have a question regarding the use or the setup of this tool, feel free to [join my Discord](https://go2tech.de/discord) and get the `Tools` role in the #get-your-roles-here channel.
 I'll be happy to assist you if I can with your question there :)
+
+The initial configuration of the tool might look a bit overwhelming, but I'm happy to help you with whatever problem you're facing, just contact me.
 
 Given you think you found a bug, a missing feature or something that can be improved, I encourage you to open an issue in [this Github repository](https://github.com/FlorianSW/cftools-server-donation).
 Please, do not use issues for your questions or for getting support.
