@@ -49,6 +49,9 @@ const messages: { [key: string]: string } = {
     DISCORD_ROLE_REDEEM_ERROR: 'Could not assign discord roles. Error: {{reason}}',
     ASSIGNED_DISCORD_ROLE: 'Discord roles you have already',
 
+    DONATION_TARGET_CLAIM: 'We need your help to cover our monthly costs of {{target}}{{currency}}. Thanks to all community members who already donated a total amount of {{totalAmount}}{{currency}}.',
+    DONATION_TARGET_REACHED: 'With the awesome amount of {{totalAmount}}{{currency}}, we have reached our donation target to cover our monthly costs of {{target}}{{currency}}. Thanks for your help, every donation helps.',
+
     FREETEXT_TEXT: '{{text}}',
 
     PERKS_OWNED_TITLE: 'Perks you own',
@@ -124,7 +127,7 @@ export function translate(key: string, options?: TranslateOptions): string {
     }
     if (options?.params !== undefined) {
         for (const param in options.params) {
-            message = message.replace(`{{${param}}}`, options.params[param]);
+            message = message.replace(new RegExp(`{{${param}}}`, 'g'), options.params[param]);
         }
     }
     return message;

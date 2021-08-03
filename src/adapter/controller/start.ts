@@ -21,6 +21,7 @@ export class StartController {
         res.render('index', {
             user: req.user,
             csrfToken: req.csrfToken(),
+            showDonationTarget: !!this.config.app.community?.donationTarget?.monthly,
             availablePackages: this.config.packages,
             step: 'PACKAGE_SELECTION',
         });
