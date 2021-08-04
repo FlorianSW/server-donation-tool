@@ -13,7 +13,7 @@ To install this donation tool has the following minimum requirements:
 * A Windows, MacOS or Linux operating system
 * some basic knowledge using a terminal/shell
 * some basic knowledge using yaml/a text editor
-* [NodeJS + npm](https://nodejs.org/en/download/) installed (minimum NodeJS 14.17 is required)
+* [NodeJS + npm](https://nodejs.org/en/download/) installed
 * a [PayPal business account](https://developer.paypal.com/developer/accountStatus) (to process payments)
 * a [Discord account](https://discord.com/)
 * (Optional) a [CFTools Cloud](https://cftools.cloud/) account and registered server (needed when offering a priority queue perk)
