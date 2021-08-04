@@ -1,10 +1,10 @@
 import {
     CapturePaymentRequest,
     CreatePaymentOrderRequest,
-    Order,
     OrderNotCompleted,
     Payment,
     PaymentCapture,
+    PaymentOrder,
     Reference,
     SteamIdMismatch
 } from '../domain/payment';
@@ -49,34 +49,13 @@ export class PaypalPayment implements Payment {
         r.requestBody({});
 
         const capture = await this.client.execute(r);
-        return capture.result;
-    }
-
-    async orderDetails(orderId: string, forUser: User): Promise<Order> {
-        const request = new paypal.orders.OrdersGetRequest(orderId);
-
-        const order: OrderResult = await this.client.execute(request);
-
-        const id = Reference.fromString(order.result.purchase_units[0].custom_id, forUser.discord.id, this.packages);
-
-        if (!id || order.result.status !== 'COMPLETED') {
-            throw new OrderNotCompleted();
-        }
-
-        const userSteamId = forUser.steam.id;
-        if (id && id.steamId !== userSteamId) {
-            throw new SteamIdMismatch(id.steamId, forUser.steam.id);
-        }
-
         return {
-            id: order.result.id,
-            created: new Date(order.result.create_time || order.result.update_time),
-            transactionId: order.result.purchase_units[0]?.payments?.captures[0]?.id,
-            reference: id,
+            orderId: capture.result.id,
+            transactionId: capture.result.purchase_units[0]?.payments?.captures[0]?.id,
         };
     }
 
-    async createPaymentOrder(request: CreatePaymentOrderRequest): Promise<Order> {
+    async createPaymentOrder(request: CreatePaymentOrderRequest): Promise<PaymentOrder> {
         const r = new paypal.orders.OrdersCreateRequest();
         r.prefer('return=representation');
         r.requestBody({
@@ -93,10 +72,9 @@ export class PaypalPayment implements Payment {
 
         const order: OrderResult = await this.client.execute(r);
         return {
-            id: order.result.id,
             created: new Date(order.result.create_time),
+            id: order.result.id,
             transactionId: order.result.purchase_units[0]?.payments?.captures[0]?.id,
-            reference: Reference.fromString(order.result.purchase_units[0].custom_id, request.discordId, this.packages),
         };
     }
 }

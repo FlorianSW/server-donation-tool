@@ -3,12 +3,14 @@ import {Request, Response, Router} from 'express';
 import {TranslateParams} from '../../translations';
 import {Package, RedeemError} from '../../domain/package';
 import {AppConfig} from '../../domain/app-config';
-import {Order, OrderNotCompleted, Payment, SteamIdMismatch} from '../../domain/payment';
+import {Order, Payment, Reference, SteamIdMismatch} from '../../domain/payment';
 import {Logger} from 'winston';
 import {SessionData} from 'express-session';
 import csrf from 'csurf';
 import {EventSource} from '../../domain/events';
 import {inject, singleton} from 'tsyringe';
+import {OrderRepository} from '../../domain/repositories';
+import {v4} from 'uuid';
 
 @singleton()
 export class DonationController {
@@ -18,6 +20,7 @@ export class DonationController {
         @inject('AppConfig') private readonly config: AppConfig,
         @inject('availablePackages') private readonly packages: Package[],
         @inject('Payment') private readonly payment: Payment,
+        @inject('OrderRepository') private readonly repo: OrderRepository,
         @inject('EventSource') private readonly events: EventSource,
         @inject('Logger') private readonly logger: Logger
     ) {
@@ -32,29 +35,21 @@ export class DonationController {
     }
 
     private async fetchOrderDetails(req: Request, res: Response): Promise<Order> {
-        try {
-            const result = await this.payment.orderDetails(req.params.orderId, req.user);
-            req.session.lastOrder = {
-                id: result.id,
-                transactionId: result.transactionId,
-            };
-            return result;
-        } catch (e) {
-            if (e instanceof OrderNotCompleted) {
-                res.render('index', {
-                    step: 'DONATE',
-                    user: req.user,
-                    paymentStatus: 'INCOMPLETE',
-                    redeemStatus: 'UNSTARTED',
-                });
-            }
-            if (e instanceof SteamIdMismatch) {
-                res.render('payment_steam_mismatch', {
-                    paymentSteamId: e.expected,
-                    userSteamId: e.fromUser,
-                });
-            }
-            throw e;
+        const order = await this.repo.find(req.params.orderId);
+
+        req.session.lastOrder = {
+            id: order.id,
+            transactionId: order.payment.transactionId,
+        };
+
+        if (order.reference.steamId !== req.user.steam.id) {
+            res.render('payment_steam_mismatch', {
+                paymentSteamId: order.reference.steamId,
+                userSteamId: req.user.steam.id,
+            });
+            throw new SteamIdMismatch(order.reference.steamId, req.user.steam.id);
+        } else {
+            return order;
         }
     }
 
@@ -137,7 +132,14 @@ export class DonationController {
     }
 
     private async createOrder(req: Request, res: Response) {
-        const order = await this.payment.createPaymentOrder({
+        const p = {
+            ...this.selectedPackage(req.session),
+            price: {
+                ...this.selectedPackage(req.session).price,
+                ...req.session.selectedPackage.price
+            }
+        };
+        const paymentOrder = await this.payment.createPaymentOrder({
             forPackage: {
                 ...this.selectedPackage(req.session),
                 price: {
@@ -148,21 +150,39 @@ export class DonationController {
             steamId: req.body.steamId,
             discordId: req.user.discord.id,
         });
+        const order: Order = {
+            id: v4(),
+            created: paymentOrder.created,
+            payment: {
+                id: paymentOrder.id,
+                transactionId: paymentOrder.transactionId,
+            },
+            reference: new Reference(req.body.steamId, req.user.discord.id, p),
+        };
+        await this.repo.save(order);
         res.status(200).json({
-            orderId: order.id
+            orderId: order.payment.id
         });
     }
 
     private async captureOrder(req: Request, res: Response) {
+        const order = await this.repo.findByPaymentOrder(req.params.orderId);
         const capture = await this.payment.capturePayment({
-            orderId: req.params.orderId
+            orderId: order.payment.id,
         });
+        req.session.lastOrder = {
+            id: capture.orderId,
+            transactionId: capture.transactionId,
+        };
+
+        order.payment.transactionId = capture.transactionId;
+        await this.repo.save(order);
+
         res.status(200).json({
-            orderId: capture.id,
+            orderId: order.id,
         });
 
         setTimeout(async () => {
-            const order = await this.fetchOrderDetails(req, res);
             this.events.emit('successfulPayment', req.user, order);
         });
     }

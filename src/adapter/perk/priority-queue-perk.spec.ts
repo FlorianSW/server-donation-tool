@@ -31,7 +31,10 @@ const aPackage: Package = {
 const anOrder: Order = {
     id: 'SOME_ORDER_ID',
     created: new Date(),
-    transactionId: 'A_TRANSACTION_ID',
+    payment: {
+        id: 'SOME_PAYMENT_ORDER_ID',
+        transactionId: 'A_TRANSACTION_ID',
+    },
     reference: new Reference(aSteamId, '11111111111', aPackage),
 };
 

@@ -36,7 +36,7 @@ const log = winston.createLogger({
 container.registerInstance('Logger', log);
 
 export const errorHandler: ErrorRequestHandler = (err: any, req: Request, res: Response, next: NextFunction) => {
-    log.error(err);
+    log.error('Unknown error', err);
     res.render('error', {
         status: err.status || 500,
         supportInfo: JSON.stringify({

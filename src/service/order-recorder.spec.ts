@@ -37,7 +37,10 @@ describe('OrderRecorder', () => {
         const order = {
             id: 'SOME_ORDER_ID',
             created: new Date('2025-05-16T18:25:49Z'),
-            transactionId: 'SOME_TRANSACTION_ID',
+            payment: {
+                id: 'ORDER_ID',
+                transactionId: 'SOME_TRANSACTION_ID',
+            },
             reference: new Reference('A_STEAM_ID', 'A_DISCORD_ID', aPackage),
         };
 

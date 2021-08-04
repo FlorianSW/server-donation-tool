@@ -61,7 +61,10 @@ describe('DiscordRoleRecorder', () => {
                 ...aPackage,
                 perks: [notExpiring],
             }),
-            transactionId: 'TRANSACTION_ID',
+            payment: {
+                id: 'ORDER_ID',
+                transactionId: 'TRANSACTION_ID',
+            },
             created: new Date(),
         });
 
@@ -75,7 +78,10 @@ describe('DiscordRoleRecorder', () => {
                 ...aPackage,
                 perks: [expiring],
             }),
-            transactionId: 'TRANSACTION_ID',
+            payment: {
+                id: 'ORDER_ID',
+                transactionId: 'TRANSACTION_ID',
+            },
             created: new Date('2020-11-01T14:52:12Z'),
         });
 
@@ -95,7 +101,10 @@ describe('DiscordRoleRecorder', () => {
                 ...aPackage,
                 perks: [expiring],
             }),
-            transactionId: 'TRANSACTION_ID',
+            payment: {
+                id: 'ORDER_ID',
+                transactionId: 'TRANSACTION_ID',
+            },
             created: new Date('2020-11-25T14:52:12Z'),
         });
 

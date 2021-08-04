@@ -92,8 +92,9 @@ export class PriorityQueuePerk implements Perk {
             id: steamId,
             expires: this.expiration(order),
             comment: `Created by CFTools Server Donation bot.
-PayPal Transaction ID: ${order.transactionId}
-PayPal Order ID: ${order.id}
+Order ID: ${order.id}
+PayPal Transaction ID: ${order.payment.transactionId}
+PayPal Order ID: ${order.payment.id}
 Selected product: ${this.inPackage.name}`
         });
     }

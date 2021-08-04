@@ -2,7 +2,7 @@ import {OrderRepository} from '../domain/repositories';
 import Knex from 'knex';
 import * as fs from 'fs';
 import {SQLiteOrderRepository} from './order-repository';
-import {Reference} from '../domain/payment';
+import {Order, Reference} from '../domain/payment';
 import {Package, PriceType} from '../domain/package';
 import {FreetextPerk} from './perk/freetext-perk';
 
@@ -18,10 +18,13 @@ const packages: Package[] = [{
     name: 'SOME_PACKAGE_NAME',
 }];
 
-const anOrder = {
+const anOrder: Order = {
     id: 'SOME_ORDER_ID',
     created: new Date('2025-05-16T18:25:49Z'),
-    transactionId: 'SOME_TRANSACTION_ID',
+    payment: {
+        id: 'PAYMENT_ORDER_ID',
+        transactionId: 'SOME_TRANSACTION_ID',
+    },
     reference: new Reference('A_STEAM_ID', 'A_DISCORD_ID', packages[0]),
 };
 
@@ -44,6 +47,15 @@ describe('OrderRepository', () => {
         await repository.save(anOrder);
 
         const roles = await repository.find('SOME_ORDER_ID');
+
+        expect(roles).not.toBeUndefined();
+        expect(roles).toEqual(anOrder);
+    });
+
+    it('finds order by payment order ID', async () => {
+        await repository.save(anOrder);
+
+        const roles = await repository.findByPaymentOrder('PAYMENT_ORDER_ID');
 
         expect(roles).not.toBeUndefined();
         expect(roles).toEqual(anOrder);

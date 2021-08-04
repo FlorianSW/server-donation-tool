@@ -1,5 +1,4 @@
 import {Package} from './package';
-import {User} from './user';
 
 export class Reference {
     constructor(public readonly steamId: string, public readonly discordId: string, public readonly p: Package) {
@@ -19,15 +18,25 @@ export class Reference {
     }
 }
 
+export interface PaymentOrder {
+    created: Date;
+    id: string;
+    transactionId?: string;
+}
+
 export interface Order {
     id: string,
     created: Date,
     reference: Reference,
-    transactionId?: string,
+    payment: {
+        id: string;
+        transactionId?: string,
+    }
 }
 
 export interface PaymentCapture {
-    id: string;
+    orderId: string;
+    transactionId: string;
 }
 
 export interface CreatePaymentOrderRequest {
@@ -41,11 +50,9 @@ export interface CapturePaymentRequest {
 }
 
 export interface Payment {
-    createPaymentOrder(request: CreatePaymentOrderRequest): Promise<Order>;
+    createPaymentOrder(request: CreatePaymentOrderRequest): Promise<PaymentOrder>;
 
     capturePayment(request: CapturePaymentRequest): Promise<PaymentCapture>;
-
-    orderDetails(orderId: string, forUser: User): Promise<Order>;
 }
 
 export class OrderNotCompleted extends Error {
