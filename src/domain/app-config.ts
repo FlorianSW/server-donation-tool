@@ -1,4 +1,3 @@
-import {Package} from './package';
 import {DiscordNotification} from '../adapter/discord-notifier';
 import {Request} from 'express';
 
@@ -50,7 +49,6 @@ export interface AppConfig {
         secret: string,
     },
     serverNames: ServerNames,
-    packages: Package[],
 
     logoUrl(root?: Request): string;
 }

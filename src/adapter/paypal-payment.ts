@@ -11,6 +11,7 @@ import {
 import {AppConfig} from '../domain/app-config';
 import {User} from '../domain/user';
 import {inject, singleton} from 'tsyringe';
+import {Package} from '../domain/package';
 
 const paypal = require('@paypal/checkout-server-sdk');
 
@@ -39,7 +40,7 @@ interface OrderResult {
 export class PaypalPayment implements Payment {
     private readonly client: any;
 
-    constructor(@inject('AppConfig') private readonly config: AppConfig) {
+    constructor(@inject('AppConfig') private readonly config: AppConfig, @inject('packages') private readonly packages: Package[]) {
         this.client = paypalClient(config);
     }
 
@@ -56,7 +57,7 @@ export class PaypalPayment implements Payment {
 
         const order: OrderResult = await this.client.execute(request);
 
-        const id = Reference.fromString(order.result.purchase_units[0].custom_id, forUser.discord.id, this.config.packages);
+        const id = Reference.fromString(order.result.purchase_units[0].custom_id, forUser.discord.id, this.packages);
 
         if (!id || order.result.status !== 'COMPLETED') {
             throw new OrderNotCompleted();
@@ -95,7 +96,7 @@ export class PaypalPayment implements Payment {
             id: order.result.id,
             created: new Date(order.result.create_time),
             transactionId: order.result.purchase_units[0]?.payments?.captures[0]?.id,
-            reference: Reference.fromString(order.result.purchase_units[0].custom_id, request.discordId, this.config.packages),
+            reference: Reference.fromString(order.result.purchase_units[0].custom_id, request.discordId, this.packages),
         };
     }
 }

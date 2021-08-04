@@ -85,12 +85,23 @@ Each package has the following metadata:
 * **id**: A numeric ID to uniquely identify the package in the list of packages _over time_.
   This ID shall _not_ be re-used for other packages in the future.
   Simply count up this number by one whenever you create a new package, without repeating already used ones.
+* **disabled**: An optional boolean to indicate that this package is not available for donations anymore. See [Disabling packages](#disabling-packages) for more information.
 * **price**: An object of price information, containing the `currency` and `amount`.
   The `currency` must be one of [the supported ones from PayPal](https://developer.paypal.com/docs/reports/reference/paypal-supported-currencies/).
   Donators will still be able to donate in their preferred currency, if supported by PayPal.
   You will, however, get the amount exchanged to the currency listed here.
 * **perks**: A list of perks the package includes.
   Each perk consists of a required `type` parameter and additional configuration, depending on the perk type (see the available perks in the list below)
+
+### <a name="disabling-packages"></a>Disabling packages
+
+Packages are a basic data model configuration of the donation tool.
+That means, once a package is configured and was out in the wild (potentially used for a donation already), it is not safe to delete the package again.
+Deleting a previously available package might result in bugs and undefined behaviour that can decrease the usability and functionality of the donation tool for your donators.
+
+Once you have a package configured, which you do not want to provide for donations anymore, you can disable it with the `disabled` configuration property of the package.
+Setting this configuration to `true` instead of deleting the package ensures, that the package is not available for new donations anymore, but the information of the package is still available in the system.
+Some features may rely on the existence of a package, even when it is not available for donations anymore.
 
 ## Built-in available Perks
 

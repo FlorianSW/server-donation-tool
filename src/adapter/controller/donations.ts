@@ -16,6 +16,7 @@ export class DonationController {
 
     constructor(
         @inject('AppConfig') private readonly config: AppConfig,
+        @inject('availablePackages') private readonly packages: Package[],
         @inject('Payment') private readonly payment: Payment,
         @inject('EventSource') private readonly events: EventSource,
         @inject('Logger') private readonly logger: Logger
@@ -132,7 +133,7 @@ export class DonationController {
     }
 
     private selectedPackage(session: Partial<SessionData>): Package {
-        return this.config.packages.find((p) => session.selectedPackage.id === p.id);
+        return this.packages.find((p) => session.selectedPackage.id === p.id);
     }
 
     private async createOrder(req: Request, res: Response) {

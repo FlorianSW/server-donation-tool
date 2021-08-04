@@ -10,7 +10,11 @@ import {inject, singleton} from 'tsyringe';
 export class StartController {
     public readonly router: Router = Router();
 
-    constructor(@inject('AppConfig') private readonly config: AppConfig, @inject('Logger') private readonly log: Logger) {
+    constructor(
+        @inject('AppConfig') private readonly config: AppConfig,
+        @inject('availablePackages') private readonly packages: Package[],
+        @inject('Logger') private readonly log: Logger
+    ) {
         const csrfProtection = csrf();
 
         this.router.post('/selectPackage', requireAuthentication, csrfProtection, this.selectPackage.bind(this));
@@ -22,7 +26,7 @@ export class StartController {
             user: req.user,
             csrfToken: req.csrfToken(),
             showDonationTarget: !!this.config.app.community?.donationTarget?.monthly,
-            availablePackages: this.config.packages,
+            availablePackages: this.packages,
             step: 'PACKAGE_SELECTION',
         });
     }
@@ -45,7 +49,7 @@ export class StartController {
     }
 
     private async selectPackage(req: Request, res: Response) {
-        const selectedPackage = this.config.packages.find((p) => p.id === parseInt(req.body.package));
+        const selectedPackage = this.packages.find((p) => p.id === parseInt(req.body.package));
         if (!selectedPackage) {
             res.redirect('/');
         }

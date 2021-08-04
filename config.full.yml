@@ -134,6 +134,10 @@ serverNames:
 #   PayPal (see https://developer.paypal.com/docs/reports/reference/paypal-supported-currencies/). The amount is a
 #   string (make sure to quote the value) with a number with two decimals. Optionally, you can specify the type of the price.
 #   It can be either FIXED or VARIABLE, while FIXED is the default value if omitted.
+# - disabled: An optional boolean flag to disable a package from being available to be donated for. You can usually omit this
+#   field, and the packages will be available to donators to donate for. Set this to `true` when you do not want to offer this
+#   package for new donations anymore. Disabling, instead of removing, the package ensures that functionality that relies on the
+#   package information is still available, even given no new donations are possible.
 # - perks: Zero, one or more perks; each perk describes a specific benefit a donator earns. A perk consists of the
 #   following mandatory configuration:
 #   * type: The type of the perk. The only currently supported value is PRIORITY_QUEUE. The value is currently unused.

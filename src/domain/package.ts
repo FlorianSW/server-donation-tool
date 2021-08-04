@@ -32,6 +32,7 @@ export class Package {
     name: string;
     description?: string;
     id: number;
+    disabled?: boolean;
     price: Price;
     perks: Perk[];
 }

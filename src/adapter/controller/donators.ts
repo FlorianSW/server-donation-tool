@@ -1,6 +1,6 @@
 import {requireAuthentication} from '../../auth';
 import {Request, Response, Router} from 'express';
-import {Perk} from '../../domain/package';
+import {Package, Perk} from '../../domain/package';
 import {AppConfig} from '../../domain/app-config';
 import {Logger} from 'winston';
 import {DiscordRole, OwnedPerk, PriorityQueue} from '../../domain/user';
@@ -16,6 +16,7 @@ export class DonatorsController {
 
     constructor(
         @inject('AppConfig') private readonly config: AppConfig,
+        @inject('packages') private readonly packages: Package[],
         @inject('CFToolsClient') private readonly cftoolsClient: CFToolsClient,
         @inject('discord.Client') private readonly discordClient: Client,
         @inject('Logger') private readonly log: Logger
@@ -24,7 +25,7 @@ export class DonatorsController {
     }
 
     private perks(type: any): Perk[] {
-        return this.config.packages.map((p) => p.perks).reduce((l, p) => l.concat(p)).filter((p) => p instanceof type);
+        return this.packages.map((p) => p.perks).reduce((l, p) => l.concat(p)).filter((p) => p instanceof type);
     }
 
     private async fetchPriorityQueue(req: Request, server: string): Promise<PriorityQueue> {
@@ -51,7 +52,6 @@ export class DonatorsController {
     }
 
     private async listOwnedPerks(req: Request, res: Response): Promise<void> {
-        const t = PriorityQueue;
         const servers = [...new Set(this.perks(PriorityQueuePerk)
             .map((p: PriorityQueuePerk) => p.cftools.serverApiId)
         )];

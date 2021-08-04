@@ -224,6 +224,9 @@ class YamlAppConfig implements AppConfig {
         container.register('packages', {
             useValue: this.packages,
         });
+        container.register('availablePackages', {
+            useValue: this.packages.filter((p) => !p.disabled),
+        });
         container.resolve(OrderRecorder);
     }
 }
