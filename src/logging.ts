@@ -37,10 +37,12 @@ container.registerInstance('Logger', log);
 
 export const errorHandler: ErrorRequestHandler = (err: any, req: Request, res: Response, next: NextFunction) => {
     log.error('Unknown error', err);
-    res.render('error', {
-        status: err.status || 500,
-        supportInfo: JSON.stringify({
-            status: err.status || 500,
+    const status = err.status || 500;
+    const errorPageFormatHint = req.header('accept');
+
+    res.status(status);
+    if (errorPageFormatHint.indexOf('application/json') !== -1) {
+        res.contentType('application/json').send({
             selectedPackage: req.session?.selectedPackage?.id,
             user: {
                 steamId: req.user?.steam.id,
@@ -50,6 +52,24 @@ export const errorHandler: ErrorRequestHandler = (err: any, req: Request, res: R
                 id: req.session?.lastOrder?.id,
                 transactionId: req.session?.lastOrder?.transactionId,
             }
-        })
-    });
+        });
+    } else if (errorPageFormatHint.indexOf('text/') !== -1) {
+        res.status(status).render('error', {
+            status: status,
+            supportInfo: JSON.stringify({
+                status: status,
+                selectedPackage: req.session?.selectedPackage?.id,
+                user: {
+                    steamId: req.user?.steam.id,
+                    discordId: req.user?.discord.id,
+                },
+                lastOrder: {
+                    id: req.session?.lastOrder?.id,
+                    transactionId: req.session?.lastOrder?.transactionId,
+                }
+            })
+        });
+    } else {
+        res.send();
+    }
 };

@@ -25,8 +25,8 @@ export class DonationController {
         @inject('Logger') private readonly logger: Logger
     ) {
         const csrfProtection = csrf();
-        this.router.post('/donations', requireAuthentication, csrfProtection, this.createOrder.bind(this));
-        this.router.post('/donations/:orderId', requireAuthentication, csrfProtection, this.captureOrder.bind(this));
+        this.router.post('/api/donations', requireAuthentication, csrfProtection, this.createOrder.bind(this));
+        this.router.post('/api/donations/:orderId', requireAuthentication, csrfProtection, this.captureOrder.bind(this));
 
         this.router.get('/donate', requireAuthentication, csrfProtection, this.prepareDonation.bind(this));
         this.router.get('/donate/:orderId', requireAuthentication, csrfProtection, this.prepareRedeem.bind(this));

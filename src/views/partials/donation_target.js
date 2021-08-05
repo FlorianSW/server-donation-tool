@@ -24,7 +24,11 @@
 
     const target = document.querySelector('.donation-target');
 
-    fetch('/statistics/monthly').then(async (result) => {
+    fetch('/api/statistics/monthly', {
+        headers: {
+            Accept: 'application/json',
+        }
+    }).then(async (result) => {
         const statistics = await result.json();
         const column = target.querySelector('.col');
 

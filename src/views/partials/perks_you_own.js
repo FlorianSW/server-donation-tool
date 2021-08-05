@@ -36,7 +36,11 @@
 
     const list = document.querySelector('.perk-list');
 
-    fetch('/donators/@me/perks').then(async (result) => {
+    fetch('/api/donators/@me/perks', {
+        headers: {
+            Accept: 'application/json',
+        }
+    }).then(async (result) => {
         const perks = await result.json();
         if (perks.length === 0) {
             list.append(textCard('You do not own any perks, yet.'));

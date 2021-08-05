@@ -23,12 +23,13 @@
                 var csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
                 paypal.Buttons({
                     createOrder: function () {
-                        return fetch('/donations', {
+                        return fetch('/api/donations', {
                             method: 'post',
                             credentials: 'same-origin',
                             headers: {
                                 'x-csrf-token': csrfToken,
-                                'content-type': 'application/json'
+                                'content-type': 'application/json',
+                                'accept': 'application/json',
                             },
                             body: JSON.stringify({
                                 steamId: '<%= user.steam.id %>'
@@ -40,12 +41,13 @@
                         });
                     },
                     onApprove: function (data) {
-                        return fetch('/donations/' + data.orderID, {
+                        return fetch('/api/donations/' + data.orderID, {
                             method: 'post',
                             credentials: 'same-origin',
                             headers: {
                                 'x-csrf-token': csrfToken,
-                                'content-type': 'application/json'
+                                'content-type': 'application/json',
+                                'accept': 'application/json',
                             }
                         }).then(function (res) {
                             return res.json();

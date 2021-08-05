@@ -21,7 +21,7 @@ export class DonatorsController {
         @inject('discord.Client') private readonly discordClient: Client,
         @inject('Logger') private readonly log: Logger
     ) {
-        this.router.get('/donators/@me/perks', requireAuthentication, this.listOwnedPerks.bind(this));
+        this.router.get('/api/donators/@me/perks', requireAuthentication, this.listOwnedPerks.bind(this));
     }
 
     private perks(type: any): Perk[] {

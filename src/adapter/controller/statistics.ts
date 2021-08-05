@@ -28,7 +28,7 @@ export class StatisticsController {
     ) {
         if (config.app.community?.donationTarget?.monthly) {
             this.monthlyTarget = config.app.community.donationTarget.monthly;
-            this.router.get('/statistics/monthly', requireAuthentication, this.monthlyStatistics.bind(this));
+            this.router.get('/api/statistics/monthly', requireAuthentication, this.monthlyStatistics.bind(this));
         }
     }
 
