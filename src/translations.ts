@@ -61,6 +61,7 @@ const messages: { [key: string]: string } = {
     PERKS_OWNED_TITLE: 'Perks you own',
     PERKS_OWNED_DISCORD_ROLE: '{{role}} role in Discord',
     PERKS_OWNED_PRIORITY_QUEUE_UNTIL: 'until: ',
+    PERKS_OWNED_FAILED_TO_LOAD: 'We\'re having troubles getting this perk\'s information. But no worries, it is still being applied if you own it.',
 
     REDEEM_TITLE: 'Thank you for your donation',
     REDEEM_DESCRIPTION_WITH_PERKS: 'You can now redeem your perk to profit from the benefits it includes.',

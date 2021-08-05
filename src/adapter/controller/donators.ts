@@ -3,7 +3,7 @@ import {Request, Response, Router} from 'express';
 import {Package, Perk} from '../../domain/package';
 import {AppConfig} from '../../domain/app-config';
 import {Logger} from 'winston';
-import {DiscordRole, OwnedPerk, PriorityQueue} from '../../domain/user';
+import {DiscordRole, FailedToLoad, OwnedPerk, PriorityQueue} from '../../domain/user';
 import {PriorityQueuePerk} from '../perk/priority-queue-perk';
 import {CFToolsClient, PriorityQueueItem, ServerApiId, SteamId64} from 'cftools-sdk';
 import {Client, Constants, DiscordAPIError} from 'discord.js';
@@ -55,9 +55,14 @@ export class DonatorsController {
         const servers = [...new Set(this.perks(PriorityQueuePerk)
             .map((p: PriorityQueuePerk) => p.cftools.serverApiId)
         )];
-        const priorityQueue = (await Promise.all(
-            servers
-                .map(async (server) => await this.fetchPriorityQueue(req, server))
+        const priorityQueue: OwnedPerk[] = (await Promise.all(
+            servers.map(async (server) => {
+                try {
+                    return await this.fetchPriorityQueue(req, server)
+                } catch (e) {
+                    return new FailedToLoad();
+                }
+            })
         )).filter((p) => !!p);
 
         const guild = await this.discordClient.guilds.fetch(this.config.discord.bot.guildId);

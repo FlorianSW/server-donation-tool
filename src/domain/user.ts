@@ -11,6 +11,14 @@ export class PriorityQueue implements OwnedPerk {
     }
 }
 
+export class FailedToLoad implements OwnedPerk {
+    type = 'FAILED_TO_LOAD';
+
+    asString(): string {
+        return translate('PERKS_OWNED_FAILED_TO_LOAD');
+    }
+}
+
 export class DiscordRole implements OwnedPerk {
     type = 'DISCORD_ROLE';
 
