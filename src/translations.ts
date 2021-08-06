@@ -30,6 +30,8 @@ const messages: { [key: string]: string } = {
     LOGIN_DESCRIPTION: 'Welcome to our donation tool. In order to ease the process of donating, as well as for you to redeem your perks, we use this website. To be able to process your donation, we would like to know, who you are, please click the login link to start.',
     LOGIN_REDIRECT: 'Login with Discord',
 
+    PRIVACY_POLICY: 'Privacy Policy',
+
     STEAM_ACCOUNT_TITLE: 'Steam Account',
     STEAM_FROM_DISCORD: 'This Steam account is linked with your Discord user.',
     STEAM_FROM_STEAM: 'You logged in with this Steam account.',

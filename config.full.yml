@@ -26,6 +26,16 @@ app:
     discord:
     # donationTarget:
       # monthly:
+  # googleAnalytics:
+    # trackingId:
+  # privacyPolicy:
+    # partials:
+      # - ./document-partials/privacy-policy/intro.txt
+      # - ./document-partials/privacy-policy/server-logs.txt
+      # - ./document-partials/privacy-policy/cookies.txt
+      # - ./document-partials/privacy-policy/paypal.txt
+      # - ./document-partials/privacy-policy/cftools.txt
+      # - ./document-partials/privacy-policy/personal-data.txt
 discord:
   # The OAuth credentials of the application (https://discord.com/developers/applications) used to sign users in. You
   # find these values in the app settings in the section 'OAuth2' -> 'Client information'

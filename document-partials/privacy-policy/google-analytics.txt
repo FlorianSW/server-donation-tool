@@ -1,0 +1,9 @@
+<h4>Google Analytics</h4>
+
+<p>This website uses, based on our legitimate interest to optimize and analyse the usage of this online-offering, the service "Google Analytics", which is provides by Google Inc. The service (Google Analytics) uses "Cookies", which are saved on your device. The collected information are usually transferred to a Google-Server in the USA and saved there.
+
+On this website, the IP anonymization is used. The IP address of users of the European Union, the european economic area and other contracting states are shortened. Only in individual cases the IP address will be transferred to a server in the USA in the full format and then shortened there. This shortening eliminates the personal identifiable character of the IP address. The IP address, which is transferred from your browser, is not matched to data otherwise gathered by Google.
+
+We use the data, collected by Google on our behalf, to analyze the usage of this website by the users, e.g. using reports of activity, as well as to optimize this website.
+
+Using a browser plugin, you can prevent the use of Cookies from Google Analytics as well as the collection of your IP address by Google Inc. The following link is providing you this plugin: https://tools.google.com/dlpage/gaoptout?hl=de</p>

@@ -1,5 +1,6 @@
 import {DiscordNotification} from '../adapter/discord-notifier';
 import {Request} from 'express';
+import {PathLike} from 'fs';
 
 export type ServerNames = {
     [serverApiId: string]: string
@@ -21,7 +22,13 @@ export interface AppConfig {
             donationTarget?: {
                 monthly?: number,
             },
-        }
+        },
+        googleAnalytics?: {
+            trackingId: string,
+        },
+        privacyPolicy: {
+            partials: PathLike[]
+        },
     },
     discord: {
         clientId: string,

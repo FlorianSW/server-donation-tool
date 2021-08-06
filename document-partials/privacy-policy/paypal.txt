@@ -1,0 +1,12 @@
+<h4>PayPal</h4>
+
+<p>This website offers to process payments using the payment processor PayPal. We do this to offer an efficient, seamless and secure payment method. In this context, we forward the following data to PayPal, given they are required to fulfill the payment:
+
+* Discord User ID (in order to match the payment back to the donator)
+* Steam User ID (in order to match the payment back to the donator)
+
+Processing the data mentioned in this section is neither required by law, nor by any contract. Without the transmission of these data, we can not offer to process a payment with PayPal.
+
+PayPal may, for different services such as the payment using a debit charge, carry out a credit check to ensure your solvency. This is of legitimate interest of PayPal and serves to fulfill a contract. For that, your data may be transferred to credit agencies. The website operator has no influence on this process  and are only receive the result of it, if the payment can be made.
+
+For more information about this you can find in the privacy policy of PayPal: https://www.paypal.com/webapps/mpp/ua/privacy-full</p>

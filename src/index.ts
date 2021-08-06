@@ -25,6 +25,7 @@ import {ExpireDiscordRole} from './service/expire-discord-role';
 import {Logger} from 'winston';
 import {StatisticsController} from './adapter/controller/statistics';
 import {LoginController} from './adapter/controller/login';
+import {PrivacyPolicyController} from './adapter/controller/privacy-policy';
 
 export interface Closeable {
     close(): Promise<void>
@@ -62,6 +63,7 @@ parseConfig(log).then(async (config) => {
     const authentication = container.resolve(Authentication);
     const statistics = container.resolve(StatisticsController);
     const login = container.resolve(LoginController);
+    const privacyPolicy = container.resolve(PrivacyPolicyController);
 
     app.locals.translate = translate;
     app.locals.community = {
@@ -122,6 +124,7 @@ parseConfig(log).then(async (config) => {
     app.use('/', authentication.router);
     app.use('/', statistics.router);
     app.use('/', login.router);
+    app.use('/', privacyPolicy.router);
 
     app.use(errorHandler);
     app.use(errorLogger({

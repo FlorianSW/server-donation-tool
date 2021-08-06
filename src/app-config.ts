@@ -6,6 +6,7 @@ import {DiscordRolePerk} from './adapter/perk/discord-role-perk';
 import {PriorityQueuePerk} from './adapter/perk/priority-queue-perk';
 import {Logger} from 'winston';
 import * as fs from 'fs';
+import {PathLike} from 'fs';
 import * as yaml from 'js-yaml';
 import {DiscordNotification, DiscordNotifier} from './adapter/discord-notifier';
 import {FreetextPerk} from './adapter/perk/freetext-perk';
@@ -56,7 +57,13 @@ class YamlAppConfig implements AppConfig {
             donationTarget?: {
                 monthly?: number;
             };
-        }
+        };
+        googleAnalytics?: {
+            trackingId: string;
+        };
+        privacyPolicy: {
+            partials: PathLike[]
+        };
     };
     cftools: { applicationId: string; secret: string };
     discord: {
@@ -125,6 +132,21 @@ class YamlAppConfig implements AppConfig {
 
         if (this.app.language) {
             settings.language = this.app.language;
+        }
+        if (!this.app.privacyPolicy?.partials) {
+            this.app.privacyPolicy = {
+                partials: [
+                    './document-partials/privacy-policy/intro.txt',
+                    './document-partials/privacy-policy/server-logs.txt',
+                    './document-partials/privacy-policy/cookies.txt',
+                    './document-partials/privacy-policy/paypal.txt',
+                    './document-partials/privacy-policy/cftools.txt',
+                    './document-partials/privacy-policy/personal-data.txt',
+                ]
+            }
+            if (this.app.googleAnalytics?.trackingId) {
+                this.app.privacyPolicy.partials.push('./document-partials/privacy-policy/google-analytics.txt');
+            }
         }
     }
 

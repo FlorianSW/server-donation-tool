@@ -1,0 +1,13 @@
+<h4>Access logs</h4>
+
+<p>We, the operator of this website, collect, based on our legitimate interest, data about the access to this website and save them in so called "Server log files" on the server of this website. The following data might be logged:
+
+* Which website was visited
+* Date and time of the access
+* The amount of data sent, in bytes
+* An optional referrer including information from what site you might be redirected to this website
+* The used browser
+* The used operating system
+* The IP address with which the access was made
+
+We save these log files for security reasons, e.g. in order to investigate abuse. Given data needs to be saved for a long term, e.g. as evidence, we do not delete them as long as the case is still pending.</p>

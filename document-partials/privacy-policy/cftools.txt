@@ -1,0 +1,12 @@
+<h4>CFTools Cloud</h4>
+
+<p>The website operator provides services and perks for donators, which use a third-party service to fulfill them, CFTools Cloud. CFTools Cloud is a server management system, which provides the priority queue slot functionality.
+
+In order for this website to be able to redeem perks of a package, which includes a priority queue slot as a perk, the following personal data will be shared with CFTools Cloud in order to setup your priority queue slot:
+
+* Your Steam ID
+* Additional metadata of the donation (like the donation ID, the PayPal Order and Transaction ID, as well as the date and time when the transaction was made)
+
+These data is necessary in order to fulfill the functionality of this website, and are in the interest of this website operator and the donator.
+
+You can find additional information about how this data is saved and processed by CFTools Cloud: https://cftools.cloud/legal/privacy</p>

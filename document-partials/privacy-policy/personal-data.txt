@@ -1,0 +1,24 @@
+<h4>Persoanl data</h4>
+
+<p>The website operator collects, processes and transfers your personal data only, if it is within the legal regulations and required to provide the functionality of this website.
+
+Personal data are all information, which can be used to identify you as a person or which can be used to traced back to you - e.g. your Discord oder Steam User ID, your name or e-mail address.</p>
+
+<h5>What?</h5>
+
+<p>The website operator saves and processes the following personal data:
+
+* Discord User ID
+* Steam User ID
+* PayPal transaction data
+</p>
+<h5>Why?</h5>
+
+<p>The website operator collects and processes this data in order to provide the donate functionality itself. Additionally, this data is required to grant perks to donators (like priority queue on a specific game server, or to assign a discord role to the donator).
+</p>
+<h5>How?</h5>
+
+<p>In order to fulfill the functionality of this website, some personal data might be shared with third-party services. The website tries to ensure that only the minimum set of data is transferred to the third-party and only if absolutely necessary. Example cases could be:
+
+* In order to grant a priority queue slot on a game server as a perk of a donation, your Steam ID needs to be shared with a third-party system
+* To assign a discord role to show the appreciation of your donation within the website operators community, your Discord ID needs to be shared with the Discord service</p>

@@ -260,4 +260,26 @@ body {
       pointer-events: none;
     }
   }
+
+  .privacy-policy {
+    p {
+      white-space: break-spaces;
+    }
+  }
+
+  .page-footer {
+    .footer-copyright .container {
+      display: flex;
+      justify-content: space-between;
+
+      a {
+        color: #ffab40;
+        transition: color .3s ease;
+
+        &:hover {
+          color: #ffd8a6;
+        }
+      }
+    }
+  }
 }

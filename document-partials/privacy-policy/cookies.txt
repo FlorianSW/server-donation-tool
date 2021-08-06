@@ -1,0 +1,13 @@
+<h4>Cookies</h4>
+
+<p>This website uses so-called "cookies". Cookies are small text files and do not harm your device. Cookies might be saved temporary, until your session with the website ends ("session cookies"), or permanently ("permanent cookies") on your device. Session cookies are automatically deleted after your visit of the website. Permanent cookies are saved on your device until you delete them manually or your browser deletes them automatically.
+
+When using third party services on this website, the third-party company might save additional cookies on your device when you open the service (third-party cookies). They make it possible to offer additional services, such as processing a payment).
+
+Several cookies we use are technically needed to provide the functionality of this website (e.g. a donation process). Others might be used to track the usage of this website.
+
+Technically required cookies, which are needed to provide this website or specific features of it, or cookies that are needed to optimise this website, are required and in the interest of the website operator.
+
+You can configure your browser, that you get informed when a cookie is set on your device. You can also configure it so you have to approve each cookie, prohibit the save of cookies generally or in specific cases or that your browser deletes cookies whenever you close it. If you choose to disable cookies complete, this website may not function correctly.
+
+Given this website uses other cookies from third-parties, you will be informed about this at another point within this privacy policy.</p>
