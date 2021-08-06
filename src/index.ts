@@ -75,6 +75,7 @@ parseConfig(log).then(async (config) => {
         return config.serverNames[serverApiId] || serverApiId;
     };
     app.locals.supportsSteamLogin = appConfig.steam?.apiKey !== undefined;
+    app.locals.googleAnalyticsTrackingId = appConfig.app.googleAnalytics?.trackingId;
     app.set('views', path.join(__dirname, 'views'));
     app.set('trust proxy', 'loopback');
     app.set('view engine', 'ejs');
