@@ -12,6 +12,7 @@ const PROGRESS_LENGTH = 45;
 @singleton()
 export class DiscordDonationTarget implements Closeable {
     private message: Message;
+    private updateInterval: NodeJS.Timeout;
 
     constructor(
         @inject('DonationEvents') private readonly events: DonationEvents,
@@ -35,6 +36,7 @@ export class DiscordDonationTarget implements Closeable {
                         }
                         this.events.on('successfulPayment', this.updateDonationTargetMessage.bind(this));
                         await this.updateDonationTargetMessage();
+                        this.updateInterval = setInterval(this.updateDonationTargetMessage.bind(this), 12 * 60 * 60 * 1000);
                     } else if (message) {
                         await message.delete({reason: 'Donation target not configured anymore.'});
                     }
@@ -47,6 +49,9 @@ export class DiscordDonationTarget implements Closeable {
 
     async close(): Promise<void> {
         this.events.off('successfulPayment', this.updateDonationTargetMessage.bind(this));
+        if (this.updateInterval) {
+            clearInterval(this.updateInterval);
+        }
     }
 
     private async updateDonationTargetMessage() {
