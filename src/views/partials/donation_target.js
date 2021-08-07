@@ -4,7 +4,11 @@
         progress.classList.add('progress');
         const determinate = document.createElement('div');
         determinate.classList.add('determinate');
-        determinate.style.width = (s.totalAmount / s.target * 100).toString(10) + '%';
+        if (s.totalAmount >= s.target) {
+            determinate.style.width = '100%';
+        } else {
+            determinate.style.width = (s.totalAmount / s.target * 100).toString(10) + '%';
+        }
         determinate.textContent = s.totalAmount + '$';
 
         progress.append(determinate);

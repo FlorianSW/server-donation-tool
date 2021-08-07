@@ -1,11 +1,11 @@
-import {Order} from '../domain/payment';
-import {User} from '../domain/user';
+import {Order} from '../../domain/payment';
+import {User} from '../../domain/user';
 import {EmbedFieldData, MessageEmbed, WebhookClient} from 'discord.js';
-import {translate} from '../translations';
-import {RedeemError} from '../domain/package';
-import {DonationEvents} from '../domain/events';
+import {translate} from '../../translations';
+import {RedeemError} from '../../domain/package';
+import {DonationEvents} from '../../domain/events';
 import {inject, singleton} from 'tsyringe';
-import {AppConfig} from '../domain/app-config';
+import {AppConfig} from '../../domain/app-config';
 
 export enum Type {
     SUCCESSFUL_REDEEM = 'SUCCESSFUL_REDEEM',

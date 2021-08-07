@@ -14,7 +14,7 @@ export class LoginController {
         res.render('login', {
             loginRedirect: '/auth/discord/redirect',
             withOpenGraph: true,
-            absoluteLogoUrl: this.config.logoUrl(req),
+            absoluteLogoUrl: this.config.logoUrl(true),
         });
     }
 }

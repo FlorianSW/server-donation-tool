@@ -17,7 +17,7 @@ export class StatisticsController {
     private async monthlyStatistics(req: Request, res: Response): Promise<void> {
         const target = await this.service.monthly();
         let msgKey = 'DONATION_TARGET_CLAIM';
-        if (target.totalAmount >= target.target) {
+        if (target.reached) {
             msgKey = 'DONATION_TARGET_REACHED';
         }
         res.send({

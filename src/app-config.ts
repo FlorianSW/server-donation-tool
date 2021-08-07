@@ -8,7 +8,7 @@ import {Logger} from 'winston';
 import * as fs from 'fs';
 import {PathLike} from 'fs';
 import * as yaml from 'js-yaml';
-import {DiscordNotification, DiscordNotifier} from './adapter/discord-notifier';
+import {DiscordNotification, DiscordNotifier} from './adapter/discord/discord-notifier';
 import {FreetextPerk} from './adapter/perk/freetext-perk';
 import session from 'express-session';
 import {StoreFactory} from 'connect-session-knex';
@@ -20,6 +20,7 @@ import {ExpireDiscordRole} from './service/expire-discord-role';
 import {OrderRecorder} from './service/order-recorder';
 import {container, instanceCachingFactory} from 'tsyringe';
 import {Request} from 'express';
+import {DiscordDonationTarget} from './adapter/discord/discord-donation-target';
 
 const initSessionStore = require('connect-session-knex');
 const sessionStore: StoreFactory = initSessionStore(session);
@@ -44,6 +45,7 @@ async function enableSqLiteWal(knex: Knex, log: Logger): Promise<void> {
 class YamlAppConfig implements AppConfig {
     app: {
         port: number;
+        publicUrl: string;
         sessionSecret: string;
         sessionStore: {
             filename: string;
@@ -55,6 +57,7 @@ class YamlAppConfig implements AppConfig {
             logo: string;
             discord?: string;
             donationTarget?: {
+                discordChannelId: string;
                 monthly?: number;
             };
         };
@@ -115,6 +118,7 @@ class YamlAppConfig implements AppConfig {
         await this.configureDiscord();
         await this.configureExpiringDiscordRoles();
         await this.configureOrderRecorder();
+        container.resolve(DiscordDonationTarget);
 
         if (this.app.community?.discord && !this.app.community.discord.startsWith('http')) {
             this.logger.warn('Community Discord link needs to be an absolute URL. This is invalid: ' + this.app.community.discord);
@@ -148,17 +152,18 @@ class YamlAppConfig implements AppConfig {
                 this.app.privacyPolicy.partials.push('./document-partials/privacy-policy/google-analytics.txt');
             }
         }
+        this.app.publicUrl = this.discord.redirectUrl.replace('/auth/discord/callback', '');
     }
 
-    logoUrl(root?: Request): string {
+    logoUrl(absolute?: boolean): string {
         if (!this.app.community?.logo) {
             return;
         }
         if (isWebUrl(this.app.community.logo)) {
             return this.app.community.logo;
         }
-        if (root) {
-            const logoUrl = new URL(root.protocol + '://' + root.hostname);
+        if (absolute) {
+            const logoUrl = new URL(this.app.publicUrl);
             logoUrl.pathname = `/assets/custom/${this.app.community?.logo}`;
             return logoUrl.toString();
         }

@@ -1,4 +1,4 @@
-import {DiscordNotification} from '../adapter/discord-notifier';
+import {DiscordNotification} from '../adapter/discord/discord-notifier';
 import {Request} from 'express';
 import {PathLike} from 'fs';
 
@@ -9,6 +9,7 @@ export type ServerNames = {
 export interface AppConfig {
     app: {
         port: number,
+        publicUrl: string,
         sessionSecret: string,
         sessionStore: {
             filename: string,
@@ -20,6 +21,7 @@ export interface AppConfig {
             logo?: string,
             discord?: string,
             donationTarget?: {
+                discordChannelId: string,
                 monthly?: number,
             },
         },
@@ -57,5 +59,5 @@ export interface AppConfig {
     },
     serverNames: ServerNames,
 
-    logoUrl(root?: Request): string;
+    logoUrl(absolute?: boolean): string;
 }

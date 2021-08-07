@@ -6,6 +6,7 @@ export interface DonationTarget {
     currency: string;
     totalAmount: number;
     target: number;
+    reached: boolean;
 }
 
 function currencyMapping(currency: string) {
@@ -42,6 +43,7 @@ export class CalculateDonationTarget {
             currency: currencyMapping(orders[0].reference.p.price.currency),
             target: this.monthlyTarget,
             totalAmount: totalDonations,
+            reached: totalDonations >= this.monthlyTarget,
         };
     }
 }

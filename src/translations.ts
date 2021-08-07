@@ -57,6 +57,9 @@ const messages: { [key: string]: string } = {
 
     DONATION_TARGET_CLAIM: 'We need your help to cover our monthly costs of {{target}}{{currency}}. Thanks to all community members who already donated a total amount of {{totalAmount}}{{currency}}.',
     DONATION_TARGET_REACHED: 'With the awesome amount of {{totalAmount}}{{currency}}, we have reached our donation target to cover our monthly costs of {{target}}{{currency}}. Thanks for your help, every donation helps.',
+    DONATION_TARGET_DISCORD_TITLE: 'Donation Target',
+    DONATION_TARGET_CALL_TO_ACTION_TITLE: 'Support us',
+    DONATION_TARGET_CALL_TO_ACTION_LINK: 'Donate now',
 
     FREETEXT_TEXT: '{{text}}',
 
