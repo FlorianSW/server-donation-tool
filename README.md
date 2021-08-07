@@ -32,11 +32,13 @@ More topics to read about:
     * [Getting Started](/docs/getting-started.md)
     * [Setup Additional Steam Login](/docs/steam-login.md)
     * [Packages and Perks](/docs/packages-and-perks.md)
+    * [Discord Notifications](/docs/discord-notifications.md)
 * Security
     * [Setup/Use https/secure connections](/docs/secure-connections.md)
 * Customization
     * [Overwrite messages](/docs/message-overrides.md)
     * [Human-readable server names (CFTools)](/docs/server-names.md)
+    * [Donation Targets](/docs/donation-targets.md)
 
 ## Support and Collaboration
 

@@ -25,6 +25,7 @@ app:
     # issue they want to discuss with you.
     discord:
     # donationTarget:
+      # discordChannelId:
       # monthly:
   # googleAnalytics:
     # trackingId:
