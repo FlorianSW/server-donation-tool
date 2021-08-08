@@ -1,0 +1,19 @@
+site_name: Server Donation Tool
+site_description: A tool to transform your game-server donations into a self-service experience for your donators.
+site_author: Florian Schmidt
+theme: windmill
+repo_url: https://github.com/floriansw/server-donation-tool
+edit_uri: edit/main/docs/
+nav:
+  - Home: 'index.md'
+  - 'Getting Strated': 'getting-started.md'
+  - Configuration:
+      - 'Packages and Perks': 'packages-and-perks.md'
+      - 'Setup Additional Steam Login': 'steam-login.md'
+      - 'Discord Notifications': 'discord-notifications.md'
+  - Security:
+      - 'Setup/Use https/secure connections': 'secure-connections.md'
+  - Customizations:
+      - 'Overwrite messages': 'message-overrides.md'
+      - 'Human-readable server names (CFTools)': 'server-names.md'
+      - 'Donation Targets': 'donation-targets.md'
