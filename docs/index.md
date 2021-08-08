@@ -1,6 +1,8 @@
 # Server donation tool
 
 [![Discord](https://img.shields.io/discord/729467994832371813?color=7289da&label=Discord&logo=discord&logoColor=ffffff&style=flat-square)](https://go2tech.de/discord)
+[![Docker Pulls](https://img.shields.io/docker/pulls/droidwiki/server-donation-tool?style=flat-square)](https://hub.docker.com/r/droidwiki/server-donation-tool)
+[![Documentation](https://img.shields.io/badge/docs-deployed-success?style=flat-square&logo=readthedocs)](https://floriansw.github.io/server-donation-tool/)
 
 <p align="center">
     <img src="https://github.com/FlorianSW/cftools-server-donation/raw/main/.github/screenshot.png" alt="Main view of the website" width="420px">
@@ -24,21 +26,7 @@ A demo deployment of the tool can be found here: https://donate-demo.go2tech.de/
 The `config.full.yml` provides extensive documentation for each configuration option.
 With the `config.example.yml`, there is a minimum configuration file, where you just need to replace the placeholder values to get started (it does not contain all the possible configuration values).
 
-Additionally, the [Getting Started Guide](/docs/getting-started.md) will provide an easy-to-use step-by-step guide for a first-time setup.
-
-More topics to read about:
-
-* Configuration
-    * [Getting Started](/docs/getting-started.md)
-    * [Setup Additional Steam Login](/docs/steam-login.md)
-    * [Packages and Perks](/docs/packages-and-perks.md)
-    * [Discord Notifications](/docs/discord-notifications.md)
-* Security
-    * [Setup/Use https/secure connections](/docs/secure-connections.md)
-* Customization
-    * [Overwrite messages](/docs/message-overrides.md)
-    * [Human-readable server names (CFTools)](/docs/server-names.md)
-    * [Donation Targets](/docs/donation-targets.md)
+Additionally, the [Getting Started Guide](./getting-started.md) will provide an easy-to-use step-by-step guide for a first-time setup.
 
 ## Support and Collaboration
 
