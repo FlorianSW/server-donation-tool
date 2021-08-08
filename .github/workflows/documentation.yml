@@ -14,4 +14,4 @@ jobs:
         with:
           python-version: 3.x
       - run: pip install mkdocs-windmill
-      - run: mkdocs gh-deploy
+      - run: mkdocs gh-deploy --force
