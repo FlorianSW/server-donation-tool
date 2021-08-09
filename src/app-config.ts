@@ -17,10 +17,9 @@ import {Environment} from './adapter/paypal-payment';
 import settings from './translations';
 import {DiscordRoleRecorder} from './service/discord-role-recorder';
 import {ExpireDiscordRole} from './service/expire-discord-role';
-import {OrderRecorder} from './service/order-recorder';
 import {container, instanceCachingFactory} from 'tsyringe';
-import {Request} from 'express';
 import {DiscordDonationTarget} from './adapter/discord/discord-donation-target';
+import {CleanupOrder} from './service/cleanup-order';
 
 const initSessionStore = require('connect-session-knex');
 const sessionStore: StoreFactory = initSessionStore(session);
@@ -117,7 +116,7 @@ class YamlAppConfig implements AppConfig {
         await this.configureSessionStore();
         await this.configureDiscord();
         await this.configureExpiringDiscordRoles();
-        await this.configureOrderRecorder();
+        await this.configureOrders();
         container.resolve(DiscordDonationTarget);
 
         if (this.app.community?.discord && !this.app.community.discord.startsWith('http')) {
@@ -247,14 +246,14 @@ class YamlAppConfig implements AppConfig {
         container.resolve(ExpireDiscordRole);
     }
 
-    private async configureOrderRecorder(): Promise<void> {
+    private async configureOrders(): Promise<void> {
         container.register('packages', {
             useValue: this.packages,
         });
         container.register('availablePackages', {
             useValue: this.packages.filter((p) => !p.disabled),
         });
-        container.resolve(OrderRecorder);
+        container.resolve(CleanupOrder);
     }
 }
 

@@ -76,12 +76,36 @@ describe('OrderRepository', () => {
         expect(result[1].id).toEqual(thirdOrder.id);
     });
 
+    it('finds unpaid orders created before', async () => {
+        const secondOrder = Order.create(new Date('2025-05-17T18:25:49Z'), anOrder.payment, anOrder.reference);
+        const thirdOrder = Order.create(new Date('2025-05-18T18:25:49Z'), anOrder.payment, anOrder.reference);
+        anOrder.pay(anOrder.payment.transactionId);
+        await repository.save(anOrder);
+        await repository.save(secondOrder);
+        await repository.save(thirdOrder);
+
+        const result = await repository.findUnpaidBefore(new Date('2025-05-17T20:25:49Z'));
+        expect(result).toHaveLength(1);
+        expect(result[0].id).toEqual(secondOrder.id);
+    });
+
     it('does not find order', async () => {
         await repository.save(anOrder);
         await repository.save(Order.create(new Date('2025-05-17T18:25:49Z'), anOrder.payment, anOrder.reference));
 
         const result = await repository.findCreatedAfter(new Date('2025-05-17T18:25:50Z'));
         expect(result).toHaveLength(0);
+    });
+
+    it('deletes order', async () => {
+        const secondOrder = Order.create(new Date('2025-05-17T18:25:49Z'), anOrder.payment, anOrder.reference);
+        await repository.save(anOrder);
+        await repository.save(secondOrder);
+
+        await repository.delete(anOrder);
+
+        await expect(repository.find(anOrder.id)).resolves.toBeUndefined();
+        await expect(repository.find(secondOrder.id)).resolves.not.toBeUndefined();
     });
 
     afterEach(async () => {

@@ -73,22 +73,6 @@ export class SQLiteOrderRepository implements OrderRepository {
         this.initialized = undefined;
     }
 
-    private toOrder(o: any): Order {
-        const p = this.packages.find((p) => p.id === o[columnPackageId]);
-        const reference = new Reference(o[columnSteamId], o[columnDiscordId], {
-            ...p,
-            price: {
-                ...p.price,
-                amount: o[columnPrice].toFixed(2),
-            }
-        });
-        const payment: OrderPayment = {
-            id: o[columnOrderId],
-            transactionId: o[columnTransactionId],
-        };
-        return new Order(o[columnId], new Date(o[columnCreated]), reference, o[columnStatus], payment);
-    }
-
     async find(id: string): Promise<Order | undefined> {
         await this.initialized;
         return this.con
@@ -124,6 +108,22 @@ export class SQLiteOrderRepository implements OrderRepository {
             });
     }
 
+    async delete(order: Order): Promise<void> {
+        await this.initialized;
+        await this.con.table(tableName).where(columnId, order.id).delete();
+    }
+
+    async findUnpaidBefore(after: Date): Promise<Order[]> {
+        await this.initialized;
+        return this.con
+            .table(tableName)
+            .where(columnCreated, '<=', after.getTime())
+            .where(columnStatus, OrderStatus.CREATED)
+            .then((result) => {
+                return result.map((o) => this.toOrder(o));
+            });
+    }
+
     async save(order: Order): Promise<void> {
         await this.initialized;
         // @formatter:off
@@ -131,6 +131,22 @@ export class SQLiteOrderRepository implements OrderRepository {
             order.id, order.payment.id, order.created.getTime(), order.status, order.payment.transactionId || null, order.reference.steamId, order.reference.discordId, order.reference.p.id, parseFloat(order.reference.p.price.amount)
         ]);
         // @formatter:on
+    }
+
+    private toOrder(o: any): Order {
+        const p = this.packages.find((p) => p.id === o[columnPackageId]);
+        const reference = new Reference(o[columnSteamId], o[columnDiscordId], {
+            ...p,
+            price: {
+                ...p.price,
+                amount: o[columnPrice].toFixed(2),
+            }
+        });
+        const payment: OrderPayment = {
+            id: o[columnOrderId],
+            transactionId: o[columnTransactionId],
+        };
+        return new Order(o[columnId], new Date(o[columnCreated]), reference, o[columnStatus], payment);
     }
 }
 
@@ -151,6 +167,14 @@ export class InMemoryOrderRepository implements OrderRepository {
 
     async findCreatedAfter(after: Date): Promise<Order[]> {
         return Array.from(this.orders.values()).filter((o) => o.created.getTime() >= after.getTime());
+    }
+
+    async findUnpaidBefore(after: Date): Promise<Order[]> {
+        return Array.from(this.orders.values()).filter((o) => o.status === OrderStatus.CREATED).filter((o) => o.created.getTime() >= after.getTime());
+    }
+
+    async delete(order: Order): Promise<void> {
+        this.orders.delete(order.id);
     }
 
     async close(): Promise<void> {
