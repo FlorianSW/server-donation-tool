@@ -10,7 +10,6 @@ import csrf from 'csurf';
 import {EventSource} from '../../domain/events';
 import {inject, singleton} from 'tsyringe';
 import {OrderRepository} from '../../domain/repositories';
-import {v4} from 'uuid';
 
 @singleton()
 export class DonationController {
@@ -150,16 +149,10 @@ export class DonationController {
             steamId: req.body.steamId,
             discordId: req.user.discord.id,
         });
-        const order: Order = {
-            id: v4(),
-            created: paymentOrder.created,
-            status: OrderStatus.CREATED,
-            payment: {
-                id: paymentOrder.id,
-                transactionId: paymentOrder.transactionId,
-            },
-            reference: new Reference(req.body.steamId, req.user.discord.id, p),
-        };
+        const order = Order.create(paymentOrder.created, {
+            id: paymentOrder.id,
+            transactionId: paymentOrder.transactionId,
+        }, new Reference(req.body.steamId, req.user.discord.id, p));
         await this.repo.save(order);
         res.status(200).json({
             orderId: order.payment.id
@@ -176,8 +169,7 @@ export class DonationController {
             transactionId: capture.transactionId,
         };
 
-        order.payment.transactionId = capture.transactionId;
-        order.status = OrderStatus.PAID;
+        order.pay(capture.transactionId);
         await this.repo.save(order);
 
         res.status(200).json({

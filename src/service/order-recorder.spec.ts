@@ -2,7 +2,7 @@ import {EventQueue} from '../adapter/event-queue';
 import {Package, PriceType} from '../domain/package';
 import {OrderRecorder} from './order-recorder';
 import {InMemoryOrderRepository} from '../adapter/order-repository';
-import {Order, OrderStatus, Reference} from '../domain/payment';
+import {Order, Reference} from '../domain/payment';
 import {User} from '../domain/user';
 
 const aPackage: Package = {
@@ -34,16 +34,10 @@ describe('OrderRecorder', () => {
     });
 
     it('records an order when payed', async () => {
-        const order: Order = {
-            id: 'SOME_ORDER_ID',
-            status: OrderStatus.PAID,
-            created: new Date('2025-05-16T18:25:49Z'),
-            payment: {
-                id: 'ORDER_ID',
-                transactionId: 'SOME_TRANSACTION_ID',
-            },
-            reference: new Reference('A_STEAM_ID', 'A_DISCORD_ID', aPackage),
-        };
+        const order: Order = Order.create(new Date('2025-05-16T18:25:49Z'), {
+            id: 'ORDER_ID',
+            transactionId: 'SOME_TRANSACTION_ID',
+        }, new Reference('A_STEAM_ID', 'A_DISCORD_ID', aPackage))
 
         await recorder.onSuccessfulPayment(aUser, order);
 

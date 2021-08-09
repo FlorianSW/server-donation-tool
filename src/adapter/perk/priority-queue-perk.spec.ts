@@ -28,16 +28,10 @@ const aPackage: Package = {
         amount: '1.00'
     }
 };
-const anOrder: Order = {
-    id: 'SOME_ORDER_ID',
-    created: new Date(),
-    status: OrderStatus.PAID,
-    payment: {
-        id: 'SOME_PAYMENT_ORDER_ID',
-        transactionId: 'A_TRANSACTION_ID',
-    },
-    reference: new Reference(aSteamId, '11111111111', aPackage),
-};
+const anOrder: Order = Order.create(new Date(), {
+    id: 'SOME_PAYMENT_ORDER_ID',
+    transactionId: 'A_TRANSACTION_ID',
+}, new Reference(aSteamId, '11111111111', aPackage));
 
 describe('PriorityQueuePerk', () => {
     let client: CFToolsClient;
@@ -67,7 +61,7 @@ describe('PriorityQueuePerk', () => {
             expected.setDate(expected.getDate() + perk.amountInDays);
             expect(expiration.toLocaleString().slice(0, -2)).toBe(expected.toLocaleString().slice(0, -2));
             expect(result.comment).toContain('A_PACKAGE');
-            expect(result.comment).toContain('SOME_ORDER_ID');
+            expect(result.comment).toContain(anOrder.id);
             expect(result.comment).toContain('A_TRANSACTION_ID');
         });
 

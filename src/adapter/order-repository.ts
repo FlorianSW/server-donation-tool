@@ -1,6 +1,6 @@
 import {OrderRepository} from '../domain/repositories';
 import Knex from 'knex';
-import {Order, OrderStatus, Reference} from '../domain/payment';
+import {Order, OrderPayment, OrderStatus, Reference} from '../domain/payment';
 import {Package} from '../domain/package';
 import {inject, singleton} from 'tsyringe';
 
@@ -75,22 +75,18 @@ export class SQLiteOrderRepository implements OrderRepository {
 
     private toOrder(o: any): Order {
         const p = this.packages.find((p) => p.id === o[columnPackageId]);
-        return {
-            id: o[columnId],
-            created: new Date(o[columnCreated]),
-            payment: {
-                id: o[columnOrderId],
-                transactionId: o[columnTransactionId],
-            },
-            status: o[columnStatus],
-            reference: new Reference(o[columnSteamId], o[columnDiscordId], {
-                ...p,
-                price: {
-                    ...p.price,
-                    amount: o[columnPrice].toFixed(2),
-                }
-            }),
-        } as Order;
+        const reference = new Reference(o[columnSteamId], o[columnDiscordId], {
+            ...p,
+            price: {
+                ...p.price,
+                amount: o[columnPrice].toFixed(2),
+            }
+        });
+        const payment: OrderPayment = {
+            id: o[columnOrderId],
+            transactionId: o[columnTransactionId],
+        };
+        return new Order(o[columnId], new Date(o[columnCreated]), reference, o[columnStatus], payment);
     }
 
     async find(id: string): Promise<Order | undefined> {

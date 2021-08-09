@@ -1,4 +1,5 @@
 import {Package} from './package';
+import {v4} from 'uuid';
 
 export class Reference {
     constructor(public readonly steamId: string, public readonly discordId: string, public readonly p: Package) {
@@ -28,14 +29,28 @@ export enum OrderStatus {
     CREATED = 0, PAID = 1
 }
 
-export interface Order {
-    id: string,
-    created: Date,
-    reference: Reference,
-    status: OrderStatus,
-    payment: {
-        id: string;
-        transactionId?: string,
+export interface OrderPayment {
+    id: string;
+    transactionId?: string,
+}
+
+export class Order {
+    constructor(
+        public readonly id: string,
+        public readonly created: Date,
+        public readonly reference: Reference,
+        public status: OrderStatus,
+        public payment: OrderPayment
+    ) {
+    }
+
+    public pay(transactionId: string) {
+        this.payment.transactionId = transactionId;
+        this.status = OrderStatus.PAID;
+    }
+
+    public static create(created: Date, payment: OrderPayment, reference: Reference): Order {
+        return new Order(v4(), created, reference, OrderStatus.CREATED, payment);
     }
 }
 
