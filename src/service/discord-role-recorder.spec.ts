@@ -2,7 +2,7 @@ import {ExpiringDiscordRole} from '../domain/repositories';
 import {DiscordRoleRecorder} from './discord-role-recorder';
 import {EventQueue} from '../adapter/event-queue';
 import {User} from '../domain/user';
-import {Reference} from '../domain/payment';
+import {OrderStatus, Reference} from '../domain/payment';
 import {DiscordRolePerk} from '../adapter/perk/discord-role-perk';
 import {Package, PriceType} from '../domain/package';
 import {Client} from 'discord.js';
@@ -57,6 +57,7 @@ describe('DiscordRoleRecorder', () => {
     it('does not record non-expiring discord role', async () => {
         await recorder.onSuccessfulRedeem(aUser, {
             id: 'SOME_ID',
+            status: OrderStatus.PAID,
             reference: new Reference('7592222222222', '11111111111', {
                 ...aPackage,
                 perks: [notExpiring],
@@ -74,6 +75,7 @@ describe('DiscordRoleRecorder', () => {
     it('records expiring discord role', async () => {
         await recorder.onSuccessfulRedeem(aUser, {
             id: 'SOME_ID',
+            status: OrderStatus.PAID,
             reference: new Reference('7592222222222', '11111111111', {
                 ...aPackage,
                 perks: [expiring],
@@ -97,6 +99,7 @@ describe('DiscordRoleRecorder', () => {
     it('does not return not yet expired roles', async () => {
         await recorder.onSuccessfulRedeem(aUser, {
             id: 'SOME_ID',
+            status: OrderStatus.PAID,
             reference: new Reference('7592222222222', '11111111111', {
                 ...aPackage,
                 perks: [expiring],

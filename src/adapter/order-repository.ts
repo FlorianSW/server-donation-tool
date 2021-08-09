@@ -1,6 +1,6 @@
 import {OrderRepository} from '../domain/repositories';
 import Knex from 'knex';
-import {Order, Reference} from '../domain/payment';
+import {Order, OrderStatus, Reference} from '../domain/payment';
 import {Package} from '../domain/package';
 import {inject, singleton} from 'tsyringe';
 
@@ -8,6 +8,7 @@ const tableName = 'order_repository';
 const columnId = 'id';
 const columnOrderId = 'order_id';
 const columnCreated = 'created';
+const columnStatus = 'status';
 const columnTransactionId = 'transaction_id';
 const columnSteamId = 'steam_id';
 const columnDiscordId = 'discord_id';
@@ -27,6 +28,7 @@ export class SQLiteOrderRepository implements OrderRepository {
                         b.string(columnOrderId);
                         b.dateTime(columnCreated).index('idx_' + columnCreated);
                         b.string(columnTransactionId).nullable();
+                        b.integer(columnStatus).index('idx_' + columnStatus);
                         b.string(columnSteamId);
                         b.string(columnDiscordId).index('idx_' + columnDiscordId);
                         b.bigInteger(columnPackageId);
@@ -46,6 +48,13 @@ export class SQLiteOrderRepository implements OrderRepository {
                         await con.schema.alterTable(tableName, (b) => {
                             b.float(columnPrice);
                         });
+                    }
+                    if (!c.hasOwnProperty(columnStatus)) {
+                        await con.schema.alterTable(tableName, (b) => {
+                            b.integer(columnStatus).index('idx_' + columnStatus);
+                        });
+                        await con.table(tableName).update(columnStatus, OrderStatus.CREATED).whereNull(columnTransactionId);
+                        await con.table(tableName).update(columnStatus, OrderStatus.PAID).whereNotNull(columnTransactionId);
                     }
                     await con.raw(`CREATE INDEX IF NOT EXISTS idx_${columnDiscordId} ON ${tableName}(${columnDiscordId})`);
                     resolve(true);
@@ -73,6 +82,7 @@ export class SQLiteOrderRepository implements OrderRepository {
                 id: o[columnOrderId],
                 transactionId: o[columnTransactionId],
             },
+            status: o[columnStatus],
             reference: new Reference(o[columnSteamId], o[columnDiscordId], {
                 ...p,
                 price: {
@@ -112,7 +122,7 @@ export class SQLiteOrderRepository implements OrderRepository {
         return this.con
             .table(tableName)
             .where(columnCreated, '>=', after.getTime())
-            .whereNotNull(columnTransactionId)
+            .where(columnStatus, '>=', OrderStatus.PAID)
             .then((result) => {
                 return result.map((o) => this.toOrder(o));
             });
@@ -121,8 +131,8 @@ export class SQLiteOrderRepository implements OrderRepository {
     async save(order: Order): Promise<void> {
         await this.initialized;
         // @formatter:off
-        await this.con.raw(`REPLACE INTO ${tableName} (${columnId}, ${columnOrderId}, ${columnCreated}, ${columnTransactionId}, ${columnSteamId}, ${columnDiscordId}, ${columnPackageId}, ${columnPrice}) VALUES(?, ?, ?, ?, ?, ?, ?, ?)`, [
-            order.id, order.payment.id, order.created.getTime(), order.payment.transactionId || null, order.reference.steamId, order.reference.discordId, order.reference.p.id, parseFloat(order.reference.p.price.amount)
+        await this.con.raw(`REPLACE INTO ${tableName} (${columnId}, ${columnOrderId}, ${columnCreated}, ${columnStatus}, ${columnTransactionId}, ${columnSteamId}, ${columnDiscordId}, ${columnPackageId}, ${columnPrice}) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)`, [
+            order.id, order.payment.id, order.created.getTime(), order.status, order.payment.transactionId || null, order.reference.steamId, order.reference.discordId, order.reference.p.id, parseFloat(order.reference.p.price.amount)
         ]);
         // @formatter:on
     }

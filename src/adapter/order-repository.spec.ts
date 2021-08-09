@@ -2,7 +2,7 @@ import {OrderRepository} from '../domain/repositories';
 import Knex from 'knex';
 import * as fs from 'fs';
 import {SQLiteOrderRepository} from './order-repository';
-import {Order, Reference} from '../domain/payment';
+import {Order, OrderStatus, Reference} from '../domain/payment';
 import {Package, PriceType} from '../domain/package';
 import {FreetextPerk} from './perk/freetext-perk';
 
@@ -21,6 +21,7 @@ const packages: Package[] = [{
 const anOrder: Order = {
     id: 'SOME_ORDER_ID',
     created: new Date('2025-05-16T18:25:49Z'),
+    status: OrderStatus.PAID,
     payment: {
         id: 'PAYMENT_ORDER_ID',
         transactionId: 'SOME_TRANSACTION_ID',

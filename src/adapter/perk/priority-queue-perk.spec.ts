@@ -3,7 +3,7 @@ import {CFToolsClient, SteamId64} from 'cftools-sdk';
 import {InMemoryCFToolsClient} from './testhelper';
 import {User} from '../../domain/user';
 import {Package, PriceType} from '../../domain/package';
-import {Order, Reference} from '../../domain/payment';
+import {Order, OrderStatus, Reference} from '../../domain/payment';
 
 const aSteamId = '76561198012102485';
 const aServerApiId = 'c10a80c6-ad46-477e-971d-614370ec173e';
@@ -31,6 +31,7 @@ const aPackage: Package = {
 const anOrder: Order = {
     id: 'SOME_ORDER_ID',
     created: new Date(),
+    status: OrderStatus.PAID,
     payment: {
         id: 'SOME_PAYMENT_ORDER_ID',
         transactionId: 'A_TRANSACTION_ID',

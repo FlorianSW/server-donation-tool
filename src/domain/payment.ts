@@ -24,10 +24,15 @@ export interface PaymentOrder {
     transactionId?: string;
 }
 
+export enum OrderStatus {
+    CREATED = 0, PAID = 1
+}
+
 export interface Order {
     id: string,
     created: Date,
     reference: Reference,
+    status: OrderStatus,
     payment: {
         id: string;
         transactionId?: string,

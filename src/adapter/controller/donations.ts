@@ -3,7 +3,7 @@ import {Request, Response, Router} from 'express';
 import {TranslateParams} from '../../translations';
 import {Package, RedeemError} from '../../domain/package';
 import {AppConfig} from '../../domain/app-config';
-import {Order, Payment, Reference, SteamIdMismatch} from '../../domain/payment';
+import {Order, OrderStatus, Payment, Reference, SteamIdMismatch} from '../../domain/payment';
 import {Logger} from 'winston';
 import {SessionData} from 'express-session';
 import csrf from 'csurf';
@@ -153,6 +153,7 @@ export class DonationController {
         const order: Order = {
             id: v4(),
             created: paymentOrder.created,
+            status: OrderStatus.CREATED,
             payment: {
                 id: paymentOrder.id,
                 transactionId: paymentOrder.transactionId,
@@ -176,6 +177,7 @@ export class DonationController {
         };
 
         order.payment.transactionId = capture.transactionId;
+        order.status = OrderStatus.PAID;
         await this.repo.save(order);
 
         res.status(200).json({
