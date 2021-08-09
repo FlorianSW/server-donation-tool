@@ -26,7 +26,7 @@ export class CalculateDonationTarget {
     private readonly monthlyTarget: number;
 
     constructor(@inject('OrderRepository') private readonly repository: OrderRepository, @inject('AppConfig') config: AppConfig) {
-        this.monthlyTarget = config.app.community.donationTarget.monthly;
+        this.monthlyTarget = config.app.community.donationTarget?.monthly;
     }
 
     hasMonthlyTarget(): boolean {

@@ -21,7 +21,7 @@ export class DiscordDonationTarget implements Closeable {
         @inject('discord.Client') private readonly client: Client,
         @inject('Logger') logger: Logger
     ) {
-        if (config.app.community.donationTarget.discordChannelId) {
+        if (config.app.community.donationTarget?.discordChannelId) {
             client.channels.fetch(config.app.community.donationTarget.discordChannelId).then(async (c) => {
                 if (c.isText()) {
                     const messages = await c.messages.fetch({limit: 100});
