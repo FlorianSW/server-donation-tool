@@ -43,7 +43,6 @@ export class DonationController {
 
         if (order.reference.steamId !== req.user.steam.id) {
             res.render('payment_steam_mismatch', {
-                paymentSteamId: order.reference.steamId,
                 userSteamId: req.user.steam.id,
             });
             throw new SteamIdMismatch(order.reference.steamId, req.user.steam.id);
