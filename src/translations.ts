@@ -47,6 +47,8 @@ const messages: { [key: string]: string } = {
     PAYPAL_DESCRIPTION: 'We use PayPal to process your donation. Proceed to PayPal in order to complete the transaction.',
     PAYPAL_SELECTED_PACKAGE: 'Your selected Package',
     PAYPAL_CUSTOM_MESSAGE: 'Leave a custom message (optional)',
+    PAYPAL_ORDER_DESCRIPTION: 'Donation for {{communityName}}',
+    PAYPAL_DEFAULT_COMMUNITY_NAME: 'our community',
     PAYPAL_ERROR: 'Something went wrong with your donation.',
 
     PRIORITY_QUEUE_REDEEM_COMPLETE: 'Your priority queue slot for {{serverName}} was created successfully. It will expire at: {{until}}',

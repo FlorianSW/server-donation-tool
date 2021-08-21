@@ -9,6 +9,7 @@ import {
 import {AppConfig} from '../domain/app-config';
 import {inject, singleton} from 'tsyringe';
 import {Package} from '../domain/package';
+import {translate} from '../translations';
 
 const paypal = require('@paypal/checkout-server-sdk');
 
@@ -53,18 +54,43 @@ export class PaypalPayment implements Payment {
     }
 
     async createPaymentOrder(request: CreatePaymentOrderRequest): Promise<PaymentOrder> {
+        const communityTitle = this.config.app.community?.title || translate('PAYPAL_DEFAULT_COMMUNITY_NAME');
         const r = new paypal.orders.OrdersCreateRequest();
         r.prefer('return=representation');
         r.requestBody({
             intent: 'CAPTURE',
+            application_context: {
+                brand_name: communityTitle,
+                shipping_preference: 'NO_SHIPPING',
+                user_action: 'PAY_NOW',
+            },
             purchase_units: [{
                 custom_id: new Reference(request.steamId, request.discordId, request.forPackage).asString(),
-                description: request.forPackage.name,
+                description: translate('PAYPAL_ORDER_DESCRIPTION', {
+                    params: {
+                        communityName: communityTitle,
+                    }
+                }),
                 amount: {
                     currency_code: request.forPackage.price.currency,
-                    value: request.forPackage.price.amount
-                }
-            }]
+                    value: request.forPackage.price.amount,
+                    breakdown: {
+                        item_total: {
+                            currency_code: request.forPackage.price.currency,
+                            value: request.forPackage.price.amount
+                        },
+                    },
+                },
+                items: [{
+                    name: request.forPackage.name,
+                    category: 'DONATION',
+                    unit_amount: {
+                        currency_code: request.forPackage.price.currency,
+                        value: request.forPackage.price.amount
+                    },
+                    quantity: 1,
+                }],
+            }],
         });
 
         const order: OrderResult = await this.client.execute(r);
