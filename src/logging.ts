@@ -40,6 +40,10 @@ export const errorHandler: ErrorRequestHandler = (err: any, req: Request, res: R
     const status = err.status || 500;
     const errorPageFormatHint = req.header('accept');
 
+    if (res.headersSent) {
+        return;
+    }
+
     res.status(status);
     if (errorPageFormatHint.indexOf('application/json') !== -1) {
         res.contentType('application/json').send({

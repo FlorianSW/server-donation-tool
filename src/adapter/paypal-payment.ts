@@ -1,15 +1,12 @@
 import {
     CapturePaymentRequest,
     CreatePaymentOrderRequest,
-    OrderNotCompleted,
     Payment,
     PaymentCapture,
     PaymentOrder,
-    Reference,
-    SteamIdMismatch
+    Reference
 } from '../domain/payment';
 import {AppConfig} from '../domain/app-config';
-import {User} from '../domain/user';
 import {inject, singleton} from 'tsyringe';
 import {Package} from '../domain/package';
 
