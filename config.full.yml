@@ -167,7 +167,16 @@ serverNames:
 # * cftools: The cftools serverApiId (in the object with the key serverApiId) of the server the donator will get the perk
 #   for. Is the Server ID of the server in the CFTools Dashboard (Manage -> Settings -> API Key section). Do not use the API
 #   key as the ID, it will throw an error that it is unknown.
-#   This setting is only used for the following types: PRIORITY_QUEUE
+#
+# - WHITELIST
+# This perk whitelists the donator on the specific CFTools Cloud server for the specified days (or permanently).
+# It required the following configuration:
+# * amountInDays: The amount of the whitelisting in days the donator should get.
+# * permanent: Boolean field, should be set to true when the donator should get permanently whitelisted. Should not
+#   be set together with amountInDays.
+# * cftools: The cftools serverApiId (in the object with the key serverApiId) of the server the donator will get the perk
+#   for. Is the Server ID of the server in the CFTools Dashboard (Manage -> Settings -> API Key section). Do not use the API
+#   key as the ID, it will throw an error that it is unknown.
 #
 # - DISCORD_ROLE
 # A perk which will grant the donator one or more specific roles in your discord server (see the discord.bot settings for

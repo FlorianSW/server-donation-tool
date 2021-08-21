@@ -1,16 +1,16 @@
-import {PriorityQueuePerk} from './priority-queue-perk';
 import {CFToolsClient, SteamId64} from 'cftools-sdk';
 import {InMemoryCFToolsClient} from './testhelper';
+import {WhitelistPerk} from './whitelist-perk';
 import {anOrder, aPackage, aServerApiId, aSteamId, aUser} from './testdata.spec';
 
-describe('PriorityQueuePerk', () => {
+describe('WhitelistPerk', () => {
     let client: CFToolsClient;
-    let perk: PriorityQueuePerk;
+    let perk: WhitelistPerk;
 
     beforeEach(() => {
         client = new InMemoryCFToolsClient();
         perk = Object.assign(
-            new PriorityQueuePerk(client as CFToolsClient, {aServerApiId: 'A_NAME'}),
+            new WhitelistPerk(client as CFToolsClient, {aServerApiId: 'A_NAME'}),
             {
                 inPackage: aPackage,
                 cftools: {
@@ -22,10 +22,10 @@ describe('PriorityQueuePerk', () => {
     });
 
     describe('redeem', () => {
-        it('creates priority queue entry', async () => {
+        it('creates whitelist entry', async () => {
             await perk.redeem(aUser, anOrder);
 
-            const result = await client.getPriorityQueue(SteamId64.of(aSteamId));
+            const result = await client.getWhitelist(SteamId64.of(aSteamId));
             const expiration = result.expiration as Date;
             const expected = new Date();
             expected.setDate(expected.getDate() + perk.amountInDays);
@@ -35,9 +35,9 @@ describe('PriorityQueuePerk', () => {
             expect(result.comment).toContain('A_TRANSACTION_ID');
         });
 
-        it('creates permanent priority queue entry', async () => {
+        it('creates permanent whitelist entry', async () => {
             perk = Object.assign(
-                new PriorityQueuePerk(client as CFToolsClient, {aServerApiId: 'A_NAME'}),
+                new WhitelistPerk(client as CFToolsClient, {aServerApiId: 'A_NAME'}),
                 {
                     inPackage: aPackage,
                     cftools: {
@@ -48,11 +48,11 @@ describe('PriorityQueuePerk', () => {
             );
             await perk.redeem(aUser, anOrder);
 
-            const result = await client.getPriorityQueue(SteamId64.of(aSteamId));
+            const result = await client.getWhitelist(SteamId64.of(aSteamId));
             expect(result.expiration).toContain('Permanent');
         });
 
-        it('does not recreate permanent priority queue', async () => {
+        it('does not recreate permanent whitelist', async () => {
             await client.putPriorityQueue({
                 id: SteamId64.of(aSteamId),
                 comment: 'A_COMMENT',
@@ -61,14 +61,14 @@ describe('PriorityQueuePerk', () => {
 
             await perk.redeem(aUser, anOrder);
 
-            const result = await client.getPriorityQueue(SteamId64.of(aSteamId));
+            const result = await client.getWhitelist(SteamId64.of(aSteamId));
             expect(result.expiration).toBe('Permanent');
             expect(result.comment).toBe('A_COMMENT');
         });
 
-        it('does not recreate priority queue which expires after new one', async () => {
+        it('does not recreate whitelist which expires after new one', async () => {
             const veryLateExpiration = new Date(9999, 12, 31);
-            await client.putPriorityQueue({
+            await client.putWhitelist({
                 id: SteamId64.of(aSteamId),
                 comment: 'A_COMMENT',
                 expires: veryLateExpiration,
@@ -76,14 +76,14 @@ describe('PriorityQueuePerk', () => {
 
             await perk.redeem(aUser, anOrder);
 
-            const result = await client.getPriorityQueue(SteamId64.of(aSteamId));
+            const result = await client.getWhitelist(SteamId64.of(aSteamId));
             expect(result.expiration).toEqual(veryLateExpiration);
             expect(result.comment).toBe('A_COMMENT');
         });
 
-        it('recreates priority queue when it expires before the new one', async () => {
+        it('recreates whitelist when it expires before the new one', async () => {
             const earlyExpiration = new Date(2021, 5, 1);
-            await client.putPriorityQueue({
+            await client.putWhitelist({
                 id: SteamId64.of(aSteamId),
                 comment: 'A_COMMENT',
                 expires: earlyExpiration,
@@ -91,7 +91,7 @@ describe('PriorityQueuePerk', () => {
 
             await perk.redeem(aUser, anOrder);
 
-            const result = await client.getPriorityQueue(SteamId64.of(aSteamId));
+            const result = await client.getWhitelist(SteamId64.of(aSteamId));
             const expiration = result.expiration as Date;
             const expected = new Date();
             expected.setDate(expected.getDate() + perk.amountInDays);

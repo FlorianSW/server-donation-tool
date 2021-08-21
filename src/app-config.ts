@@ -20,6 +20,7 @@ import {ExpireDiscordRole} from './service/expire-discord-role';
 import {container, instanceCachingFactory} from 'tsyringe';
 import {DiscordDonationTarget} from './adapter/discord/discord-donation-target';
 import {CleanupOrder} from './service/cleanup-order';
+import {WhitelistPerk} from './adapter/perk/whitelist-perk';
 
 const initSessionStore = require('connect-session-knex');
 const sessionStore: StoreFactory = initSessionStore(session);
@@ -294,6 +295,8 @@ export async function parseConfig(logger: Logger): Promise<AppConfig> {
                 p.perks[i] = discordPerk;
             } else if (perk.type === 'FREETEXT_ONLY') {
                 p.perks[i] = Object.assign(new FreetextPerk(), perk);
+            } else if (perk.type === 'WHITELIST') {
+                p.perks[i] = Object.assign(new WhitelistPerk(container.resolve('CFToolsClient'), intermediate.serverNames), perk);
             } else {
                 throw new Error('No available provider can redeem perk: ' + perk.type);
             }

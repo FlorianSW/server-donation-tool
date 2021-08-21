@@ -110,7 +110,7 @@ The following perks are available built-in.
 ### Priority Queue
 
 The priority queue perk works together with CFTools Cloud.
-If included in a package and redeemed by a donator, the perk will setup a priority queue slot for a single configured CFTools Cloud server..
+If included in a package and redeemed by a donator, the perk will setup a priority queue slot for a single configured CFTools Cloud server.
 The priority queue slot will last as long as configured.
 
 This perk, in order to work correctly, requires the CFTools Cloud application the be setup.
@@ -127,6 +127,32 @@ This perk requires the following additional configuration options:
 * **amountInDays**: A number with the amount of days the priority queue slot should be setup for.
   E.g. `30` for 30 days, or `14` for 14 days and so on.
 * **permanent**: When set to `true`, the priority queue slot will never expire (a permanent priority queue). This option
+  overrides the `amountInDays` option.
+* **cftools**: An object of required information to work with CFTools Cloud.
+  The only required parameter for now is `serverApiId` which is the `Server Id`.
+  You find this ID in the server you want the Priority Queue setup for.
+  Go to Manage -> Settings and look into the `API Key` section.
+
+### Whitelist
+
+The whitelist perk works together with CFTools Cloud.
+If included in a package and redeemed by a donator, the perk will setup a whitelist entry for a single configured CFTools Cloud server.
+The whitelist will last as long as configured.
+
+This perk, in order to work correctly, requires the CFTools Cloud application the be setup.
+Please see the Getting Started guide, section "Setup dependent accounts" -> "CFTools", to get more information on how to do that.
+
+If you want the donator to be whitelisted on multiple servers for a package, you may want to configure multiple whitelist perks for that package.
+
+#### Available configuration options
+
+**Type**: `WHITELIST`
+
+This perk requires the following additional configuration options:
+
+* **amountInDays**: A number with the amount of days the whitelist should be setup for.
+  E.g. `30` for 30 days, or `14` for 14 days and so on.
+* **permanent**: When set to `true`, the whitelisting will never expire (a permanent whitelist entry). This option
   overrides the `amountInDays` option.
 * **cftools**: An object of required information to work with CFTools Cloud.
   The only required parameter for now is `serverApiId` which is the `Server Id`.

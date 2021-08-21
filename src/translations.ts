@@ -5,7 +5,7 @@ const overridesFile = 'string_overrides.yml';
 
 interface TranslationSettings {
     language: string;
-};
+}
 
 interface MessageOverrides {
     messages: { [key: string]: string };
@@ -51,6 +51,9 @@ const messages: { [key: string]: string } = {
     PRIORITY_QUEUE_REDEEM_COMPLETE: 'Your priority queue slot for {{serverName}} was created successfully. It will expire at: {{until}}',
     PRIORITY_QUEUE_REDEEM_ERROR: 'Could not setup priority queue for {{serverName}}. Error: {{reason}}',
 
+    WHITELIST_REDEEM_COMPLETE: 'You are now whitelisted for {{serverName}}. It will expire at: {{until}}',
+    WHITELIST_REDEEM_ERROR: 'Could not setup whitelist for {{serverName}}. Error: {{reason}}',
+
     DISCORD_ROLE_REDEEM_COMPLETE: 'You got assigned the following discord roles: {{roles}}',
     DISCORD_ROLE_REDEEM_ERROR: 'Could not assign discord roles. Error: {{reason}}',
     ASSIGNED_DISCORD_ROLE: 'Discord roles you have already',
@@ -84,6 +87,8 @@ const messages: { [key: string]: string } = {
     PERK_PRIORITY_QUEUE_DESCRIPTION: 'Priority Queue on {{serverName}} for {{amountInDays}} days',
     PERK_PRIORITY_QUEUE_PERMANENT_DESCRIPTION: 'Permanent Priority Queue on {{serverName}}',
     PERK_DISCORD_ROLE_DESCRIPTION: 'These discord roles will be assigned to your user: {{roles}}',
+    PERK_WHITELIST_DESCRIPTION: 'Whitelisted on {{serverName}} for {{amountInDays}} days',
+    PERK_WHITELIST_PERMANENT_DESCRIPTION: 'Permanently whitelisted on {{serverName}}',
 
     NOTIFICATIONS_REDEEM_SUCCESSFUL_TITLE: 'Donation redeemed',
     NOTIFICATIONS_REDEEM_SUCCESSFUL_DESCRIPTION: 'A donator redeemed perks of the package they donated for.',
