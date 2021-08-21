@@ -39,6 +39,7 @@ export class Order {
         public readonly id: string,
         public readonly created: Date,
         public readonly reference: Reference,
+        public readonly customMessage: string | null,
         public status: OrderStatus,
         public payment: OrderPayment
     ) {
@@ -49,8 +50,8 @@ export class Order {
         this.status = OrderStatus.PAID;
     }
 
-    public static create(created: Date, payment: OrderPayment, reference: Reference): Order {
-        return new Order(v4(), created, reference, OrderStatus.CREATED, payment);
+    public static create(created: Date, payment: OrderPayment, reference: Reference, customMessage: string | null = null): Order {
+        return new Order(v4(), created, reference, customMessage, OrderStatus.CREATED, payment);
     }
 }
 

@@ -40,15 +40,18 @@ export class DiscordNotifier {
         this.notifications
             .filter((n) => n.types.includes(Type.DONATED))
             .forEach((d) => {
+                const embed = new MessageEmbed()
+                    .setColor('DARK_BLUE')
+                    .setTitle(translate('NOTIFICATIONS_PAYMENT_SUCCESSFUL_TITLE'))
+                    .setDescription(translate('NOTIFICATIONS_PAYMENT_SUCCESSFUL_DESCRIPTION'))
+                    .addFields(this.metaFields(user, order));
+
+                if (order.customMessage) {
+                    embed.addField(translate('NOTIFICATIONS_PAYMENT_SUCCESSFUL_CUSTOM_MESSAGE'), order.customMessage);
+                }
                 webhookClient(d).send({
                     username: d.username || 'Donations',
-                    embeds: [
-                        new MessageEmbed()
-                            .setColor('DARK_BLUE')
-                            .setTitle(translate('NOTIFICATIONS_PAYMENT_SUCCESSFUL_TITLE'))
-                            .setDescription(translate('NOTIFICATIONS_PAYMENT_SUCCESSFUL_DESCRIPTION'))
-                            .addFields(this.metaFields(user, order))
-                    ],
+                    embeds: [embed],
                 });
             });
     }

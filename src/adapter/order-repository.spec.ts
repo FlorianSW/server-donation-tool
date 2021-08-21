@@ -21,7 +21,7 @@ const packages: Package[] = [{
 const anOrder: Order = Order.create(new Date('2025-05-16T18:25:49Z'), {
     id: 'PAYMENT_ORDER_ID',
     transactionId: 'SOME_TRANSACTION_ID',
-}, new Reference('A_STEAM_ID', 'A_DISCORD_ID', packages[0]));
+}, new Reference('A_STEAM_ID', 'A_DISCORD_ID', packages[0]), 'A_MESSAGE');
 
 describe('OrderRepository', () => {
     let repository: OrderRepository;
@@ -41,10 +41,10 @@ describe('OrderRepository', () => {
     it('persists order', async () => {
         await repository.save(anOrder);
 
-        const roles = await repository.find(anOrder.id);
+        const order = await repository.find(anOrder.id);
 
-        expect(roles).not.toBeUndefined();
-        expect(roles).toEqual(anOrder);
+        expect(order).not.toBeUndefined();
+        expect(order).toEqual(anOrder);
     });
 
     it('finds order by payment order ID', async () => {

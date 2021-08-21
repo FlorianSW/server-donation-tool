@@ -3,7 +3,7 @@ import {Request, Response, Router} from 'express';
 import {TranslateParams} from '../../translations';
 import {Package, RedeemError} from '../../domain/package';
 import {AppConfig} from '../../domain/app-config';
-import {Order, OrderStatus, Payment, Reference, SteamIdMismatch} from '../../domain/payment';
+import {Order, Payment, Reference, SteamIdMismatch} from '../../domain/payment';
 import {Logger} from 'winston';
 import {SessionData} from 'express-session';
 import csrf from 'csurf';
@@ -130,6 +130,17 @@ export class DonationController {
     }
 
     private async createOrder(req: Request, res: Response) {
+        let customMessage = req.body.customMessage;
+        if (customMessage && customMessage.length > 255) {
+            res.sendStatus(400).write(JSON.stringify({
+                error: 'custom message an not exceed 255 characters'
+            }));
+            return;
+        }
+        if (!customMessage) {
+            customMessage = null;
+        }
+
         const p = {
             ...this.selectedPackage(req.session),
             price: {
@@ -138,21 +149,17 @@ export class DonationController {
             }
         };
         const paymentOrder = await this.payment.createPaymentOrder({
-            forPackage: {
-                ...this.selectedPackage(req.session),
-                price: {
-                    ...this.selectedPackage(req.session).price,
-                    ...req.session.selectedPackage.price
-                }
-            },
+            forPackage: p,
             steamId: req.body.steamId,
             discordId: req.user.discord.id,
         });
+
         const order = Order.create(paymentOrder.created, {
             id: paymentOrder.id,
             transactionId: paymentOrder.transactionId,
-        }, new Reference(req.body.steamId, req.user.discord.id, p));
+        }, new Reference(req.body.steamId, req.user.discord.id, p), customMessage);
         await this.repo.save(order);
+
         res.status(200).json({
             orderId: order.payment.id
         });

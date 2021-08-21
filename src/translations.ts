@@ -46,6 +46,7 @@ const messages: { [key: string]: string } = {
     PAYPAL_DONATION_TITLE: 'PayPal Donation',
     PAYPAL_DESCRIPTION: 'We use PayPal to process your donation. Proceed to PayPal in order to complete the transaction.',
     PAYPAL_SELECTED_PACKAGE: 'Your selected Package',
+    PAYPAL_CUSTOM_MESSAGE: 'Leave a custom message (optional)',
     PAYPAL_ERROR: 'Something went wrong with your donation.',
 
     PRIORITY_QUEUE_REDEEM_COMPLETE: 'Your priority queue slot for {{serverName}} was created successfully. It will expire at: {{until}}',
@@ -100,6 +101,7 @@ const messages: { [key: string]: string } = {
     NOTIFICATIONS_REDEEM_ERROR_TITLE: 'Redeem of perk errored',
     NOTIFICATIONS_PAYMENT_SUCCESSFUL_TITLE: 'New Donation',
     NOTIFICATIONS_PAYMENT_SUCCESSFUL_DESCRIPTION: 'A new donation was received. The payment succeeded.',
+    NOTIFICATIONS_PAYMENT_SUCCESSFUL_CUSTOM_MESSAGE: 'Custom message of donator',
 
     ERROR_STEAM_ID_MISMATCH_TITLE: 'Steam ID mismatch',
     ERROR_STEAM_ID_MISMATCH_DESCRIPTION: 'The Steam ID for this donation is different from the one connected with your profile.',

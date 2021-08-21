@@ -10,53 +10,21 @@
                 <%= selectedPackage.name %><br>
                 <%= selectedPackage.price.currency + ' ' + selectedPackage.price.amount %>
             </p>
+            <div class="input-field">
+                <textarea id="custom-message" class="materialize-textarea" maxlength="255"></textarea>
+                <label for="custom-message" class="active"><%= translate('PAYPAL_CUSTOM_MESSAGE') %></label>
+            </div>
             <div class="status">
                 <% if (paymentStatus === 'ERROR') { %>
                     <i class="material-icons error">highlight_off</i> <%= translate('PAYPAL_ERROR') %>
                 <% } %>
             </div>
+            <input type="hidden" id="steam-id" value="<%= user.steam.id %>">
         </div>
         <% if (paymentStatus === 'UNSTARTED') { %>
             <script src="https://www.paypal.com/sdk/js?client-id=<%= paypalClientId %>"></script>
             <div class="card-action" id="paypal-button-container"></div>
-            <script>
-                var csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-                paypal.Buttons({
-                    createOrder: function () {
-                        return fetch('/api/donations', {
-                            method: 'post',
-                            credentials: 'same-origin',
-                            headers: {
-                                'x-csrf-token': csrfToken,
-                                'content-type': 'application/json',
-                                'accept': 'application/json',
-                            },
-                            body: JSON.stringify({
-                                steamId: '<%= user.steam.id %>'
-                            })
-                        }).then(function (res) {
-                            return res.json();
-                        }).then(function (data) {
-                            return data.orderId;
-                        });
-                    },
-                    onApprove: function (data) {
-                        return fetch('/api/donations/' + data.orderID, {
-                            method: 'post',
-                            credentials: 'same-origin',
-                            headers: {
-                                'x-csrf-token': csrfToken,
-                                'content-type': 'application/json',
-                                'accept': 'application/json',
-                            }
-                        }).then(function (res) {
-                            return res.json();
-                        }).then(function (details) {
-                            window.location.href = `/donate/${details.orderId}/`;
-                        })
-                    }
-                }).render('#paypal-button-container');
-            </script>
+            <script src="/assets/js/steps/donate.js"></script>
         <% } %>
     </div>
 </div>
