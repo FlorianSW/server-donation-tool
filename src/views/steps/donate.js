@@ -18,7 +18,6 @@ function initPayPalButton() {
                     'accept': 'application/json',
                 },
                 body: JSON.stringify({
-                    steamId: document.querySelector('input#steam-id').value,
                     customMessage: customMessage,
                 }),
             }).then(function (res) {

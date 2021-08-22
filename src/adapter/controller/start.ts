@@ -58,6 +58,7 @@ export class StartController {
             req.session.selectedPackage = {
                 id: selectedPackage.id,
                 price: this.price(req, selectedPackage),
+                forAccount: req.user.steam.id,
             };
             res.redirect('/donate');
         } catch (e) {

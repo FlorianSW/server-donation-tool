@@ -17,6 +17,7 @@ declare module 'express-session' {
         selectedPackage: {
             id: number;
             price: Price;
+            forAccount: string | undefined;
         };
         afterLoginTarget?: string;
         lastOrder?: {

@@ -148,16 +148,17 @@ export class DonationController {
                 ...req.session.selectedPackage.price
             }
         };
+        const steamId = req.session.selectedPackage.forAccount;
         const paymentOrder = await this.payment.createPaymentOrder({
             forPackage: p,
-            steamId: req.body.steamId,
+            steamId: steamId,
             discordId: req.user.discord.id,
         });
 
         const order = Order.create(paymentOrder.created, {
             id: paymentOrder.id,
             transactionId: paymentOrder.transactionId,
-        }, new Reference(req.body.steamId, req.user.discord.id, p), customMessage);
+        }, new Reference(steamId, req.user.discord.id, p), customMessage);
         await this.repo.save(order);
 
         res.status(200).json({

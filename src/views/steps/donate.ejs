@@ -19,7 +19,6 @@
                     <i class="material-icons error">highlight_off</i> <%= translate('PAYPAL_ERROR') %>
                 <% } %>
             </div>
-            <input type="hidden" id="steam-id" value="<%= user.steam.id %>">
         </div>
         <% if (paymentStatus === 'UNSTARTED') { %>
             <script src="https://www.paypal.com/sdk/js?client-id=<%= paypalClientId %>"></script>

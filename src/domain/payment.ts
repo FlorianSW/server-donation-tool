@@ -5,15 +5,6 @@ export class Reference {
     constructor(public readonly steamId: string, public readonly discordId: string, public readonly p: Package) {
     }
 
-    static fromString(s: string, d: string, packages: Package[]): Reference | undefined {
-        const ids = s.split('#');
-        const selectedPackage = packages.find((p) => p.id === parseInt(ids[1]));
-        if (!selectedPackage) {
-            return;
-        }
-        return new Reference(ids[0], d, selectedPackage);
-    }
-
     asString() {
         return `${this.steamId}#${this.p.id}`
     }
