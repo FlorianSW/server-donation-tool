@@ -38,6 +38,9 @@ const messages: { [key: string]: string } = {
     STEAM_LOGIN_ANOTHER: 'Login with another account',
 
     PERK_SELECTION_TITLE: 'Select package',
+    PERK_SELECTION_WHO_DESCRIPTION: 'Do you want to redeem the donation perks by your self of should this be a gift to someone else? Please select one option to proceed with the donation.',
+    PERK_SELECTION_WHO_ME: 'It is for me',
+    PERK_SELECTION_WHO_OTHER: 'It is a gift',
     PERK_SELECTION_VARIABLE_LABEL: 'Choose your desired amount in {{currency}}',
     PERK_SELECTION_VARIABLE_TITLE: 'An amount with two optional decimal fractions. Examples: 10 or 7.51',
     PERK_SELECTION_SELECT: 'Select',
@@ -75,7 +78,9 @@ const messages: { [key: string]: string } = {
     PERKS_OWNED_FAILED_TO_LOAD: 'We\'re having troubles getting this perk\'s information. But no worries, it is still being applied if you own it.',
 
     REDEEM_TITLE: 'Thank you for your donation',
-    REDEEM_DESCRIPTION_WITH_PERKS: 'You can now redeem your perk to profit from the benefits it includes.',
+    REDEEM_SHARE_TITLE: 'Share the earned perks',
+    REDEEM_SHARE_DESCRIPTION: 'You can share this link with someone you want to gift the perks to. Perks can only be redeemed by one person.',
+    REDEEM_DESCRIPTION_WITH_PERKS: 'You can now redeem your perks to profit from the following benefits:',
     REDEEM_DESCRIPTION_WITHOUT_PERKS: 'We appreciate your support to our community.',
     REDEEM_SUBMIT: 'Redeem',
     REDEEM_BACK: 'Back to Start',

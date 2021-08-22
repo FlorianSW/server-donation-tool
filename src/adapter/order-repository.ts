@@ -31,7 +31,7 @@ export class SQLiteOrderRepository implements OrderRepository {
                         b.string(columnTransactionId).nullable();
                         b.integer(columnStatus).index('idx_' + columnStatus);
                         b.string(columnCustomMessage, 255).nullable().defaultTo(null);
-                        b.string(columnSteamId);
+                        b.string(columnSteamId).nullable().defaultTo(null);
                         b.string(columnDiscordId).index('idx_' + columnDiscordId);
                         b.bigInteger(columnPackageId);
                         b.float(columnPrice);
@@ -135,14 +135,14 @@ export class SQLiteOrderRepository implements OrderRepository {
         await this.initialized;
         // @formatter:off
         await this.con.raw(`REPLACE INTO ${tableName} (${columnId}, ${columnOrderId}, ${columnCreated}, ${columnStatus}, ${columnTransactionId}, ${columnSteamId}, ${columnDiscordId}, ${columnPackageId}, ${columnPrice}, ${columnCustomMessage}) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, [
-            order.id, order.payment.id, order.created.getTime(), order.status, order.payment.transactionId || null, order.reference.steamId, order.reference.discordId, order.reference.p.id, parseFloat(order.reference.p.price.amount), order.customMessage
+            order.id, order.payment.id, order.created.getTime(), order.status, order.payment.transactionId || null, order.reference.steamId || null, order.reference.discordId, order.reference.p.id, parseFloat(order.reference.p.price.amount), order.customMessage
         ]);
         // @formatter:on
     }
 
     private toOrder(o: any): Order {
         const p = this.packages.find((p) => p.id === o[columnPackageId]);
-        const reference = new Reference(o[columnSteamId], o[columnDiscordId], {
+        const reference = new Reference(o[columnSteamId] || null, o[columnDiscordId], {
             ...p,
             price: {
                 ...p.price,

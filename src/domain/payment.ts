@@ -2,11 +2,11 @@ import {Package} from './package';
 import {v4} from 'uuid';
 
 export class Reference {
-    constructor(public readonly steamId: string, public readonly discordId: string, public readonly p: Package) {
+    constructor(public steamId: string | null, public readonly discordId: string, public readonly p: Package) {
     }
 
     asString() {
-        return `${this.steamId}#${this.p.id}`
+        return `${this.steamId || this.discordId}#${this.p.id}`
     }
 }
 

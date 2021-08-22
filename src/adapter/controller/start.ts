@@ -54,11 +54,20 @@ export class StartController {
             res.redirect('/');
         }
 
+        let forAccount;
+        if (req.body['perks-for'] === 'me') {
+            forAccount = req.user.steam.id;
+        } else if (req.body['perks-for'] === 'other') {
+            forAccount = null;
+        } else {
+            res.redirect('/');
+        }
+
         try {
             req.session.selectedPackage = {
                 id: selectedPackage.id,
                 price: this.price(req, selectedPackage),
-                forAccount: req.user.steam.id,
+                forAccount: forAccount,
             };
             res.redirect('/donate');
         } catch (e) {

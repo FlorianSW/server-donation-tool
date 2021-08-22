@@ -41,7 +41,7 @@ export class DonationController {
             transactionId: order.payment.transactionId,
         };
 
-        if (order.reference.steamId !== req.user.steam.id) {
+        if (order.reference.steamId !== null && order.reference.steamId !== req.user.steam.id) {
             res.render('payment_steam_mismatch', {
                 userSteamId: req.user.steam.id,
             });
@@ -81,9 +81,13 @@ export class DonationController {
         res.render('index', {
             user: req.user,
             step: 'REDEEM',
+            canShare: order.reference.discordId === req.user.discord.id,
+            shareLink: new URL(`/donate/${order.id}`, this.config.app.publicUrl).toString(),
+            isUnclaimed: order.reference.steamId === null,
+            perks: order.reference.p.perks,
             csrfToken: req.csrfToken(),
             redeemStatus: 'PENDING',
-            hasPerks: this.selectedPackage(req.session).perks.length !== 0,
+            hasPerks: order.reference.p.perks.length !== 0,
             errors: []
         });
     }
@@ -93,10 +97,16 @@ export class DonationController {
     }
 
     private async redeem(req: Request, res: Response) {
-        const order = await this.fetchOrderDetails(req, res);
+        let order = await this.fetchOrderDetails(req, res);
         if (!order.reference) {
             res.sendStatus(400);
             return;
+        }
+
+        if (order.reference.steamId === null) {
+            order.reference.steamId = req.user.steam.id;
+            await this.repo.save(order);
+            order = await this.fetchOrderDetails(req, res);
         }
 
         const result: TranslateParams[] = [];
@@ -119,6 +129,8 @@ export class DonationController {
         res.render('index', {
             user: req.user,
             step: 'REDEEM',
+            isUnclaimed: false,
+            canShare: false,
             redeemStatus: 'COMPLETE',
             results: result,
             errors: errors,

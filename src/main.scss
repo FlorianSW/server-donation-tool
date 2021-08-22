@@ -194,6 +194,13 @@ body {
     }
   }
 
+  .redeem-share {
+    .input-field {
+      margin-top: 2rem;
+      margin-bottom: 0;
+    }
+  }
+
   .collection {
     .collection-item {
       background-color: transparent;
@@ -284,6 +291,12 @@ body {
           color: #ffd8a6;
         }
       }
+    }
+  }
+
+  .input-field {
+    .clickable {
+      cursor: pointer;
     }
   }
 }

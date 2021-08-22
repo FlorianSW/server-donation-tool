@@ -18,13 +18,16 @@
                                         (<%= pack.price.currency %> <%= pack.price.amount %>)
                                     <% } %>
                                 </span>
-                                <% if (pack.description) { %><div><%= pack.description %></div><% } %>
+                                <% if (pack.description) { %>
+                                    <div><%= pack.description %></div>
+                                <% } %>
                                 <div class="package-information">
                                     <% if (pack.price.type === 'VARIABLE') { %>
                                         <div class="input-field">
                                             <input id="price" name="price-<%= pack.id %>" type="text"
                                                    pattern="^(([0-9]+)|(([0-9]+)?[.,][0-9]{1,2}))$"
-                                                   title="<%= translate('PERK_SELECTION_VARIABLE_TITLE') %>" value="<%= pack.price.amount %>">
+                                                   title="<%= translate('PERK_SELECTION_VARIABLE_TITLE') %>"
+                                                   value="<%= pack.price.amount %>">
                                             <label for="price"
                                                    class="active"><%= translate('PERK_SELECTION_VARIABLE_LABEL', {params: {currency: pack.price.currency}}) %></label>
                                         </div>
@@ -43,14 +46,22 @@
                 <% if (availablePackages.length === 0) { %>
                     <%= translate('PERK_NO_AVAILABLE') %>
                 <% } %>
+                <p><%= translate('PERK_SELECTION_WHO_DESCRIPTION') %></p>
             </div>
             <div class="card-action">
-                <button class="btn waves-effect waves-light" type="submit" name="action"
+                <button class="btn waves-effect waves-light" name="perks-for" value="me" type="submit" name="action"
                 <% if (availablePackages.length === 0) { %>
                         disabled
                         <% } %>
                 >
-                    <%= translate('PERK_SELECTION_SELECT') %>
+                    <%= translate('PERK_SELECTION_WHO_ME') %>
+                </button>
+                <button class="btn waves-effect waves-light" name="perks-for" value="other" type="submit" name="action"
+                <% if (availablePackages.length === 0) { %>
+                        disabled
+                        <% } %>
+                >
+                    <%= translate('PERK_SELECTION_WHO_OTHER') %>
                 </button>
             </div>
         </div>

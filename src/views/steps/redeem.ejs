@@ -17,16 +17,23 @@
                 </ul>
             <% } else if (hasPerks) { %>
                 <p><%= translate('REDEEM_DESCRIPTION_WITH_PERKS') %></p>
+                <ul class="collection">
+                    <% perks.forEach(function (p) { %>
+                        <li class="collection-item">
+                            <span><%= p.asTranslatedString() %></span>
+                        </li>
+                    <% }); %>
+                </ul>
             <% } else { %>
                 <p><%= translate('REDEEM_DESCRIPTION_WITHOUT_PERKS') %></p>
             <% } %>
         </div>
         <div class="card-action">
             <% if (redeemStatus !== 'COMPLETE' && hasPerks) { %>
-            <form method="post" action="./redeem">
-                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-                <input type="submit" class="link" value="<%= translate('REDEEM_SUBMIT') %>" />
-            </form>
+                <form method="post" action="./redeem">
+                    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                    <input type="submit" class="link" value="<%= translate('REDEEM_SUBMIT') %>"/>
+                </form>
             <% } else if (errors.length !== 0) { %>
                 <a href="#" onclick="window.location.reload();"><%= translate('REDEEM_RETRY') %></a>
             <% } else { %>
@@ -34,4 +41,18 @@
             <% } %>
         </div>
     </div>
+    <% if (isUnclaimed && canShare) { %>
+        <div class="card redeem-share">
+            <div class="card-content">
+                <span class="card-title"><%= translate('REDEEM_SHARE_TITLE') %></span>
+                <p><%= translate('REDEEM_SHARE_DESCRIPTION') %></p>
+                <div class="input-field">
+                    <i class="material-icons prefix clickable">share</i>
+                    <input id="share" type="text" readonly value="<%= shareLink %>">
+                    <label for="share" class="active">Share Link</label>
+                </div>
+                <script src="/assets/js/steps/redeem.js"></script>
+            </div>
+        </div>
+    <% } %>
 </div>
