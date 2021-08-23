@@ -67,10 +67,10 @@ export interface Payment {
     capturePayment(request: CapturePaymentRequest): Promise<PaymentCapture>;
 }
 
-export class OrderNotCompleted extends Error {
+export class OrderNotFound extends Error {
     constructor() {
-        super('OrderNotCompleted');
-        Object.setPrototypeOf(this, OrderNotCompleted.prototype);
+        super('OrderNotFound');
+        Object.setPrototypeOf(this, OrderNotFound.prototype);
     }
 }
 

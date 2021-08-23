@@ -119,6 +119,8 @@ const messages: { [key: string]: string } = {
     ERROR_LOGIN_DESCRIPTION: 'The login was not successful. Please make sure you complete the login on the Discord page.',
     ERROR_LOGIN_AGAIN: 'Login again',
 
+    ERROR_ORDER_NOT_FOUND: 'Order with ID {{orderId}} not found',
+
     ERROR_GENERIC_TITLE: 'Something went wrong 😥',
     ERROR_GENERIC_DESCRIPTION: 'There was an error while processing your request from which we can not recover automatically. If the error persists, please contact the community support channel and report this error using the below additional error information.',
     ERROR_GENERIC_SUPPORT: 'Support information bundle:',

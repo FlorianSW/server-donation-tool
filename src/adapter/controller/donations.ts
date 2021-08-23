@@ -1,9 +1,9 @@
 import {requireAuthentication} from '../../auth';
 import {Request, Response, Router} from 'express';
-import {TranslateParams} from '../../translations';
+import {translate, TranslateParams} from '../../translations';
 import {Package, RedeemError} from '../../domain/package';
 import {AppConfig} from '../../domain/app-config';
-import {Order, Payment, Reference, SteamIdMismatch} from '../../domain/payment';
+import {Order, OrderNotFound, Payment, Reference, SteamIdMismatch} from '../../domain/payment';
 import {Logger} from 'winston';
 import {SessionData} from 'express-session';
 import csrf from 'csurf';
@@ -35,6 +35,13 @@ export class DonationController {
 
     private async fetchOrderDetails(req: Request, res: Response): Promise<Order> {
         const order = await this.repo.find(req.params.orderId);
+        if (!order) {
+            res.status(404).render('error', {
+                status: '404',
+                supportInfo: translate('ERROR_ORDER_NOT_FOUND', {params: {orderId: req.params.orderId}}),
+            });
+            throw new OrderNotFound();
+        }
 
         req.session.lastOrder = {
             id: order.id,
