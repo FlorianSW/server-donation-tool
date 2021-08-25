@@ -90,6 +90,7 @@ export class DonationController {
             step: 'REDEEM',
             canShare: order.reference.discordId === req.user.discord.id,
             shareLink: new URL(`/donate/${order.id}`, this.config.app.publicUrl).toString(),
+            redeemLink: `/donate/${order.id}/redeem`,
             isUnclaimed: order.reference.steamId === null,
             perks: order.reference.p.perks,
             csrfToken: req.csrfToken(),

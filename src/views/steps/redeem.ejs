@@ -30,7 +30,7 @@
         </div>
         <div class="card-action">
             <% if (redeemStatus !== 'COMPLETE' && hasPerks) { %>
-                <form method="post" action="./redeem">
+                <form method="post" action="<%= redeemLink %>">
                     <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                     <input type="submit" class="link" value="<%= translate('REDEEM_SUBMIT') %>"/>
                 </form>
