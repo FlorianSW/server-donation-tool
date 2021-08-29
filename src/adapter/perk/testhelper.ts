@@ -107,7 +107,7 @@ export class InMemoryCFToolsClient implements CFToolsClient {
     async putPriorityQueue(request: PutPriorityQueueItemRequest): Promise<void> {
         const item = await this.getPriorityQueue(request.id);
         if (item) {
-            throw new DuplicateResourceCreation();
+            throw new DuplicateResourceCreation('http://localhost:8081');
         }
         this.priorityQueueItems.set(request.id.id, {
             createdBy: CFToolsId.of('123456789'),

@@ -1,9 +1,10 @@
-import {CFToolsClient, DuplicateResourceCreation, ServerApiId, SteamId64} from 'cftools-sdk';
+import {CFToolsClient, DuplicateResourceCreation, ServerApiId, SteamId64, TokenExpired} from 'cftools-sdk';
 import {translate, TranslateParams} from '../../translations';
 import {Package, Perk, RedeemError} from '../../domain/package';
 import {ServerNames} from '../../domain/app-config';
 import {User} from '../../domain/user';
 import {Order} from '../../domain/payment';
+import {Logger} from 'winston';
 
 export class PriorityQueuePerk implements Perk {
     inPackage: Package;
@@ -18,6 +19,7 @@ export class PriorityQueuePerk implements Perk {
     constructor(
         private readonly client: CFToolsClient,
         private readonly serverNames: ServerNames,
+        private readonly log: Logger,
     ) {
     }
 
@@ -47,6 +49,9 @@ export class PriorityQueuePerk implements Perk {
     }
 
     private throwRedeemError(e: Error) {
+        if (e instanceof TokenExpired) {
+            this.log.error(e.message, e.info, e);
+        }
         throw new RedeemError(['PRIORITY_QUEUE_REDEEM_ERROR', {
             params: {
                 serverName: this.serverNames[this.cftools.serverApiId],

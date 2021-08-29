@@ -1,4 +1,4 @@
-import {CFToolsClientBuilder} from 'cftools-sdk';
+import {Authorization, AuthorizationProvider, CFToolsClientBuilder, TokenExpired} from 'cftools-sdk';
 import {Client} from 'discord.js';
 import {AppConfig, ServerNames} from './domain/app-config';
 import {Package, PriceType} from './domain/package';
@@ -21,6 +21,7 @@ import {container, instanceCachingFactory} from 'tsyringe';
 import {DiscordDonationTarget} from './adapter/discord/discord-donation-target';
 import {CleanupOrder} from './service/cleanup-order';
 import {WhitelistPerk} from './adapter/perk/whitelist-perk';
+import {fromHttpError, GotHttpClient, httpClient} from 'cftools-sdk/lib/internal/http';
 
 const initSessionStore = require('connect-session-knex');
 const sessionStore: StoreFactory = initSessionStore(session);
@@ -39,6 +40,41 @@ async function enableSqLiteWal(knex: Knex, log: Logger): Promise<void> {
     const journalMode = result[0]?.journal_mode;
     if (journalMode !== 'wal') {
         log.warn(`Could not set journal mode to WAL, which might decrease performance on multiple concurrent requests. Store runs in mode: ${journalMode}`);
+    }
+}
+
+interface RequestWithContext<T> {
+    request: Promise<T>,
+    context?: Record<string, unknown>,
+}
+
+class LogTokenExpiredGotHttpClient extends GotHttpClient {
+    constructor(private readonly authorization: AuthorizationProvider, private readonly logger: Logger) {
+        super(authorization);
+    }
+
+    protected async withErrorHandler<T>(requestFn: (newContext?: Record<string, unknown>) => RequestWithContext<T>): Promise<T> {
+        const r = requestFn(undefined);
+        try {
+            return await r.request;
+        } catch (error) {
+            const err = fromHttpError(error, r.context?.authorization as Authorization);
+            if (err instanceof TokenExpired) {
+                this.logger.error(err.message, err.info, err);
+
+                this.authorization?.reportExpired();
+                const authorization = await this.authorization?.provide();
+                try {
+                    return await requestFn({
+                        ...r.context,
+                        authorization: authorization,
+                    }).request;
+                } catch (e) {
+                    throw fromHttpError(e, authorization);
+                }
+            }
+            throw err;
+        }
     }
 }
 
@@ -98,6 +134,7 @@ class YamlAppConfig implements AppConfig {
     async initialize(): Promise<void> {
         container.registerInstance('CFToolsClient', new CFToolsClientBuilder()
             .withCredentials(this.cftools.applicationId, this.cftools.secret)
+            .withHttpClient((auth?: AuthorizationProvider) => new LogTokenExpiredGotHttpClient(auth, this.logger))
             .build());
         container.register('DonationsDB', {
             useFactory: instanceCachingFactory((c) => {
@@ -283,7 +320,7 @@ export async function parseConfig(logger: Logger): Promise<AppConfig> {
 
             perk.inPackage = p;
             if (perk.type === 'PRIORITY_QUEUE') {
-                p.perks[i] = Object.assign(new PriorityQueuePerk(container.resolve('CFToolsClient'), intermediate.serverNames), perk);
+                p.perks[i] = Object.assign(new PriorityQueuePerk(container.resolve('CFToolsClient'), intermediate.serverNames, logger), perk);
             } else if (perk.type === 'DISCORD_ROLE') {
                 const discordPerk: DiscordRolePerk = Object.assign(new DiscordRolePerk(container.resolve('discord.Client'), intermediate.discord.bot.guildId, logger), perk);
                 discordPerk.roles.forEach((r) => {

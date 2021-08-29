@@ -2,6 +2,7 @@ import {PriorityQueuePerk} from './priority-queue-perk';
 import {CFToolsClient, SteamId64} from 'cftools-sdk';
 import {InMemoryCFToolsClient} from './testhelper';
 import {anOrder, aPackage, aServerApiId, aSteamId, aUser} from './testdata.spec';
+import {createLogger} from 'winston';
 
 describe('PriorityQueuePerk', () => {
     let client: CFToolsClient;
@@ -10,7 +11,7 @@ describe('PriorityQueuePerk', () => {
     beforeEach(() => {
         client = new InMemoryCFToolsClient();
         perk = Object.assign(
-            new PriorityQueuePerk(client as CFToolsClient, {aServerApiId: 'A_NAME'}),
+            new PriorityQueuePerk(client as CFToolsClient, {aServerApiId: 'A_NAME'}, createLogger()),
             {
                 inPackage: aPackage,
                 cftools: {
@@ -37,7 +38,7 @@ describe('PriorityQueuePerk', () => {
 
         it('creates permanent priority queue entry', async () => {
             perk = Object.assign(
-                new PriorityQueuePerk(client as CFToolsClient, {aServerApiId: 'A_NAME'}),
+                new PriorityQueuePerk(client as CFToolsClient, {aServerApiId: 'A_NAME'}, createLogger()),
                 {
                     inPackage: aPackage,
                     cftools: {
