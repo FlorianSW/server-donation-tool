@@ -85,7 +85,7 @@ export class DiscordDonationTarget implements Closeable {
         })}
 
 \`0${target.currency} [${'□'.repeat(squares)}${'-'.repeat(dashes)}] ${target.target}${target.currency}\``)
-            .setURL(this.config.app.publicUrl)
+            .setURL(this.config.app.publicUrl.toString())
             .setFooter('Server Donation Tool made by FlorianSW')
             .addField(translate('DONATION_TARGET_CALL_TO_ACTION_TITLE'), `[${translate('DONATION_TARGET_CALL_TO_ACTION_LINK')}](${this.config.app.publicUrl})`);
 

@@ -9,7 +9,7 @@ export type ServerNames = {
 export interface AppConfig {
     app: {
         port: number,
-        publicUrl: string,
+        publicUrl: URL,
         sessionSecret: string,
         sessionStore: {
             filename: string,

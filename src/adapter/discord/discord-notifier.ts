@@ -85,6 +85,7 @@ export class DiscordNotifier {
                             .setTitle(translate('NOTIFICATIONS_REDEEM_ERROR_TITLE'))
                             .setDescription(translate(...error.params))
                             .addFields(this.metaFields(user, order))
+                            .addField(translate('NOTIFICATIONS_REDEEM_ERROR_RETRY_TITLE'), `[${translate('NOTIFICATIONS_REDEEM_ERROR_RETRY_LINK')}](${order.asLink(this.config)})`, true)
                     ],
                 });
             });

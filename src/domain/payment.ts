@@ -1,5 +1,6 @@
 import {Package} from './package';
 import {v4} from 'uuid';
+import {AppConfig} from './app-config';
 
 export class Reference {
     constructor(public steamId: string | null, public readonly discordId: string, public readonly p: Package) {
@@ -36,13 +37,17 @@ export class Order {
     ) {
     }
 
+    public static create(created: Date, payment: OrderPayment, reference: Reference, customMessage: string | null = null): Order {
+        return new Order(v4(), created, reference, customMessage, OrderStatus.CREATED, payment);
+    }
+
     public pay(transactionId: string) {
         this.payment.transactionId = transactionId;
         this.status = OrderStatus.PAID;
     }
 
-    public static create(created: Date, payment: OrderPayment, reference: Reference, customMessage: string | null = null): Order {
-        return new Order(v4(), created, reference, customMessage, OrderStatus.CREATED, payment);
+    public asLink(config: AppConfig): URL {
+        return new URL(`/donate/${this.id}`, config.app.publicUrl);
     }
 }
 

@@ -106,6 +106,8 @@ const messages: { [key: string]: string } = {
     NOTIFICATIONS_REDEEM_SUCCESSFUL_PACKAGE: 'Package name',
     NOTIFICATIONS_REDEEM_SUCCESSFUL_TRANSACTION: 'Transaction details',
     NOTIFICATIONS_REDEEM_ERROR_TITLE: 'Redeem of perk errored',
+    NOTIFICATIONS_REDEEM_ERROR_RETRY_TITLE: 'Donator retry link',
+    NOTIFICATIONS_REDEEM_ERROR_RETRY_LINK: 'Retry link',
     NOTIFICATIONS_PAYMENT_SUCCESSFUL_TITLE: 'New Donation',
     NOTIFICATIONS_PAYMENT_SUCCESSFUL_DESCRIPTION: 'A new donation was received. The payment succeeded.',
     NOTIFICATIONS_PAYMENT_SUCCESSFUL_CUSTOM_MESSAGE: 'Custom message of donator',

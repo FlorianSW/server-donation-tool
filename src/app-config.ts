@@ -81,7 +81,7 @@ class LogTokenExpiredGotHttpClient extends GotHttpClient {
 class YamlAppConfig implements AppConfig {
     app: {
         port: number;
-        publicUrl: string;
+        publicUrl: URL;
         sessionSecret: string;
         sessionStore: {
             filename: string;
@@ -189,7 +189,7 @@ class YamlAppConfig implements AppConfig {
                 this.app.privacyPolicy.partials.push('./document-partials/privacy-policy/google-analytics.txt');
             }
         }
-        this.app.publicUrl = this.discord.redirectUrl.replace('/auth/discord/callback', '');
+        this.app.publicUrl = new URL(this.discord.redirectUrl.replace('/auth/discord/callback', ''));
     }
 
     logoUrl(absolute?: boolean): string {
@@ -200,8 +200,7 @@ class YamlAppConfig implements AppConfig {
             return this.app.community.logo;
         }
         if (absolute) {
-            const logoUrl = new URL(this.app.publicUrl);
-            logoUrl.pathname = `/assets/custom/${this.app.community?.logo}`;
+            const logoUrl = new URL(`/assets/custom/${this.app.community?.logo}`, this.app.publicUrl);
             return logoUrl.toString();
         }
         return `/assets/custom/${this.app.community?.logo}`;
