@@ -73,18 +73,18 @@ export class SQLiteSubscriptionsRepository implements SubscriptionsRepository {
             return undefined;
         }
         const o = result[0];
-        return {
-            id: o[columnId],
-            payment: {
+        return new Subscription(
+            o[columnId],
+            o[columnPlanId],
+            {
                 id: o[columnPaymentId],
             },
-            planId: o[columnPlanId],
-            user: {
+            {
                 discordId: o[columnUserDiscordId],
                 steamId: o[columnUserSteamId],
             },
-            state: o[columnState],
-        };
+            o[columnState],
+        );
     }
 
     async clear(): Promise<void> {

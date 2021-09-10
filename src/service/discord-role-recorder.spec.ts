@@ -4,7 +4,7 @@ import {EventQueue} from '../adapter/event-queue';
 import {User} from '../domain/user';
 import {Order, Reference} from '../domain/payment';
 import {DiscordRolePerk} from '../adapter/perk/discord-role-perk';
-import {Package, PriceType} from '../domain/package';
+import {Package, PriceType, RedeemTarget} from '../domain/package';
 import {Client} from 'discord.js';
 import {Logger} from 'winston';
 import {InMemoryDiscordRoleRepository} from '../adapter/discord-role-repository';
@@ -55,7 +55,7 @@ describe('DiscordRoleRecorder', () => {
     });
 
     it('does not record non-expiring discord role', async () => {
-        await recorder.onSuccessfulRedeem(aUser, Order.create(new Date(), {
+        await recorder.onSuccessfulRedeem(RedeemTarget.fromUser(aUser), Order.create(new Date(), {
             id: 'ORDER_ID',
             transactionId: 'TRANSACTION_ID',
         }, new Reference('7592222222222', '11111111111', {
@@ -67,7 +67,7 @@ describe('DiscordRoleRecorder', () => {
     });
 
     it('records expiring discord role', async () => {
-        await recorder.onSuccessfulRedeem(aUser, Order.create(new Date('2020-11-01T14:52:12Z'), {
+        await recorder.onSuccessfulRedeem(RedeemTarget.fromUser(aUser), Order.create(new Date('2020-11-01T14:52:12Z'), {
             id: 'ORDER_ID',
             transactionId: 'TRANSACTION_ID',
         }, new Reference('7592222222222', '11111111111', {
@@ -85,7 +85,7 @@ describe('DiscordRoleRecorder', () => {
     });
 
     it('does not return not yet expired roles', async () => {
-        await recorder.onSuccessfulRedeem(aUser, Order.create(new Date('2020-11-25T14:52:12Z'), {
+        await recorder.onSuccessfulRedeem(RedeemTarget.fromUser(aUser), Order.create(new Date('2020-11-25T14:52:12Z'), {
             id: 'ORDER_ID',
             transactionId: 'TRANSACTION_ID',
         }, new Reference('7592222222222', '11111111111', {

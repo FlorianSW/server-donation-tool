@@ -1,0 +1,57 @@
+<%- include('partials/header.ejs') %>
+<div class="container">
+    <div class="row info">
+        <div class="col s12">
+            <h3>
+                <%= translate('SUBSCRIPTION_TITLE') %>
+            </h3>
+            <p>
+                <%= translate('SUBSCRIPTION_DESCRIPTION') %>
+            </p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col s12 m12 l12">
+            <div class="card subscription">
+                <div class="card-content">
+                    <span class="card-title"><%= translate('SUBSCRIPTION_DETAILS_TITLE') %></span>
+                    <div class="details">
+                        <div><%= translate('SUBSCRIPTION_DETAILS_STATUS') %></div>
+                        <div>
+                            <% if (subscription.state === 'PENDING') { %>
+                                <span class="pending"><%= translate('SUBSCRIPTION_DETAILS_STATUS_PENDING') %></span>
+                            <% } else if (subscription.state === 'ACTIVE') { %>
+                                <span class="active"><%= translate('SUBSCRIPTION_DETAILS_STATUS_ACTIVE') %></span>
+                            <% } else { %>
+                                <span class="cancelled"><%= translate('SUBSCRIPTION_DETAILS_STATUS_CANCELLED') %></span>
+                            <% } %>
+                        </div>
+                        <div><%= translate('SUBSCRIPTION_DETAILS_PACKAGE_NAME') %></div>
+                        <div>
+                            <%= plan.basePackage.name %>
+                        </div>
+                        <div><%= translate('SUBSCRIPTION_DETAILS_PACKAGE_PRICE') %></div>
+                        <div>
+                            <%= plan.basePackage.price.currency %> <%= plan.basePackage.price.amount %>
+                        </div>
+                        <div><%= translate('SUBSCRIPTION_DETAILS_CYCLE') %></div>
+                        <div>
+                            <%= plan.basePackage.subscription %>
+                        </div>
+                    </div>
+                </div>
+                <% if (subscription.state === 'ACTIVE') { %>
+                    <div class="card-action">
+                        <form method="post">
+                            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                            <button class="btn waves-effect waves-light" name="cancel" type="submit">
+                                <%= translate('SUBSCRIPTION_CANCEL') %>
+                            </button>
+                        </form>
+                    </div>
+                <% } %>
+            </div>
+        </div>
+    </div>
+</div>
+<%- include('partials/footer.ejs') %>

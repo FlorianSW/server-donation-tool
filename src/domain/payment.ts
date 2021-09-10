@@ -83,6 +83,10 @@ export class Subscription {
     ) {
     }
 
+    public cancel(): void {
+        this.state = 'CANCELLED';
+    }
+
     public static create(plan: SubscriptionPlan, paymentId: string, user: User): Subscription {
         return new Subscription(v4(), plan.id, {id: paymentId}, {
             steamId: user.steam.id,
@@ -119,6 +123,8 @@ export interface Payment {
     persistSubscription(p: Package, plan?: SubscriptionPlan): Promise<SubscriptionPlan>;
 
     subscribe(plan: SubscriptionPlan, user: User): Promise<PendingSubscription>;
+
+    cancelSubscription(subscription: Subscription): Promise<void>;
 }
 
 export class OrderNotFound extends Error {

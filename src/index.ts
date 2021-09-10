@@ -34,6 +34,7 @@ import {Payment} from './domain/payment';
 import {SQLiteSubscriptionsRepository} from './adapter/subscriptions-repository';
 import {RedeemPackage} from './service/redeem-package';
 import {Subscriptions} from './service/subscriptions';
+import {SubscriptionsController} from './adapter/controller/subscriptions';
 
 export interface Closeable {
     close(): Promise<void>
@@ -79,6 +80,7 @@ parseConfig(log).then(async (config) => {
     const login = container.resolve(LoginController);
     const privacyPolicy = container.resolve(PrivacyPolicyController);
     const paypalWebhooks = container.resolve(PaypalWebhooksController);
+    const subscriptions = container.resolve(SubscriptionsController);
 
     app.locals.translate = translate;
     app.locals.community = {
@@ -142,6 +144,7 @@ parseConfig(log).then(async (config) => {
     app.use('/', login.router);
     app.use('/', privacyPolicy.router);
     app.use('/', paypalWebhooks.router);
+    app.use('/', subscriptions.router);
 
     app.use(errorHandler);
     app.use(errorLogger({

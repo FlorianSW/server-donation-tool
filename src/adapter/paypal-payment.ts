@@ -5,7 +5,7 @@ import {
     PaymentCapture,
     PaymentOrder,
     PendingSubscription,
-    Reference,
+    Reference, Subscription,
     SubscriptionPlan
 } from '../domain/payment';
 import {AppConfig} from '../domain/app-config';
@@ -127,6 +127,13 @@ export class PaypalPayment implements Payment {
             id: result.result.id,
             approvalLink: result.result.links.find((l) => l.rel === 'approve').href,
         };
+    }
+
+    async cancelSubscription(subscription: Subscription): Promise<void> {
+        const r = new CancelSubscriptionRequest(subscription.payment.id);
+        r.reason('Requested by user');
+
+        await this.client.execute(r);
     }
 
     private homeUrl(): string | undefined {
@@ -420,7 +427,30 @@ class CreatePlanRequest {
     }
 }
 
-interface Subscription {
+class CancelSubscriptionRequest {
+    path: string;
+    verb: string;
+    body: null | object;
+    headers: { [key: string]: string };
+
+    constructor(subscriptionId: string) {
+        this.path = '/v1/billing/subscriptions/{subscription_id}/cancel?'.replace('{subscription_id}', querystring.escape(subscriptionId));
+        this.verb = 'POST';
+        this.body = null;
+        this.headers = {
+            'Content-Type': 'application/json'
+        };
+    }
+
+    reason(reason: string) {
+        this.body = {
+            reason: reason,
+        };
+        return this;
+    }
+}
+
+interface PayPalSubscription {
     plan_id: string;
     application_context: {
         brand_name: string;
@@ -445,7 +475,7 @@ class CreateSubscriptionRequest {
         };
     }
 
-    requestBody(s: Subscription) {
+    requestBody(s: PayPalSubscription) {
         this.body = s;
         return this;
     }
@@ -502,4 +532,7 @@ export class FakePayment implements Payment {
         });
     }
 
+    cancelSubscription(subscription: Subscription): Promise<void> {
+        return Promise.resolve(undefined);
+    }
 }

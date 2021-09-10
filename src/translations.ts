@@ -93,6 +93,18 @@ const messages: { [key: string]: string } = {
     REDEEM_BACK: 'Back to Start',
     REDEEM_RETRY: 'Retry',
 
+    SUBSCRIPTION_TITLE: 'Subscriptions',
+    SUBSCRIPTION_DESCRIPTION: 'With subscriptions you can opt into automatically donating for your favourite package on a recurring basis. The subscription will automatically debit the price from your PayPal account and setup the perks included in the package for you. On this page you can manage your subscription.',
+    SUBSCRIPTION_DETAILS_TITLE: 'Details',
+    SUBSCRIPTION_DETAILS_STATUS: 'Status',
+    SUBSCRIPTION_DETAILS_STATUS_PENDING: 'Pending',
+    SUBSCRIPTION_DETAILS_STATUS_ACTIVE: 'Active',
+    SUBSCRIPTION_DETAILS_STATUS_CANCELLED: 'Cancelled',
+    SUBSCRIPTION_DETAILS_PACKAGE_NAME: 'Subscribed to package',
+    SUBSCRIPTION_DETAILS_PACKAGE_PRICE: 'Package price',
+    SUBSCRIPTION_DETAILS_CYCLE: 'Billing cycle',
+    SUBSCRIPTION_CANCEL: 'Cancel',
+
     ALREADY_PRIORITY_QUEUE_TITLE: 'Already Priority Queue',
     ALREADY_PRIORITY_QUEUE_DESCRIPTION: 'Your Steam ID, which is connected to your Discord user, already has priority queue. Thanks for your donation!',
     ALREADY_PRIORITY_QUEUE_STEAM_ID: 'Your Steam ID',
