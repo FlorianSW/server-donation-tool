@@ -22,6 +22,7 @@ import {DiscordDonationTarget} from './adapter/discord/discord-donation-target';
 import {CleanupOrder} from './service/cleanup-order';
 import {WhitelistPerk} from './adapter/perk/whitelist-perk';
 import {fromHttpError, GotHttpClient, httpClient} from 'cftools-sdk/lib/internal/http';
+import {DiscordUserNotifier} from './adapter/discord/discord-user-notifier';
 
 const initSessionStore = require('connect-session-knex');
 const sessionStore: StoreFactory = initSessionStore(session);
@@ -270,6 +271,7 @@ class YamlAppConfig implements AppConfig {
         if (this.discord.notifications && this.discord.notifications.length !== 0) {
             container.resolve(DiscordNotifier);
         }
+        container.resolve(DiscordUserNotifier);
     }
 
     private async configureExpiringDiscordRoles(): Promise<void> {

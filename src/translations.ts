@@ -112,6 +112,13 @@ const messages: { [key: string]: string } = {
     NOTIFICATIONS_PAYMENT_SUCCESSFUL_DESCRIPTION: 'A new donation was received. The payment succeeded.',
     NOTIFICATIONS_PAYMENT_SUCCESSFUL_CUSTOM_MESSAGE: 'Custom message of donator',
 
+    USER_NOTIFICATIONS_FAILED_REDEEM_TEXT: 'Hi :wave:,\n\nThanks for your donation. Unfortunately, we were unable to setup a perk for you :cold_sweat:\nWith the link below you can retry the redeem at a later time. If it still does not work for you, please contact us in our discord. Sorry for the inconvenience!',
+    USER_NOTIFICATIONS_FAILED_REDEEM_RETRY_TITLE: 'Retry link',
+    USER_NOTIFICATIONS_FAILED_REDEEM_RETRY_LINK: 'Click me :smiley:',
+    USER_NOTIFICATIONS_STEAM_ID: 'Steam ID',
+    USER_NOTIFICATIONS_DISCORD_LINK: 'Link to our discord',
+    USER_NOTIFICATIONS_PACKAGE: 'Package name',
+
     ERROR_STEAM_ID_MISMATCH_TITLE: 'Steam ID mismatch',
     ERROR_STEAM_ID_MISMATCH_DESCRIPTION: 'The Steam ID for this donation is different from the one connected with your profile.',
     ERROR_STEAM_ID_MISMATCH_ORDER_LABEL: 'Steam ID of donation',
