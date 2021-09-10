@@ -1,19 +1,21 @@
-import {User} from './user';
 import {Order} from './payment';
-import {RedeemError} from './package';
+import {RedeemError, RedeemTarget} from './package';
 
 export interface DonationEvents {
-    on(event: 'successfulPayment', listener: (user: User, order: Order) => void): this;
-    on(event: 'successfulRedeem', listener: (user: User, order: Order) => void): this;
-    on(event: 'failedRedeemPerk', listener: (user: User, order: Order, error: RedeemError) => void): this;
+    on(event: 'successfulPayment', listener: (user: RedeemTarget, order: Order) => void): this;
+    on(event: 'successfulRedeem', listener: (user: RedeemTarget, order: Order) => void): this;
+    on(event: 'successfulSubscriptionExecution', listener: (user: RedeemTarget, order: Order) => void): this;
+    on(event: 'failedRedeemPerk', listener: (user: RedeemTarget, order: Order, error: RedeemError) => void): this;
 
-    off(event: 'successfulPayment', listener: (user: User, order: Order) => void): this;
-    off(event: 'successfulRedeem', listener: (user: User, order: Order) => void): this;
-    off(event: 'failedRedeemPerk', listener: (user: User, order: Order, error: RedeemError) => void): this;
+    off(event: 'successfulPayment', listener: (user: RedeemTarget, order: Order) => void): this;
+    off(event: 'successfulRedeem', listener: (user: RedeemTarget, order: Order) => void): this;
+    off(event: 'successfulSubscriptionExecution', listener: (user: RedeemTarget, order: Order) => void): this;
+    off(event: 'failedRedeemPerk', listener: (user: RedeemTarget, order: Order, error: RedeemError) => void): this;
 }
 
 export interface EventSource {
-    emit(event: 'successfulPayment', user: User, order: Order): void;
-    emit(event: 'successfulRedeem', user: User, order: Order): void;
-    emit(event: 'failedRedeemPerk', user: User, order: Order, error: RedeemError): void;
+    emit(event: 'successfulPayment', user: RedeemTarget, order: Order): void;
+    emit(event: 'successfulRedeem', user: RedeemTarget, order: Order): void;
+    emit(event: 'successfulSubscriptionExecution', user: RedeemTarget, order: Order): void;
+    emit(event: 'failedRedeemPerk', user: RedeemTarget, order: Order, error: RedeemError): void;
 }

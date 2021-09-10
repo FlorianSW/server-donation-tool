@@ -1,6 +1,6 @@
 import {translate, TranslateParams} from '../../translations';
 import {Client, Guild} from 'discord.js';
-import {Package, Perk, RedeemError} from '../../domain/package';
+import {Package, Perk, RedeemError, RedeemTarget} from '../../domain/package';
 import {User} from '../../domain/user';
 import {Order} from '../../domain/payment';
 import {Logger} from 'winston';
@@ -30,14 +30,14 @@ export class DiscordRolePerk implements Perk {
         }
     }
 
-    async redeem(forUser: User, order: Order): Promise<TranslateParams> {
+    async redeem(target: RedeemTarget, order: Order): Promise<TranslateParams> {
         const successParams: TranslateParams = ['DISCORD_ROLE_REDEEM_COMPLETE', {
             params: {}
         }];
         const addedRoles: string[] = [];
         try {
             const guild = await this.client.guilds.fetch(this.guildId);
-            const guildMember = await guild.members.fetch(forUser.discord.id);
+            const guildMember = await guild.members.fetch(target.discordId);
             for (let roleId of this.roles) {
                 const alreadyAdded = guildMember.roles.cache.find((r) => r.id === roleId);
                 if (!alreadyAdded) {

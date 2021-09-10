@@ -6,7 +6,7 @@
                 <ul class="collection">
                     <% errors.forEach(function (r) { %>
                         <li class="collection-item status">
-                            <i class="material-icons error">error</i> <%= translate(...r) %>
+                            <i class="material-icons error">error</i> <%= translate(...r.params) %>
                         </li>
                     <% }); %>
                     <% results.forEach(function (r) { %>

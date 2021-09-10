@@ -3,6 +3,7 @@ import {CFToolsClient, SteamId64} from 'cftools-sdk';
 import {InMemoryCFToolsClient} from './testhelper';
 import {anOrder, aPackage, aServerApiId, aSteamId, aUser} from './testdata.spec';
 import {createLogger} from 'winston';
+import {RedeemTarget} from '../../domain/package';
 
 describe('PriorityQueuePerk', () => {
     let client: CFToolsClient;
@@ -24,7 +25,7 @@ describe('PriorityQueuePerk', () => {
 
     describe('redeem', () => {
         it('creates priority queue entry', async () => {
-            await perk.redeem(aUser, anOrder);
+            await perk.redeem(RedeemTarget.fromUser(aUser), anOrder);
 
             const result = await client.getPriorityQueue(SteamId64.of(aSteamId));
             const expiration = result.expiration as Date;
@@ -47,7 +48,7 @@ describe('PriorityQueuePerk', () => {
                     permanent: true,
                 }
             );
-            await perk.redeem(aUser, anOrder);
+            await perk.redeem(RedeemTarget.fromUser(aUser), anOrder);
 
             const result = await client.getPriorityQueue(SteamId64.of(aSteamId));
             expect(result.expiration).toContain('Permanent');
@@ -60,7 +61,7 @@ describe('PriorityQueuePerk', () => {
                 expires: 'Permanent'
             });
 
-            await perk.redeem(aUser, anOrder);
+            await perk.redeem(RedeemTarget.fromUser(aUser), anOrder);
 
             const result = await client.getPriorityQueue(SteamId64.of(aSteamId));
             expect(result.expiration).toBe('Permanent');
@@ -75,7 +76,7 @@ describe('PriorityQueuePerk', () => {
                 expires: veryLateExpiration,
             });
 
-            await perk.redeem(aUser, anOrder);
+            await perk.redeem(RedeemTarget.fromUser(aUser), anOrder);
 
             const result = await client.getPriorityQueue(SteamId64.of(aSteamId));
             expect(result.expiration).toEqual(veryLateExpiration);
@@ -90,7 +91,7 @@ describe('PriorityQueuePerk', () => {
                 expires: earlyExpiration,
             });
 
-            await perk.redeem(aUser, anOrder);
+            await perk.redeem(RedeemTarget.fromUser(aUser), anOrder);
 
             const result = await client.getPriorityQueue(SteamId64.of(aSteamId));
             const expiration = result.expiration as Date;

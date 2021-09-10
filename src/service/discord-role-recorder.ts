@@ -1,10 +1,10 @@
 import {DonationEvents} from '../domain/events';
-import {User} from '../domain/user';
 import {Order} from '../domain/payment';
 import {DiscordRolePerk} from '../adapter/perk/discord-role-perk';
 import {DiscordRoleRepository} from '../domain/repositories';
 import {inject, singleton} from 'tsyringe';
 import {Closeable} from '../index';
+import {RedeemTarget} from '../domain/package';
 
 @singleton()
 export class DiscordRoleRecorder implements Closeable {
@@ -12,7 +12,7 @@ export class DiscordRoleRecorder implements Closeable {
         events.on('successfulRedeem', this.onSuccessfulRedeem.bind(this));
     }
 
-    async onSuccessfulRedeem(user: User, order: Order): Promise<void> {
+    async onSuccessfulRedeem(target: RedeemTarget, order: Order): Promise<void> {
         const perks = order.reference.p.perks
             .filter((p) => p instanceof DiscordRolePerk)
             .filter((p: DiscordRolePerk) => p.amountInDays !== undefined);
@@ -22,7 +22,7 @@ export class DiscordRoleRecorder implements Closeable {
             expires.setDate(expires.getDate() + p.amountInDays);
             for (const r of p.roles) {
                 await this.repository.save({
-                    discordUser: user.discord.id,
+                    discordUser: target.discordId,
                     roleId: r,
                     expiresAt: expires
                 });

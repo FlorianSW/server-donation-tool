@@ -45,6 +45,7 @@ const messages: { [key: string]: string } = {
     PERK_SELECTION_VARIABLE_TITLE: 'An amount with two optional decimal fractions. Examples: 10 or 7.51',
     PERK_SELECTION_SELECT: 'Select',
     PERK_NO_AVAILABLE: 'There is no package available. You may already have all available perks.',
+    PERK_SUBSCRIPTION_AVAILABLE: 'This package is available as a monthly subscription. To subscribe to it, proceed to the next step. Subscriptions are not available as a gift.',
 
     PAYPAL_DONATION_TITLE: 'PayPal Donation',
     PAYPAL_DESCRIPTION: 'We use PayPal to process your donation. Proceed to PayPal in order to complete the transaction.',
@@ -53,6 +54,12 @@ const messages: { [key: string]: string } = {
     PAYPAL_ORDER_DESCRIPTION: 'Donation for {{communityName}}',
     PAYPAL_DEFAULT_COMMUNITY_NAME: 'our community',
     PAYPAL_ERROR: 'Something went wrong with your donation.',
+    PAYPAL_SUBSCRIPTION_MONTHLY_DESCRIPTION: 'Donate every month to earn the perks of this package.',
+    PAYPAL_SUBSCRIPTION_MONTHLY_NAME: 'Monthly',
+    PAYPAL_SUBSCRIPTION_DESCRIPTION: 'When clicking the Subscribe button, you will be redirected to PayPal in order to setup the subscription. Once we receive the first payment of that Subscription (which may take some minutes), we will automatically setup the perks included in your selected donation package.',
+    PAYPAL_ONE_TIME: 'One-time donation',
+    PAYPAL_SUBSCRIPTION: 'Subscription',
+    PAYPAL_SUBSCRIBE: 'Subscribe',
 
     PRIORITY_QUEUE_REDEEM_COMPLETE: 'Your priority queue slot for {{serverName}} was created successfully. It will expire at: {{until}}',
     PRIORITY_QUEUE_REDEEM_ERROR: 'Could not setup priority queue for {{serverName}}. Error: {{reason}}',
@@ -118,6 +125,8 @@ const messages: { [key: string]: string } = {
     USER_NOTIFICATIONS_STEAM_ID: 'Steam ID',
     USER_NOTIFICATIONS_DISCORD_LINK: 'Link to our discord',
     USER_NOTIFICATIONS_PACKAGE: 'Package name',
+    USER_NOTIFICATIONS_SUB_EXECUTED_TEXT: 'Hi :wave:,\n\nThanks again for donating to our community. We received a payment of your recurring subscription :pray:\nAs part of that subscription we automatically extended the included perks for you.\nIf you want to cancel this subscription, please go to your PayPal account -> Settings and cancel the subscription there.\n\nIf you have any questions, feel free to get in touch with us. Thanks again for your donation and have a good day :heart:',
+    USER_NOTIFICATIONS_SUB_TRANSACTION_ID: 'This payment will show in your PayPal activity with this Transaction ID',
 
     ERROR_STEAM_ID_MISMATCH_TITLE: 'Steam ID mismatch',
     ERROR_STEAM_ID_MISMATCH_DESCRIPTION: 'The Steam ID for this donation is different from the one connected with your profile.',

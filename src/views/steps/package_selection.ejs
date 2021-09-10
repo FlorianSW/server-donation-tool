@@ -21,6 +21,12 @@
                                 <% if (pack.description) { %>
                                     <div><%= pack.description %></div>
                                 <% } %>
+                                <% if (pack.subscription) { %>
+                                    <div class="subscription-info">
+                                        <img src="/assets/images/repeat_white_24dp.svg">
+                                        <%= translate('PERK_SUBSCRIPTION_AVAILABLE') %>
+                                    </div>
+                                <% } %>
                                 <div class="package-information">
                                     <% if (pack.price.type === 'VARIABLE') { %>
                                         <div class="input-field">
@@ -49,14 +55,14 @@
                 <p><%= translate('PERK_SELECTION_WHO_DESCRIPTION') %></p>
             </div>
             <div class="card-action">
-                <button class="btn waves-effect waves-light" name="perks-for" value="me" type="submit" name="action"
+                <button class="btn waves-effect waves-light" name="perks-for" value="me" type="submit"
                 <% if (availablePackages.length === 0) { %>
                         disabled
                         <% } %>
                 >
                     <%= translate('PERK_SELECTION_WHO_ME') %>
                 </button>
-                <button class="btn waves-effect waves-light" name="perks-for" value="other" type="submit" name="action"
+                <button class="btn waves-effect waves-light" name="perks-for" value="other" type="submit"
                 <% if (availablePackages.length === 0) { %>
                         disabled
                         <% } %>

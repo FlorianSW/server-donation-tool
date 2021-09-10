@@ -44,7 +44,7 @@ export interface User {
 export interface SteamConnection {
     id: string;
     name: string;
-    source: 'DISCORD' | 'STEAM'
+    source: 'DISCORD' | 'STEAM';
 }
 
 export interface DiscordConnection {

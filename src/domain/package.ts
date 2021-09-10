@@ -6,9 +6,22 @@ export interface Perk {
     inPackage: Package;
     type: string;
 
-    redeem(forUser: User, order: Order): Promise<TranslateParams>;
+    redeem(forUser: RedeemTarget, order: Order): Promise<TranslateParams>;
 
     asTranslatedString(): string;
+}
+
+export class RedeemTarget {
+    constructor(
+        public readonly steamId: string,
+        public readonly discordId: string,
+        public readonly username?: string,
+    ) {
+    }
+
+    public static fromUser(user: User): RedeemTarget {
+        return new RedeemTarget(user.steam.id, user.discord.id, user.username);
+    }
 }
 
 export enum PriceType {
@@ -28,11 +41,16 @@ export class RedeemError extends Error {
     }
 }
 
+export enum SubscriptionCycle {
+    MONTHLY = 'monthly'
+}
+
 export class Package {
     name: string;
     description?: string;
     id: number;
     disabled?: boolean;
+    subscription?: SubscriptionCycle | undefined;
     price: Price;
     perks: Perk[];
 }

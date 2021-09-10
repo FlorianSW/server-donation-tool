@@ -1,6 +1,7 @@
 import {Package} from './package';
 import {v4} from 'uuid';
 import {AppConfig} from './app-config';
+import {User} from './user';
 
 export class Reference {
     constructor(public steamId: string | null, public readonly discordId: string, public readonly p: Package) {
@@ -51,6 +52,45 @@ export class Order {
     }
 }
 
+export class SubscriptionPlan {
+    constructor(
+        public readonly id: string,
+        public readonly basePackage: Package,
+        public readonly payment: {
+            productId: string,
+            planId: string,
+        }
+    ) {
+    }
+
+    public static create(basePackage: Package, productId: string, planId: string): SubscriptionPlan {
+        return new SubscriptionPlan(v4(), basePackage, {productId: productId, planId: planId});
+    }
+}
+
+export class Subscription {
+    constructor(
+        public readonly id: string,
+        public readonly planId: string,
+        public readonly payment: {
+            id: string,
+        },
+        public readonly user: {
+            steamId: string,
+            discordId: string,
+        },
+        public state: 'PENDING' | 'ACTIVE' | 'CANCELLED',
+    ) {
+    }
+
+    public static create(plan: SubscriptionPlan, paymentId: string, user: User): Subscription {
+        return new Subscription(v4(), plan.id, {id: paymentId}, {
+            steamId: user.steam.id,
+            discordId: user.discord.id
+        }, 'PENDING');
+    }
+}
+
 export interface PaymentCapture {
     orderId: string;
     transactionId: string;
@@ -66,10 +106,19 @@ export interface CapturePaymentRequest {
     orderId: string;
 }
 
+export interface PendingSubscription {
+    id: string;
+    approvalLink: string;
+}
+
 export interface Payment {
     createPaymentOrder(request: CreatePaymentOrderRequest): Promise<PaymentOrder>;
 
     capturePayment(request: CapturePaymentRequest): Promise<PaymentCapture>;
+
+    persistSubscription(p: Package, plan?: SubscriptionPlan): Promise<SubscriptionPlan>;
+
+    subscribe(plan: SubscriptionPlan, user: User): Promise<PendingSubscription>;
 }
 
 export class OrderNotFound extends Error {

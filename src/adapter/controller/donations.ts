@@ -1,7 +1,7 @@
 import {requireAuthentication} from '../../auth';
 import {Request, Response, Router} from 'express';
-import {translate, TranslateParams} from '../../translations';
-import {Package, RedeemError} from '../../domain/package';
+import {translate} from '../../translations';
+import {Package, RedeemTarget} from '../../domain/package';
 import {AppConfig} from '../../domain/app-config';
 import {Order, OrderNotFound, Payment, Reference, SteamIdMismatch} from '../../domain/payment';
 import {Logger} from 'winston';
@@ -10,6 +10,8 @@ import csrf from 'csurf';
 import {EventSource} from '../../domain/events';
 import {inject, singleton} from 'tsyringe';
 import {OrderRepository} from '../../domain/repositories';
+import {Subscriptions} from '../../service/subscriptions';
+import {RedeemPackage} from '../../service/redeem-package';
 
 @singleton()
 export class DonationController {
@@ -20,6 +22,8 @@ export class DonationController {
         @inject('availablePackages') private readonly packages: Package[],
         @inject('Payment') private readonly payment: Payment,
         @inject('OrderRepository') private readonly repo: OrderRepository,
+        @inject('Subscriptions') private readonly subscriptions: Subscriptions,
+        @inject('RedeemPackage') private readonly redeemPackage: RedeemPackage,
         @inject('EventSource') private readonly events: EventSource,
         @inject('Logger') private readonly logger: Logger
     ) {
@@ -28,6 +32,7 @@ export class DonationController {
         this.router.post('/api/donations/:orderId', requireAuthentication, csrfProtection, this.captureOrder.bind(this));
 
         this.router.get('/donate', requireAuthentication, csrfProtection, this.prepareDonation.bind(this));
+        this.router.post('/donate', requireAuthentication, csrfProtection, this.subscribe.bind(this));
         this.router.get('/donate/:orderId', requireAuthentication, csrfProtection, this.prepareRedeem.bind(this));
         this.router.post('/donate/:orderId/redeem', requireAuthentication, csrfProtection, this.redeem.bind(this));
         this.router.get('/donate/:orderId/redeem', requireAuthentication, this.redirectToPrepareRedeem.bind(this));
@@ -71,6 +76,7 @@ export class DonationController {
             selectedPackage: {
                 name: selectedPackage.name,
                 price: req.session.selectedPackage.price,
+                subscription: selectedPackage.subscription,
             },
             paypalClientId: this.config.paypal.clientId,
             paymentStatus: 'UNSTARTED',
@@ -100,6 +106,17 @@ export class DonationController {
         });
     }
 
+    private async subscribe(req: Request, res: Response) {
+        const selectedPackage = this.selectedPackage(req.session);
+        if (!selectedPackage || !selectedPackage.subscription) {
+            res.redirect('/');
+            return;
+        }
+
+        const result = await this.subscriptions.subscribe(selectedPackage, req.user);
+        res.redirect(result.approvalLink);
+    }
+
     private async redirectToPrepareRedeem(req: Request, res: Response) {
         res.redirect(`/donate/${req.params.orderId}`);
     }
@@ -111,37 +128,15 @@ export class DonationController {
             return;
         }
 
-        if (order.reference.steamId === null) {
-            order.reference.steamId = req.user.steam.id;
-            await this.repo.save(order);
-            order = await this.fetchOrderDetails(req, res);
-        }
-
-        const result: TranslateParams[] = [];
-        const errors: TranslateParams[] = [];
-        for (let perk of order.reference.p.perks) {
-            try {
-                result.push(await perk.redeem(req.user, order));
-            } catch (e) {
-                this.logger.error(`Could not redeem perk ${perk.type}:`, e);
-                if (e instanceof RedeemError) {
-                    errors.push(e.params);
-                    this.events.emit('failedRedeemPerk', req.user, order, e);
-                } else {
-                    throw e;
-                }
-            }
-        }
-
-        this.events.emit('successfulRedeem', req.user, order);
+        const result = await this.redeemPackage.redeem(order, RedeemTarget.fromUser(req.user));
         res.render('index', {
             user: req.user,
             step: 'REDEEM',
             isUnclaimed: false,
             canShare: false,
             redeemStatus: 'COMPLETE',
-            results: result,
-            errors: errors,
+            results: result.success,
+            errors: result.errors,
         });
     }
 
@@ -204,7 +199,7 @@ export class DonationController {
         });
 
         setTimeout(async () => {
-            this.events.emit('successfulPayment', req.user, order);
+            this.events.emit('successfulPayment', RedeemTarget.fromUser(req.user), order);
         });
     }
 }

@@ -26,6 +26,14 @@ import {Logger} from 'winston';
 import {StatisticsController} from './adapter/controller/statistics';
 import {LoginController} from './adapter/controller/login';
 import {PrivacyPolicyController} from './adapter/controller/privacy-policy';
+import {PaypalWebhooksController} from './adapter/controller/paypal-webhooks';
+import {Package} from './domain/package';
+import {SQLiteSubscriptionPlanRepository} from './adapter/subscription-plan-repository';
+import {SubscriptionPlanRepository} from './domain/repositories';
+import {Payment} from './domain/payment';
+import {SQLiteSubscriptionsRepository} from './adapter/subscriptions-repository';
+import {RedeemPackage} from './service/redeem-package';
+import {Subscriptions} from './service/subscriptions';
 
 export interface Closeable {
     close(): Promise<void>
@@ -46,7 +54,13 @@ container.registerType('DiscordRoleRepository', SQLiteDiscordRoleRepository);
 container.registerSingleton('Closeable', 'DiscordRoleRepository');
 container.registerType('OrderRepository', SQLiteOrderRepository);
 container.registerSingleton('Closeable', 'OrderRepository');
+container.registerType('SubscriptionPlanRepository', SQLiteSubscriptionPlanRepository);
+container.registerSingleton('Closeable', 'SubscriptionPlanRepository');
+container.registerType('SubscriptionsRepository', SQLiteSubscriptionsRepository);
+container.registerSingleton('Closeable', 'SubscriptionsRepository');
 container.registerType('Payment', PaypalPayment);
+container.registerType('RedeemPackage', RedeemPackage);
+container.registerType('Subscriptions', Subscriptions);
 container.registerType('Closeable', DiscordRoleRecorder);
 container.registerType('Closeable', ExpireDiscordRole);
 
@@ -64,6 +78,7 @@ parseConfig(log).then(async (config) => {
     const statistics = container.resolve(StatisticsController);
     const login = container.resolve(LoginController);
     const privacyPolicy = container.resolve(PrivacyPolicyController);
+    const paypalWebhooks = container.resolve(PaypalWebhooksController);
 
     app.locals.translate = translate;
     app.locals.community = {
@@ -126,11 +141,15 @@ parseConfig(log).then(async (config) => {
     app.use('/', statistics.router);
     app.use('/', login.router);
     app.use('/', privacyPolicy.router);
+    app.use('/', paypalWebhooks.router);
 
     app.use(errorHandler);
     app.use(errorLogger({
         winstonInstance: log,
     }));
+
+    log.info('Initializing subscription plans');
+    await initSubscriptions();
 
     app.listen(port, () => {
         log.info(`Server listening on port ${port}`);
@@ -139,6 +158,18 @@ parseConfig(log).then(async (config) => {
     log.error('Initializing app failed', e);
     process.exit(1);
 });
+
+async function initSubscriptions() {
+    const packages: Package[] = container.resolve('availablePackages');
+    const payment: Payment = container.resolve('Payment');
+    const subscriptions: SubscriptionPlanRepository = container.resolve('SubscriptionPlanRepository');
+    const subscriptionPackages = packages.filter((p) => p.subscription !== undefined);
+    log.debug('Found ' + subscriptionPackages.length + ' packages that support subscriptions');
+    for (const p of subscriptionPackages) {
+        const plan = await subscriptions.findByPackage(p);
+        await subscriptions.save(await payment.persistSubscription(p, plan));
+    }
+}
 
 process.on('SIGINT', async () => {
     log.info('App is shutting down on user event');

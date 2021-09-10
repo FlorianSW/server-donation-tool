@@ -77,6 +77,16 @@ body {
 
     &.package {
       .collection-item {
+        .subscription-info {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+
+          img {
+            height: 16px;
+          }
+        }
+
         .package-information {
           display: none;
 
@@ -97,12 +107,22 @@ body {
     }
 
     &.paypal {
-      .card-action {
+      .card-action.one-time {
         text-align: center;
       }
 
       .input-field {
         margin-top: 32px;
+      }
+
+      .switch {
+        text-align: center;
+        margin: 16px 0;
+
+        label {
+          font-size: inherit;
+          color: inherit;
+        }
       }
     }
 

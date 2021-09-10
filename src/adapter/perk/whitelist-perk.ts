@@ -1,6 +1,6 @@
 import {CFToolsClient, DuplicateResourceCreation, ServerApiId, SteamId64} from 'cftools-sdk';
 import {translate, TranslateParams} from '../../translations';
-import {Package, Perk, RedeemError} from '../../domain/package';
+import {Package, Perk, RedeemError, RedeemTarget} from '../../domain/package';
 import {ServerNames} from '../../domain/app-config';
 import {User} from '../../domain/user';
 import {Order} from '../../domain/payment';
@@ -21,8 +21,8 @@ export class WhitelistPerk implements Perk {
     ) {
     }
 
-    async redeem(forUser: User, order: Order): Promise<TranslateParams> {
-        const steamId = SteamId64.of(forUser.steam.id)
+    async redeem(target: RedeemTarget, order: Order): Promise<TranslateParams> {
+        const steamId = SteamId64.of(target.steamId)
 
         const successParams: TranslateParams = ['WHITELIST_REDEEM_COMPLETE', {
             params: {
