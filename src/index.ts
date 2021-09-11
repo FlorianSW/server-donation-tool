@@ -27,7 +27,7 @@ import {StatisticsController} from './adapter/controller/statistics';
 import {LoginController} from './adapter/controller/login';
 import {PrivacyPolicyController} from './adapter/controller/privacy-policy';
 import {PaypalWebhooksController} from './adapter/controller/paypal-webhooks';
-import {Package} from './domain/package';
+import {Package, PriceType} from './domain/package';
 import {SQLiteSubscriptionPlanRepository} from './adapter/subscription-plan-repository';
 import {SubscriptionPlanRepository} from './domain/repositories';
 import {Payment} from './domain/payment';
@@ -169,6 +169,11 @@ async function initSubscriptions() {
     const subscriptionPackages = packages.filter((p) => p.subscription !== undefined);
     log.debug('Found ' + subscriptionPackages.length + ' packages that support subscriptions');
     for (const p of subscriptionPackages) {
+        if (p.price.type === PriceType.VARIABLE) {
+            log.warn('Variable price package (' + p.id + '; ' + p.name + ') can not be subscribable. Ignoring subscription option');
+            p.subscription = undefined;
+            continue;
+        }
         const plan = await subscriptions.findByPackage(p);
         await subscriptions.save(await payment.persistSubscription(p, plan));
     }
