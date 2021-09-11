@@ -77,6 +77,7 @@ export class DonationController {
                 name: selectedPackage.name,
                 price: req.session.selectedPackage.price,
                 subscription: selectedPackage.subscription,
+                type: req.session.selectedPackage.type,
             },
             paypalClientId: this.config.paypal.clientId,
             paymentStatus: 'UNSTARTED',

@@ -1,45 +1,19 @@
 <div class="col s12 m9 l9">
     <div class="card paypal">
-        <div class="card-content">
-            <span class="card-title"><%= translate('PAYPAL_DONATION_TITLE') %></span>
-            <p>
-                <%- translate('PAYPAL_DESCRIPTION') %>
-            </p>
-            <h5><%= translate('PAYPAL_SELECTED_PACKAGE') %></h5>
-            <p>
-                <%= selectedPackage.name %><br>
-                <%= selectedPackage.price.currency + ' ' + selectedPackage.price.amount %>
-            </p>
-            <% if (selectedPackage.subscription) { %>
-                <div class="switch subscription">
-                    <label>
-                        <%= translate('PAYPAL_ONE_TIME') %>
-                        <input type="checkbox">
-                        <span class="lever"></span>
-                        <%= translate('PAYPAL_SUBSCRIPTION') %>
-                    </label>
-                </div>
-                <script src="/assets/js/steps/donate_subscription.js"></script>
-                <div class="subscription-info" style="display: none;">
-                    <%= translate('PAYPAL_SUBSCRIPTION_DESCRIPTION') %>
-                </div>
-            <% } %>
-            <div class="input-field custom-message">
-                <textarea id="custom-message" class="materialize-textarea" maxlength="255"></textarea>
-                <label for="custom-message" class="active"><%= translate('PAYPAL_CUSTOM_MESSAGE') %></label>
+        <% if (selectedPackage.type === 'subscription') { %>
+            <div class="card-content">
+                <span class="card-title"><%= translate('PAYPAL_SUBSCRIPTION_TITLE') %></span>
+                <p>
+                    <%- translate('PAYPAL_SUBSCRIPTION_DESCRIPTION') %>
+                </p>
+                <h5><%= translate('PAYPAL_SELECTED_PACKAGE') %></h5>
+                <p>
+                    <%= selectedPackage.name %><br>
+                    <%= selectedPackage.price.currency + ' ' + selectedPackage.price.amount %><br>
+                    <%= translate('PAYPAL_SUBSCRIPTION_BILLED', {params: {cycle: selectedPackage.subscription}}) %>
+                </p>
             </div>
-            <div class="status">
-                <% if (paymentStatus === 'ERROR') { %>
-                    <i class="material-icons error">highlight_off</i> <%= translate('PAYPAL_ERROR') %>
-                <% } %>
-            </div>
-        </div>
-        <% if (paymentStatus === 'UNSTARTED') { %>
-            <script src="https://www.paypal.com/sdk/js?client-id=<%= paypalClientId %>"></script>
-            <div class="card-action one-time" id="paypal-button-container"></div>
-            <script src="/assets/js/steps/donate.js"></script>
-
-            <div class="card-action subscription" style="display: none">
+            <div class="card-action subscription">
                 <form action="/donate" method="post">
                     <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                     <button class="btn waves-effect waves-light" name="subscribe" type="submit">
@@ -47,6 +21,32 @@
                     </button>
                 </form>
             </div>
+        <% } else { %>
+            <div class="card-content">
+                <span class="card-title"><%= translate('PAYPAL_DONATION_TITLE') %></span>
+                <p>
+                    <%- translate('PAYPAL_DESCRIPTION') %>
+                </p>
+                <h5><%= translate('PAYPAL_SELECTED_PACKAGE') %></h5>
+                <p>
+                    <%= selectedPackage.name %><br>
+                    <%= selectedPackage.price.currency + ' ' + selectedPackage.price.amount %>
+                </p>
+                <div class="input-field custom-message">
+                    <textarea id="custom-message" class="materialize-textarea" maxlength="255"></textarea>
+                    <label for="custom-message" class="active"><%= translate('PAYPAL_CUSTOM_MESSAGE') %></label>
+                </div>
+                <div class="status">
+                    <% if (paymentStatus === 'ERROR') { %>
+                        <i class="material-icons error">highlight_off</i> <%= translate('PAYPAL_ERROR') %>
+                    <% } %>
+                </div>
+            </div>
+            <% if (paymentStatus === 'UNSTARTED') { %>
+                <script src="https://www.paypal.com/sdk/js?client-id=<%= paypalClientId %>"></script>
+                <div class="card-action one-time" id="paypal-button-container"></div>
+                <script src="/assets/js/steps/donate.js"></script>
+            <% } %>
         <% } %>
     </div>
 </div>

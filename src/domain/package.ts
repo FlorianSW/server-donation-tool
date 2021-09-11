@@ -34,6 +34,10 @@ export interface Price {
     amount: string;
 }
 
+export enum DonationType {
+    OneTime = 'one-time', Subscription = 'subscription'
+}
+
 export class RedeemError extends Error {
     constructor(public readonly params: TranslateParams) {
         super('RedeemError');

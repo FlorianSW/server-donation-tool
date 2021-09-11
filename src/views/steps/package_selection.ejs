@@ -1,75 +1,63 @@
-<form action="/selectPackage" method="post">
-    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-    <div class="col s12 m6 l9">
-        <div class="card package">
-            <div class="card-content">
-                <span class="card-title"><%= translate('PERK_SELECTION_TITLE') %></span>
-                <ul class="collection">
-                    <% availablePackages.forEach(function (pack, index) { %>
-                        <li class="collection-item">
-                            <label>
-                                <input class="with-gap" type="radio" name="package" value="<%= pack.id %>"
-                                       <% if (index === 0) { %>checked
-                                        <% } %>
-                                >
-                                <span>
-                                    <%= pack.name %>
-                                    <% if (pack.price.type === 'FIXED') { %>
-                                        (<%= pack.price.currency %> <%= pack.price.amount %>)
-                                    <% } %>
-                                </span>
-                                <% if (pack.description) { %>
-                                    <div><%= pack.description %></div>
-                                <% } %>
-                                <% if (pack.subscription) { %>
-                                    <div class="subscription-info">
-                                        <img src="/assets/images/repeat_white_24dp.svg">
-                                        <%= translate('PERK_SUBSCRIPTION_AVAILABLE') %>
-                                    </div>
-                                <% } %>
-                                <div class="package-information">
-                                    <% if (pack.price.type === 'VARIABLE') { %>
-                                        <div class="input-field">
-                                            <input id="price" name="price-<%= pack.id %>" type="text"
-                                                   pattern="^(([0-9]+)|(([0-9]+)?[.,][0-9]{1,2}))$"
-                                                   title="<%= translate('PERK_SELECTION_VARIABLE_TITLE') %>"
-                                                   value="<%= pack.price.amount %>">
-                                            <label for="price"
-                                                   class="active"><%= translate('PERK_SELECTION_VARIABLE_LABEL', {params: {currency: pack.price.currency}}) %></label>
-                                        </div>
-                                    <% } %>
-                                    <% if (pack.perks.length !== 0) { %>
-                                        <%= translate('PERK_INCLUDED') %>
-                                        <% pack.perks.forEach(function (p) { %>
-                                            <span><%= p.asTranslatedString() %></span>
-                                        <% }); %>
-                                    <% } %>
-                                </div>
-                            </label>
-                        </li>
-                    <% }); %>
-                </ul>
-                <% if (availablePackages.length === 0) { %>
-                    <%= translate('PERK_NO_AVAILABLE') %>
-                <% } %>
-                <p><%= translate('PERK_SELECTION_WHO_DESCRIPTION') %></p>
-            </div>
-            <div class="card-action">
-                <button class="btn waves-effect waves-light" name="perks-for" value="me" type="submit"
-                <% if (availablePackages.length === 0) { %>
-                        disabled
+<h3>
+    <%= translate('PERK_SELECTION_TITLE') %>
+</h3>
+
+<div class="packages">
+    <% availablePackages.forEach(function (pack) { %>
+        <form action="/selectPackage" method="post">
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+            <input type="hidden" name="package" value="<%= pack.id %>">
+            <div class="card package">
+                <div class="card-content">
+                    <span class="card-title">
+                        <%= pack.name %>
+                        <% if (pack.subscription) { %>
+                            <img src="/assets/images/repeat_white_24dp.svg"
+                                 title="<%= translate('PERK_SUBSCRIPTION_AVAILABLE') %>">
                         <% } %>
-                >
-                    <%= translate('PERK_SELECTION_WHO_ME') %>
-                </button>
-                <button class="btn waves-effect waves-light" name="perks-for" value="other" type="submit"
-                <% if (availablePackages.length === 0) { %>
-                        disabled
+                    </span>
+
+                    <% if (pack.description) { %>
+                        <div><%= pack.description %></div>
+                    <% } %>
+                    <div class="package-information">
+                        <% if (pack.price.type === 'VARIABLE') { %>
+                            <div class="input-field">
+                                <input id="price" name="price-<%= pack.id %>" type="text"
+                                       pattern="^(([0-9]+)|(([0-9]+)?[.,][0-9]{1,2}))$"
+                                       title="<%= translate('PERK_SELECTION_VARIABLE_TITLE') %>"
+                                       value="<%= pack.price.amount %>">
+                                <label for="price"
+                                       class="active"><%= translate('PERK_SELECTION_VARIABLE_LABEL', {params: {currency: pack.price.currency}}) %></label>
+                            </div>
                         <% } %>
-                >
-                    <%= translate('PERK_SELECTION_WHO_OTHER') %>
-                </button>
+                        <% if (pack.perks.length !== 0) { %>
+                            <%= translate('PERK_INCLUDED') %>
+                            <% pack.perks.forEach(function (p) { %>
+                                <span><%= p.asTranslatedString() %></span>
+                            <% }); %>
+                        <% } %>
+                    </div>
+                    <% if (pack.price.type === 'FIXED') { %>
+                        <div class="price">
+                            <%= pack.price.currency %> <%= pack.price.amount %>
+                        </div>
+                    <% } %>
+                </div>
+                <div class="card-action">
+                    <button class="btn waves-effect waves-light" name="perks-for" value="me" type="submit">
+                        <%= translate('PERK_SELECTION_WHO_ME') %>
+                    </button>
+                    <button class="btn waves-effect waves-light" name="perks-for" value="other" type="submit">
+                        <%= translate('PERK_SELECTION_WHO_OTHER') %>
+                    </button>
+                    <% if (pack.subscription) { %>
+                        <button class="btn waves-effect waves-light" name="perks-for" value="subscribe" type="submit">
+                            <%= translate('PERK_SELECTION_SUBSCRIBE') %>
+                        </button>
+                    <% } %>
+                </div>
             </div>
-        </div>
-    </div>
-</form>
+        </form>
+    <% }); %>
+</div>

@@ -1,7 +1,7 @@
 import {Request, Response, Router} from 'express';
 import {requireAuthentication} from '../../auth';
 import {AppConfig} from '../../domain/app-config';
-import {Package, Price, PriceType} from '../../domain/package';
+import {DonationType, Package, Price, PriceType} from '../../domain/package';
 import {Logger} from 'winston';
 import csrf from 'csurf';
 import {inject, singleton} from 'tsyringe';
@@ -55,10 +55,14 @@ export class StartController {
         }
 
         let forAccount;
+        let type = DonationType.OneTime;
         if (req.body['perks-for'] === 'me') {
             forAccount = req.user.steam.id;
         } else if (req.body['perks-for'] === 'other') {
             forAccount = null;
+        } else if (req.body['perks-for'] === 'subscribe') {
+            forAccount = req.user.steam.id;
+            type = DonationType.Subscription;
         } else {
             res.redirect('/');
         }
@@ -68,6 +72,7 @@ export class StartController {
                 id: selectedPackage.id,
                 price: this.price(req, selectedPackage),
                 forAccount: forAccount,
+                type: type,
             };
             res.redirect('/donate');
         } catch (e) {

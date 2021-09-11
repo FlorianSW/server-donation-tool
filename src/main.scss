@@ -55,6 +55,17 @@ body {
     color: white;
   }
 
+  .packages {
+    display: flex;
+    gap: 1em;
+    flex-wrap: wrap;
+    justify-content: center;
+
+    > form {
+      max-width: 360px;
+    }
+  }
+
   .card {
     background-color: #616161;
 
@@ -76,33 +87,31 @@ body {
     }
 
     &.package {
-      .collection-item {
-        .subscription-info {
-          display: flex;
-          align-items: center;
-          gap: 6px;
+      .card-title {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
 
-          img {
-            height: 16px;
-          }
+        img {
+          height: 16px;
         }
+      }
 
-        .package-information {
-          display: none;
+      .package-information {
+        margin-top: 0.5em;
+        font-size: 0.8em;
 
-          span {
-            display: list-item;
-            list-style: square inside;
-          }
+        span {
+          display: list-item;
+          list-style: square inside;
         }
+      }
 
-        input[type="radio"][name="package"]:checked ~ .package-information {
-          display: block;
-        }
-
-        label {
-          color: white;
-        }
+      .price {
+        display: flex;
+        justify-content: end;
+        font-size: 1.5em;
+        margin-top: 12px;
       }
     }
 

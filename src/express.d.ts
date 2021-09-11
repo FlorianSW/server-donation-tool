@@ -1,5 +1,5 @@
 import {User as DomainUser} from './domain/user';
-import {Price} from './domain/package';
+import {DonationType, Price} from './domain/package';
 
 declare global {
     namespace Express {
@@ -18,6 +18,7 @@ declare module 'express-session' {
             id: number;
             price: Price;
             forAccount: string | undefined;
+            type: DonationType;
         };
         afterLoginTarget?: string;
         lastOrder?: {
