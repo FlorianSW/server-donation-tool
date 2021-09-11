@@ -18,6 +18,7 @@ export class SubscriptionsController {
     ) {
         const csrfProtection = csrf();
         this.router.get('/subscriptions/:subscriptionId', requireAuthentication, csrfProtection, this.renderSubscription.bind(this));
+        this.router.get('/subscriptions/:subscriptionId/abort', requireAuthentication, this.abortPendingSubscription.bind(this));
         this.router.post('/subscriptions/:subscriptionId', requireAuthentication, csrfProtection, this.cancelSubscription.bind(this));
     }
 
@@ -36,6 +37,19 @@ export class SubscriptionsController {
         try {
             await this.subs.cancel(req.params.subscriptionId, req.user);
             res.redirect(`/subscriptions/${req.params.subscriptionId}`);
+        } catch (e) {
+            if (e instanceof SubscriptionNotFound) {
+                res.sendStatus(404).end();
+            } else {
+                throw e;
+            }
+        }
+    }
+
+    private async abortPendingSubscription(req: Request, res: Response) {
+        try {
+            await this.subs.abort(req.params.subscriptionId, req.user);
+            res.redirect('/');
         } catch (e) {
             if (e instanceof SubscriptionNotFound) {
                 res.sendStatus(404).end();

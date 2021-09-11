@@ -40,7 +40,6 @@ describe('SubscriptionsRepository', () => {
             state: 'PENDING',
             planId: aPlan.id,
         } as Subscription);
-
     });
 
     it('finds by ID', async () => {
@@ -61,6 +60,16 @@ describe('SubscriptionsRepository', () => {
             state: 'PENDING',
             planId: aPlan.id,
         } as Subscription);
+    });
+
+    it('deletes a subscription', async () => {
+        const sub = Subscription.create(aPlan, aUser);
+        sub.pay('A_PAYMENT_ID');
+        await repository.save(sub);
+
+        await repository.delete(sub);
+
+        await expect(repository.find(sub.id)).resolves.toBeUndefined();
     });
 
     afterEach(async () => {

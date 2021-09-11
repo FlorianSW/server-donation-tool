@@ -15,6 +15,9 @@
             <div class="card subscription">
                 <div class="card-content">
                     <span class="card-title"><%= translate('SUBSCRIPTION_DETAILS_TITLE') %></span>
+                    <% if (subscription.state === 'PENDING') { %>
+                        <div class="pending"><%= translate('SUBSCRIPTION_DETAILS_STATUS_PENDING_DESCRIPTION') %></div>
+                    <% } %>
                     <div class="details">
                         <div><%= translate('SUBSCRIPTION_DETAILS_STATUS') %></div>
                         <div>

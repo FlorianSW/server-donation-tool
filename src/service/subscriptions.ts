@@ -6,6 +6,7 @@ import {
     Reference,
     Subscription,
     SubscriptionNotFound,
+    SubscriptionNotPending,
     SubscriptionPlan
 } from '../domain/payment';
 import {User} from '../domain/user';
@@ -67,14 +68,6 @@ export class Subscriptions {
         };
     }
 
-    private async subscription(id: string, forUser: User): Promise<Subscription> {
-        const subscription = await this.subscriptions.find(id);
-        if (!subscription || subscription.user.discordId !== forUser.discord.id) {
-            throw new SubscriptionNotFound();
-        }
-        return subscription;
-    }
-
     async cancel(id: string, forUser: User): Promise<void> {
         const subscription = await this.subscription(id, forUser);
         await this.payment.cancelSubscription(subscription);
@@ -89,6 +82,25 @@ export class Subscriptions {
         }
         subscription.cancel();
         await this.subscriptions.save(subscription);
+    }
+
+    async abort(id: string, forUser: User): Promise<void> {
+        const subscription = await this.subscription(id, forUser);
+        if (!subscription) {
+            throw new SubscriptionNotFound();
+        }
+        if (subscription.state !== 'PENDING') {
+            throw new SubscriptionNotPending();
+        }
+        await this.subscriptions.delete(subscription);
+    }
+
+    private async subscription(id: string, forUser: User): Promise<Subscription> {
+        const subscription = await this.subscriptions.find(id);
+        if (!subscription || subscription.user.discordId !== forUser.discord.id) {
+            throw new SubscriptionNotFound();
+        }
+        return subscription;
     }
 }
 

@@ -5,7 +5,10 @@ import {
     PaymentCapture,
     PaymentOrder,
     PendingSubscription,
-    Reference, SaleCompleted, Subscription, SubscriptionCancelled,
+    Reference,
+    SaleCompleted,
+    Subscription,
+    SubscriptionCancelled,
     SubscriptionPlan
 } from '../domain/payment';
 import {AppConfig} from '../domain/app-config';
@@ -101,8 +104,9 @@ export class PaypalPayment implements Payment {
 
     async persistSubscription(p: Package, sp?: SubscriptionPlan): Promise<SubscriptionPlan> {
         let product: ProductResult;
-        if (await this.hasProduct(p)) {
-            product = await this.updateProduct(p);
+        product = await this.product(p);
+        if (product.statusCode === 200) {
+            product = await this.updateProduct(product, p);
         } else {
             product = await this.createProduct(p);
         }
@@ -130,6 +134,7 @@ export class PaypalPayment implements Payment {
                 shipping_preference: 'NO_SHIPPING',
                 user_action: 'SUBSCRIBE_NOW',
                 return_url: sub.asLink(this.config).toString(),
+                cancel_url: sub.abortLink(this.config).toString(),
             },
         });
         const result: SubscriptionResult = await this.client.execute(r);
@@ -190,10 +195,6 @@ export class PaypalPayment implements Payment {
         return `DONATE-${p.id}`;
     }
 
-    private async hasProduct(p: Package): Promise<boolean> {
-        return (await this.product(p)).statusCode === 200;
-    }
-
     private async product(p: Package): Promise<ProductResult> {
         const r = new GetProductRequest(this.asProductId(p));
 
@@ -214,9 +215,9 @@ export class PaypalPayment implements Payment {
         return await this.client.execute(productRequest);
     }
 
-    private async updateProduct(p: Package): Promise<ProductResult> {
+    private async updateProduct(product: ProductResult, p: Package): Promise<ProductResult> {
         const productRequest = new UpdateProductRequest(this.asProductId(p));
-        productRequest.requestBody({
+        productRequest.requestBody(product.result, {
             category: 'ONLINE_GAMING',
             description: p.description,
             name: p.name,
@@ -310,6 +311,14 @@ interface Product {
     home_url: string;
 }
 
+interface UpdateProduct {
+    name: string;
+    description: string;
+    category: ProductCategory;
+    image_url?: string;
+    home_url?: string;
+}
+
 enum PlanState {
     CREATED = 'CREATED', ACTIVE = 'ACTIVE', INACTIVE = 'INACTIVE'
 }
@@ -366,14 +375,6 @@ class CreateProductRequest {
     }
 }
 
-interface UpdateProduct {
-    name: string;
-    description: string;
-    category: ProductCategory;
-    image_url?: string;
-    home_url?: string;
-}
-
 class UpdateProductRequest {
     path: string;
     verb: string;
@@ -389,11 +390,22 @@ class UpdateProductRequest {
         };
     }
 
-    requestBody(product: UpdateProduct) {
+    private getProperty<T, K extends keyof T>(o: T, propertyName: K): T[K] {
+        return o[propertyName];
+    }
+
+    requestBody(original: Product, product: UpdateProduct) {
         const ops = [];
-        for (let entry of Object.entries(product)) {
+        for (let entry of Object.entries(product) as [string, string][]) {
+            const oldValue = this.getProperty(original, entry[0] as keyof Product);
             if (entry[1] !== undefined) {
-                ops.push({op: 'replace', path: `/${entry[0]}`, value: entry[1]});
+                if (oldValue === undefined) {
+                    ops.push({op: 'add', path: `/${entry[0]}`, value: entry[1]});
+                } else {
+                    ops.push({op: 'replace', path: `/${entry[0]}`, value: entry[1]});
+                }
+            } else if (oldValue !== undefined) {
+                ops.push({op: 'delete', path: `/${entry[0]}`, value: entry[1]});
             }
         }
         this.body = ops;
@@ -491,6 +503,7 @@ interface PayPalSubscription {
         shipping_preference: 'NO_SHIPPING';
         user_action: 'SUBSCRIBE_NOW';
         return_url: string;
+        cancel_url: string;
     };
     custom_id: string;
 }

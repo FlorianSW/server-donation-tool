@@ -30,7 +30,8 @@ export interface SubscriptionPlanRepository extends Closeable {
 }
 
 export interface SubscriptionsRepository extends Closeable {
-    save(subscriptionPlan: Subscription): Promise<void>
+    save(subscription: Subscription): Promise<void>
+    delete(subscription: Subscription): Promise<void>
     find(id: string): Promise<Subscription>
     findByPayment(id: string): Promise<Subscription>
 }

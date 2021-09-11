@@ -98,6 +98,7 @@ const messages: { [key: string]: string } = {
     SUBSCRIPTION_DETAILS_TITLE: 'Details',
     SUBSCRIPTION_DETAILS_STATUS: 'Status',
     SUBSCRIPTION_DETAILS_STATUS_PENDING: 'Pending',
+    SUBSCRIPTION_DETAILS_STATUS_PENDING_DESCRIPTION: 'The subscription is currently pending and we are waiting for the payment confirmation. Once the subscription is confirmed, we will automatically setup your perks and will send you a message in Discord. Please make sure that you allow messages from members of our community discord, which are not in your friend list. You can refresh this page after some minutes to check the state as well.',
     SUBSCRIPTION_DETAILS_STATUS_ACTIVE: 'Active',
     SUBSCRIPTION_DETAILS_STATUS_CANCELLED: 'Cancelled',
     SUBSCRIPTION_DETAILS_PACKAGE_NAME: 'Subscribed to package',

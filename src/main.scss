@@ -127,6 +127,10 @@ body {
     }
 
     &.subscription {
+      .card-content > .pending {
+        margin-bottom: 16px;
+      }
+
       .details {
         display: grid;
         grid-template-columns: 1fr 1fr;

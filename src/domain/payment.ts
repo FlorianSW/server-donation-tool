@@ -93,8 +93,14 @@ export class Subscription {
     }
 
     public asLink(config: AppConfig): URL {
-        return new URL(`https://abcdef.abc/subscriptions/${this.id}`);
-        //return new URL(`/subscriptions/${this.id}`, config.app.publicUrl);
+        return new URL(`/subscriptions/${this.id}`, config.app.publicUrl);
+    }
+
+    public abortLink(config: AppConfig): URL {
+        if (this.state !== 'PENDING') {
+            throw new SubscriptionNotPending();
+        }
+        return new URL(`/subscriptions/${this.id}/abort`, config.app.publicUrl);
     }
 
     public static create(plan: SubscriptionPlan, user: User): Subscription {
@@ -109,6 +115,13 @@ export class SubscriptionNotFound extends Error {
     constructor() {
         super('SubscriptionNotFound');
         Object.setPrototypeOf(this, SubscriptionNotFound.prototype);
+    }
+}
+
+export class SubscriptionNotPending extends Error {
+    constructor() {
+        super('SubscriptionNotPending');
+        Object.setPrototypeOf(this, SubscriptionNotPending.prototype);
     }
 }
 

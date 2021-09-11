@@ -1,8 +1,7 @@
-import {SubscriptionPlanRepository, SubscriptionsRepository} from '../domain/repositories';
+import {SubscriptionsRepository} from '../domain/repositories';
 import Knex from 'knex';
 import {inject, singleton} from 'tsyringe';
-import {Subscription, SubscriptionPlan} from '../domain/payment';
-import {Package} from '../domain/package';
+import {Subscription} from '../domain/payment';
 
 const tableName = 'subscriptions';
 const columnId = 'id';
@@ -46,6 +45,11 @@ export class SQLiteSubscriptionsRepository implements SubscriptionsRepository {
         // @formatter:on
     }
 
+    async delete(sub: Subscription): Promise<void> {
+        await this.initialized;
+        await this.con.table(tableName).where(columnId, sub.id).delete();
+    }
+
     async findByPayment(id: string): Promise<Subscription | undefined> {
         await this.initialized;
         return this.con
@@ -68,6 +72,16 @@ export class SQLiteSubscriptionsRepository implements SubscriptionsRepository {
             });
     }
 
+    async clear(): Promise<void> {
+        await this.initialized;
+        await this.con.table(tableName).truncate();
+    }
+
+    async close(): Promise<void> {
+        await this.con.destroy();
+        this.initialized = undefined;
+    }
+
     private toSubscription(result: any[]): Subscription {
         if (result.length !== 1) {
             return undefined;
@@ -86,16 +100,6 @@ export class SQLiteSubscriptionsRepository implements SubscriptionsRepository {
             o[columnState],
         );
     }
-
-    async clear(): Promise<void> {
-        await this.initialized;
-        await this.con.table(tableName).truncate();
-    }
-
-    async close(): Promise<void> {
-        await this.con.destroy();
-        this.initialized = undefined;
-    }
 }
 
 export class InMemorySubscriptionsRepository implements SubscriptionsRepository {
@@ -106,6 +110,10 @@ export class InMemorySubscriptionsRepository implements SubscriptionsRepository 
 
     async findByPayment(id: string): Promise<Subscription | undefined> {
         return this.subscriptions.get(id);
+    }
+
+    async delete(subscription: Subscription): Promise<void> {
+        this.subscriptions.delete(subscription.id);
     }
 
     async find(id: string): Promise<Subscription | undefined> {
