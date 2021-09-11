@@ -33,13 +33,14 @@ export class Order {
         public readonly created: Date,
         public readonly reference: Reference,
         public readonly customMessage: string | null,
+        public redeemedAt: Date | null,
         public status: OrderStatus,
         public payment: OrderPayment
     ) {
     }
 
     public static create(created: Date, payment: OrderPayment, reference: Reference, customMessage: string | null = null): Order {
-        return new Order(v4(), created, reference, customMessage, OrderStatus.CREATED, payment);
+        return new Order(v4(), created, reference, customMessage, null, OrderStatus.CREATED, payment);
     }
 
     public pay(transactionId: string) {

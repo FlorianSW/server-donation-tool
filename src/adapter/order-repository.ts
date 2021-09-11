@@ -15,6 +15,7 @@ const columnSteamId = 'steam_id';
 const columnDiscordId = 'discord_id';
 const columnPackageId = 'package_id';
 const columnPrice = 'price';
+const columnRedeemedAt = 'redeemed_at';
 
 @singleton()
 export class SQLiteOrderRepository implements OrderRepository {
@@ -35,6 +36,7 @@ export class SQLiteOrderRepository implements OrderRepository {
                         b.string(columnDiscordId).index('idx_' + columnDiscordId);
                         b.bigInteger(columnPackageId);
                         b.float(columnPrice);
+                        b.dateTime(columnRedeemedAt).nullable().defaultTo(null);
                     }).then(() => {
                         resolve(true);
                     });
@@ -62,6 +64,12 @@ export class SQLiteOrderRepository implements OrderRepository {
                         await con.schema.alterTable(tableName, (b) => {
                             b.string(columnCustomMessage, 255).nullable().defaultTo(null);
                         });
+                    }
+                    if (!c.hasOwnProperty(columnRedeemedAt)) {
+                        await con.schema.alterTable(tableName, (b) => {
+                            b.dateTime(columnRedeemedAt).nullable().defaultTo(null);
+                        });
+                        await con.raw(`UPDATE ${tableName} SET ${columnRedeemedAt} = ${columnCreated} WHERE ${columnRedeemedAt} IS NULL;`);
                     }
                     await con.raw(`CREATE INDEX IF NOT EXISTS idx_${columnDiscordId} ON ${tableName}(${columnDiscordId})`);
                     resolve(true);
@@ -133,8 +141,8 @@ export class SQLiteOrderRepository implements OrderRepository {
     async save(order: Order): Promise<void> {
         await this.initialized;
         // @formatter:off
-        await this.con.raw(`REPLACE INTO ${tableName} (${columnId}, ${columnOrderId}, ${columnCreated}, ${columnStatus}, ${columnTransactionId}, ${columnSteamId}, ${columnDiscordId}, ${columnPackageId}, ${columnPrice}, ${columnCustomMessage}) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, [
-            order.id, order.payment.id, order.created.getTime(), order.status, order.payment.transactionId || null, order.reference.steamId || null, order.reference.discordId, order.reference.p.id, parseFloat(order.reference.p.price.amount), order.customMessage
+        await this.con.raw(`REPLACE INTO ${tableName} (${columnId}, ${columnOrderId}, ${columnCreated}, ${columnStatus}, ${columnTransactionId}, ${columnSteamId}, ${columnDiscordId}, ${columnPackageId}, ${columnPrice}, ${columnCustomMessage}, ${columnRedeemedAt}) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, [
+            order.id, order.payment.id, order.created.getTime(), order.status, order.payment.transactionId || null, order.reference.steamId || null, order.reference.discordId, order.reference.p.id, parseFloat(order.reference.p.price.amount), order.customMessage, order.redeemedAt || null
         ]);
         // @formatter:on
     }
@@ -152,7 +160,7 @@ export class SQLiteOrderRepository implements OrderRepository {
             id: o[columnOrderId],
             transactionId: o[columnTransactionId],
         };
-        return new Order(o[columnId], new Date(o[columnCreated]), reference, o[columnCustomMessage] || null, o[columnStatus], payment);
+        return new Order(o[columnId], new Date(o[columnCreated]), reference, o[columnCustomMessage] || null, o[columnRedeemedAt] || null, o[columnStatus], payment);
     }
 }
 

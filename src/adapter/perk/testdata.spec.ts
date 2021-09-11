@@ -29,3 +29,9 @@ export const anOrder: Order = Order.create(new Date(), {
     id: 'SOME_PAYMENT_ORDER_ID',
     transactionId: 'A_TRANSACTION_ID',
 }, new Reference(aSteamId, '11111111111', aPackage));
+
+export const aRedeemedOrder: Order = Order.create(new Date(), {
+    id: 'SOME_PAYMENT_ORDER_ID',
+    transactionId: 'A_TRANSACTION_ID',
+}, new Reference(aSteamId, '11111111111', aPackage));
+aRedeemedOrder.redeemedAt = aRedeemedOrder.created;

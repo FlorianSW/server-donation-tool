@@ -1,7 +1,7 @@
 import {CFToolsClient, SteamId64} from 'cftools-sdk';
 import {InMemoryCFToolsClient} from './testhelper';
 import {WhitelistPerk} from './whitelist-perk';
-import {anOrder, aPackage, aServerApiId, aSteamId, aUser} from './testdata.spec';
+import {aRedeemedOrder, aPackage, aServerApiId, aSteamId, aUser} from './testdata.spec';
 import {RedeemTarget} from '../../domain/package';
 
 describe('WhitelistPerk', () => {
@@ -24,7 +24,7 @@ describe('WhitelistPerk', () => {
 
     describe('redeem', () => {
         it('creates whitelist entry', async () => {
-            await perk.redeem(RedeemTarget.fromUser(aUser), anOrder);
+            await perk.redeem(RedeemTarget.fromUser(aUser), aRedeemedOrder);
 
             const result = await client.getWhitelist(SteamId64.of(aSteamId));
             const expiration = result.expiration as Date;
@@ -32,7 +32,7 @@ describe('WhitelistPerk', () => {
             expected.setDate(expected.getDate() + perk.amountInDays);
             expect(expiration.toLocaleString().slice(0, -2)).toBe(expected.toLocaleString().slice(0, -2));
             expect(result.comment).toContain('A_PACKAGE');
-            expect(result.comment).toContain(anOrder.id);
+            expect(result.comment).toContain(aRedeemedOrder.id);
             expect(result.comment).toContain('A_TRANSACTION_ID');
         });
 
@@ -47,20 +47,20 @@ describe('WhitelistPerk', () => {
                     permanent: true,
                 }
             );
-            await perk.redeem(RedeemTarget.fromUser(aUser), anOrder);
+            await perk.redeem(RedeemTarget.fromUser(aUser), aRedeemedOrder);
 
             const result = await client.getWhitelist(SteamId64.of(aSteamId));
             expect(result.expiration).toContain('Permanent');
         });
 
         it('does not recreate permanent whitelist', async () => {
-            await client.putPriorityQueue({
+            await client.putWhitelist({
                 id: SteamId64.of(aSteamId),
                 comment: 'A_COMMENT',
                 expires: 'Permanent'
             });
 
-            await perk.redeem(RedeemTarget.fromUser(aUser), anOrder);
+            await perk.redeem(RedeemTarget.fromUser(aUser), aRedeemedOrder);
 
             const result = await client.getWhitelist(SteamId64.of(aSteamId));
             expect(result.expiration).toBe('Permanent');
@@ -75,7 +75,7 @@ describe('WhitelistPerk', () => {
                 expires: veryLateExpiration,
             });
 
-            await perk.redeem(RedeemTarget.fromUser(aUser), anOrder);
+            await perk.redeem(RedeemTarget.fromUser(aUser), aRedeemedOrder);
 
             const result = await client.getWhitelist(SteamId64.of(aSteamId));
             expect(result.expiration).toEqual(veryLateExpiration);
@@ -90,7 +90,7 @@ describe('WhitelistPerk', () => {
                 expires: earlyExpiration,
             });
 
-            await perk.redeem(RedeemTarget.fromUser(aUser), anOrder);
+            await perk.redeem(RedeemTarget.fromUser(aUser), aRedeemedOrder);
 
             const result = await client.getWhitelist(SteamId64.of(aSteamId));
             const expiration = result.expiration as Date;

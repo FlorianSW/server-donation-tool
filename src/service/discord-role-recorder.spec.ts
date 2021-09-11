@@ -11,7 +11,12 @@ import {InMemoryDiscordRoleRepository} from '../adapter/discord-role-repository'
 
 const aUser: User = {
     discord: {
-        id: '1111111111'
+        id: '1111111111',
+    },
+    steam: {
+        id: '2222222222',
+        source: 'DISCORD',
+        name: 'A_NAME',
     },
     username: 'A_NAME',
 };
@@ -67,13 +72,15 @@ describe('DiscordRoleRecorder', () => {
     });
 
     it('records expiring discord role', async () => {
-        await recorder.onSuccessfulRedeem(RedeemTarget.fromUser(aUser), Order.create(new Date('2020-11-01T14:52:12Z'), {
+        const order = Order.create(new Date('2020-11-01T14:52:12Z'), {
             id: 'ORDER_ID',
             transactionId: 'TRANSACTION_ID',
         }, new Reference('7592222222222', '11111111111', {
             ...aPackage,
             perks: [expiring],
-        })));
+        }));
+        order.redeemedAt = order.created;
+        await recorder.onSuccessfulRedeem(RedeemTarget.fromUser(aUser), order);
 
         expect(repository.count()).toBe(2);
         expect(await repository.find(new Date('2020-11-03T14:52:13Z'))).toHaveLength(2);
@@ -85,13 +92,15 @@ describe('DiscordRoleRecorder', () => {
     });
 
     it('does not return not yet expired roles', async () => {
-        await recorder.onSuccessfulRedeem(RedeemTarget.fromUser(aUser), Order.create(new Date('2020-11-25T14:52:12Z'), {
+        const order = Order.create(new Date('2020-11-25T14:52:12Z'), {
             id: 'ORDER_ID',
             transactionId: 'TRANSACTION_ID',
         }, new Reference('7592222222222', '11111111111', {
             ...aPackage,
             perks: [expiring],
-        })));
+        }));
+        order.redeemedAt = order.created
+        await recorder.onSuccessfulRedeem(RedeemTarget.fromUser(aUser), order);
 
         expect(await repository.find(new Date('2020-11-25T14:52:11Z'))).toHaveLength(0);
     });

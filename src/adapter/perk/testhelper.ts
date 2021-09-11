@@ -32,6 +32,7 @@ import {
 
 export class InMemoryCFToolsClient implements CFToolsClient {
     private priorityQueueItems: Map<string, PriorityQueueItem> = new Map();
+    private whitelistItems: Map<string, WhitelistItem> = new Map();
 
     getServerInfo(request: GetServerInfoRequest): Promise<ServerInfo> {
         return Promise.resolve(undefined);
@@ -67,6 +68,11 @@ export class InMemoryCFToolsClient implements CFToolsClient {
     }
 
     deleteWhitelist(id: GenericId | DeleteWhitelistRequest): Promise<void> {
+        if ('playerId' in id) {
+            this.whitelistItems.delete(id.playerId.id);
+        } else {
+            this.whitelistItems.delete(id.id);
+        }
         return Promise.resolve(undefined);
     }
 
@@ -93,7 +99,13 @@ export class InMemoryCFToolsClient implements CFToolsClient {
     }
 
     getWhitelist(id: GenericId | GetWhitelistRequest): Promise<WhitelistItem | null> {
-        return Promise.resolve(undefined);
+        let item: WhitelistItem | undefined;
+        if ('playerId' in id) {
+            item = this.whitelistItems.get(id.playerId.id);
+        } else {
+            item = this.whitelistItems.get(id.id);
+        }
+        return Promise.resolve(item);
     }
 
     listBans(request: ListBansRequest): Promise<Ban[]> {
@@ -118,7 +130,17 @@ export class InMemoryCFToolsClient implements CFToolsClient {
         return Promise.resolve(undefined);
     }
 
-    putWhitelist(request: PutWhitelistItemRequest): Promise<void> {
+    async putWhitelist(request: PutWhitelistItemRequest): Promise<void> {
+        const item = await this.getWhitelist(request.id);
+        if (item) {
+            throw new DuplicateResourceCreation('http://localhost:8081');
+        }
+        this.whitelistItems.set(request.id.id, {
+            createdBy: CFToolsId.of('123456789'),
+            expiration: request.expires || 'Permanent',
+            comment: request.comment,
+            created: new Date(),
+        });
         return Promise.resolve(undefined);
     }
 }

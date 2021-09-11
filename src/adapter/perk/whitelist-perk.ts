@@ -80,8 +80,8 @@ export class WhitelistPerk implements Perk {
         if (this.permanent) {
             return 'Permanent';
         }
-        const expiration = new Date(order.created.valueOf());
-        expiration.setDate(order.created.getDate() + this.amountInDays);
+        const expiration = new Date(order.redeemedAt.valueOf());
+        expiration.setDate(order.redeemedAt.getDate() + this.amountInDays);
 
         return expiration;
     }

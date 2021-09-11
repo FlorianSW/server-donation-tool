@@ -23,8 +23,11 @@ export class RedeemPackage {
     async redeem(order: Order, target: RedeemTarget): Promise<RedeemResults> {
         if (order.reference.steamId === null) {
             order.reference.steamId = target.steamId;
-            await this.repo.save(order);
         }
+        if (order.redeemedAt === null) {
+            order.redeemedAt = new Date();
+        }
+        await this.repo.save(order);
 
         const success: TranslateParams[] = [];
         const errors: RedeemError[] = [];

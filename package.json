@@ -61,12 +61,17 @@
     "typescript": "^4.4.2"
   },
   "jest": {
+    "testMatch": ["<rootDir>/src/**/*.spec.ts"],
     "testEnvironment": "node",
     "setupFilesAfterEnv": [
       "<rootDir>/src/setupJest.ts"
     ],
     "modulePathIgnorePatterns": [
       "<rootDir>/lib/"
+    ],
+    "testPathIgnorePatterns": [
+      "/node_modules/",
+      "testdata.spec.ts"
     ],
     "transform": {
       "^.+\\.tsx?$": "ts-jest"
