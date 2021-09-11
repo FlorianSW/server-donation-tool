@@ -28,9 +28,10 @@ export class Subscriptions {
 
     async subscribe(p: Package, user: User): Promise<PendingSubscription> {
         const plan = await this.subscriptionPlans.findByPackage(p);
-        const result = await this.payment.subscribe(plan, user);
-
-        await this.subscriptions.save(Subscription.create(plan, result.id, user));
+        const sub = Subscription.create(plan, user);
+        const result = await this.payment.subscribe(sub, plan, user);
+        sub.pay(result.id);
+        await this.subscriptions.save(sub);
 
         return result;
     }
@@ -77,6 +78,15 @@ export class Subscriptions {
     async cancel(id: string, forUser: User): Promise<void> {
         const subscription = await this.subscription(id, forUser);
         await this.payment.cancelSubscription(subscription);
+        subscription.cancel();
+        await this.subscriptions.save(subscription);
+    }
+
+    async notifyCancel(paymentId: string): Promise<void> {
+        const subscription = await this.subscriptions.findByPayment(paymentId);
+        if (!subscription) {
+            throw new SubscriptionNotFound();
+        }
         subscription.cancel();
         await this.subscriptions.save(subscription);
     }

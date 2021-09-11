@@ -76,6 +76,16 @@ describe('Subscriptions', () => {
         expect(result.state).toBe('CANCELLED');
     });
 
+    it('notifies subscription about cancellation', async () => {
+        const ps = await service.subscribe(aPackage, aUser);
+        const sub = await subRepository.findByPayment(ps.id);
+
+        await service.notifyCancel(ps.id);
+
+        const result = await subRepository.find(sub.id);
+        expect(result.state).toBe('CANCELLED');
+    });
+
     it('errors when other\'s subscription cancelled', async () => {
         const ps = await service.subscribe(aPackage, aUser);
         const sub = await subRepository.findByPayment(ps.id);

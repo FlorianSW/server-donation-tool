@@ -5,7 +5,7 @@ import {
     PaymentCapture,
     PaymentOrder,
     PendingSubscription,
-    Reference, Subscription,
+    Reference, SaleCompleted, Subscription, SubscriptionCancelled,
     SubscriptionPlan
 } from '../domain/payment';
 import {AppConfig} from '../domain/app-config';
@@ -89,6 +89,16 @@ export class PaypalPayment implements Payment {
         };
     }
 
+    async webhookEvent<T extends SaleCompleted | SubscriptionCancelled>(id: string): Promise<T | null> {
+        const r = new GetWebhookEvent(id);
+        const event: WebhookEventResult = await this.client.execute(r);
+
+        if (event.statusCode !== 200) {
+            return null;
+        }
+        return event.result.resource as T;
+    }
+
     async persistSubscription(p: Package, sp?: SubscriptionPlan): Promise<SubscriptionPlan> {
         let product: ProductResult;
         if (await this.hasProduct(p)) {
@@ -109,7 +119,7 @@ export class PaypalPayment implements Payment {
         }
     }
 
-    async subscribe(plan: SubscriptionPlan, user: User): Promise<PendingSubscription> {
+    async subscribe(sub: Subscription, plan: SubscriptionPlan, user: User): Promise<PendingSubscription> {
         const communityTitle = this.config.app.community?.title || translate('PAYPAL_DEFAULT_COMMUNITY_NAME');
         const r = new CreateSubscriptionRequest();
         r.requestBody({
@@ -119,6 +129,7 @@ export class PaypalPayment implements Payment {
                 brand_name: communityTitle,
                 shipping_preference: 'NO_SHIPPING',
                 user_action: 'SUBSCRIBE_NOW',
+                return_url: sub.asLink(this.config).toString(),
             },
         });
         const result: SubscriptionResult = await this.client.execute(r);
@@ -450,12 +461,36 @@ class CancelSubscriptionRequest {
     }
 }
 
+class GetWebhookEvent {
+    path: string;
+    verb: string;
+    body: null | object;
+    headers: { [key: string]: string };
+
+    constructor(eventId: string) {
+        this.path = '/v1/notifications/webhooks-events/{event_id}?'.replace('{event_id}', querystring.escape(eventId));
+        this.verb = 'GET';
+        this.body = null;
+        this.headers = {
+            'Content-Type': 'application/json'
+        };
+    }
+}
+
+interface WebhookEventResult {
+    statusCode: number;
+    result: {
+        resource: SaleCompleted | SubscriptionCancelled;
+    };
+}
+
 interface PayPalSubscription {
     plan_id: string;
     application_context: {
         brand_name: string;
         shipping_preference: 'NO_SHIPPING';
         user_action: 'SUBSCRIBE_NOW';
+        return_url: string;
     };
     custom_id: string;
 }
@@ -495,7 +530,6 @@ function paypalClient(config: AppConfig) {
  *
  * Set up and return PayPal JavaScript SDK environment with PayPal access credentials.
  * This sample uses SandboxEnvironment. In production, use LiveEnvironment.
- *
  */
 function environment(config: AppConfig) {
     if (config.paypal.environment === Environment.PRODUCTION) {
@@ -506,6 +540,10 @@ function environment(config: AppConfig) {
 }
 
 export class FakePayment implements Payment {
+    webhookEvent<T extends SaleCompleted | SubscriptionCancelled>(id: string): Promise<T | null> {
+        return null;
+    }
+
     capturePayment(request: CapturePaymentRequest): Promise<PaymentCapture> {
         return Promise.resolve({
             orderId: v4(),
@@ -525,7 +563,7 @@ export class FakePayment implements Payment {
         return Promise.resolve(SubscriptionPlan.create(p, v4(), v4()));
     }
 
-    subscribe(plan: SubscriptionPlan, user: User): Promise<PendingSubscription> {
+    subscribe(sub: Subscription, plan: SubscriptionPlan, user: User): Promise<PendingSubscription> {
         return Promise.resolve({
             id: v4(),
             approvalLink: 'https://example.com/approveSubscription',

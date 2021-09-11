@@ -74,7 +74,7 @@ export class Subscription {
         public readonly id: string,
         public readonly planId: string,
         public readonly payment: {
-            id: string,
+            id?: string,
         },
         public readonly user: {
             steamId: string,
@@ -88,8 +88,17 @@ export class Subscription {
         this.state = 'CANCELLED';
     }
 
-    public static create(plan: SubscriptionPlan, paymentId: string, user: User): Subscription {
-        return new Subscription(v4(), plan.id, {id: paymentId}, {
+    public pay(paymentId: string): void {
+        this.payment.id = paymentId;
+    }
+
+    public asLink(config: AppConfig): URL {
+        return new URL(`https://abcdef.abc/subscriptions/${this.id}`);
+        //return new URL(`/subscriptions/${this.id}`, config.app.publicUrl);
+    }
+
+    public static create(plan: SubscriptionPlan, user: User): Subscription {
+        return new Subscription(v4(), plan.id, {}, {
             steamId: user.steam.id,
             discordId: user.discord.id
         }, 'PENDING');
@@ -123,14 +132,31 @@ export interface PendingSubscription {
     approvalLink: string;
 }
 
+export interface SaleCompleted {
+    amount: {
+        total: string;
+        currency: string;
+    };
+    custom: string;
+    billing_agreement_id: string;
+    id: string;
+    state: string;
+}
+
+export interface SubscriptionCancelled {
+    id: string;
+}
+
 export interface Payment {
+    webhookEvent<T extends SaleCompleted | SubscriptionCancelled>(id: string): Promise<T | null>;
+
     createPaymentOrder(request: CreatePaymentOrderRequest): Promise<PaymentOrder>;
 
     capturePayment(request: CapturePaymentRequest): Promise<PaymentCapture>;
 
     persistSubscription(p: Package, plan?: SubscriptionPlan): Promise<SubscriptionPlan>;
 
-    subscribe(plan: SubscriptionPlan, user: User): Promise<PendingSubscription>;
+    subscribe(sub: Subscription, plan: SubscriptionPlan, user: User): Promise<PendingSubscription>;
 
     cancelSubscription(subscription: Subscription): Promise<void>;
 }
