@@ -1,5 +1,13 @@
 import {inject, singleton} from 'tsyringe';
-import {Order, Payment, PendingSubscription, Reference, Subscription} from '../domain/payment';
+import {
+    Order,
+    Payment,
+    PendingSubscription,
+    Reference,
+    Subscription,
+    SubscriptionNotFound,
+    SubscriptionPlan
+} from '../domain/payment';
 import {User} from '../domain/user';
 import {Package, RedeemTarget} from '../domain/package';
 import {OrderRepository, SubscriptionPlanRepository, SubscriptionsRepository} from '../domain/repositories';
@@ -37,6 +45,7 @@ export class Subscriptions {
             id: paymentId,
             transactionId: transactionId,
         }, new Reference(sub.user.steamId, sub.user.discordId, plan.basePackage));
+        order.pay(transactionId);
         await this.orders.save(order);
         const target = new RedeemTarget(sub.user.steamId, sub.user.discordId);
         await this.redeem.redeem(order, target);
@@ -44,4 +53,38 @@ export class Subscriptions {
 
         return order;
     }
+
+    async viewSubscription(id: string, forUser: User): Promise<ViewSubscription> {
+        const subscription = await this.subscription(id, forUser);
+        const orders = await this.orders.findByPaymentOrder(subscription.payment.id);
+        const plan = await this.subscriptionPlans.find(subscription.planId);
+
+        return {
+            subscription: subscription,
+            plan: plan,
+            history: orders,
+        };
+    }
+
+    private async subscription(id: string, forUser: User): Promise<Subscription> {
+        const subscription = await this.subscriptions.find(id);
+        if (!subscription || subscription.user.discordId !== forUser.discord.id) {
+            throw new SubscriptionNotFound();
+        }
+        return subscription;
+    }
+
+    async cancel(id: string, forUser: User): Promise<void> {
+        const subscription = await this.subscription(id, forUser);
+        await this.payment.cancelSubscription(subscription);
+        subscription.cancel();
+        await this.subscriptions.save(subscription);
+    }
 }
+
+export interface ViewSubscription {
+    subscription: Subscription,
+    plan: SubscriptionPlan,
+    history: Order[],
+}
+

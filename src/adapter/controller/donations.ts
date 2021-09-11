@@ -182,7 +182,7 @@ export class DonationController {
     }
 
     private async captureOrder(req: Request, res: Response) {
-        const order = await this.repo.findByPaymentOrder(req.params.orderId);
+        const order = (await this.repo.findByPaymentOrder(req.params.orderId))[0];
         const capture = await this.payment.capturePayment({
             orderId: order.payment.id,
         });

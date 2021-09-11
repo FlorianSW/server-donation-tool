@@ -1,5 +1,5 @@
 import {OrderRepository, SubscriptionPlanRepository, SubscriptionsRepository} from '../domain/repositories';
-import {Order, Payment, SubscriptionPlan} from '../domain/payment';
+import {Order, OrderStatus, Payment, SubscriptionNotFound, SubscriptionPlan} from '../domain/payment';
 import {InMemorySubscriptionPlanRepository} from '../adapter/subscription-plan-repository';
 import {FakePayment} from '../adapter/paypal-payment';
 import {Subscriptions} from './subscriptions';
@@ -52,6 +52,7 @@ describe('Subscriptions', () => {
                 expect(target.discordId).toEqual(aUser.discord.id);
                 expect(target.steamId).toEqual(aUser.steam.id);
                 expect(order.payment.transactionId).toEqual('A_TRANSACTION_ID');
+                expect(order.status).toEqual(OrderStatus.PAID);
                 subRepository.findByPayment(sub.id).then((subscription) => {
                     expect(subscription.state).toBe('ACTIVE');
                     done();
@@ -63,5 +64,37 @@ describe('Subscriptions', () => {
                 expect(order).not.toBeNull();
             });
         });
+    });
+
+    it('cancels subscription', async () => {
+        const ps = await service.subscribe(aPackage, aUser);
+        const sub = await subRepository.findByPayment(ps.id);
+
+        await service.cancel(sub.id, aUser);
+
+        const result = await subRepository.find(sub.id);
+        expect(result.state).toBe('CANCELLED');
+    });
+
+    it('errors when other\'s subscription cancelled', async () => {
+        const ps = await service.subscribe(aPackage, aUser);
+        const sub = await subRepository.findByPayment(ps.id);
+
+        await expect(() => service.cancel(sub.id, {...aUser, discord: {id: 'ANOTHER_DISCORD_ID'}})).rejects.toBeInstanceOf(SubscriptionNotFound);
+    });
+
+    it('views subscriptions details and history', async () => {
+        const ps = await service.subscribe(aPackage, aUser);
+        const sub = await subRepository.findByPayment(ps.id);
+        const first = await service.redeemSubscriptionPayment(sub.payment.id, 'A_PAYMENT_ID');
+        const second = await service.redeemSubscriptionPayment(sub.payment.id, 'A_PAYMENT_ID');
+
+        const result = await service.viewSubscription(sub.id, aUser);
+
+        expect(result.subscription.id).toEqual(sub.id);
+        expect(result.plan).toEqual(aPlan);
+        expect(result.history).toHaveLength(2);
+        expect(result.history[0].id).toEqual(first.id);
+        expect(result.history[1].id).toEqual(second.id);
     });
 });

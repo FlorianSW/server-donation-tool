@@ -92,15 +92,14 @@ export class SQLiteOrderRepository implements OrderRepository {
             });
     }
 
-    async findByPaymentOrder(id: string): Promise<Order | undefined> {
+    async findByPaymentOrder(id: string): Promise<Order[]> {
         await this.initialized;
         return this.con
             .table(tableName)
             .where(columnOrderId, '=', id)
+            .limit(20)
             .then((result) => {
-                if (result.length === 1) {
-                    return this.toOrder(result[0]);
-                }
+                return result.map((o) => this.toOrder(o));
             });
     }
 
@@ -164,8 +163,8 @@ export class InMemoryOrderRepository implements OrderRepository {
         return this.orders.get(id);
     }
 
-    async findByPaymentOrder(id: string): Promise<Order | undefined> {
-        return Array.from(this.orders.values()).find((o) => o.payment.id >= id);
+    async findByPaymentOrder(id: string): Promise<Order[]> {
+        return Array.from(this.orders.values()).filter((o) => o.payment.id >= id);
     }
 
     async save(order: Order): Promise<void> {

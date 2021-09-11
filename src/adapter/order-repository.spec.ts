@@ -53,7 +53,7 @@ describe('OrderRepository', () => {
         const roles = await repository.findByPaymentOrder('PAYMENT_ORDER_ID');
 
         expect(roles).not.toBeUndefined();
-        expect(roles).toEqual(anOrder);
+        expect(roles).toEqual([anOrder]);
     });
 
     it('returns undefined on unknown order Id', async () => {

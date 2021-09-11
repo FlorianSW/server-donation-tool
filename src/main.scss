@@ -151,6 +151,15 @@ body {
       }
     }
 
+    &.subscription-history {
+      .details {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-column-gap: 8px;
+        grid-row-gap: 6px;
+      }
+    }
+
     &.missing-steam-connection {
       .card-image {
         display: flex;

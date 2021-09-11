@@ -11,7 +11,7 @@ export const aUser: User = {
         name: 'Test',
     },
     discord: {
-        id: '',
+        id: 'A_DISCORD_ID',
     },
     username: 'A_USERNAME',
 };

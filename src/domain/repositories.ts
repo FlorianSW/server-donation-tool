@@ -17,7 +17,7 @@ export interface DiscordRoleRepository extends Closeable {
 export interface OrderRepository extends Closeable {
     save(order: Order): Promise<void>
     find(id: string): Promise<Order | undefined>
-    findByPaymentOrder(id: string): Promise<Order | undefined>
+    findByPaymentOrder(id: string): Promise<Order[]>
     findCreatedAfter(after: Date): Promise<Order[]>
     findUnpaidBefore(after: Date): Promise<Order[]>
     delete(order: Order): Promise<void>

@@ -95,6 +95,13 @@ export class Subscription {
     }
 }
 
+export class SubscriptionNotFound extends Error {
+    constructor() {
+        super('SubscriptionNotFound');
+        Object.setPrototypeOf(this, SubscriptionNotFound.prototype);
+    }
+}
+
 export interface PaymentCapture {
     orderId: string;
     transactionId: string;

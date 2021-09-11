@@ -104,6 +104,7 @@ const messages: { [key: string]: string } = {
     SUBSCRIPTION_DETAILS_PACKAGE_PRICE: 'Package price',
     SUBSCRIPTION_DETAILS_CYCLE: 'Billing cycle',
     SUBSCRIPTION_CANCEL: 'Cancel',
+    SUBSCRIPTION_HISTORY_TITLE: 'Past transactions',
 
     ALREADY_PRIORITY_QUEUE_TITLE: 'Already Priority Queue',
     ALREADY_PRIORITY_QUEUE_DESCRIPTION: 'Your Steam ID, which is connected to your Discord user, already has priority queue. Thanks for your donation!',
