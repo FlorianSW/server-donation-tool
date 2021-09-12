@@ -113,9 +113,10 @@ export class PaypalPayment implements Payment {
 
         let plan: PlanResult;
         if (sp?.payment.planId) {
+            plan = await this.updatePlan(await this.plan(sp.payment.planId), p);
             return new SubscriptionPlan(sp.id, p, {
                 productId: product.result.id,
-                planId: sp.payment.planId,
+                planId: plan.result.id,
             });
         } else {
             plan = await this.createPlan(p);
@@ -187,7 +188,7 @@ export class PaypalPayment implements Payment {
                 tenure_type: 'REGULAR',
                 total_cycles: 0,
             }]
-        });
+        } as CreatePlanRequest);
         return await this.client.execute(planRequest);
     }
 
@@ -197,6 +198,12 @@ export class PaypalPayment implements Payment {
 
     private async product(p: Package): Promise<ProductResult> {
         const r = new GetProductRequest(this.asProductId(p));
+
+        return await this.client.execute(r);
+    }
+
+    private async plan(id: string): Promise<PlanResult> {
+        const r = new GetPlanRequest(id);
 
         return await this.client.execute(r);
     }
@@ -226,6 +233,30 @@ export class PaypalPayment implements Payment {
 
         await this.client.execute(productRequest);
         return await this.product(p);
+    }
+
+    private async updatePlan(plan: PlanResult, p: Package): Promise<PlanResult> {
+        const request = new UpdatePlanRequest(plan.result.id);
+        request.requestBody(plan.result, {
+            description: translate('PAYPAL_SUBSCRIPTION_MONTHLY_DESCRIPTION'),
+            name: translate('PAYPAL_SUBSCRIPTION_MONTHLY_NAME', {params: {package: p.name}}),
+        });
+        await this.client.execute(request);
+
+        const pricing = new UpdatePricingPlanRequest(plan.result.id);
+        pricing.requestBody({
+            pricing_schemes: [{
+                billing_cycle_sequence: 1,
+                pricing_scheme: {
+                    fixed_price: {
+                        currency_code: p.price.currency,
+                        value: p.price.amount,
+                    },
+                },
+            }],
+        });
+        await this.client.execute(pricing);
+        return await this.plan(plan.result.id);
     }
 }
 
@@ -261,18 +292,20 @@ interface ProductResult {
     }
 }
 
+interface Plan {
+    id: string;
+    product_id: string;
+    name: string;
+    description: string;
+    status: PlanState;
+    billing_cycles: BillingCycle[];
+    payment_preferences: PaymentPreferences;
+    create_time: string;
+    update_time: string;
+}
+
 interface PlanResult {
-    result: {
-        id: string;
-        product_id: string;
-        name: string;
-        description: string;
-        status: PlanState;
-        billing_cycles: BillingCycle[];
-        payment_preferences: PaymentPreferences;
-        create_time: string;
-        update_time: string;
-    }
+    result: Plan;
 }
 
 interface SubscriptionResult {
@@ -319,6 +352,11 @@ interface UpdateProduct {
     home_url?: string;
 }
 
+interface UpdatePlan {
+    name: string;
+    description: string;
+}
+
 enum PlanState {
     CREATED = 'CREATED', ACTIVE = 'ACTIVE', INACTIVE = 'INACTIVE'
 }
@@ -344,7 +382,7 @@ interface PaymentPreferences {
     payment_failure_threshold: number;
 }
 
-interface Plan {
+interface CreatePlanRequest {
     product_id: string;
     name: string;
     status: Exclude<PlanState, 'INACTIVE'>;
@@ -390,10 +428,6 @@ class UpdateProductRequest {
         };
     }
 
-    private getProperty<T, K extends keyof T>(o: T, propertyName: K): T[K] {
-        return o[propertyName];
-    }
-
     requestBody(original: Product, product: UpdateProduct) {
         const ops = [];
         for (let entry of Object.entries(product) as [string, string][]) {
@@ -405,10 +439,85 @@ class UpdateProductRequest {
                     ops.push({op: 'replace', path: `/${entry[0]}`, value: entry[1]});
                 }
             } else if (oldValue !== undefined) {
-                ops.push({op: 'delete', path: `/${entry[0]}`, value: entry[1]});
+                ops.push({op: 'remove', path: `/${entry[0]}`});
             }
         }
         this.body = ops;
+        return this;
+    }
+
+    private getProperty<T, K extends keyof T>(o: T, propertyName: K): T[K] {
+        return o[propertyName];
+    }
+}
+
+class UpdatePlanRequest {
+    path: string;
+    verb: string;
+    body: null | object | object[];
+    headers: { [key: string]: string };
+
+    constructor(id: string) {
+        this.path = '/v1/billing/plans/{id}?'.replace('{id}', querystring.escape(id));
+        this.verb = 'PATCH';
+        this.body = null;
+        this.headers = {
+            'Content-Type': 'application/json'
+        };
+    }
+
+    requestBody(original: Plan, product: UpdatePlan) {
+        const ops = [];
+        for (let entry of Object.entries(product) as [string, string][]) {
+            const oldValue = this.getProperty(original, entry[0] as keyof Plan);
+            if (entry[1] !== undefined) {
+                if (oldValue === undefined) {
+                    ops.push({op: 'add', path: `/${entry[0]}`, value: entry[1]});
+                } else {
+                    ops.push({op: 'replace', path: `/${entry[0]}`, value: entry[1]});
+                }
+            } else if (oldValue !== undefined) {
+                ops.push({op: 'remove', path: `/${entry[0]}`});
+            }
+        }
+        this.body = ops;
+        return this;
+    }
+
+    private getProperty<T, K extends keyof T>(o: T, propertyName: K): T[K] {
+        return o[propertyName];
+    }
+}
+
+interface UpdatePricingPlan {
+    pricing_schemes: {
+        billing_cycle_sequence: number,
+        pricing_scheme: {
+            fixed_price: {
+                value: string,
+                currency_code: string,
+            },
+        },
+    }[],
+}
+
+class UpdatePricingPlanRequest {
+    path: string;
+    verb: string;
+    body: null | object | object[];
+    headers: { [key: string]: string };
+
+    constructor(id: string) {
+        this.path = '/v1/billing/plans/{id}/update-pricing-schemes?'.replace('{id}', querystring.escape(id));
+        this.verb = 'POST';
+        this.body = null;
+        this.headers = {
+            'Content-Type': 'application/json'
+        };
+    }
+
+    requestBody(r: UpdatePricingPlan) {
+        this.body = r;
         return this;
     }
 }
@@ -421,6 +530,22 @@ class GetProductRequest {
 
     constructor(productId: string) {
         this.path = '/v1/catalogs/products/{product_id}?'.replace('{product_id}', querystring.escape(productId));
+        this.verb = 'GET';
+        this.body = null;
+        this.headers = {
+            'Content-Type': 'application/json'
+        };
+    }
+}
+
+class GetPlanRequest {
+    path: string;
+    verb: string;
+    body: null | object;
+    headers: { [key: string]: string };
+
+    constructor(planId: string) {
+        this.path = '/v1/billing/plans/{plan_id}?'.replace('{plan_id}', querystring.escape(planId));
         this.verb = 'GET';
         this.body = null;
         this.headers = {
@@ -444,7 +569,7 @@ class CreatePlanRequest {
         };
     }
 
-    requestBody(plan: Plan) {
+    requestBody(plan: CreatePlanRequest) {
         this.body = plan;
         return this;
     }

@@ -62,7 +62,7 @@ const messages: { [key: string]: string } = {
     PAYPAL_DEFAULT_COMMUNITY_NAME: 'our community',
     PAYPAL_ERROR: 'Something went wrong with your donation.',
     PAYPAL_SUBSCRIPTION_MONTHLY_DESCRIPTION: 'Donate every month to earn the perks of this package.',
-    PAYPAL_SUBSCRIPTION_MONTHLY_NAME: 'Monthly',
+    PAYPAL_SUBSCRIPTION_MONTHLY_NAME: 'Monthly donation for {{package}}',
     PAYPAL_ONE_TIME: 'One-time donation',
     PAYPAL_SUBSCRIPTION: 'Subscription',
     PAYPAL_SUBSCRIBE: 'Subscribe',
