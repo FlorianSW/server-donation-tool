@@ -5,6 +5,7 @@ import {DonationType, Package, Price, PriceType} from '../../domain/package';
 import {Logger} from 'winston';
 import csrf from 'csurf';
 import {inject, singleton} from 'tsyringe';
+import {UserData} from '../../service/user-data';
 
 @singleton()
 export class StartController {
@@ -13,6 +14,7 @@ export class StartController {
     constructor(
         @inject('AppConfig') private readonly config: AppConfig,
         @inject('availablePackages') private readonly packages: Package[],
+        @inject(UserData) private readonly data: UserData,
         @inject('Logger') private readonly log: Logger
     ) {
         const csrfProtection = csrf();
@@ -22,11 +24,14 @@ export class StartController {
     }
 
     private async startPage(req: Request, res: Response) {
+        req.user = await this.data.onRefresh(req.user);
+
         res.render('index', {
             user: req.user,
             csrfToken: req.csrfToken(),
             showDonationTarget: !!this.config.app.community?.donationTarget?.monthly,
             availablePackages: this.packages,
+            subscribedPackages: req.user.subscribedPackages,
             step: 'PACKAGE_SELECTION',
         });
     }
@@ -50,7 +55,7 @@ export class StartController {
 
     private async selectPackage(req: Request, res: Response) {
         const selectedPackage = this.packages.find((p) => p.id === parseInt(req.body.package));
-        if (!selectedPackage) {
+        if (!selectedPackage || req.user.subscribedPackages[selectedPackage.id] !== undefined) {
             res.redirect('/');
         }
 

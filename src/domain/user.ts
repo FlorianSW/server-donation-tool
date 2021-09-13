@@ -32,6 +32,7 @@ export class DiscordRole implements OwnedPerk {
 
 export interface OwnedPerk {
     type: string;
+
     asString(): string;
 }
 
@@ -39,6 +40,7 @@ export interface User {
     steam?: SteamConnection;
     discord: DiscordConnection;
     username: string;
+    subscribedPackages: { [packageId: number]: string };
 }
 
 export interface SteamConnection {

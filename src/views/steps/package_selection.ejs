@@ -47,16 +47,25 @@
                     <% } %>
                 </div>
                 <div class="card-action">
-                    <button class="btn waves-effect waves-light" name="perks-for" value="me" type="submit">
-                        <%= translate('PERK_SELECTION_WHO_ME') %>
-                    </button>
-                    <button class="btn waves-effect waves-light" name="perks-for" value="other" type="submit">
-                        <%= translate('PERK_SELECTION_WHO_OTHER') %>
-                    </button>
-                    <% if (pack.subscription) { %>
-                        <button class="btn waves-effect waves-light" name="perks-for" value="subscribe" type="submit">
-                            <%= translate('PERK_SELECTION_SUBSCRIBE') %>
+                    <% if (subscribedPackages[pack.id] === undefined) { %>
+                        <button class="btn waves-effect waves-light" name="perks-for" value="me" type="submit">
+                            <%= translate('PERK_SELECTION_WHO_ME') %>
                         </button>
+                        <button class="btn waves-effect waves-light" name="perks-for" value="other" type="submit">
+                            <%= translate('PERK_SELECTION_WHO_OTHER') %>
+                        </button>
+                        <% if (pack.subscription) { %>
+                            <button class="btn waves-effect waves-light" name="perks-for" value="subscribe"
+                                    type="submit">
+                                <%= translate('PERK_SELECTION_SUBSCRIBE') %>
+                            </button>
+                        <% } %>
+                    <% } else { %>
+                        <a href="<%= subscribedPackages[pack.id] %>">
+                            <button class="btn waves-effect waves-light" type="button">
+                                <%= translate('PERK_SELECTION_VIEW_SUBSCRIPTION') %>
+                            </button>
+                        </a>
                     <% } %>
                 </div>
             </div>

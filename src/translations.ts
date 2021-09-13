@@ -45,6 +45,7 @@ const messages: { [key: string]: string } = {
     PERK_SELECTION_WHO_ME: 'For me',
     PERK_SELECTION_WHO_OTHER: 'As a gift',
     PERK_SELECTION_SUBSCRIBE: 'Subscribe',
+    PERK_SELECTION_VIEW_SUBSCRIPTION: 'View Subscription',
     PERK_SELECTION_VARIABLE_LABEL: 'Choose your desired amount in {{currency}}',
     PERK_SELECTION_VARIABLE_TITLE: 'An amount with two optional decimal fractions. Examples: 10 or 7.51',
     PERK_SELECTION_SELECT: 'Select',

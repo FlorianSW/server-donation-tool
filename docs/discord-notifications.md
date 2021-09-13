@@ -51,7 +51,7 @@ You can configure multiple notifications, which take different (or even the same
             <td>A donator tried to redeem perks for their package and there was an error. This notification might occur multiple times for the same donation, one for each errored perk.</td>
         </tr>
         <tr>
-            <td>SUBSCRIPTION_CREATED</td>
+            <td>SUBSCRIPTION_ACTIVATED</td>
             <td>A donator subscribed to a package.</td>
             <td rowspan="2">Subscription ID, Subscription Plan ID, PayPal Subscription ID, PayPal Plan ID, PayPal Product ID, Donator Discord and Steam ID, Package the donator subscribed to</td>
         </tr>

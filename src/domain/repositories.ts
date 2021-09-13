@@ -1,6 +1,7 @@
 import {Order, Subscription, SubscriptionPlan} from './payment';
 import {Closeable} from '../index';
 import {Package} from './package';
+import {User} from './user';
 
 export interface ExpiringDiscordRole {
     discordUser: string,
@@ -33,5 +34,6 @@ export interface SubscriptionsRepository extends Closeable {
     save(subscription: Subscription): Promise<void>
     delete(subscription: Subscription): Promise<void>
     find(id: string): Promise<Subscription>
+    findActive(user: User): Promise<Subscription[]>
     findByPayment(id: string): Promise<Subscription>
 }

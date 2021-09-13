@@ -88,8 +88,19 @@ export class Subscription {
         this.state = 'CANCELLED';
     }
 
-    public pay(paymentId: string): void {
+    public agreeBilling(paymentId: string): void {
         this.payment.id = paymentId;
+    }
+
+    public pay(transactionId: string, p: Package): Order {
+        const order = Order.create(new Date(), {
+            id: this.payment.id,
+            transactionId: transactionId,
+        }, new Reference(this.user.steamId, this.user.discordId, p));
+        order.pay(transactionId);
+
+        this.state = 'ACTIVE';
+        return order;
     }
 
     public asLink(config: AppConfig): URL {
@@ -101,6 +112,10 @@ export class Subscription {
             throw new SubscriptionNotPending();
         }
         return new URL(`/subscriptions/${this.id}/abort`, config.app.publicUrl);
+    }
+
+    public isActive(): boolean {
+        return ['PENDING', 'ACTIVE'].includes(this.state);
     }
 
     public static create(plan: SubscriptionPlan, user: User): Subscription {

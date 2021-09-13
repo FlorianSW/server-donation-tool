@@ -1,36 +1,13 @@
 import {ExpiringDiscordRole} from '../domain/repositories';
 import {DiscordRoleRecorder} from './discord-role-recorder';
 import {EventQueue} from '../adapter/event-queue';
-import {User} from '../domain/user';
 import {Order, Reference} from '../domain/payment';
 import {DiscordRolePerk} from '../adapter/perk/discord-role-perk';
-import {Package, PriceType, RedeemTarget} from '../domain/package';
+import {RedeemTarget} from '../domain/package';
 import {Client} from 'discord.js';
 import {Logger} from 'winston';
 import {InMemoryDiscordRoleRepository} from '../adapter/discord-role-repository';
-
-const aUser: User = {
-    discord: {
-        id: '1111111111',
-    },
-    steam: {
-        id: '2222222222',
-        source: 'DISCORD',
-        name: 'A_NAME',
-    },
-    username: 'A_NAME',
-};
-
-const aPackage: Package = {
-    id: 1,
-    perks: [],
-    name: 'A_PACKAGE',
-    price: {
-        type: PriceType.FIXED,
-        currency: 'USD',
-        amount: '1.00'
-    }
-};
+import {aPackage, aUser} from '../adapter/perk/testdata.spec';
 
 const notExpiring = Object.assign(
     new DiscordRolePerk({} as Client, '11111111', {} as Logger),

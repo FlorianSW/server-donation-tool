@@ -1,7 +1,7 @@
 import {SubscriptionsRepository} from '../domain/repositories';
 import Knex from 'knex';
 import * as fs from 'fs';
-import {aPackage, aUser} from './perk/testdata.spec';
+import {anotherUser, aPackage, aUser} from './perk/testdata.spec';
 import {Subscription, SubscriptionPlan} from '../domain/payment';
 import {SQLiteSubscriptionsRepository} from './subscriptions-repository';
 
@@ -25,11 +25,11 @@ describe('SubscriptionsRepository', () => {
 
     it('persists subscription', async () => {
         const sub = Subscription.create(aPlan, aUser);
-        sub.pay('A_PAYMENT_ID');
+        sub.agreeBilling('A_PAYMENT_ID');
         await repository.save(sub);
-        const roles = await repository.findByPayment('A_PAYMENT_ID');
+        const subs = await repository.findByPayment('A_PAYMENT_ID');
 
-        expect(roles).toMatchObject({
+        expect(subs).toMatchObject({
             user: {
                 steamId: aUser.steam.id,
                 discordId: aUser.discord.id,
@@ -44,12 +44,12 @@ describe('SubscriptionsRepository', () => {
 
     it('finds by ID', async () => {
         const sub = Subscription.create(aPlan, aUser);
-        sub.pay('A_PAYMENT_ID');
+        sub.agreeBilling('A_PAYMENT_ID');
         await repository.save(sub);
 
-        const roles = await repository.find(sub.id);
+        const subs = await repository.find(sub.id);
 
-        expect(roles).toMatchObject({
+        expect(subs).toMatchObject({
             user: {
                 steamId: aUser.steam.id,
                 discordId: aUser.discord.id,
@@ -62,9 +62,42 @@ describe('SubscriptionsRepository', () => {
         } as Subscription);
     });
 
+    it('finds active subscriptions', async () => {
+        const sub = Subscription.create(aPlan, aUser);
+        sub.agreeBilling('A_PAYMENT_ID');
+        await repository.save(sub);
+
+        const sub2 = Subscription.create(aPlan, aUser);
+        sub2.agreeBilling('A_PAYMENT_ID2');
+        await repository.save(sub2);
+
+        const sub3 = Subscription.create(aPlan, aUser);
+        sub3.agreeBilling('A_PAYMENT_ID3');
+        sub3.pay('A_TRANSACTION_ID', aPackage);
+        await repository.save(sub3);
+
+        const cancelled = Subscription.create(aPlan, aUser);
+        cancelled.agreeBilling('A_PAYMENT_ID');
+        cancelled.cancel();
+        await repository.save(cancelled);
+
+        const anotherSub = Subscription.create(aPlan, anotherUser);
+        anotherSub.agreeBilling('ANOTHER_PAYMENT');
+        await repository.save(anotherSub);
+
+        const subs = await repository.findActive(aUser);
+
+        expect(subs).toHaveLength(3);
+        const validIds = [sub.id, sub2.id, sub3.id];
+        for (let sub of subs) {
+            expect(validIds).toContain(sub.id);
+            expect(sub.isActive()).toBe(true);
+        }
+    });
+
     it('deletes a subscription', async () => {
         const sub = Subscription.create(aPlan, aUser);
-        sub.pay('A_PAYMENT_ID');
+        sub.agreeBilling('A_PAYMENT_ID');
         await repository.save(sub);
 
         await repository.delete(sub);

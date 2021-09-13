@@ -14,6 +14,7 @@ export function discordUserCallback(accessToken: string, refreshToken: string, p
         discord: {
             id: profile.id,
         },
+        subscribedPackages: {},
     };
     if (connection) {
         user.steam = {

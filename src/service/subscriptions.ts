@@ -3,7 +3,6 @@ import {
     Order,
     Payment,
     PendingSubscription,
-    Reference,
     Subscription,
     SubscriptionNotFound,
     SubscriptionNotPending,
@@ -14,6 +13,11 @@ import {Package, RedeemTarget} from '../domain/package';
 import {OrderRepository, SubscriptionPlanRepository, SubscriptionsRepository} from '../domain/repositories';
 import {RedeemPackage} from './redeem-package';
 import {EventSource} from '../domain/events';
+
+interface SubscriptionResult {
+    pending: PendingSubscription,
+    subscription: Subscription,
+}
 
 @singleton()
 export class Subscriptions {
@@ -31,7 +35,7 @@ export class Subscriptions {
         const plan = await this.subscriptionPlans.findByPackage(p);
         const sub = Subscription.create(plan, user);
         const result = await this.payment.subscribe(sub, plan, user);
-        sub.pay(result.id);
+        sub.agreeBilling(result.id);
         await this.subscriptions.save(sub);
 
         return result;
@@ -45,13 +49,8 @@ export class Subscriptions {
             this.events.emit('subscriptionCreated', target, plan, sub);
         }
 
-        sub.state = 'ACTIVE';
+        const order = sub.pay(transactionId, plan.basePackage);
         await this.subscriptions.save(sub);
-        const order = Order.create(new Date(), {
-            id: paymentId,
-            transactionId: transactionId,
-        }, new Reference(sub.user.steamId, sub.user.discordId, plan.basePackage));
-        order.pay(transactionId);
         await this.orders.save(order);
         await this.redeem.redeem(order, target);
         this.events.emit('subscriptionExecuted', target, plan, sub, order);

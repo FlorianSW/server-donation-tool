@@ -2,6 +2,7 @@ import {SubscriptionsRepository} from '../domain/repositories';
 import Knex from 'knex';
 import {inject, singleton} from 'tsyringe';
 import {Subscription} from '../domain/payment';
+import {User} from '../domain/user';
 
 const tableName = 'subscriptions';
 const columnId = 'id';
@@ -57,7 +58,11 @@ export class SQLiteSubscriptionsRepository implements SubscriptionsRepository {
             .limit(1)
             .where(columnPaymentId, id)
             .then((result) => {
-                return this.toSubscription(result);
+                const subs = this.toSubscription(result);
+                if (subs.length !== 1) {
+                    return undefined;
+                }
+                return subs[0];
             });
     }
 
@@ -67,6 +72,21 @@ export class SQLiteSubscriptionsRepository implements SubscriptionsRepository {
             .table(tableName)
             .limit(1)
             .where(columnId, id)
+            .then((result) => {
+                const subs = this.toSubscription(result);
+                if (subs.length !== 1) {
+                    return undefined;
+                }
+                return subs[0];
+            });
+    }
+
+    async findActive(user: User): Promise<Subscription[]> {
+        await this.initialized;
+        return this.con
+            .table(tableName)
+            .where(columnUserDiscordId, user.discord.id)
+            .where(columnState, 'IN', ['PENDING', 'ACTIVE'])
             .then((result) => {
                 return this.toSubscription(result);
             });
@@ -82,23 +102,25 @@ export class SQLiteSubscriptionsRepository implements SubscriptionsRepository {
         this.initialized = undefined;
     }
 
-    private toSubscription(result: any[]): Subscription {
-        if (result.length !== 1) {
-            return undefined;
+    private toSubscription(dbResult: any[]): Subscription[] {
+        const result: Subscription[] = [];
+        for (let o of dbResult) {
+            result.push(
+                new Subscription(
+                    o[columnId],
+                    o[columnPlanId],
+                    {
+                        id: o[columnPaymentId],
+                    },
+                    {
+                        discordId: o[columnUserDiscordId],
+                        steamId: o[columnUserSteamId],
+                    },
+                    o[columnState],
+                )
+            );
         }
-        const o = result[0];
-        return new Subscription(
-            o[columnId],
-            o[columnPlanId],
-            {
-                id: o[columnPaymentId],
-            },
-            {
-                discordId: o[columnUserDiscordId],
-                steamId: o[columnUserSteamId],
-            },
-            o[columnState],
-        );
+        return result;
     }
 }
 
@@ -122,6 +144,10 @@ export class InMemorySubscriptionsRepository implements SubscriptionsRepository 
 
     async save(s: Subscription): Promise<void> {
         this.subscriptions.set(s.payment.id, s);
+    }
+
+    async findActive(user: User): Promise<Subscription[]> {
+        return Array.from(this.subscriptions.values()).filter((s) => s.user.discordId === user.discord.id && s.isActive());
     }
 }
 
