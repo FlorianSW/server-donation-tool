@@ -48,7 +48,7 @@ describe('Subscriptions', () => {
 
     it('redeems perks for a subscription payment', (done: DoneCallback) => {
         service.subscribe(aPackage, aUser).then((sub) => {
-            events.on('successfulSubscriptionExecution', (target: RedeemTarget, order: Order) => {
+            events.on('subscriptionExecuted', (target: RedeemTarget, order: Order) => {
                 expect(target.discordId).toEqual(aUser.discord.id);
                 expect(target.steamId).toEqual(aUser.steam.id);
                 expect(order.payment.transactionId).toEqual('A_TRANSACTION_ID');

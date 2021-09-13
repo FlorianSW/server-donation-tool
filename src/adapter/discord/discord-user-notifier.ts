@@ -1,4 +1,4 @@
-import {Order} from '../../domain/payment';
+import {Order, Subscription, SubscriptionPlan} from '../../domain/payment';
 import {Client, EmbedFieldData, MessageEmbed} from 'discord.js';
 import {translate} from '../../translations';
 import {RedeemTarget} from '../../domain/package';
@@ -10,7 +10,7 @@ import {AppConfig} from '../../domain/app-config';
 export class DiscordUserNotifier {
     constructor(@inject('DonationEvents') private readonly events: DonationEvents, @inject('AppConfig') private readonly config: AppConfig, @inject('discord.Client') private readonly client: Client) {
         events.on('failedRedeemPerk', this.onFailedRedeemPerk.bind(this));
-        events.on('successfulSubscriptionExecution', this.successfulSubscriptionExecution.bind(this));
+        events.on('subscriptionExecuted', this.onSubscriptionExecuted.bind(this));
     }
 
     async onFailedRedeemPerk(target: RedeemTarget, order: Order): Promise<void> {
@@ -29,12 +29,13 @@ export class DiscordUserNotifier {
         });
     }
 
-    async successfulSubscriptionExecution(target: RedeemTarget, order: Order): Promise<void> {
+    async onSubscriptionExecuted(target: RedeemTarget, plan: SubscriptionPlan, sub: Subscription, order: Order): Promise<void> {
         const discordUser = await this.client.users.fetch(order.reference.discordId);
         const embed = new MessageEmbed()
             .setColor('DARK_GREEN')
             .addFields(this.metaFields(target, order))
-            .addField(translate('USER_NOTIFICATIONS_SUB_TRANSACTION_ID'), order.payment.transactionId, false);
+            .addField(translate('USER_NOTIFICATIONS_SUB_TRANSACTION_ID'), order.payment.transactionId, false)
+            .addField(translate('USER_NOTIFICATIONS_SUB_DETAILS_LINK'), `[Subscription details](${new URL(`/subscriptions/${sub.id}`, this.config.app.publicUrl).toString()})`, true);
 
         await discordUser.send({
             content: translate('USER_NOTIFICATIONS_SUB_EXECUTED_TEXT'),
