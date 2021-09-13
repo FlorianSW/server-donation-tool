@@ -1,5 +1,5 @@
 import {OrderRepository, SubscriptionPlanRepository, SubscriptionsRepository} from '../domain/repositories';
-import {Order, OrderStatus, Payment, SubscriptionNotFound, SubscriptionPlan} from '../domain/payment';
+import {Order, OrderStatus, Payment, Subscription, SubscriptionNotFound, SubscriptionPlan} from '../domain/payment';
 import {InMemorySubscriptionPlanRepository} from '../adapter/subscription-plan-repository';
 import {FakePayment} from '../adapter/paypal/paypal-payment';
 import {Subscriptions} from './subscriptions';
@@ -48,12 +48,12 @@ describe('Subscriptions', () => {
 
     it('redeems perks for a subscription payment', (done: DoneCallback) => {
         service.subscribe(aPackage, aUser).then((sub) => {
-            events.on('subscriptionExecuted', (target: RedeemTarget, order: Order) => {
+            events.on('subscriptionExecuted', (target: RedeemTarget, plan: SubscriptionPlan, sub: Subscription, order: Order) => {
                 expect(target.discordId).toEqual(aUser.discord.id);
                 expect(target.steamId).toEqual(aUser.steam.id);
                 expect(order.payment.transactionId).toEqual('A_TRANSACTION_ID');
                 expect(order.status).toEqual(OrderStatus.PAID);
-                subRepository.findByPayment(sub.id).then((subscription) => {
+                subRepository.findByPayment(sub.payment.id).then((subscription) => {
                     expect(subscription.state).toBe('ACTIVE');
                     done();
                 });

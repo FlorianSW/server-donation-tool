@@ -9,6 +9,7 @@ nav:
   - 'Getting Strated': 'getting-started.md'
   - Configuration:
       - 'Packages and Perks': 'packages-and-perks.md'
+      - 'Subscriptions': 'subscriptions.md'
       - 'Setup Additional Steam Login': 'steam-login.md'
       - 'Discord Notifications': 'discord-notifications.md'
   - Security:
