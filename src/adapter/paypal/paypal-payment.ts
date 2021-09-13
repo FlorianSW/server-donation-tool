@@ -25,7 +25,7 @@ import {
     CreateSubscriptionRequest,
     GetPlanRequest,
     GetProductRequest,
-    Order,
+    Order, PayPalHTTPError,
     PayPalSubscription,
     Plan,
     PlanState,
@@ -34,6 +34,7 @@ import {
     UpdatePricingPlanRequest,
     UpdateProductRequest
 } from './types';
+import {HTTPError} from 'discord.js';
 
 const paypal = require('@paypal/checkout-server-sdk');
 
@@ -205,13 +206,31 @@ export class PaypalPayment implements Payment {
     private async product(p: Package): Promise<Response<Product>> {
         const r = new GetProductRequest(this.asProductId(p));
 
-        return await this.client.execute<Product>(r);
+        try {
+            return await this.client.execute(r);
+        } catch (e) {
+            if (e.statusCode === 404) {
+                return {
+                    statusCode: 404,
+                } as Response<null>;
+            }
+            throw e;
+        }
     }
 
     private async plan(id: string): Promise<Response<Plan>> {
         const r = new GetPlanRequest(id);
 
-        return await this.client.execute(r);
+        try {
+            return await this.client.execute(r);
+        } catch (e) {
+            if (e.statusCode === 404) {
+                return {
+                    statusCode: 404,
+                } as Response<null>;
+            }
+            throw e;
+        }
     }
 
     private async createProduct(p: Package): Promise<Response<Product>> {

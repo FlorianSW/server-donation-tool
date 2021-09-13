@@ -1,7 +1,11 @@
 import {JsonRequest} from './client';
 import querystring from 'querystring';
 import {SaleCompleted, SubscriptionCancelled} from '../../domain/payment';
-import {WebhookTypes} from 'discord.js';
+
+export interface PayPalHTTPError {
+    message: string;
+    statusCode: number;
+}
 
 /**
  * https://developer.paypal.com/docs/api/orders/v2/#definition-purchase_unit
