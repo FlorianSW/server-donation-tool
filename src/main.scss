@@ -87,6 +87,17 @@ body {
     }
 
     &.package {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      height: 100%;
+
+      .card-content {
+        flex-grow: 1;
+        display: grid;
+        grid-template-rows: 1fr auto;
+      }
+
       .card-title {
         display: flex;
         align-items: center;

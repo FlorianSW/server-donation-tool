@@ -9,6 +9,7 @@
             <input type="hidden" name="package" value="<%= pack.id %>">
             <div class="card package">
                 <div class="card-content">
+                    <div>
                     <span class="card-title">
                         <%= pack.name %>
                         <% if (pack.subscription) { %>
@@ -17,26 +18,27 @@
                         <% } %>
                     </span>
 
-                    <% if (pack.description) { %>
-                        <div><%= pack.description %></div>
-                    <% } %>
-                    <div class="package-information">
-                        <% if (pack.price.type === 'VARIABLE') { %>
-                            <div class="input-field">
-                                <input id="price" name="price-<%= pack.id %>" type="text"
-                                       pattern="^(([0-9]+)|(([0-9]+)?[.,][0-9]{1,2}))$"
-                                       title="<%= translate('PERK_SELECTION_VARIABLE_TITLE') %>"
-                                       value="<%= pack.price.amount %>">
-                                <label for="price"
-                                       class="active"><%= translate('PERK_SELECTION_VARIABLE_LABEL', {params: {currency: pack.price.currency}}) %></label>
-                            </div>
+                        <% if (pack.description) { %>
+                            <div><%= pack.description %></div>
                         <% } %>
-                        <% if (pack.perks.length !== 0) { %>
-                            <%= translate('PERK_INCLUDED') %>
-                            <% pack.perks.forEach(function (p) { %>
-                                <span><%= p.asTranslatedString() %></span>
-                            <% }); %>
-                        <% } %>
+                        <div class="package-information">
+                            <% if (pack.price.type === 'VARIABLE') { %>
+                                <div class="input-field">
+                                    <input id="price" name="price-<%= pack.id %>" type="text"
+                                           pattern="^(([0-9]+)|(([0-9]+)?[.,][0-9]{1,2}))$"
+                                           title="<%= translate('PERK_SELECTION_VARIABLE_TITLE') %>"
+                                           value="<%= pack.price.amount %>">
+                                    <label for="price"
+                                           class="active"><%= translate('PERK_SELECTION_VARIABLE_LABEL', {params: {currency: pack.price.currency}}) %></label>
+                                </div>
+                            <% } %>
+                            <% if (pack.perks.length !== 0) { %>
+                                <%= translate('PERK_INCLUDED') %>
+                                <% pack.perks.forEach(function (p) { %>
+                                    <span><%= p.asTranslatedString() %></span>
+                                <% }); %>
+                            <% } %>
+                        </div>
                     </div>
                     <% if (pack.price.type === 'FIXED') { %>
                         <div class="price">

@@ -14,22 +14,24 @@
         <%- include('partials/donation_target.ejs') %>
     <% } %>
     <div class="row">
-        <% if (step !== 'PACKAGE_SELECTION') { %>
-            <div class="col s12 m3 l3">
-                <%- include('partials/steam_info.ejs'); %>
-            </div>
-        <% } %>
-        <% switch (step) {
-        case "PACKAGE_SELECTION": %>
-        <%- include('steps/package_selection.ejs'); %>
-        <% break;
-        case "DONATE": %>
-        <%- include('steps/donate.ejs'); %>
-        <% break;
-        case "REDEEM": %>
-        <%- include('steps/redeem.ejs'); %>
-        <% break;
-        } %>
+        <div class="col s12">
+            <% if (step !== 'PACKAGE_SELECTION') { %>
+                <div class="col s12 m3 l3">
+                    <%- include('partials/steam_info.ejs'); %>
+                </div>
+            <% } %>
+            <% switch (step) {
+            case "PACKAGE_SELECTION": %>
+            <%- include('steps/package_selection.ejs'); %>
+            <% break;
+            case "DONATE": %>
+            <%- include('steps/donate.ejs'); %>
+            <% break;
+            case "REDEEM": %>
+            <%- include('steps/redeem.ejs'); %>
+            <% break;
+            } %>
+        </div>
     </div>
     <% if (step === 'PACKAGE_SELECTION') { %>
         <div class="row">
