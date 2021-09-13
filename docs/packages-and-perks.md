@@ -82,6 +82,7 @@ Each package has the following metadata:
 
 * **name**: The name of the perk as shown to the donator in various views: The package selection view when a donation starts, as well as on the PayPal receipt.
 * **description**: An optional freetext field which may contain additional information for your donators about this package.
+* **subscription**: When set, will enable this package to be subscribed to by a donator. See [the subscriptions documentation](./subscriptions.md) for more detailed information.
 * **id**: A numeric ID to uniquely identify the package in the list of packages _over time_.
   This ID shall _not_ be re-used for other packages in the future.
   Simply count up this number by one whenever you create a new package, without repeating already used ones.

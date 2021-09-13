@@ -50,6 +50,20 @@ You can configure multiple notifications, which take different (or even the same
             <td>REDEEM_ERROR</td>
             <td>A donator tried to redeem perks for their package and there was an error. This notification might occur multiple times for the same donation, one for each errored perk.</td>
         </tr>
+        <tr>
+            <td>SUBSCRIPTION_CREATED</td>
+            <td>A donator subscribed to a package.</td>
+            <td rowspan="2">Subscription ID, Subscription Plan ID, PayPal Subscription ID, PayPal Plan ID, PayPal Product ID, Donator Discord and Steam ID, Package the donator subscribed to</td>
+        </tr>
+        <tr>
+            <td>SUBSCRIPTION_CANCELLED</td>
+            <td>A donator cancelled a subscription.</td>
+        </tr>
+        <tr>
+            <td>SUBSCRIPTION_EXECUTED</td>
+            <td>A payment was made as part of a recurring subscription. This event will come together with the `SUCCESSFUL_REDEEM` event.</td>
+            <td>Subscription ID, Subscription Plan ID, PayPal Subscription ID, PayPal Plan ID, PayPal Product ID, Order ID, PayPal Order ID, PayPal Transaction ID, Donator Discord and Steam ID, Package the donator subscribed to</td>
+        </tr>
     </tbody>
 </table>
 
