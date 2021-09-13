@@ -13,7 +13,7 @@ import {FreetextPerk} from './adapter/perk/freetext-perk';
 import session from 'express-session';
 import {StoreFactory} from 'connect-session-knex';
 import Knex from 'knex';
-import {Environment} from './adapter/paypal-payment';
+import {Environment} from './adapter/paypal/paypal-payment';
 import settings from './translations';
 import {DiscordRoleRecorder} from './service/discord-role-recorder';
 import {ExpireDiscordRole} from './service/expire-discord-role';

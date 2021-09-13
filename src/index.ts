@@ -19,7 +19,7 @@ import {container} from 'tsyringe';
 import {EventQueue} from './adapter/event-queue';
 import {SQLiteDiscordRoleRepository} from './adapter/discord-role-repository';
 import {SQLiteOrderRepository} from './adapter/order-repository';
-import {PaypalPayment} from './adapter/paypal-payment';
+import {PaypalPayment} from './adapter/paypal/paypal-payment';
 import {DiscordRoleRecorder} from './service/discord-role-recorder';
 import {ExpireDiscordRole} from './service/expire-discord-role';
 import {Logger} from 'winston';
@@ -35,6 +35,7 @@ import {SQLiteSubscriptionsRepository} from './adapter/subscriptions-repository'
 import {RedeemPackage} from './service/redeem-package';
 import {Subscriptions} from './service/subscriptions';
 import {SubscriptionsController} from './adapter/controller/subscriptions';
+import {paypalClient} from './adapter/paypal/client';
 
 export interface Closeable {
     close(): Promise<void>
@@ -50,6 +51,9 @@ container.register('DonationEvents', {
 });
 container.register('EventSource', {
     useFactory: (c) => c.resolve(EventQueue)
+});
+container.register('PayPalClient', {
+    useFactory: (c) => paypalClient(c.resolve('AppConfig'))
 });
 container.registerType('DiscordRoleRepository', SQLiteDiscordRoleRepository);
 container.registerSingleton('Closeable', 'DiscordRoleRepository');

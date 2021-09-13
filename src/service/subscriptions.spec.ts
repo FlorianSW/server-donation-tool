@@ -1,7 +1,7 @@
 import {OrderRepository, SubscriptionPlanRepository, SubscriptionsRepository} from '../domain/repositories';
 import {Order, OrderStatus, Payment, SubscriptionNotFound, SubscriptionPlan} from '../domain/payment';
 import {InMemorySubscriptionPlanRepository} from '../adapter/subscription-plan-repository';
-import {FakePayment} from '../adapter/paypal-payment';
+import {FakePayment} from '../adapter/paypal/paypal-payment';
 import {Subscriptions} from './subscriptions';
 import {InMemorySubscriptionsRepository} from '../adapter/subscriptions-repository';
 import {aPackage, aUser} from '../adapter/perk/testdata.spec';
