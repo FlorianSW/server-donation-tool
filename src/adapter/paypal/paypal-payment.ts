@@ -260,19 +260,21 @@ export class PaypalPayment implements Payment {
         });
         await this.client.execute(request);
 
-        const pricing = new UpdatePricingPlanRequest(plan.id);
-        pricing.requestBody({
-            pricing_schemes: [{
-                billing_cycle_sequence: 1,
-                pricing_scheme: {
-                    fixed_price: {
-                        currency_code: p.price.currency,
-                        value: p.price.amount,
+        if (parseFloat(plan.billing_cycles[0].pricing_scheme.fixed_price.value) !== parseFloat(p.price.amount)) {
+            const pricing = new UpdatePricingPlanRequest(plan.id);
+            pricing.requestBody({
+                pricing_schemes: [{
+                    billing_cycle_sequence: 1,
+                    pricing_scheme: {
+                        fixed_price: {
+                            currency_code: p.price.currency,
+                            value: p.price.amount,
+                        },
                     },
-                },
-            }],
-        });
-        await this.client.execute(pricing);
+                }],
+            });
+            await this.client.execute(pricing);
+        }
         return await this.plan(plan.id);
     }
 }
