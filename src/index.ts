@@ -1,5 +1,5 @@
 import 'reflect-metadata';
-import express from 'express';
+import express, {Express} from 'express';
 import path from 'path';
 import session from 'express-session';
 import {translate} from './translations';
@@ -83,8 +83,6 @@ parseConfig(log).then(async (config) => {
     const statistics = container.resolve(StatisticsController);
     const login = container.resolve(LoginController);
     const privacyPolicy = container.resolve(PrivacyPolicyController);
-    const paypalWebhooks = container.resolve(PaypalWebhooksController);
-    const subscriptions = container.resolve(SubscriptionsController);
 
     app.locals.translate = translate;
     app.locals.community = {
@@ -147,16 +145,13 @@ parseConfig(log).then(async (config) => {
     app.use('/', statistics.router);
     app.use('/', login.router);
     app.use('/', privacyPolicy.router);
-    app.use('/', paypalWebhooks.router);
-    app.use('/', subscriptions.router);
+
+    await initSubscriptions(app);
 
     app.use(errorHandler);
     app.use(errorLogger({
         winstonInstance: log,
     }));
-
-    log.info('Initializing subscription plans');
-    await initSubscriptions();
 
     app.listen(port, () => {
         log.info(`Server listening on port ${port}`);
@@ -166,12 +161,21 @@ parseConfig(log).then(async (config) => {
     process.exit(1);
 });
 
-async function initSubscriptions() {
+async function initSubscriptions(app: Express) {
     const packages: Package[] = container.resolve('availablePackages');
     const payment: Payment = container.resolve('Payment');
     const subscriptions: SubscriptionPlanRepository = container.resolve('SubscriptionPlanRepository');
     const subscriptionPackages = packages.filter((p) => p.subscription !== undefined);
     log.debug('Found ' + subscriptionPackages.length + ' packages that support subscriptions');
+    if (subscriptionPackages.length === 0) {
+        return;
+    }
+    log.info('Initializing subscriptions');
+    const controller = container.resolve(SubscriptionsController);
+    const paypalWebhooks = container.resolve(PaypalWebhooksController);
+    app.use('/', controller.router);
+    app.use('/', paypalWebhooks.router);
+
     for (const p of subscriptionPackages) {
         if (p.price.type === PriceType.VARIABLE) {
             log.warn('Variable price package (' + p.id + '; ' + p.name + ') can not be subscribable. Ignoring subscription option');

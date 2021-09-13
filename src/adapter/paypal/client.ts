@@ -27,7 +27,7 @@ export abstract class JsonRequest<T = null> implements Request<T> {
     }
 }
 
-export interface PaypalClient {
+export interface PayPalClient {
     execute<T, S = any>(request: Request<S>): Promise<Response<T>>;
 }
 
@@ -37,7 +37,7 @@ export interface PaypalClient {
  * credentials context. Use this instance to invoke PayPal APIs, provided the
  * credentials have access.
  */
-export function paypalClient(config: AppConfig): PaypalClient {
+export function paypalClient(config: AppConfig): PayPalClient {
     return new paypal.core.PayPalHttpClient(environment(config));
 }
 

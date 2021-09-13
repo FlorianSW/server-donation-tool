@@ -52,6 +52,7 @@ export interface AppConfig {
         environment: string,
         clientId: string,
         clientSecret: string,
+        manageWebhook: boolean,
     },
     cftools: {
         applicationId: string,

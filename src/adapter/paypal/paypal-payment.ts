@@ -6,9 +6,7 @@ import {
     PaymentOrder,
     PendingSubscription,
     Reference,
-    SaleCompleted,
     Subscription,
-    SubscriptionCancelled,
     SubscriptionPlan
 } from '../../domain/payment';
 import {AppConfig} from '../../domain/app-config';
@@ -17,23 +15,24 @@ import {Package} from '../../domain/package';
 import {translate} from '../../translations';
 import {User} from '../../domain/user';
 import {v4} from 'uuid';
-import {PaypalClient, Response} from './client';
+import {PayPalClient, Response} from './client';
 import {
-    CancelSubscriptionRequest, CaptureOrderResponse,
+    CancelSubscriptionRequest,
+    CaptureOrderResponse,
     CreatePlanBody,
     CreatePlanRequest,
     CreateProductRequest,
     CreateSubscriptionRequest,
     GetPlanRequest,
     GetProductRequest,
-    GetWebhookEvent, Order, PayPalSubscription,
+    Order,
+    PayPalSubscription,
     Plan,
     PlanState,
     Product,
     UpdatePlanRequest,
     UpdatePricingPlanRequest,
-    UpdateProductRequest,
-    WebhookEventResponse
+    UpdateProductRequest
 } from './types';
 
 const paypal = require('@paypal/checkout-server-sdk');
@@ -47,7 +46,7 @@ export class PaypalPayment implements Payment {
     constructor(
         @inject('AppConfig') private readonly config: AppConfig,
         @inject('packages') private readonly packages: Package[],
-        @inject('PayPalClient') private readonly client: PaypalClient,
+        @inject('PayPalClient') private readonly client: PayPalClient,
     ) {
     }
 
@@ -107,16 +106,6 @@ export class PaypalPayment implements Payment {
             id: order.result.id,
             transactionId: order.result.purchase_units[0]?.payments?.captures[0]?.id,
         };
-    }
-
-    async webhookEvent<T extends SaleCompleted | SubscriptionCancelled>(id: string): Promise<T | null> {
-        const r = new GetWebhookEvent(id);
-        const event = await this.client.execute<WebhookEventResponse>(r);
-
-        if (event.statusCode !== 200) {
-            return null;
-        }
-        return event.result.resource as T;
     }
 
     async persistSubscription(p: Package, sp?: SubscriptionPlan): Promise<SubscriptionPlan> {
@@ -280,10 +269,6 @@ export class PaypalPayment implements Payment {
 }
 
 export class FakePayment implements Payment {
-    webhookEvent<T extends SaleCompleted | SubscriptionCancelled>(id: string): Promise<T | null> {
-        return null;
-    }
-
     capturePayment(request: CapturePaymentRequest): Promise<PaymentCapture> {
         return Promise.resolve({
             orderId: v4(),

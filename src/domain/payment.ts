@@ -161,8 +161,6 @@ export interface SubscriptionCancelled {
 }
 
 export interface Payment {
-    webhookEvent<T extends SaleCompleted | SubscriptionCancelled>(id: string): Promise<T | null>;
-
     createPaymentOrder(request: CreatePaymentOrderRequest): Promise<PaymentOrder>;
 
     capturePayment(request: CapturePaymentRequest): Promise<PaymentCapture>;

@@ -1,6 +1,7 @@
 import {JsonRequest} from './client';
 import querystring from 'querystring';
 import {SaleCompleted, SubscriptionCancelled} from '../../domain/payment';
+import {WebhookTypes} from 'discord.js';
 
 /**
  * https://developer.paypal.com/docs/api/orders/v2/#definition-purchase_unit
@@ -50,8 +51,68 @@ export interface WebhookEventResponse {
     resource: SaleCompleted | SubscriptionCancelled;
 }
 
-interface CancelSubscriptionBody {
+export interface CancelSubscriptionBody {
     reason: string;
+}
+
+export interface EventType {
+    name: string;
+}
+
+export interface CreateWebhookBody {
+    url: string;
+    event_types: EventType[],
+}
+
+export interface Webhook {
+    id: string;
+    url: string;
+    event_types: EventType[];
+}
+
+/**
+ * https://developer.paypal.com/docs/api/webhooks/v1/#webhooks_post
+ */
+export class CreateWebhookRequest extends JsonRequest<CreateWebhookBody> {
+    body: null | CreateWebhookBody;
+
+    constructor() {
+        super('/v1/notifications/webhooks?', 'POST');
+    }
+
+    requestBody(request: CreateWebhookBody) {
+        this.body = request;
+        return this;
+    }
+}
+
+/**
+ * https://developer.paypal.com/docs/api/webhooks/v1/#webhooks_update
+ */
+export class UpdateWebhookRequest extends JsonRequest<PatchOperation[]> {
+    body: null | PatchOperation[];
+
+    constructor(id: string) {
+        super('/v1/notifications/webhooks/{webhook_id}?'.replace('{webhook_id}', querystring.escape(id)), 'PATCH');
+    }
+
+    requestBody(url: string) {
+        this.body = [{
+            op: 'replace',
+            path: '/url',
+            value: url,
+        }] as PatchOperation[];
+        return this;
+    }
+}
+
+/**
+ * https://developer.paypal.com/docs/api/webhooks/v1/#webhooks_get
+ */
+export class GetWebhookRequest extends JsonRequest {
+    constructor(id: string) {
+        super('/v1/notifications/webhooks/{webhook_id}?'.replace('{webhook_id}', querystring.escape(id)), 'GET');
+    }
 }
 
 /**

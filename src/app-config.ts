@@ -126,7 +126,8 @@ class YamlAppConfig implements AppConfig {
     paypal: {
         environment: Environment;
         clientId: string;
-        clientSecret: string
+        clientSecret: string;
+        manageWebhook: boolean;
     };
     serverNames: ServerNames;
 
@@ -170,6 +171,9 @@ class YamlAppConfig implements AppConfig {
         if (this.paypal.environment === undefined) {
             this.logger.warn('PayPal environment not set. Sandbox credentials are assumed, which might not be intended.');
             this.paypal.environment = Environment.SANDBOX;
+        }
+        if (this.paypal.manageWebhook === undefined) {
+            this.paypal.manageWebhook = true;
         }
 
         if (this.app.language) {
