@@ -3,6 +3,7 @@ import {Package, Perk, RedeemError, RedeemTarget} from '../../domain/package';
 import {AppConfig, ServerNames} from '../../domain/app-config';
 import {Order} from '../../domain/payment';
 import * as https from 'https';
+import {OwnedPerk} from '../../domain/user';
 
 interface CreateReservedSlotRequest {
     data: {
@@ -64,6 +65,10 @@ export class ReservedSlotPerk implements Perk {
             this.throwRedeemError(e);
         }
         return successParams;
+    }
+
+    async ownedBy(target: RedeemTarget): Promise<OwnedPerk[] | null> {
+        return null;
     }
 
     asTranslatedString(): string {

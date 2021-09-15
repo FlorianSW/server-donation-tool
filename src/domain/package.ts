@@ -1,12 +1,14 @@
 import {TranslateParams} from '../translations';
 import {Order} from './payment';
-import {User} from './user';
+import {OwnedPerk, User} from './user';
 
 export interface Perk {
     inPackage: Package;
     type: string;
 
     redeem(forUser: RedeemTarget, order: Order): Promise<TranslateParams>;
+
+    ownedBy(target: RedeemTarget): Promise<OwnedPerk[] | null>;
 
     asTranslatedString(): string;
 }

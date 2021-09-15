@@ -140,6 +140,7 @@ class YamlAppConfig implements AppConfig {
     async initialize(): Promise<void> {
         container.registerInstance('CFToolsClient', new CFToolsClientBuilder()
             .withCredentials(this.cftools.applicationId, this.cftools.secret)
+            .withCache()
             .withHttpClient((auth?: AuthorizationProvider) => new LogTokenExpiredGotHttpClient(auth, this.logger))
             .build());
         container.register('DonationsDB', {

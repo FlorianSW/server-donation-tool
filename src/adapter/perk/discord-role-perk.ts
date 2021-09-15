@@ -1,7 +1,7 @@
 import {translate, TranslateParams} from '../../translations';
-import {Client, Guild} from 'discord.js';
+import {Client, Constants, DiscordAPIError, Guild} from 'discord.js';
 import {Package, Perk, RedeemError, RedeemTarget} from '../../domain/package';
-import {User} from '../../domain/user';
+import {DiscordRole, OwnedPerk, User} from '../../domain/user';
 import {Order} from '../../domain/payment';
 import {Logger} from 'winston';
 
@@ -59,6 +59,17 @@ export class DiscordRolePerk implements Perk {
             roles: addedRoles.join(', '),
         };
         return successParams;
+    }
+
+    async ownedBy(target: RedeemTarget): Promise<OwnedPerk[] | null> {
+        try {
+            const guildMember = await this.guild.members.fetch(target.discordId);
+            return guildMember.roles.cache
+                .filter((r) => this.roles.includes(r.id))
+                .map((r) => new DiscordRole(r.name));
+        } catch (e) {
+            throw e;
+        }
     }
 
     asTranslatedString(): string {

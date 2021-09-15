@@ -1,8 +1,15 @@
-import {CFToolsClient, DuplicateResourceCreation, ServerApiId, SteamId64, TokenExpired} from 'cftools-sdk';
+import {
+    CFToolsClient,
+    DuplicateResourceCreation,
+    PriorityQueueItem,
+    ServerApiId,
+    SteamId64,
+    TokenExpired
+} from 'cftools-sdk';
 import {translate, TranslateParams} from '../../translations';
 import {Package, Perk, RedeemError, RedeemTarget} from '../../domain/package';
 import {ServerNames} from '../../domain/app-config';
-import {User} from '../../domain/user';
+import {OwnedPerk, PriorityQueue} from '../../domain/user';
 import {Order} from '../../domain/payment';
 import {Logger} from 'winston';
 
@@ -46,6 +53,49 @@ export class PriorityQueuePerk implements Perk {
             this.throwRedeemError(e);
         }
         return successParams;
+    }
+
+    async ownedBy(target: RedeemTarget): Promise<OwnedPerk[] | null> {
+        return [await this.fetchPriorityQueue(SteamId64.of(target.steamId), ServerApiId.of(this.cftools.serverApiId))];
+    }
+
+    asTranslatedString(): string {
+        if (this.permanent) {
+            return translate('PERK_PRIORITY_QUEUE_PERMANENT_DESCRIPTION', {
+                params: {
+                    serverName: this.serverNames[this.cftools.serverApiId],
+                }
+            });
+        }
+        return translate('PERK_PRIORITY_QUEUE_DESCRIPTION', {
+            params: {
+                serverName: this.serverNames[this.cftools.serverApiId],
+                amountInDays: this.amountInDays.toString(10),
+            }
+        })
+    }
+
+    private async fetchPriorityQueue(steamId: SteamId64, server: ServerApiId): Promise<PriorityQueue> {
+        try {
+            const entry = await this.client.getPriorityQueue({
+                playerId: steamId,
+                serverApiId: server,
+            });
+            if (entry === null || this.isExpired(entry)) {
+                return null;
+            }
+            return new PriorityQueue(this.serverNames[server.id] || server.id, entry.expiration);
+        } catch (e) {
+            this.log.error(`Could not request Priority queue information for server API ID: ${server}. Error: ` + e);
+            throw e;
+        }
+    }
+
+    private isExpired(p: PriorityQueueItem): boolean {
+        if (p.expiration === 'Permanent') {
+            return false;
+        }
+        return p.expiration.getTime() <= new Date().getTime();
     }
 
     private throwRedeemError(e: Error) {
@@ -102,21 +152,5 @@ PayPal Transaction ID: ${order.payment.transactionId}
 PayPal Order ID: ${order.payment.id}
 Selected product: ${this.inPackage.name}`
         });
-    }
-
-    asTranslatedString(): string {
-        if (this.permanent) {
-            return translate('PERK_PRIORITY_QUEUE_PERMANENT_DESCRIPTION', {
-                params: {
-                    serverName: this.serverNames[this.cftools.serverApiId],
-                }
-            });
-        }
-        return translate('PERK_PRIORITY_QUEUE_DESCRIPTION', {
-            params: {
-                serverName: this.serverNames[this.cftools.serverApiId],
-                amountInDays: this.amountInDays.toString(10),
-            }
-        })
     }
 }

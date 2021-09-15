@@ -10,6 +10,8 @@
             image.src = '/assets/images/discord.svg';
         } else if (p.type === 'PRIORITY_QUEUE') {
             image.src = '/assets/images/rocket-svgrepo-com.svg';
+        } else if (p.type === 'WHITELIST') {
+            image.src = '/assets/images/guest-svgrepo-com.svg';
         }
         imgContainer.append(image);
 

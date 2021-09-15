@@ -1,6 +1,6 @@
 import {TranslateParams} from '../../translations';
 import {Package, Perk, RedeemTarget} from '../../domain/package';
-import {User} from '../../domain/user';
+import {OwnedPerk, User} from '../../domain/user';
 import {Order} from '../../domain/payment';
 
 export class FreetextPerk implements Perk {
@@ -11,6 +11,10 @@ export class FreetextPerk implements Perk {
 
     async redeem(target: RedeemTarget, order: Order): Promise<TranslateParams> {
         return ['FREETEXT_TEXT', {params: {text: this.text}}];
+    }
+
+    async ownedBy(target: RedeemTarget): Promise<OwnedPerk[] | null> {
+        return null;
     }
 
     asTranslatedString(): string {

@@ -9,6 +9,31 @@ export class PriorityQueue implements OwnedPerk {
     asString(): string {
         return `${this.serverName} (${translate('PERKS_OWNED_PRIORITY_QUEUE_UNTIL')} ${this.expires.toLocaleString()})`;
     }
+
+    equals(other: OwnedPerk): boolean {
+        if (other.type !== this.type) {
+            return false;
+        }
+        return this.serverName === (other as PriorityQueue).serverName;
+    }
+}
+
+export class Whitelist implements OwnedPerk {
+    type = 'WHITELIST';
+
+    constructor(private readonly serverName: string, private readonly expires?: Date | 'Permanent') {
+    }
+
+    asString(): string {
+        return `${this.serverName} (${translate('PERKS_OWNED_WHITELIST_UNTIL')} ${this.expires.toLocaleString()})`;
+    }
+
+    equals(other: OwnedPerk): boolean {
+        if (other.type !== this.type) {
+            return false;
+        }
+        return this.serverName === (other as Whitelist).serverName;
+    }
 }
 
 export class FailedToLoad implements OwnedPerk {
@@ -16,6 +41,10 @@ export class FailedToLoad implements OwnedPerk {
 
     asString(): string {
         return translate('PERKS_OWNED_FAILED_TO_LOAD');
+    }
+
+    equals(other: OwnedPerk): boolean {
+        return false;
     }
 }
 
@@ -28,12 +57,21 @@ export class DiscordRole implements OwnedPerk {
     asString(): string {
         return translate('PERKS_OWNED_DISCORD_ROLE', {params: {role: this.role}});
     }
+
+    equals(other: OwnedPerk): boolean {
+        if (other.type !== this.type) {
+            return false;
+        }
+        return this.role === (other as DiscordRole).role;
+    }
 }
 
 export interface OwnedPerk {
     type: string;
 
     asString(): string;
+
+    equals(other: OwnedPerk): boolean;
 }
 
 export interface User {

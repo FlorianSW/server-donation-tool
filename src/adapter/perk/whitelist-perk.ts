@@ -1,8 +1,8 @@
-import {CFToolsClient, DuplicateResourceCreation, ServerApiId, SteamId64} from 'cftools-sdk';
+import {CFToolsClient, DuplicateResourceCreation, PriorityQueueItem, ServerApiId, SteamId64} from 'cftools-sdk';
 import {translate, TranslateParams} from '../../translations';
 import {Package, Perk, RedeemError, RedeemTarget} from '../../domain/package';
 import {ServerNames} from '../../domain/app-config';
-import {User} from '../../domain/user';
+import {OwnedPerk, PriorityQueue, User, Whitelist} from '../../domain/user';
 import {Order} from '../../domain/payment';
 
 export class WhitelistPerk implements Perk {
@@ -44,6 +44,32 @@ export class WhitelistPerk implements Perk {
             this.throwRedeemError(e);
         }
         return successParams;
+    }
+
+    async ownedBy(target: RedeemTarget): Promise<OwnedPerk[] | null> {
+        return [await this.fetchWhitelist(SteamId64.of(target.steamId), ServerApiId.of(this.cftools.serverApiId))];
+    }
+
+    private async fetchWhitelist(steamId: SteamId64, server: ServerApiId): Promise<Whitelist> {
+        try {
+            const entry = await this.client.getWhitelist({
+                playerId: steamId,
+                serverApiId: server,
+            });
+            if (entry === null || this.isExpired(entry)) {
+                return null;
+            }
+            return new Whitelist(this.serverNames[server.id] || server.id, entry.expiration);
+        } catch (e) {
+            throw e;
+        }
+    }
+
+    private isExpired(p: PriorityQueueItem): boolean {
+        if (p.expiration === 'Permanent') {
+            return false;
+        }
+        return p.expiration.getTime() <= new Date().getTime();
     }
 
     private throwRedeemError(e: Error) {
