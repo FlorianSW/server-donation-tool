@@ -343,7 +343,7 @@ export async function parseConfig(logger: Logger): Promise<AppConfig> {
             } else if (perk.type === 'FREETEXT_ONLY') {
                 p.perks[i] = Object.assign(new FreetextPerk(), perk);
             } else if (perk.type === 'WHITELIST') {
-                p.perks[i] = Object.assign(new WhitelistPerk(container.resolve('CFToolsClient'), intermediate.serverNames), perk);
+                p.perks[i] = Object.assign(new WhitelistPerk(container.resolve('CFToolsClient'), intermediate.serverNames, logger), perk);
             } else if (perk.type === 'RESERVED_SLOT') {
                 p.perks[i] = Object.assign(new ReservedSlotPerk(intermediate.serverNames, intermediate), perk);
             } else {

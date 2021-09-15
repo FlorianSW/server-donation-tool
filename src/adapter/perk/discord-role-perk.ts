@@ -1,7 +1,7 @@
 import {translate, TranslateParams} from '../../translations';
 import {Client, Constants, DiscordAPIError, Guild} from 'discord.js';
 import {Package, Perk, RedeemError, RedeemTarget} from '../../domain/package';
-import {DiscordRole, OwnedPerk, User} from '../../domain/user';
+import {DiscordRole, FailedToLoad, OwnedPerk, User} from '../../domain/user';
 import {Order} from '../../domain/payment';
 import {Logger} from 'winston';
 

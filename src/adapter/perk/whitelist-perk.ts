@@ -2,8 +2,9 @@ import {CFToolsClient, DuplicateResourceCreation, PriorityQueueItem, ServerApiId
 import {translate, TranslateParams} from '../../translations';
 import {Package, Perk, RedeemError, RedeemTarget} from '../../domain/package';
 import {ServerNames} from '../../domain/app-config';
-import {OwnedPerk, PriorityQueue, User, Whitelist} from '../../domain/user';
+import {FailedToLoad, OwnedPerk, PriorityQueue, User, Whitelist} from '../../domain/user';
 import {Order} from '../../domain/payment';
+import {Logger} from 'winston';
 
 export class WhitelistPerk implements Perk {
     inPackage: Package;
@@ -18,6 +19,7 @@ export class WhitelistPerk implements Perk {
     constructor(
         private readonly client: CFToolsClient,
         private readonly serverNames: ServerNames,
+        private readonly log: Logger,
     ) {
     }
 
@@ -47,7 +49,12 @@ export class WhitelistPerk implements Perk {
     }
 
     async ownedBy(target: RedeemTarget): Promise<OwnedPerk[] | null> {
-        return [await this.fetchWhitelist(SteamId64.of(target.steamId), ServerApiId.of(this.cftools.serverApiId))];
+        try {
+            return [await this.fetchWhitelist(SteamId64.of(target.steamId), ServerApiId.of(this.cftools.serverApiId))];
+        } catch (e) {
+            this.log.error(`Could not request Whitelist entry information for server API ID: ${this.cftools.serverApiId}. Error: ` + e);
+            return [new FailedToLoad()];
+        }
     }
 
     private async fetchWhitelist(steamId: SteamId64, server: ServerApiId): Promise<Whitelist> {

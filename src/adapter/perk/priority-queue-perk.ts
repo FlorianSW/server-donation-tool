@@ -9,7 +9,7 @@ import {
 import {translate, TranslateParams} from '../../translations';
 import {Package, Perk, RedeemError, RedeemTarget} from '../../domain/package';
 import {ServerNames} from '../../domain/app-config';
-import {OwnedPerk, PriorityQueue} from '../../domain/user';
+import {FailedToLoad, OwnedPerk, PriorityQueue} from '../../domain/user';
 import {Order} from '../../domain/payment';
 import {Logger} from 'winston';
 
@@ -56,7 +56,12 @@ export class PriorityQueuePerk implements Perk {
     }
 
     async ownedBy(target: RedeemTarget): Promise<OwnedPerk[] | null> {
-        return [await this.fetchPriorityQueue(SteamId64.of(target.steamId), ServerApiId.of(this.cftools.serverApiId))];
+        try {
+            return [await this.fetchPriorityQueue(SteamId64.of(target.steamId), ServerApiId.of(this.cftools.serverApiId))];
+        } catch(e) {
+            this.log.error(`Could not request Priority queue information for server API ID: ${this.cftools.serverApiId}. Error: ` + e);
+            return [new FailedToLoad()];
+        }
     }
 
     asTranslatedString(): string {
