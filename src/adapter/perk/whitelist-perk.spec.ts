@@ -3,6 +3,7 @@ import {InMemoryCFToolsClient} from './testhelper';
 import {WhitelistPerk} from './whitelist-perk';
 import {aRedeemedOrder, aPackage, aServerApiId, aSteamId, aUser} from './testdata.spec';
 import {RedeemTarget} from '../../domain/package';
+import {createLogger} from 'winston';
 
 describe('WhitelistPerk', () => {
     let client: CFToolsClient;
@@ -11,7 +12,7 @@ describe('WhitelistPerk', () => {
     beforeEach(() => {
         client = new InMemoryCFToolsClient();
         perk = Object.assign(
-            new WhitelistPerk(client as CFToolsClient, {aServerApiId: 'A_NAME'}),
+            new WhitelistPerk(client as CFToolsClient, {aServerApiId: 'A_NAME'}, createLogger()),
             {
                 inPackage: aPackage,
                 cftools: {
@@ -38,7 +39,7 @@ describe('WhitelistPerk', () => {
 
         it('creates permanent whitelist entry', async () => {
             perk = Object.assign(
-                new WhitelistPerk(client as CFToolsClient, {aServerApiId: 'A_NAME'}),
+                new WhitelistPerk(client as CFToolsClient, {aServerApiId: 'A_NAME'}, createLogger()),
                 {
                     inPackage: aPackage,
                     cftools: {
