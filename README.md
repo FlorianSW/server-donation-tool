@@ -2,6 +2,7 @@
 
 [![Discord](https://img.shields.io/discord/729467994832371813?color=7289da&label=Discord&logo=discord&logoColor=ffffff&style=flat-square)](https://go2tech.de/discord)
 [![Docker Pulls](https://img.shields.io/docker/pulls/droidwiki/server-donation-tool?style=flat-square)](https://hub.docker.com/r/droidwiki/server-donation-tool)
+[![Tests](https://img.shields.io/github/workflow/status/FlorianSW/server-donation-tool/Test?label=tests&style=flat-square)](https://github.com/FlorianSW/server-donation-tool/actions/workflows/test.yml)
 [![Documentation](https://img.shields.io/badge/docs-deployed-success?style=flat-square&logo=readthedocs)](https://floriansw.github.io/server-donation-tool/)
 
 <p align="center">
