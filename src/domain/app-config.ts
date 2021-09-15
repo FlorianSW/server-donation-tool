@@ -54,6 +54,9 @@ export interface AppConfig {
         clientSecret: string,
         manageWebhook: boolean,
     },
+    battlemetrics: {
+        access_token: string,
+    },
     cftools: {
         applicationId: string,
         secret: string,

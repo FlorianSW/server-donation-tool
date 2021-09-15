@@ -71,6 +71,9 @@ const messages: { [key: string]: string } = {
     PRIORITY_QUEUE_REDEEM_COMPLETE: 'Your priority queue slot for {{serverName}} was created successfully. It will expire at: {{until}}',
     PRIORITY_QUEUE_REDEEM_ERROR: 'Could not setup priority queue for {{serverName}}. Error: {{reason}}',
 
+    RESERVED_SLOT_REDEEM_COMPLETE: 'Your reserved slot for {{serverName}} was created successfully. It will expire at: {{until}}',
+    RESERVED_SLOT_REDEEM_ERROR: 'Could not setup reserved slot for {{serverName}}. Error: {{reason}}',
+
     WHITELIST_REDEEM_COMPLETE: 'You are now whitelisted for {{serverName}}. It will expire at: {{until}}',
     WHITELIST_REDEEM_ERROR: 'Could not setup whitelist for {{serverName}}. Error: {{reason}}',
 
@@ -125,6 +128,8 @@ const messages: { [key: string]: string } = {
     PERK_DISCORD_ROLE_DESCRIPTION: 'These discord roles will be assigned to your user: {{roles}}',
     PERK_WHITELIST_DESCRIPTION: 'Whitelisted on {{serverName}} for {{amountInDays}} days',
     PERK_WHITELIST_PERMANENT_DESCRIPTION: 'Permanently whitelisted on {{serverName}}',
+    PERK_RESERVED_SLOT_DESCRIPTION: 'Reserved slot on {{serverName}} for {{amountInDays}} days',
+    PERK_RESERVED_SLOT_PERMANENT_DESCRIPTION: 'Permanent reserved slot on {{serverName}}',
 
     NOTIFICATIONS_REDEEM_SUCCESSFUL_TITLE: 'Donation redeemed',
     NOTIFICATIONS_REDEEM_SUCCESSFUL_DESCRIPTION: 'A donator redeemed perks of the package they donated for.',

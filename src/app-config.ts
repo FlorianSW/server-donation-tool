@@ -23,6 +23,7 @@ import {CleanupOrder} from './service/cleanup-order';
 import {WhitelistPerk} from './adapter/perk/whitelist-perk';
 import {fromHttpError, GotHttpClient, httpClient} from 'cftools-sdk/lib/internal/http';
 import {DiscordUserNotifier} from './adapter/discord/discord-user-notifier';
+import {ReservedSlotPerk} from './adapter/perk/reserved-slot';
 
 const initSessionStore = require('connect-session-knex');
 const sessionStore: StoreFactory = initSessionStore(session);
@@ -121,6 +122,9 @@ class YamlAppConfig implements AppConfig {
         apiKey: string;
         redirectUrl: string;
         realm: string;
+    };
+    battlemetrics: {
+        access_token: string;
     };
     packages: Package[];
     paypal: {
@@ -339,6 +343,8 @@ export async function parseConfig(logger: Logger): Promise<AppConfig> {
                 p.perks[i] = Object.assign(new FreetextPerk(), perk);
             } else if (perk.type === 'WHITELIST') {
                 p.perks[i] = Object.assign(new WhitelistPerk(container.resolve('CFToolsClient'), intermediate.serverNames), perk);
+            } else if (perk.type === 'RESERVED_SLOT') {
+                p.perks[i] = Object.assign(new ReservedSlotPerk(intermediate.serverNames, intermediate), perk);
             } else {
                 throw new Error('No available provider can redeem perk: ' + perk.type);
             }

@@ -142,6 +142,9 @@ export class DonationController {
     }
 
     private selectedPackage(session: Partial<SessionData>): Package {
+        if (!session.selectedPackage) {
+            return;
+        }
         return this.packages.find((p) => session.selectedPackage.id === p.id);
     }
 
