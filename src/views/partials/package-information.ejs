@@ -1,0 +1,16 @@
+<div class="donate col s12 m5 l5">
+    <div class="package-information">
+        <div class="title">
+            <h6><%= translate('DONATE_SELECTED_PACKAGE') %></h6>
+            <a href="/"><%= translate('DONATE_SELECTED_PACKAGE_EDIT') %></a>
+        </div>
+        <div>
+            <span><%= selectedPackage.name %></span>
+            <span><%= selectedPackage.price.currency + ' ' + selectedPackage.price.amount %></span>
+            <% selectedPackage.perks.forEach(function (perk) { %>
+                <span><%= perk.asShortString() %></span>
+                <span><%= translate('DONATE_PERK_INCLUDED') %></span>
+            <% }); %>
+        </div>
+    </div>
+</div>

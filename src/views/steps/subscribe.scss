@@ -1,0 +1,21 @@
+@import "../partials/package-information";
+
+.subscribe {
+  .summary {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-column-gap: 12px;
+    grid-row-gap: 4px;
+    justify-content: flex-end;
+
+    > span > span {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      img {
+        width: 24px
+      }
+    }
+  }
+}

@@ -132,7 +132,7 @@ Selected product: ${this.inPackage.name}`
         });
     }
 
-    asTranslatedString(): string {
+    asLongString(): string {
         if (this.permanent) {
             return translate('PERK_WHITELIST_PERMANENT_DESCRIPTION', {
                 params: {
@@ -145,6 +145,10 @@ Selected product: ${this.inPackage.name}`
                 serverName: this.serverNames[this.cftools.serverApiId],
                 amountInDays: this.amountInDays.toString(10),
             }
-        })
+        });
+    }
+
+    asShortString(): string {
+        return this.asLongString();
     }
 }

@@ -10,7 +10,9 @@ export interface Perk {
 
     ownedBy(target: RedeemTarget): Promise<OwnedPerk[] | null>;
 
-    asTranslatedString(): string;
+    asLongString(): string;
+
+    asShortString(): string;
 }
 
 export class RedeemTarget {

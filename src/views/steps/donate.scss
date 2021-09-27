@@ -1,0 +1,31 @@
+@import "../partials/package-information";
+
+.donate {
+  #paypal-button-container {
+    margin-top: 1rem;
+  }
+
+  h5 {
+    border-top: 1px solid #616161;
+    margin: 1rem 0 0;
+    padding: 1rem 0 .5rem 0;
+  }
+
+  .summary {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-column-gap: 12px;
+    grid-row-gap: 4px;
+    justify-content: flex-end;
+
+    > span > span {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      img {
+        width: 24px
+      }
+    }
+  }
+}

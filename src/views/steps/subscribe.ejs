@@ -1,0 +1,28 @@
+<div class="subscribe col s12 m7 l7">
+    <h3><%= translate('PAYPAL_SUBSCRIPTION_TITLE') %></h3>
+    <h5><%= translate('DONATE_SUMMARY_TITLE') %></h5>
+    <div class="summary">
+        <label><%= translate('SUBSCRIBE_CYCLE_LABEL') %></label>
+        <span>
+            <%= translate('SUBSCRIBE_CYCLE_MONTHLY') %>
+        </span>
+        <label><%= translate('DONATE_SUMMARY_USER_LABEL') %></label>
+        <span>
+            <span><img class="image" src="/assets/images/steam_logo.png"> <%= user.steam.name %> (<%= user.steam.id %>)</span>
+            <span><img class="image" src="/assets/images/discord.svg"> <%= user.username %></span>
+        </span>
+    </div>
+
+    <h5><%= translate('DONATE_SUBSCRIBE_TITLE') %></h5>
+    <p>
+        <%= translate('PAYPAL_SUBSCRIPTION_DESCRIPTION') %>
+    </p>
+    <form action="/donate" method="post">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        <button class="btn waves-effect waves-light" name="subscribe" type="submit">
+            <%= translate('PAYPAL_SUBSCRIBE') %>
+        </button>
+    </form>
+</div>
+<%- include('../partials/package-information.ejs') %>
+<link rel="stylesheet" href="/assets/css/steps/subscribe.css">

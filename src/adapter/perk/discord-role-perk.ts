@@ -72,8 +72,12 @@ export class DiscordRolePerk implements Perk {
         }
     }
 
-    asTranslatedString(): string {
-        return translate('PERK_DISCORD_ROLE_DESCRIPTION', {
+    asLongString(): string {
+        return this.asTranslatedString('PERK_DISCORD_ROLE_DESCRIPTION');
+    }
+
+    private asTranslatedString(key: string): string {
+        return translate(key, {
             params: {
                 roles: this.roles.map((r) => {
                     const role = this.guild.roles.cache.get(r);
@@ -83,6 +87,10 @@ export class DiscordRolePerk implements Perk {
                     return r;
                 }).join(', '),
             }
-        })
+        });
+    }
+
+    asShortString(): string {
+        return this.asTranslatedString('PERK_DISCORD_ROLE_SHORT');
     }
 }

@@ -1,0 +1,33 @@
+.package-information {
+  border: 1px solid #616161;
+  border-radius: 2px;
+  margin: calc(48px + 1.9466666667rem + 1.168rem) 0 1rem 0;
+  padding: 24px;
+
+  .title {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 1.25rem;
+
+    h6 {
+      font-weight: bold;
+    }
+
+    a {
+      font-size: 12px;
+    }
+  }
+
+  > div {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-column-gap: 12px;
+    grid-row-gap: 8px;
+    justify-content: flex-end;
+
+    span:nth-child(2n) {
+      justify-self: end;
+    }
+  }
+}

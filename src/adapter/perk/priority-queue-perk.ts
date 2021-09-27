@@ -64,7 +64,7 @@ export class PriorityQueuePerk implements Perk {
         }
     }
 
-    asTranslatedString(): string {
+    asLongString(): string {
         if (this.permanent) {
             return translate('PERK_PRIORITY_QUEUE_PERMANENT_DESCRIPTION', {
                 params: {
@@ -77,7 +77,11 @@ export class PriorityQueuePerk implements Perk {
                 serverName: this.serverNames[this.cftools.serverApiId],
                 amountInDays: this.amountInDays.toString(10),
             }
-        })
+        });
+    }
+
+    asShortString(): string {
+        return this.asLongString();
     }
 
     private async fetchPriorityQueue(steamId: SteamId64, server: ServerApiId): Promise<PriorityQueue> {

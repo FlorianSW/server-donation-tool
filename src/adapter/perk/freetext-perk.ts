@@ -17,7 +17,11 @@ export class FreetextPerk implements Perk {
         return null;
     }
 
-    asTranslatedString(): string {
+    asLongString(): string {
+        return this.text;
+    }
+
+    asShortString(): string {
         return this.text;
     }
 }

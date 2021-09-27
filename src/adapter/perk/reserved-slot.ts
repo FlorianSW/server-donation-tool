@@ -71,7 +71,7 @@ export class ReservedSlotPerk implements Perk {
         return null;
     }
 
-    asTranslatedString(): string {
+    asLongString(): string {
         if (this.permanent) {
             return translate('PERK_RESERVED_SLOT_PERMANENT_DESCRIPTION', {
                 params: {
@@ -84,7 +84,11 @@ export class ReservedSlotPerk implements Perk {
                 serverName: this.serverNames[this.battlemetrics.serverId],
                 amountInDays: this.amountInDays.toString(10),
             }
-        })
+        });
+    }
+
+    asShortString(): string {
+        return this.asLongString();
     }
 
     private createReservedSlot(target: RedeemTarget, order: Order): Promise<void> {

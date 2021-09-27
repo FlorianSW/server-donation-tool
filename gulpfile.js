@@ -30,7 +30,13 @@ function assets() {
 function scripts() {
     return src('src/views/**/*.js')
         .pipe(uglify())
-        .pipe(dest('dist/assets/js/'))
+        .pipe(dest('dist/assets/js/'));
+}
+
+function css() {
+    return src('src/views/**/*.scss')
+        .pipe(sass({outputStyle: 'compressed'}))
+        .pipe(dest('dist/assets/css/'));
 }
 
 function materialize() {
@@ -45,4 +51,4 @@ function tsc() {
         .js.pipe(dest("dist"));
 }
 
-exports.default = series(clean, tsc, mainCss, views, assets, scripts, materialize);
+exports.default = series(clean, tsc, mainCss, views, assets, scripts, css, materialize);

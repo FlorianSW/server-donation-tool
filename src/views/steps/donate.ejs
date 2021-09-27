@@ -1,52 +1,30 @@
-<div class="col s12 m9 l9">
-    <div class="card paypal">
-        <% if (selectedPackage.type === 'subscription') { %>
-            <div class="card-content">
-                <span class="card-title"><%= translate('PAYPAL_SUBSCRIPTION_TITLE') %></span>
-                <p>
-                    <%- translate('PAYPAL_SUBSCRIPTION_DESCRIPTION') %>
-                </p>
-                <h5><%= translate('PAYPAL_SELECTED_PACKAGE') %></h5>
-                <p>
-                    <%= selectedPackage.name %><br>
-                    <%= selectedPackage.price.currency + ' ' + selectedPackage.price.amount %><br>
-                    <%= translate('PAYPAL_SUBSCRIPTION_BILLED', {params: {cycle: selectedPackage.subscription}}) %>
-                </p>
-            </div>
-            <div class="card-action subscription">
-                <form action="/donate" method="post">
-                    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-                    <button class="btn waves-effect waves-light" name="subscribe" type="submit">
-                        <%= translate('PAYPAL_SUBSCRIBE') %>
-                    </button>
-                </form>
-            </div>
+<div class="donate col s12 m7 l7">
+    <h3><%= translate('DONATE_TITLE') %></h3>
+    <h5><%= translate('DONATE_SUMMARY_TITLE') %></h5>
+    <div class="summary">
+        <label><%= translate('DONATE_SUMMARY_PERKS_FOR_LABEL') %></label>
+        <% if (selectedPackage.forAccount !== null) { %>
+            <span><%= translate('DONATE_SUMMARY_PERKS_FOR_YOURSELF') %></span>
         <% } else { %>
-            <div class="card-content">
-                <span class="card-title"><%= translate('PAYPAL_DONATION_TITLE') %></span>
-                <p>
-                    <%- translate('PAYPAL_DESCRIPTION') %>
-                </p>
-                <h5><%= translate('PAYPAL_SELECTED_PACKAGE') %></h5>
-                <p>
-                    <%= selectedPackage.name %><br>
-                    <%= selectedPackage.price.currency + ' ' + selectedPackage.price.amount %>
-                </p>
-                <div class="input-field custom-message">
-                    <textarea id="custom-message" class="materialize-textarea" maxlength="255"></textarea>
-                    <label for="custom-message" class="active"><%= translate('PAYPAL_CUSTOM_MESSAGE') %></label>
-                </div>
-                <div class="status">
-                    <% if (paymentStatus === 'ERROR') { %>
-                        <i class="material-icons error">highlight_off</i> <%= translate('PAYPAL_ERROR') %>
-                    <% } %>
-                </div>
-            </div>
-            <% if (paymentStatus === 'UNSTARTED') { %>
-                <script src="https://www.paypal.com/sdk/js?client-id=<%= paypalClientId %>"></script>
-                <div class="card-action one-time" id="paypal-button-container"></div>
-                <script src="/assets/js/steps/donate.js"></script>
-            <% } %>
+            <span><%= translate('DONATE_SUMMARY_PERKS_FOR_GIFT') %></span>
         <% } %>
+        <label><%= translate('DONATE_SUMMARY_USER_LABEL') %></label>
+        <span>
+            <span><img class="image" src="/assets/images/steam_logo.png"> <%= user.steam.name %> (<%= user.steam.id %>)</span>
+            <span><img class="image" src="/assets/images/discord.svg"> <%= user.username %></span>
+        </span>
     </div>
+
+    <h5><%= translate('DONATE_CUSTOM_MESSAGE_TITLE') %></h5>
+    <div class="input-field custom-message">
+        <textarea id="custom-message" class="materialize-textarea" maxlength="255"></textarea>
+        <label for="custom-message" class="active"><%= translate('DONATE_CUSTOM_MESSAGE_LABEL') %></label>
+    </div>
+
+    <h5><%= translate('DONATE_PAYMENT_TITLE') %></h5>
+    <script src="https://www.paypal.com/sdk/js?client-id=<%= paypalClientId %>"></script>
+    <div id="paypal-button-container"></div>
+    <script src="/assets/js/steps/donate.js"></script>
 </div>
+<%- include('../partials/package-information.ejs') %>
+<link rel="stylesheet" href="/assets/css/steps/donate.css">
