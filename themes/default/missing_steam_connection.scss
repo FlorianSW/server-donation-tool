@@ -1,0 +1,28 @@
+@import "partials/header_footer";
+
+.card.missing-steam-connection {
+  .card-image {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #424242;
+
+    .image {
+      width: 88px;
+      height: 88px;
+    }
+
+    .connector {
+      width: 28px;
+      height: 28px;
+      margin: 0 37px;
+    }
+  }
+
+  .card-content {
+    img {
+      margin-top: 16px;
+      max-width: 100%;
+    }
+  }
+}

@@ -1,0 +1,54 @@
+@import "../partials/header_footer";
+@import "../partials/perks_you_own";
+@import "../partials/donation_target";
+
+.packages {
+  display: flex;
+  gap: 1em;
+  flex-wrap: wrap;
+  justify-content: center;
+
+  > form {
+    max-width: 360px;
+  }
+}
+
+.card.package {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+
+  .card-content {
+    flex-grow: 1;
+    display: grid;
+    grid-template-rows: 1fr auto;
+  }
+
+  .card-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    img {
+      height: 16px;
+    }
+  }
+
+  .package-information {
+    margin-top: 0.5em;
+    font-size: 0.8em;
+
+    span {
+      display: list-item;
+      list-style: square inside;
+    }
+  }
+
+  .price {
+    display: flex;
+    justify-content: end;
+    font-size: 1.5em;
+    margin-top: 12px;
+  }
+}

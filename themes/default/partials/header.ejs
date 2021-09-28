@@ -22,9 +22,12 @@
     <% } %>
     <title>Donations - <%= community.title %></title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <link rel="stylesheet" href="/assets/css/materialize.min.css">
-    <link rel="stylesheet" href="/assets/css/main.min.css">
+    <% stylesheets.forEach(function (path) { %>
+        <link rel="stylesheet" href="<%= path %>">
+    <% }); %>
+
     <% if (locals.googleAnalyticsTrackingId) { %>
         <script async src="https://www.googletagmanager.com/gtag/js?id=<%= locals.googleAnalyticsTrackingId %>"></script>
         <script>
@@ -64,3 +67,5 @@
         </div>
     </div>
 </nav>
+<div class="container">
+    <div class="row">

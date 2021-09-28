@@ -1,3 +1,4 @@
+<%- include('../partials/header.ejs') %>
 <div class="col s12">
     <div class="card redeem">
         <div class="card-content">
@@ -51,8 +52,9 @@
                     <input id="share" type="text" readonly value="<%= shareLink %>">
                     <label for="share" class="active">Share Link</label>
                 </div>
-                <script src="/assets/js/steps/redeem.js"></script>
+                <%- script('steps/redeem.js') %>
             </div>
         </div>
     <% } %>
 </div>
+<%- include('../partials/footer.ejs') %>

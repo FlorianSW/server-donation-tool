@@ -1,3 +1,4 @@
+<%- include('../partials/header.ejs') %>
 <div class="donate col s12 m7 l7">
     <h3><%= translate('DONATE_TITLE') %></h3>
     <h5><%= translate('DONATE_SUMMARY_TITLE') %></h5>
@@ -10,8 +11,8 @@
         <% } %>
         <label><%= translate('DONATE_SUMMARY_USER_LABEL') %></label>
         <span>
-            <span><img class="image" src="/assets/images/steam_logo.png"> <%= user.steam.name %> (<%= user.steam.id %>)</span>
-            <span><img class="image" src="/assets/images/discord.svg"> <%= user.username %></span>
+            <span><img class="image" src="<%= imagePath('steam_logo.png') %>"> <%= user.steam.name %> (<%= user.steam.id %>)</span>
+            <span><img class="image" src="<%= imagePath('discord.svg') %>"> <%= user.username %></span>
         </span>
     </div>
 
@@ -24,7 +25,7 @@
     <h5><%= translate('DONATE_PAYMENT_TITLE') %></h5>
     <script src="https://www.paypal.com/sdk/js?client-id=<%= paypalClientId %>"></script>
     <div id="paypal-button-container"></div>
-    <script src="/assets/js/steps/donate.js"></script>
+    <%- script('steps/donate.js') %>
 </div>
 <%- include('../partials/package-information.ejs') %>
-<link rel="stylesheet" href="/assets/css/steps/donate.css">
+<%- include('../partials/footer.ejs') %>

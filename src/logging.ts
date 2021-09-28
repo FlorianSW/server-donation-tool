@@ -49,7 +49,7 @@ export const errorHandler: ErrorRequestHandler = (err: any, req: Request, res: R
         res.contentType('application/json').send({
             selectedPackage: req.session?.selectedPackage?.id,
             user: {
-                steamId: req.user?.steam.id,
+                steamId: req.user?.steam?.id,
                 discordId: req.user?.discord.id,
             },
             lastOrder: {
@@ -64,7 +64,7 @@ export const errorHandler: ErrorRequestHandler = (err: any, req: Request, res: R
                 status: status,
                 selectedPackage: req.session?.selectedPackage?.id,
                 user: {
-                    steamId: req.user?.steam.id,
+                    steamId: req.user?.steam?.id,
                     discordId: req.user?.discord.id,
                 },
                 lastOrder: {

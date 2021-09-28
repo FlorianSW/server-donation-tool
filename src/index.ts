@@ -36,6 +36,7 @@ import {RedeemPackage} from './service/redeem-package';
 import {Subscriptions} from './service/subscriptions';
 import {SubscriptionsController} from './adapter/controller/subscriptions';
 import {paypalClient} from './adapter/paypal/client';
+import {Theming} from './service/theming';
 
 export interface Closeable {
     close(): Promise<void>
@@ -69,9 +70,7 @@ container.registerType('Subscriptions', Subscriptions);
 container.registerType('Closeable', DiscordRoleRecorder);
 container.registerType('Closeable', ExpireDiscordRole);
 
-let appConfig: AppConfig;
 parseConfig(log).then(async (config) => {
-    appConfig = config;
     log.info('Starting server');
     const app = express();
 
@@ -83,21 +82,10 @@ parseConfig(log).then(async (config) => {
     const statistics = container.resolve(StatisticsController);
     const login = container.resolve(LoginController);
     const privacyPolicy = container.resolve(PrivacyPolicyController);
+    const theming = container.resolve(Theming);
 
-    app.locals.translate = translate;
-    app.locals.community = {
-        title: config.app.community?.title,
-        logoUrl: config.logoUrl(),
-        discordUrl: config.app.community?.discord,
-    }
-    app.locals.nameFromServerApiId = (serverApiId: string) => {
-        return config.serverNames[serverApiId] || serverApiId;
-    };
-    app.locals.supportsSteamLogin = appConfig.steam?.apiKey !== undefined;
-    app.locals.googleAnalyticsTrackingId = appConfig.app.googleAnalytics?.trackingId;
-    app.set('views', path.join(__dirname, 'views'));
+    theming.setup(app);
     app.set('trust proxy', 'loopback');
-    app.set('view engine', 'ejs');
     if (config.app.compressResponse) {
         app.use(compression({
             threshold: 500

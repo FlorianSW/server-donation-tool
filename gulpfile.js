@@ -4,6 +4,8 @@ const del = require('del');
 const sass = require('gulp-sass')(require('sass'));
 const rename = require('gulp-rename');
 const ts = require("gulp-typescript");
+const through = require("through2");
+const path = require("path");
 const tsProject = ts.createProject("tsconfig.json");
 
 function clean() {
@@ -17,26 +19,39 @@ function mainCss() {
         .pipe(dest('dist/assets/css/'));
 }
 
-function views() {
-    return src('src/views/**/*')
-        .pipe(dest('dist/views/'));
-}
-
 function assets() {
     return src('src/assets/**/*')
         .pipe(dest('dist/assets/'));
 }
 
-function scripts() {
-    return src('src/views/**/*.js')
+function themes() {
+    return src('themes/**/*.ejs')
+        .pipe(dest('dist/themes/'));
+}
+
+function themeScripts() {
+    return src('themes/**/*.js')
         .pipe(uglify())
         .pipe(dest('dist/assets/js/'));
 }
 
-function css() {
-    return src('src/views/**/*.scss')
+function themeCss() {
+    return src('themes/**/*.scss')
         .pipe(sass({outputStyle: 'compressed'}))
         .pipe(dest('dist/assets/css/'));
+}
+
+function themeAssets() {
+    return src('themes/*/images/**/*')
+        .pipe(removeDuplicateImagesPath())
+        .pipe(dest('dist/assets/images/'));
+}
+
+function removeDuplicateImagesPath() {
+    return through.obj(function (file, encoding, callback) {
+        file.path = file.path.replace('images' + path.sep, '');
+        callback(null, file);
+    });
 }
 
 function materialize() {
@@ -51,4 +66,4 @@ function tsc() {
         .js.pipe(dest("dist"));
 }
 
-exports.default = series(clean, tsc, mainCss, views, assets, scripts, css, materialize);
+exports.default = series(clean, tsc, mainCss, themes, assets, themeScripts, themeCss, themeAssets, materialize);

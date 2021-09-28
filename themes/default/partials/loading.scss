@@ -1,0 +1,49 @@
+@keyframes loading {
+  0% {
+    transform: translate3d(-30%, 0, 0);
+  }
+  50%, 100% {
+    transform: translate3d(30%, 0, 0);
+  }
+}
+
+.loading {
+  overflow: hidden;
+  position: relative;
+
+  .card-image {
+    background-color: white;
+
+    div {
+      height: 38px;
+      width: 38px;
+    }
+  }
+
+
+  .placeholder:first-child {
+    margin-top: 0;
+  }
+
+  .placeholder {
+    content: ' ';
+    margin-top: 6px;
+    height: 6px;
+    background-color: white;
+  }
+
+  &::before {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 50%;
+    z-index: 1;
+    width: 500%;
+    margin-left: -250%;
+    background: linear-gradient(to right, rgba(255, 255, 255, 0) 46%, #212121 50%, rgba(255, 255, 255, 0) 54%) 50% 50%;
+    animation: loading 1.8s linear infinite;
+    content: " ";
+    pointer-events: none;
+  }
+}

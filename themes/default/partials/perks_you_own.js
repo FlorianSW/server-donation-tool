@@ -5,13 +5,14 @@
         const imgContainer = document.createElement('div');
         imgContainer.classList.add('card-image');
 
+        const imagePath = document.querySelector('#icon-path').textContent;
         const image = document.createElement('img');
         if (p.type === 'DISCORD_ROLE') {
-            image.src = '/assets/images/discord.svg';
+            image.src = imagePath + 'discord.svg';
         } else if (p.type === 'PRIORITY_QUEUE') {
-            image.src = '/assets/images/rocket-svgrepo-com.svg';
+            image.src = imagePath + '/rocket-svgrepo-com.svg';
         } else if (p.type === 'WHITELIST') {
-            image.src = '/assets/images/guest-svgrepo-com.svg';
+            image.src = imagePath + '/guest-svgrepo-com.svg';
         }
         imgContainer.append(image);
 

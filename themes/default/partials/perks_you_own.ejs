@@ -1,0 +1,16 @@
+<h4 id="owned-perks-title"><%= translate('PERKS_OWNED_TITLE') %></h4>
+<div class="perk-list">
+    <% [0, 1, 2].forEach(function () { %>
+        <div class="owned-perk card loading">
+            <div class="card-image">
+                <div></div>
+            </div>
+            <div class="card-content">
+                <div class="placeholder"></div>
+                <div class="placeholder"></div>
+            </div>
+        </div>
+    <% }) %>
+</div>
+<div style="display: none" id="icon-path"><%= imagePath('') %></div>
+<%- script('partials/perks_you_own.js') %>

@@ -1,0 +1,12 @@
+@import "loading";
+
+.donation-target {
+  .loading .placeholder:last-child, .progress {
+    height: 22px;
+
+    .determinate {
+      text-align: end;
+      padding: 0 8px;
+    }
+  }
+}

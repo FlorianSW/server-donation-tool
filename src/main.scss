@@ -1,69 +1,9 @@
-@keyframes loading {
-  0% {
-    transform: translate3d(-30%, 0, 0);
-  }
-  50%, 100% {
-    transform: translate3d(30%, 0, 0);
-  }
-}
-
 body {
   background-color: #212121;
   color: #fff;
 
-  nav, .page-footer {
-    background-color: #616161;
-
-    .nav-wrapper .row {
-      height: 100%;
-
-      .col {
-        height: 100%;
-
-        display: flex;
-        align-items: center;
-        gap: 8px;
-
-        .brand-logo {
-          position: relative;
-          height: 100%;
-
-          img, a {
-            max-height: 100%;
-            height: 100%;
-          }
-        }
-
-        .logout {
-          margin-left: auto;
-        }
-
-        ul.left {
-          margin-left: 64px;
-        }
-      }
-    }
-
-    .container .links {
-      img {
-        height: 48px;
-      }
-    }
-  }
-
   input[type="text"], textarea {
     color: white;
-  }
-
-  .packages {
-    display: flex;
-    gap: 1em;
-    flex-wrap: wrap;
-    justify-content: center;
-
-    > form {
-      max-width: 360px;
-    }
   }
 
   .card {
@@ -86,196 +26,12 @@ body {
       gap: 8px;
     }
 
-    &.package {
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      height: 100%;
-
-      .card-content {
-        flex-grow: 1;
-        display: grid;
-        grid-template-rows: 1fr auto;
-      }
-
-      .card-title {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-
-        img {
-          height: 16px;
-        }
-      }
-
-      .package-information {
-        margin-top: 0.5em;
-        font-size: 0.8em;
-
-        span {
-          display: list-item;
-          list-style: square inside;
-        }
-      }
-
-      .price {
-        display: flex;
-        justify-content: end;
-        font-size: 1.5em;
-        margin-top: 12px;
-      }
-    }
-
-    &.paypal {
-      .card-action.one-time {
-        text-align: center;
-      }
-
-      .input-field {
-        margin-top: 32px;
-      }
-
-      .switch {
-        text-align: center;
-        margin: 16px 0;
-
-        label {
-          font-size: inherit;
-          color: inherit;
-        }
-      }
-    }
-
-    &.subscription {
-      .card-content > .pending {
-        margin-bottom: 16px;
-      }
-
-      .details {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        grid-column-gap: 8px;
-        grid-row-gap: 12px;
-
-        div:nth-child(odd) {
-          color: lightgrey;
-        }
-
-        .pending {
-          color: orange;
-        }
-
-        .active {
-          color: green;
-        }
-
-        .cancelled {
-          color: red;
-        }
-      }
-    }
-
-    &.subscription-history {
-      .details {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        grid-column-gap: 8px;
-        grid-row-gap: 6px;
-      }
-    }
-
-    &.missing-steam-connection {
-      .card-image {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background-color: #424242;
-
-        .image {
-          width: 88px;
-          height: 88px;
-        }
-
-        .connector {
-          width: 28px;
-          height: 28px;
-          margin: 0 37px;
-        }
-      }
-
-      .card-content {
-        img {
-          margin-top: 16px;
-          max-width: 100%;
-        }
-      }
-    }
-
     i.success {
       color: #43a047;
     }
 
-    i.pending {
-      color: #fdd835;
-    }
-
     i.error {
       color: #e53935;
-    }
-
-    i.info {
-      color: #000;
-    }
-  }
-
-  .perk-list {
-    display: flex;
-    justify-content: center;
-    gap: 16px;
-    flex-wrap: wrap;
-
-    > div {
-      width: 190px;
-      min-width: 190px;
-      max-width: 190px;
-      text-align: center;
-      background-color: transparent;
-      box-shadow: none;
-
-      .card-image {
-        margin-top: 16px;
-        background-color: transparent;
-        border: 2px solid white;
-        border-radius: 100%;
-        display: inline-block;
-
-        img {
-          height: 38px;
-          width: 38px;
-        }
-      }
-
-      .card-content {
-        padding: 16px;
-      }
-    }
-  }
-
-  .donation-target {
-    .loading .placeholder:last-child, .progress {
-      height: 22px;
-
-      .determinate {
-        text-align: end;
-        padding: 0 8px;
-      }
-    }
-  }
-
-  .redeem-share {
-    .input-field {
-      margin-top: 2rem;
-      margin-bottom: 0;
     }
   }
 
@@ -283,16 +39,6 @@ body {
     .collection-item {
       background-color: transparent;
     }
-  }
-
-  .collection.with-header {
-    .collection-header {
-      background-color: transparent;
-    }
-  }
-
-  [type="radio"]:not(:checked) + span:before, [type="radio"]:not(:checked) + span:after {
-    border-color: white;
   }
 
   input[type="submit"].link {
@@ -306,69 +52,6 @@ body {
 
     &:hover {
       color: #ffd8a6;
-    }
-  }
-
-  .loading {
-    overflow: hidden;
-    position: relative;
-
-    .card-image {
-      background-color: white;
-
-      div {
-        height: 38px;
-        width: 38px;
-      }
-    }
-
-
-    .placeholder:first-child {
-      margin-top: 0;
-    }
-
-    .placeholder {
-      content: ' ';
-      margin-top: 6px;
-      height: 6px;
-      background-color: white;
-    }
-
-    &::before {
-      position: absolute;
-      top: 0;
-      right: 0;
-      bottom: 0;
-      left: 50%;
-      z-index: 1;
-      width: 500%;
-      margin-left: -250%;
-      background: linear-gradient(to right, rgba(255, 255, 255, 0) 46%, #212121 50%, rgba(255, 255, 255, 0) 54%) 50% 50%;
-      animation: loading 1.8s linear infinite;
-      content: " ";
-      pointer-events: none;
-    }
-  }
-
-  .privacy-policy {
-    p {
-      white-space: break-spaces;
-    }
-  }
-
-  .page-footer {
-    .footer-copyright .container {
-      display: flex;
-      justify-content: space-between;
-
-      a {
-        color: #ffab40;
-        transition: color .3s ease;
-
-        &:hover {
-          color: #ffd8a6;
-        }
-      }
     }
   }
 

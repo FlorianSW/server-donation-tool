@@ -1,7 +1,7 @@
 import {requireAuthentication} from '../../auth';
 import {Request, Response, Router} from 'express';
 import {translate} from '../../translations';
-import {Package, RedeemTarget} from '../../domain/package';
+import {DonationType, Package, RedeemTarget} from '../../domain/package';
 import {AppConfig} from '../../domain/app-config';
 import {Order, OrderNotFound, Payment, Reference, SteamIdMismatch} from '../../domain/payment';
 import {Logger} from 'winston';
@@ -69,8 +69,11 @@ export class DonationController {
             res.redirect('/');
             return;
         }
-        res.render('index', {
-            step: 'DONATE',
+        let template = 'steps/donate';
+        if (req.session.selectedPackage.type === DonationType.Subscription) {
+            template = 'steps/subscribe';
+        }
+        res.render(template, {
             csrfToken: req.csrfToken(),
             user: req.user,
             selectedPackage: {
@@ -93,9 +96,8 @@ export class DonationController {
             return;
         }
 
-        res.render('index', {
+        res.render('steps/redeem', {
             user: req.user,
-            step: 'REDEEM',
             canShare: order.reference.discordId === req.user.discord.id,
             shareLink: new URL(`/donate/${order.id}`, this.config.app.publicUrl).toString(),
             redeemLink: `/donate/${order.id}/redeem`,
@@ -131,9 +133,8 @@ export class DonationController {
         }
 
         const result = await this.redeemPackage.redeem(order, RedeemTarget.fromUser(req.user));
-        res.render('index', {
+        res.render('steps/redeem', {
             user: req.user,
-            step: 'REDEEM',
             isUnclaimed: false,
             canShare: false,
             redeemStatus: 'COMPLETE',

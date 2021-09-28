@@ -1,3 +1,16 @@
+<%- include('../partials/header.ejs') %>
+<div class="row info">
+    <div class="col s12">
+        <h3>
+            <%= translate('INFO_TITLE') %>
+        </h3>
+        <p>
+            <%= translate('INFO_DESCRIPTION') %>
+        </p>
+    </div>
+</div>
+<%- include('../partials/donation_target.ejs') %>
+
 <div class="col s12">
     <h3>
         <%= translate('PERK_SELECTION_TITLE') %>
@@ -14,7 +27,7 @@
                     <span class="card-title">
                         <%= pack.name %>
                         <% if (pack.subscription) { %>
-                            <img src="/assets/images/repeat_white_24dp.svg"
+                            <img src="<%= imagePath('repeat_white_24dp.svg') %>"
                                  title="<%= translate('PERK_SUBSCRIPTION_AVAILABLE') %>">
                         <% } %>
                     </span>
@@ -74,3 +87,18 @@
         <% }); %>
     </div>
 </div>
+
+<div class="row">
+    <div class="col s12">
+        <%- include('../partials/perks_you_own.ejs'); %>
+    </div>
+</div>
+<div class="row">
+    <div class="col col s10 m4 offset-s1 offset-m2">
+        <%- include('../partials/steam_info.ejs'); %>
+    </div>
+    <div class="col col s10 m4">
+        <%- include('../partials/discord_info.ejs'); %>
+    </div>
+</div>
+<%- include('../partials/footer.ejs') %>

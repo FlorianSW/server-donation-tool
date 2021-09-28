@@ -4,9 +4,9 @@
         <div class="col s8 offset-s0">
             <div class="card missing-steam-connection">
                 <div class="card-image">
-                    <img class="image" src="/assets/images/discord.svg">
-                    <img class="connector" src="/assets/images/connector.svg">
-                    <img class="image" src="/assets/images/steam_logo.png">
+                    <img class="image" src="<%= imagePath('discord.svg') %>">
+                    <img class="connector" src="<%= imagePath('connector.svg') %>">
+                    <img class="image" src="<%= imagePath('steam_logo.png') %>">
                 </div>
                 <div class="card-content">
                     <span class="card-title">
@@ -15,7 +15,7 @@
                     <p>
                         <%- translate('ERROR_MISSING_STEAM_DESCRIPTION') %>
                     </p>
-                    <img src="/assets/images/how_connect_steam.png">
+                    <img src="<%= imagePath('how_connect_steam.png') %>">
                 </div>
                 <div class="card-action">
                     <a href="/auth/logout"><%= translate('ERROR_MISSING_STEAM_TRY_AGAIN') %></a>
@@ -26,7 +26,7 @@
             <div class="col s4 offset-s0">
                 <div class="card steam-login">
                     <div class="card-image">
-                        <img class="image" src="/assets/images/steam.png">
+                        <img class="image" src="<%= imagePath('steam.png') %>">
                     </div>
                     <div class="card-content">
                     <span class="card-title">

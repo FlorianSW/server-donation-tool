@@ -26,13 +26,12 @@ export class StartController {
     private async startPage(req: Request, res: Response) {
         req.user = await this.data.onRefresh(req.user);
 
-        res.render('index', {
+        res.render('steps/package_selection', {
             user: req.user,
             csrfToken: req.csrfToken(),
             showDonationTarget: !!this.config.app.community?.donationTarget?.monthly,
             availablePackages: this.packages,
             subscribedPackages: req.user.subscribedPackages,
-            step: 'PACKAGE_SELECTION',
         });
     }
 

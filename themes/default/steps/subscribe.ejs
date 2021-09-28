@@ -1,3 +1,4 @@
+<%- include('../partials/header.ejs') %>
 <div class="subscribe col s12 m7 l7">
     <h3><%= translate('PAYPAL_SUBSCRIPTION_TITLE') %></h3>
     <h5><%= translate('DONATE_SUMMARY_TITLE') %></h5>
@@ -8,8 +9,8 @@
         </span>
         <label><%= translate('DONATE_SUMMARY_USER_LABEL') %></label>
         <span>
-            <span><img class="image" src="/assets/images/steam_logo.png"> <%= user.steam.name %> (<%= user.steam.id %>)</span>
-            <span><img class="image" src="/assets/images/discord.svg"> <%= user.username %></span>
+            <span><img class="image" src="<%= imagePath('steam_logo.png') %>"> <%= user.steam.name %> (<%= user.steam.id %>)</span>
+            <span><img class="image" src="<%= imagePath('discord.svg') %>"> <%= user.username %></span>
         </span>
     </div>
 
@@ -25,4 +26,4 @@
     </form>
 </div>
 <%- include('../partials/package-information.ejs') %>
-<link rel="stylesheet" href="/assets/css/steps/subscribe.css">
+<%- include('../partials/footer.ejs') %>
