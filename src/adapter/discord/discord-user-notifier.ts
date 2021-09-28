@@ -25,7 +25,7 @@ export class DiscordUserNotifier {
         }
         await discordUser.send({
             content: translate('USER_NOTIFICATIONS_FAILED_REDEEM_TEXT'),
-            embed: embed
+            embeds: [embed],
         });
     }
 
@@ -39,7 +39,7 @@ export class DiscordUserNotifier {
 
         await discordUser.send({
             content: translate('USER_NOTIFICATIONS_SUB_EXECUTED_TEXT'),
-            embed: embed
+            embeds: [embed],
         });
     }
 

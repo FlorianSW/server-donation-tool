@@ -22,8 +22,7 @@ export interface DiscordNotification {
 }
 
 function webhookClient(notification: DiscordNotification): WebhookClient {
-    const parts = notification.webhookUrl.split('/');
-    return new WebhookClient(parts[parts.length - 2], parts[parts.length - 1]);
+    return new WebhookClient({url: notification.webhookUrl});
 }
 
 @singleton()

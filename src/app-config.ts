@@ -255,9 +255,7 @@ class YamlAppConfig implements AppConfig {
 
         if (this.discord.bot?.token) {
             const client = new Client({
-                ws: {
-                    intents: ['GUILD_MEMBERS', 'GUILDS']
-                }
+                intents: ['GUILD_MEMBERS', 'GUILDS'],
             });
             await new Promise(async (resolve, reject) => {
                 client.on('ready', () => {

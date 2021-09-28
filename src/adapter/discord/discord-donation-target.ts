@@ -32,13 +32,13 @@ export class DiscordDonationTarget implements Closeable {
                             this.message = message;
                         } else {
                             logger.info('Did not find donation target message for updates, hence creating a new one');
-                            this.message = await c.send(new MessageEmbed().setTitle(translate('DONATION_TARGET_DISCORD_TITLE')));
+                            this.message = await c.send({embeds: [new MessageEmbed().setTitle(translate('DONATION_TARGET_DISCORD_TITLE'))]});
                         }
                         this.events.on('successfulPayment', this.updateDonationTargetMessage.bind(this));
                         await this.updateDonationTargetMessage();
                         this.updateInterval = setInterval(this.updateDonationTargetMessage.bind(this), 12 * 60 * 60 * 1000);
                     } else if (message) {
-                        await message.delete({reason: 'Donation target not configured anymore.'});
+                        await message.delete();
                     }
                 } else {
                     logger.warn('Can not use non-text based channel for donation target messages.');
@@ -93,6 +93,6 @@ export class DiscordDonationTarget implements Closeable {
             embed.setImage(this.config.logoUrl(true));
         }
 
-        await this.message.edit(embed);
+        await this.message.edit({embeds: [embed]});
     }
 }
