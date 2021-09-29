@@ -12,10 +12,16 @@ export class Theming {
     private readonly localBasePath: string;
     private readonly remoteBasePath: string;
 
+    private readonly globalStyles: string[] = [];
+
     constructor(@inject('AppConfig') private readonly config: AppConfig) {
         this.themeBasePath = path.join(__dirname, '../../themes/default/');
         this.localBasePath = path.join(__dirname, '../../assets/{type}/default/');
         this.remoteBasePath = path.join('/assets/{type}/default/');
+
+        if (fs.existsSync(path.join(this.localBasePath.replace('{type}', 'css'), 'main.css'))) {
+            this.globalStyles.push(this.cssPath('main.css'));
+        }
     }
 
     public setup(app: Express): Express {
@@ -56,8 +62,8 @@ export class Theming {
     private renderCssHook(): NextHandleFunction {
         return (req: Request, res: Response, next: NextFunction) => {
             res.locals.stylesheets = [
+                ...this.globalStyles,
                 '/assets/css/materialize.min.css',
-                '/assets/css/main.min.css',
             ];
 
             const original = res.render.bind(res);

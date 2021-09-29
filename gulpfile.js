@@ -12,13 +12,6 @@ function clean() {
     return del('dist/**', {force: true});
 }
 
-function mainCss() {
-    return src('src/main.scss')
-        .pipe(sass({outputStyle: 'compressed'}))
-        .pipe(rename('main.min.css'))
-        .pipe(dest('dist/assets/css/'));
-}
-
 function assets() {
     return src('src/assets/**/*')
         .pipe(dest('dist/assets/'));
@@ -66,4 +59,4 @@ function tsc() {
         .js.pipe(dest("dist"));
 }
 
-exports.default = series(clean, tsc, mainCss, themes, assets, themeScripts, themeCss, themeAssets, materialize);
+exports.default = series(clean, tsc, themes, assets, themeScripts, themeCss, themeAssets, materialize);
