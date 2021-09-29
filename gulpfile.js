@@ -47,16 +47,10 @@ function removeDuplicateImagesPath() {
     });
 }
 
-function materialize() {
-    return src('node_modules/materialize-css/dist/css/materialize.min.css')
-        .pipe(rename('materialize.min.css'))
-        .pipe(dest('dist/assets/css/'));
-}
-
 function tsc() {
     return tsProject.src()
         .pipe(tsProject())
         .js.pipe(dest("dist"));
 }
 
-exports.default = series(clean, tsc, themes, assets, themeScripts, themeCss, themeAssets, materialize);
+exports.default = series(clean, tsc, themes, assets, themeScripts, themeCss, themeAssets);

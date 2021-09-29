@@ -63,7 +63,6 @@ export class Theming {
         return (req: Request, res: Response, next: NextFunction) => {
             res.locals.stylesheets = [
                 ...this.globalStyles,
-                '/assets/css/materialize.min.css',
             ];
 
             const original = res.render.bind(res);
