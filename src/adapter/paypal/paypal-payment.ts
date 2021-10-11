@@ -71,6 +71,8 @@ export class PaypalPayment implements Payment {
                 brand_name: communityTitle,
                 shipping_preference: 'NO_SHIPPING',
                 user_action: 'PAY_NOW',
+                return_url: request.returnUrl.success.toString(),
+                cancel_url: request.returnUrl.cancel.toString(),
             },
             purchase_units: [{
                 custom_id: new Reference(request.steamId, request.discordId, request.forPackage).asString(),
@@ -106,6 +108,7 @@ export class PaypalPayment implements Payment {
             created: new Date(order.result.create_time),
             id: order.result.id,
             transactionId: order.result.purchase_units[0]?.payments?.captures[0]?.id,
+            approvalLink: order.result.links.find((l) => l.rel === 'approve').href,
         };
     }
 

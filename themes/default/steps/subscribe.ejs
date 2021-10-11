@@ -18,7 +18,7 @@
     <p>
         <%= translate('PAYPAL_SUBSCRIPTION_DESCRIPTION') %>
     </p>
-    <form action="/donate" method="post">
+    <form action="/subscribe" method="post">
         <input type="hidden" name="_csrf" value="<%= csrfToken %>">
         <button class="btn waves-effect waves-light" name="subscribe" type="submit">
             <%= translate('PAYPAL_SUBSCRIBE') %>
