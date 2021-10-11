@@ -76,6 +76,7 @@ export class DonationController {
         res.render(template, {
             csrfToken: req.csrfToken(),
             user: req.user,
+            currency: req.session.selectedPackage.price.currency,
             selectedPackage: {
                 name: selectedPackage.name,
                 price: req.session.selectedPackage.price,

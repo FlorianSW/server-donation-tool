@@ -23,7 +23,7 @@
     </div>
 
     <h5><%= translate('DONATE_PAYMENT_TITLE') %></h5>
-    <script src="https://www.paypal.com/sdk/js?client-id=<%= paypalClientId %>"></script>
+    <script src="https://www.paypal.com/sdk/js?client-id=<%= paypalClientId %>&currency=<%= currency %>"></script>
     <div id="paypal-button-container"></div>
     <%- script('steps/donate.js') %>
 </div>

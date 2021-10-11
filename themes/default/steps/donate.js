@@ -2,6 +2,12 @@ function initPayPalButton() {
     var csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
     paypal.Buttons({
+        style: {
+            shape: 'rect',
+            color: 'blue',
+            layout: 'vertical',
+            label: 'donate',
+        },
         createOrder: function () {
             var customMessage = null;
             var textarea = document.querySelector('textarea');
