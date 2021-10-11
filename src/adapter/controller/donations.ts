@@ -3,7 +3,7 @@ import {Request, Response, Router} from 'express';
 import {translate} from '../../translations';
 import {DonationType, Package, RedeemTarget} from '../../domain/package';
 import {AppConfig} from '../../domain/app-config';
-import {Order, OrderNotFound, Payment, Reference, SteamIdMismatch} from '../../domain/payment';
+import {Order, OrderNotFound, OrderStatus, Payment, Reference, SteamIdMismatch} from '../../domain/payment';
 import {Logger} from 'winston';
 import {SessionData} from 'express-session';
 import csrf from 'csurf';
@@ -30,6 +30,7 @@ export class DonationController {
         const csrfProtection = csrf();
         this.router.post('/api/donations', requireAuthentication, csrfProtection, this.createOrder.bind(this));
         this.router.post('/api/donations/:orderId', requireAuthentication, csrfProtection, this.captureOrder.bind(this));
+        this.router.delete('/api/donations/:orderId', requireAuthentication, csrfProtection, this.dropOrder.bind(this));
 
         this.router.get('/donate', requireAuthentication, csrfProtection, this.prepareDonation.bind(this));
         this.router.post('/donate', requireAuthentication, csrfProtection, this.subscribe.bind(this));
@@ -208,5 +209,15 @@ export class DonationController {
         setTimeout(async () => {
             this.events.emit('successfulPayment', RedeemTarget.fromUser(req.user), order);
         });
+    }
+
+    private async dropOrder(req: Request, res: Response) {
+        const order = (await this.repo.findByPaymentOrder(req.params.orderId))[0];
+        if (order.status !== OrderStatus.CREATED) {
+            res.status(403);
+        } else {
+            await this.repo.delete(order);
+            res.status(204).json();
+        }
     }
 }

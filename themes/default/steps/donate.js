@@ -45,7 +45,18 @@ function initPayPalButton() {
                 return res.json();
             }).then(function (details) {
                 window.location.href = `/donate/${details.orderId}/`;
-            })
+            });
+        },
+        onCancel: function(data) {
+            return fetch('/api/donations/' + data.orderID, {
+                method: 'delete',
+                credentials: 'same-origin',
+                headers: {
+                    'x-csrf-token': csrfToken,
+                    'content-type': 'application/json',
+                    'accept': 'application/json',
+                }
+            });
         }
     }).render('#paypal-button-container');
 }
