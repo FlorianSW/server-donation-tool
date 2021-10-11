@@ -28,16 +28,11 @@ export class DonationController {
         @inject('Logger') private readonly logger: Logger
     ) {
         const csrfProtection = csrf();
+        this.router.post('/api/donations', requireAuthentication, csrfProtection, this.createOrder.bind(this));
         this.router.post('/api/donations/:orderId', requireAuthentication, csrfProtection, this.captureOrder.bind(this));
 
         this.router.get('/donate', requireAuthentication, csrfProtection, this.prepareDonation.bind(this));
-        this.router.post('/donate', requireAuthentication, csrfProtection, this.donate.bind(this));
-        this.router.get('/donate/return', requireAuthentication, csrfProtection, this.captureOrder.bind(this));
-        this.router.get('/donate/cancel', requireAuthentication, csrfProtection, this.cancelOrder.bind(this));
-
-        this.router.get('/subscribe', requireAuthentication, csrfProtection, this.prepareSubscription.bind(this));
-        this.router.post('/subscribe', requireAuthentication, csrfProtection, this.subscribe.bind(this));
-
+        this.router.post('/donate', requireAuthentication, csrfProtection, this.subscribe.bind(this));
         this.router.get('/donate/:orderId', requireAuthentication, csrfProtection, this.prepareRedeem.bind(this));
         this.router.post('/donate/:orderId/redeem', requireAuthentication, csrfProtection, this.redeem.bind(this));
         this.router.get('/donate/:orderId/redeem', requireAuthentication, this.redirectToPrepareRedeem.bind(this));
@@ -74,11 +69,11 @@ export class DonationController {
             res.redirect('/');
             return;
         }
+        let template = 'steps/donate';
         if (req.session.selectedPackage.type === DonationType.Subscription) {
-            res.redirect('/');
-            return;
+            template = 'steps/subscribe';
         }
-        res.render('steps/donate', {
+        res.render(template, {
             csrfToken: req.csrfToken(),
             user: req.user,
             selectedPackage: {
@@ -86,29 +81,10 @@ export class DonationController {
                 price: req.session.selectedPackage.price,
                 forAccount: req.session.selectedPackage.forAccount,
                 perks: selectedPackage.perks,
+                subscription: selectedPackage.subscription,
+                type: req.session.selectedPackage.type,
             },
-        })
-    }
-
-    private async prepareSubscription(req: Request, res: Response) {
-        const selectedPackage = this.selectedPackage(req.session);
-        if (!selectedPackage) {
-            res.redirect('/');
-            return;
-        }
-        if (req.session.selectedPackage.type !== DonationType.Subscription) {
-            res.redirect('/');
-            return;
-        }
-        res.render('steps/subscribe', {
-            csrfToken: req.csrfToken(),
-            user: req.user,
-            selectedPackage: {
-                name: selectedPackage.name,
-                price: req.session.selectedPackage.price,
-                forAccount: req.session.selectedPackage.forAccount,
-                perks: selectedPackage.perks,
-            },
+            paypalClientId: this.config.paypal.clientId,
         })
     }
 
@@ -145,48 +121,6 @@ export class DonationController {
         res.redirect(result.approvalLink);
     }
 
-    private async donate(req: Request, res: Response) {
-        const selectedPackage = this.selectedPackage(req.session);
-        if (!selectedPackage || !selectedPackage.subscription) {
-            res.redirect('/');
-            return;
-        }
-
-        let customMessage = req.body['custom-message'] || null;
-        if (customMessage && customMessage.length > 255) {
-            res.sendStatus(400).write(JSON.stringify({
-                error: 'custom message can not exceed 255 characters'
-            }));
-            return;
-        }
-
-        const p = {
-            ...selectedPackage,
-            price: {
-                ...selectedPackage.price,
-                ...req.session.selectedPackage.price
-            }
-        };
-        const steamId = req.session.selectedPackage.forAccount;
-        const paymentOrder = await this.payment.createPaymentOrder({
-            forPackage: p,
-            steamId: steamId,
-            discordId: req.user.discord.id,
-            returnUrl: {
-                success: new URL('/donate/return', this.config.app.publicUrl),
-                cancel: new URL('/donate/cancel', this.config.app.publicUrl),
-            }
-        });
-
-        const order = Order.create(paymentOrder.created, {
-            id: paymentOrder.id,
-            transactionId: paymentOrder.transactionId,
-        }, new Reference(steamId, req.user.discord.id, p), customMessage);
-        await this.repo.save(order);
-
-        res.redirect(paymentOrder.approvalLink);
-    }
-
     private async redirectToPrepareRedeem(req: Request, res: Response) {
         res.redirect(`/donate/${req.params.orderId}`);
     }
@@ -216,13 +150,45 @@ export class DonationController {
         return this.packages.find((p) => session.selectedPackage.id === p.id);
     }
 
-    private async captureOrder(req: Request, res: Response) {
-        const token = req.query.token;
-        if (!token) {
-            res.sendStatus(400).end();
+    private async createOrder(req: Request, res: Response) {
+        let customMessage = req.body.customMessage;
+        if (customMessage && customMessage.length > 255) {
+            res.sendStatus(400).write(JSON.stringify({
+                error: 'custom message an not exceed 255 characters'
+            }));
             return;
         }
-        const order = (await this.repo.findByPaymentOrder(token as string))[0];
+        if (!customMessage) {
+            customMessage = null;
+        }
+
+        const p = {
+            ...this.selectedPackage(req.session),
+            price: {
+                ...this.selectedPackage(req.session).price,
+                ...req.session.selectedPackage.price
+            }
+        };
+        const steamId = req.session.selectedPackage.forAccount;
+        const paymentOrder = await this.payment.createPaymentOrder({
+            forPackage: p,
+            steamId: steamId,
+            discordId: req.user.discord.id,
+        });
+
+        const order = Order.create(paymentOrder.created, {
+            id: paymentOrder.id,
+            transactionId: paymentOrder.transactionId,
+        }, new Reference(steamId, req.user.discord.id, p), customMessage);
+        await this.repo.save(order);
+
+        res.status(200).json({
+            orderId: order.payment.id
+        });
+    }
+
+    private async captureOrder(req: Request, res: Response) {
+        const order = (await this.repo.findByPaymentOrder(req.params.orderId))[0];
         const capture = await this.payment.capturePayment({
             orderId: order.payment.id,
         });
@@ -234,21 +200,12 @@ export class DonationController {
         order.pay(capture.transactionId);
         await this.repo.save(order);
 
-        res.redirect('/donate/' + order.id);
+        res.status(200).json({
+            orderId: order.id,
+        });
 
         setTimeout(async () => {
             this.events.emit('successfulPayment', RedeemTarget.fromUser(req.user), order);
         });
-    }
-
-    private async cancelOrder(req: Request, res: Response) {
-        const token = req.query.token;
-        if (!token) {
-            res.sendStatus(400).end();
-            return;
-        }
-        const order = (await this.repo.findByPaymentOrder(token as string))[0];
-        await this.repo.delete(order);
-        res.redirect('/donate');
     }
 }

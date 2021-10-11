@@ -16,7 +16,6 @@ export interface PaymentOrder {
     created: Date;
     id: string;
     transactionId?: string;
-    approvalLink?: string;
 }
 
 export enum OrderStatus {
@@ -150,10 +149,6 @@ export interface CreatePaymentOrderRequest {
     forPackage: Package;
     steamId: string;
     discordId: string;
-    returnUrl: {
-        success: URL,
-        cancel: URL,
-    };
 }
 
 export interface CapturePaymentRequest {

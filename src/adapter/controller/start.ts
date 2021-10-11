@@ -78,11 +78,7 @@ export class StartController {
                 forAccount: forAccount,
                 type: type,
             };
-            if (type === DonationType.OneTime) {
-                res.redirect('/donate');
-            } else {
-                res.redirect('/subscribe');
-            }
+            res.redirect('/donate');
         } catch (e) {
             if (e.message === 'VariablePriceForFixedPackage') {
                 this.log.warn(`Discord user ${req.user.discord.id} requested variable price for fixed package.`);

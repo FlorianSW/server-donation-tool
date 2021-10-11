@@ -39,12 +39,7 @@ export interface Order {
     status: string,
     create_time?: string,
     update_time: string,
-    purchase_units: PurchaseUnit[],
-    links: {
-        href: string,
-        rel: string,
-        method?: string,
-    }[]
+    purchase_units: PurchaseUnit[]
 }
 
 /**
