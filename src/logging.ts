@@ -58,7 +58,7 @@ export const errorHandler: ErrorRequestHandler = (err: any, req: Request, res: R
             }
         });
     } else if (errorPageFormatHint.indexOf('text/') !== -1) {
-        res.status(status).render('error', {
+        res.render('error', {
             status: status,
             supportInfo: JSON.stringify({
                 status: status,

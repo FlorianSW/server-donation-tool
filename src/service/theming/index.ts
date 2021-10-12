@@ -67,20 +67,19 @@ export class Theming {
 
             const original = res.render.bind(res);
             res.render = (view: string, options?: object, callback?: (err: Error, html: string) => void): void => {
-                fs.exists(path.join(this.localBasePath.replace('{type}', 'css'), view + '.css'), (exists) => {
-                    if (exists) {
-                        res.locals.stylesheets.push(this.cssPath(view + '.css'));
+                const exists = fs.existsSync(path.join(this.localBasePath.replace('{type}', 'css'), view + '.css'));
+                if (exists) {
+                    res.locals.stylesheets.push(this.cssPath(view + '.css'));
+                }
+                original(view, options, (err: Error, html: string) => {
+                    if (callback) {
+                        callback(err, html);
+                        return;
                     }
-                    original(view, options, (err: Error, html: string) => {
-                        if (callback) {
-                            callback(err, html);
-                            return;
-                        }
-                        if (err) {
-                            throw err;
-                        }
-                        res.status(200).contentType('html').send(html);
-                    });
+                    if (err) {
+                        throw err;
+                    }
+                    res.status(200).contentType('html').send(html);
                 });
             };
             next();
