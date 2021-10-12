@@ -40,7 +40,10 @@ export class Authentication {
             done(null, user);
         });
         passport.deserializeUser<User>((obj, done) => {
-            done(null, obj);
+            done(null, {
+                subscribedPackages: {},
+                ...obj,
+            });
         });
 
         passport.use(new DiscordStrategy({
