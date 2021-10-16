@@ -56,14 +56,15 @@ container.register('EventSource', {
 container.register('PayPalClient', {
     useFactory: (c) => paypalClient(c.resolve('AppConfig'))
 });
-container.registerType('DiscordRoleRepository', SQLiteDiscordRoleRepository);
+container.registerSingleton('DiscordRoleRepository', SQLiteDiscordRoleRepository);
 container.registerSingleton('Closeable', 'DiscordRoleRepository');
-container.registerType('OrderRepository', SQLiteOrderRepository);
+container.registerSingleton('OrderRepository', SQLiteOrderRepository);
 container.registerSingleton('Closeable', 'OrderRepository');
-container.registerType('SubscriptionPlanRepository', SQLiteSubscriptionPlanRepository);
+container.registerSingleton('SubscriptionPlanRepository', SQLiteSubscriptionPlanRepository);
 container.registerSingleton('Closeable', 'SubscriptionPlanRepository');
-container.registerType('SubscriptionsRepository', SQLiteSubscriptionsRepository);
+container.registerSingleton('SubscriptionsRepository', SQLiteSubscriptionsRepository);
 container.registerSingleton('Closeable', 'SubscriptionsRepository');
+
 container.registerType('Payment', PaypalPayment);
 container.registerType('RedeemPackage', RedeemPackage);
 container.registerType('Subscriptions', Subscriptions);
