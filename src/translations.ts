@@ -115,7 +115,7 @@ const messages: { [key: string]: string } = {
     REDEEM_SHARE_DESCRIPTION: 'You can share this link with someone you want to gift the perks to. Perks can only be redeemed by one person.',
     REDEEM_DESCRIPTION_WITH_PERKS: 'You can now redeem your perks to profit from the following benefits:',
     REDEEM_DESCRIPTION_WITHOUT_PERKS: 'We appreciate your support to our community.',
-    REDEEM_SUBMIT: 'Redeem',
+    REDEEM_SUBMIT: 'Redeem now',
     REDEEM_BACK: 'Back to Start',
     REDEEM_RETRY: 'Retry',
 

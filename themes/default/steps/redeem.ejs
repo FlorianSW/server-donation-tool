@@ -33,7 +33,9 @@
             <% if (redeemStatus !== 'COMPLETE' && hasPerks) { %>
                 <form method="post" action="<%= redeemLink %>">
                     <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-                    <input type="submit" class="link" value="<%= translate('REDEEM_SUBMIT') %>"/>
+                    <button class="btn waves-effect waves-light" type="submit">
+                        <%= translate('REDEEM_SUBMIT') %>
+                    </button>
                 </form>
             <% } else if (errors.length !== 0) { %>
                 <a href="#" onclick="window.location.reload();"><%= translate('REDEEM_RETRY') %></a>
