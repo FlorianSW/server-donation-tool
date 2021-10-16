@@ -344,6 +344,9 @@ export class FakePayment implements Payment {
     }
 
     subscriptionDetails(sub: Subscription): Promise<SubscriptionPayment> {
-        return Promise.resolve(undefined);
+        return Promise.resolve({
+            state: 'ACTIVE',
+            approvalLink: undefined,
+        });
     }
 }
