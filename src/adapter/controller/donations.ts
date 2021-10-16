@@ -98,18 +98,26 @@ export class DonationController {
             return;
         }
 
-        res.render('steps/redeem', {
-            user: req.user,
-            canShare: order.reference.discordId === req.user.discord.id,
-            shareLink: new URL(`/donate/${order.id}`, this.config.app.publicUrl).toString(),
-            redeemLink: `/donate/${order.id}/redeem`,
-            isUnclaimed: order.reference.steamId === null,
-            perks: order.reference.p.perks,
-            csrfToken: req.csrfToken(),
-            redeemStatus: 'PENDING',
-            hasPerks: order.reference.p.perks.length !== 0,
-            errors: []
-        });
+        if (this.canAutoRedeem(order)) {
+            await this.redeem(req, res);
+        } else {
+            res.render('steps/redeem', {
+                user: req.user,
+                canShare: order.reference.discordId === req.user.discord.id,
+                shareLink: new URL(`/donate/${order.id}`, this.config.app.publicUrl).toString(),
+                redeemLink: `/donate/${order.id}/redeem`,
+                isUnclaimed: order.reference.steamId === null,
+                perks: order.reference.p.perks,
+                csrfToken: req.csrfToken(),
+                redeemStatus: 'PENDING',
+                hasPerks: order.reference.p.perks.length !== 0,
+                errors: []
+            });
+        }
+    }
+
+    private canAutoRedeem(order: Order): boolean {
+        return order.redeemedAt === null && order.reference.steamId !== null;
     }
 
     private async subscribe(req: Request, res: Response) {
