@@ -14,11 +14,6 @@ import {OrderRepository, SubscriptionPlanRepository, SubscriptionsRepository} fr
 import {RedeemPackage} from './redeem-package';
 import {EventSource} from '../domain/events';
 
-interface SubscriptionResult {
-    pending: PendingSubscription,
-    subscription: Subscription,
-}
-
 @singleton()
 export class Subscriptions {
     constructor(
@@ -62,17 +57,29 @@ export class Subscriptions {
         const subscription = await this.subscription(id, forUser);
         const orders = await this.orders.findByPaymentOrder(subscription.payment.id);
         const plan = await this.subscriptionPlans.find(subscription.planId);
+        const paymentStatus = await this.payment.subscriptionDetails(subscription);
+        let pending: PendingSubscription | null;
+        if (paymentStatus.state === 'APPROVAL_PENDING') {
+            pending = {
+                id: subscription.payment.id,
+                approvalLink: paymentStatus.approvalLink
+            } as PendingSubscription;
+        }
 
         return {
             subscription: subscription,
             plan: plan,
             history: orders,
+            pending: pending,
         };
     }
 
     async cancel(id: string, forUser: User): Promise<void> {
         const subscription = await this.subscription(id, forUser);
-        await this.payment.cancelSubscription(subscription);
+        const paymentStatus = await this.payment.subscriptionDetails(subscription);
+        if (paymentStatus.state === 'APPROVED' || paymentStatus.state === 'ACTIVE') {
+            await this.payment.cancelSubscription(subscription);
+        }
         subscription.cancel();
         await this.subscriptions.save(subscription);
     }
@@ -112,5 +119,6 @@ export interface ViewSubscription {
     subscription: Subscription,
     plan: SubscriptionPlan,
     history: Order[],
+    pending: PendingSubscription | null;
 }
 

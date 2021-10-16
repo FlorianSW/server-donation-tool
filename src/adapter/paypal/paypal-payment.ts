@@ -7,6 +7,7 @@ import {
     PendingSubscription,
     Reference,
     Subscription,
+    SubscriptionPayment,
     SubscriptionPlan
 } from '../../domain/payment';
 import {AppConfig} from '../../domain/app-config';
@@ -25,7 +26,8 @@ import {
     CreateSubscriptionRequest,
     GetPlanRequest,
     GetProductRequest,
-    Order, PayPalHTTPError,
+    GetSubscriptionRequest,
+    Order,
     PayPalSubscription,
     Plan,
     PlanState,
@@ -34,7 +36,6 @@ import {
     UpdatePricingPlanRequest,
     UpdateProductRequest
 } from './types';
-import {HTTPError} from 'discord.js';
 
 const paypal = require('@paypal/checkout-server-sdk');
 
@@ -150,6 +151,30 @@ export class PaypalPayment implements Payment {
         return {
             id: result.result.id,
             approvalLink: result.result.links.find((l) => l.rel === 'approve').href,
+        };
+    }
+
+    async subscriptionDetails(sub: Subscription): Promise<SubscriptionPayment> {
+        const r = new GetSubscriptionRequest(sub.payment.id);
+        const result = await this.client.execute<PayPalSubscription>(r);
+
+        let status: SubscriptionPayment['state'];
+        switch (result.result.status) {
+            case 'APPROVAL_PENDING':
+                status = 'APPROVAL_PENDING';
+                break;
+            case 'ACTIVE':
+                status = 'ACTIVE';
+                break;
+            case 'APPROVED':
+                status = 'APPROVED';
+                break;
+            default:
+                status = 'CANCELLED'
+        }
+        return {
+            state: status,
+            approvalLink: result.result.links.find((l) => l.rel === 'approve')?.href,
         };
     }
 
@@ -315,6 +340,10 @@ export class FakePayment implements Payment {
     }
 
     cancelSubscription(subscription: Subscription): Promise<void> {
+        return Promise.resolve(undefined);
+    }
+
+    subscriptionDetails(sub: Subscription): Promise<SubscriptionPayment> {
         return Promise.resolve(undefined);
     }
 }

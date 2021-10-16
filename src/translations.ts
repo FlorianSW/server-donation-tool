@@ -131,6 +131,7 @@ const messages: { [key: string]: string } = {
     SUBSCRIPTION_DETAILS_PACKAGE_PRICE: 'Package price',
     SUBSCRIPTION_DETAILS_CYCLE: 'Billing cycle',
     SUBSCRIPTION_CANCEL: 'Cancel',
+    SUBSCRIPTION_APPROVE: 'Complete subscription',
     SUBSCRIPTION_HISTORY_TITLE: 'Past transactions',
 
     ALREADY_PRIORITY_QUEUE_TITLE: 'Already Priority Queue',

@@ -407,6 +407,18 @@ export class CreateSubscriptionRequest extends JsonRequest<CreateSubscriptionBod
 }
 
 /**
+ * https://developer.paypal.com/docs/api/subscriptions/v1/#subscriptions_get
+ */
+export class GetSubscriptionRequest extends JsonRequest<void> {
+    path: string;
+    verb: string;
+
+    constructor(subscriptionId: string) {
+        super('/v1/billing/subscriptions/{subscription_id}?'.replace('{subscription_id}', querystring.escape(subscriptionId)), 'GET');
+    }
+}
+
+/**
  * https://developer.paypal.com/docs/api/catalog-products/v1/#products_create
  */
 export class CreateProductRequest extends JsonRequest<Product> {

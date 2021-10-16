@@ -43,16 +43,21 @@
                         </div>
                     </div>
                 </div>
-                <% if (subscription.state === 'ACTIVE') { %>
-                    <div class="card-action">
-                        <form method="post">
+                <div class="card-action">
+                    <% if (subscription.state === 'PENDING' && locals.pending) { %>
+                        <a href="<%= locals.pending.approvalLink %>" class="btn waves-effect waves-light">
+                            <%= translate('SUBSCRIPTION_APPROVE') %>
+                        </a>
+                    <% } %>
+                    <% if (subscription.state === 'ACTIVE' || subscription.state === 'PENDING') { %>
+                        <form method="post" class="inline">
                             <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                             <button class="btn waves-effect waves-light" name="cancel" type="submit">
                                 <%= translate('SUBSCRIPTION_CANCEL') %>
                             </button>
                         </form>
-                    </div>
-                <% } %>
+                    <% } %>
+                </div>
             </div>
             <div class="card subscription-history">
                 <div class="card-content">

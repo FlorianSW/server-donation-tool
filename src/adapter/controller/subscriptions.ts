@@ -27,6 +27,7 @@ export class SubscriptionsController {
         res.render('subscription', {
             user: req.user,
             subscription: view.subscription,
+            pending: view.pending,
             plan: view.plan,
             history: view.history,
             csrfToken: req.csrfToken(),

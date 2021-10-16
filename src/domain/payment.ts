@@ -2,6 +2,8 @@ import {Package} from './package';
 import {v4} from 'uuid';
 import {AppConfig} from './app-config';
 import {User} from './user';
+import {PaypalPayment} from '../adapter/paypal/paypal-payment';
+import {PayPalSubscription} from '../adapter/paypal/types';
 
 export class Reference {
     constructor(public steamId: string | null, public readonly discordId: string, public readonly p: Package) {
@@ -160,6 +162,11 @@ export interface PendingSubscription {
     approvalLink: string;
 }
 
+export interface SubscriptionPayment {
+    state: 'APPROVAL_PENDING' | 'APPROVED' | 'ACTIVE' | 'CANCELLED';
+    approvalLink: string | null;
+}
+
 export interface SaleCompleted {
     amount: {
         total: string;
@@ -183,6 +190,8 @@ export interface Payment {
     persistSubscription(p: Package, plan?: SubscriptionPlan): Promise<SubscriptionPlan>;
 
     subscribe(sub: Subscription, plan: SubscriptionPlan, user: User): Promise<PendingSubscription>;
+
+    subscriptionDetails(sub:Subscription): Promise<SubscriptionPayment>;
 
     cancelSubscription(subscription: Subscription): Promise<void>;
 }
