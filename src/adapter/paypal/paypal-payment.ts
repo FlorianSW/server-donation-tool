@@ -203,7 +203,7 @@ export class PaypalPayment implements Payment {
             },
             status: PlanState.ACTIVE,
             description: translate('PAYPAL_SUBSCRIPTION_MONTHLY_DESCRIPTION'),
-            name: translate('PAYPAL_SUBSCRIPTION_MONTHLY_NAME'),
+            name: translate('PAYPAL_SUBSCRIPTION_MONTHLY_NAME', {params: {package: p.name}}),
             quantity_supported: false,
             billing_cycles: [{
                 frequency: {
