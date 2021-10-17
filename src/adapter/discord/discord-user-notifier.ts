@@ -5,10 +5,16 @@ import {RedeemTarget} from '../../domain/package';
 import {DonationEvents} from '../../domain/events';
 import {inject, singleton} from 'tsyringe';
 import {AppConfig} from '../../domain/app-config';
+import {Logger} from 'winston';
 
 @singleton()
 export class DiscordUserNotifier {
-    constructor(@inject('DonationEvents') private readonly events: DonationEvents, @inject('AppConfig') private readonly config: AppConfig, @inject('discord.Client') private readonly client: Client) {
+    constructor(
+        @inject('DonationEvents') private readonly events: DonationEvents,
+        @inject('AppConfig') private readonly config: AppConfig,
+        @inject('discord.Client') private readonly client: Client,
+        @inject('Logger') private readonly logger: Logger,
+    ) {
         events.on('failedRedeemPerk', this.onFailedRedeemPerk.bind(this));
         events.on('subscriptionExecuted', this.onSubscriptionExecuted.bind(this));
     }
@@ -23,10 +29,14 @@ export class DiscordUserNotifier {
         if (this.config.app.community?.discord) {
             embed.addField(translate('USER_NOTIFICATIONS_DISCORD_LINK'), `[${this.config.app.community.title}](${this.config.app.community.discord})`, true)
         }
-        await discordUser.send({
-            content: translate('USER_NOTIFICATIONS_FAILED_REDEEM_TEXT'),
-            embeds: [embed],
-        });
+        try {
+            await discordUser.send({
+                content: translate('USER_NOTIFICATIONS_FAILED_REDEEM_TEXT'),
+                embeds: [embed],
+            });
+        } catch (e) {
+            this.logger.error('Could not send failed redeem message to ' + order.reference.discordId, e);
+        }
     }
 
     async onSubscriptionExecuted(target: RedeemTarget, plan: SubscriptionPlan, sub: Subscription, order: Order): Promise<void> {
@@ -37,10 +47,14 @@ export class DiscordUserNotifier {
             .addField(translate('USER_NOTIFICATIONS_SUB_TRANSACTION_ID'), order.payment.transactionId, false)
             .addField(translate('USER_NOTIFICATIONS_SUB_DETAILS_LINK'), `[Subscription details](${new URL(`/subscriptions/${sub.id}`, this.config.app.publicUrl).toString()})`, true);
 
-        await discordUser.send({
-            content: translate('USER_NOTIFICATIONS_SUB_EXECUTED_TEXT'),
-            embeds: [embed],
-        });
+        try {
+            await discordUser.send({
+                content: translate('USER_NOTIFICATIONS_SUB_EXECUTED_TEXT'),
+                embeds: [embed],
+            });
+        } catch (e) {
+            this.logger.error('Could not send subscription executed message to ' + order.reference.discordId, e);
+        }
     }
 
     private metaFields(target: RedeemTarget, order: Order): EmbedFieldData[] {

@@ -1,7 +1,7 @@
 import {translate, TranslateParams} from '../../translations';
-import {Client, Constants, DiscordAPIError, Guild} from 'discord.js';
+import {Client, Guild} from 'discord.js';
 import {Package, Perk, RedeemError, RedeemTarget} from '../../domain/package';
-import {DiscordRole, FailedToLoad, OwnedPerk, User} from '../../domain/user';
+import {DiscordRole, OwnedPerk} from '../../domain/user';
 import {Order} from '../../domain/payment';
 import {Logger} from 'winston';
 
@@ -76,6 +76,10 @@ export class DiscordRolePerk implements Perk {
         return this.asTranslatedString('PERK_DISCORD_ROLE_DESCRIPTION');
     }
 
+    asShortString(): string {
+        return this.asTranslatedString('PERK_DISCORD_ROLE_SHORT');
+    }
+
     private asTranslatedString(key: string): string {
         return translate(key, {
             params: {
@@ -88,9 +92,5 @@ export class DiscordRolePerk implements Perk {
                 }).join(', '),
             }
         });
-    }
-
-    asShortString(): string {
-        return this.asTranslatedString('PERK_DISCORD_ROLE_SHORT');
     }
 }
