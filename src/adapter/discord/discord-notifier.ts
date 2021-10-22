@@ -10,6 +10,7 @@ export enum Type {
     SUCCESSFUL_REDEEM = 'SUCCESSFUL_REDEEM',
     REDEEM_ERROR = 'REDEEM_ERROR',
     DONATED = 'DONATED',
+    DONATED_PUBLIC = 'DONATED_PUBLIC',
     SUBSCRIPTION_EXECUTED = 'SUBSCRIPTION_EXECUTED',
     SUBSCRIPTION_CREATED = 'SUBSCRIPTION_CREATED',
     SUBSCRIPTION_CANCELLED = 'SUBSCRIPTION_CANCELLED',
@@ -50,6 +51,32 @@ export class DiscordNotifier {
                     .setDescription(translate('NOTIFICATIONS_PAYMENT_SUCCESSFUL_DESCRIPTION'))
                     .addFields(this.donatorMetaFields(target))
                     .addFields(this.orderMetaFields(order));
+
+                if (order.customMessage) {
+                    embed.addField(translate('NOTIFICATIONS_PAYMENT_SUCCESSFUL_CUSTOM_MESSAGE'), order.customMessage);
+                }
+                webhookClient(d).send({
+                    username: d.username || 'Donations',
+                    embeds: [embed],
+                });
+            });
+        this.notifications
+            .filter((n) => n.types.includes(Type.DONATED_PUBLIC))
+            .forEach((d) => {
+                const embed = new MessageEmbed()
+                    .setColor('GREEN')
+                    .setTitle(translate('NOTIFICATIONS_PAYMENT_SUCCESSFUL_TITLE'))
+                    .setURL(this.config.app.publicUrl.toString())
+                    .setFooter('Server Donation Tool by FlorianSW')
+                    .setDescription(translate('NOTIFICATIONS_PAYMENT_SUCCESSFUL_PUBLIC_DESCRIPTION', {
+                        params: {
+                            user: `<@${target.discordId}> ${target.username ? `(${target.username})` : ''}`,
+                            username: target.username || '',
+                            userId: target.discordId,
+                            package: order.reference.p.name,
+                            price: `${order.reference.p.price.currency} ${order.reference.p.price.amount}`,
+                        }
+                    }));
 
                 if (order.customMessage) {
                     embed.addField(translate('NOTIFICATIONS_PAYMENT_SUCCESSFUL_CUSTOM_MESSAGE'), order.customMessage);

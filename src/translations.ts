@@ -161,6 +161,7 @@ const messages: { [key: string]: string } = {
     NOTIFICATIONS_REDEEM_ERROR_RETRY_LINK: 'Retry link',
     NOTIFICATIONS_PAYMENT_SUCCESSFUL_TITLE: 'New Donation',
     NOTIFICATIONS_PAYMENT_SUCCESSFUL_DESCRIPTION: 'A new donation was received. The payment succeeded.',
+    NOTIFICATIONS_PAYMENT_SUCCESSFUL_PUBLIC_DESCRIPTION: 'Thanks {{user}} for donating and supporting our community! :heart:',
     NOTIFICATIONS_PAYMENT_SUCCESSFUL_CUSTOM_MESSAGE: 'Custom message of donator',
     NOTIFICATIONS_SUBSCRIPTION_CREATED_TITLE: 'New Subscription',
     NOTIFICATIONS_SUBSCRIPTION_CREATED_DESCRIPTION: 'A donator subscribed to a package. The first payment is pending.',
