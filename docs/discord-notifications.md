@@ -38,6 +38,11 @@ You can configure multiple notifications, which take different (or even the same
     </thead>
     <tbody>
         <tr>
+            <td>DONATED_PUBLIC</td>
+            <td>Same as `DONATED` with the difference that it is aimed to be send to a public discord channel.</td>
+            <td>By default only the Discord username (and tag) is used. Server owners can overwrite the `NOTIFICATIONS_PAYMENT_SUCCESSFUL_PUBLIC_DESCRIPTION` message and use the following variables additionally: `username`, `userId`, `package`, `price`.</td>
+        </tr>
+        <tr>
             <td>DONATED</td>
             <td>A donator successfully donated (donation is processed and confirmed by PayPal).</td>
             <td rowspan="3">Order ID, PayPal Order ID, PayPal Transaction ID, Donator Discord and Steam ID, Donated for package, Order creation date</td>
