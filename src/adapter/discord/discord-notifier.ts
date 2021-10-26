@@ -78,9 +78,6 @@ export class DiscordNotifier {
                         }
                     }));
 
-                if (order.customMessage) {
-                    embed.addField(translate('NOTIFICATIONS_PAYMENT_SUCCESSFUL_CUSTOM_MESSAGE'), order.customMessage);
-                }
                 webhookClient(d).send({
                     username: d.username || 'Donations',
                     embeds: [embed],
