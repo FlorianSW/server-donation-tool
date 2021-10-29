@@ -91,7 +91,7 @@ export class PaypalPayment implements Payment {
                     },
                 },
                 items: [{
-                    name: request.forPackage.name,
+                    name: request.forPackage.payment?.name || request.forPackage.name,
                     category: 'DONATION',
                     unit_amount: {
                         currency_code: request.forPackage.price.currency,

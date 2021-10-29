@@ -1,5 +1,4 @@
 import {DiscordNotification} from '../adapter/discord/discord-notifier';
-import {Request} from 'express';
 import {PathLike} from 'fs';
 
 export type ServerNames = {

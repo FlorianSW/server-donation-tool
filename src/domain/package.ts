@@ -56,6 +56,9 @@ export enum SubscriptionCycle {
 export class Package {
     name: string;
     description?: string;
+    payment?: {
+        name: string;
+    }
     id: number;
     disabled?: boolean;
     subscription?: SubscriptionCycle | undefined;
