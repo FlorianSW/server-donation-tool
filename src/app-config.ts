@@ -133,6 +133,10 @@ class YamlAppConfig implements AppConfig {
         clientSecret: string;
         manageWebhook: boolean;
     };
+    stripe?: {
+        secretKey: string;
+        publishableKey: string;
+    };
     serverNames: ServerNames;
 
     private logger: Logger;

@@ -32,6 +32,7 @@
     "passport-steam": "^1.0.17",
     "reflect-metadata": "^0.1.13",
     "sqlite3": "^5.0.2",
+    "stripe": "^8.190.0",
     "tsyringe": "^4.6.0",
     "uuid": "^8.3.2",
     "winston": "^3.3.3"

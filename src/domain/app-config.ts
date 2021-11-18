@@ -53,6 +53,10 @@ export interface AppConfig {
         clientSecret: string,
         manageWebhook: boolean,
     },
+    stripe?: {
+        secretKey: string,
+        publishableKey: string,
+    },
     battlemetrics: {
         access_token: string,
     },

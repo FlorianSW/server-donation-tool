@@ -30,13 +30,15 @@ import {PaypalWebhooksController} from './adapter/controller/paypal-webhooks';
 import {Package, PriceType} from './domain/package';
 import {SQLiteSubscriptionPlanRepository} from './adapter/subscription-plan-repository';
 import {SubscriptionPlanRepository} from './domain/repositories';
-import {Payment} from './domain/payment';
+import {Payment, SubscriptionPaymentProvider} from './domain/payment';
 import {SQLiteSubscriptionsRepository} from './adapter/subscriptions-repository';
 import {RedeemPackage} from './service/redeem-package';
 import {Subscriptions} from './service/subscriptions';
 import {SubscriptionsController} from './adapter/controller/subscriptions';
 import {paypalClient} from './adapter/paypal/client';
 import {Theming} from './service/theming';
+import {stripeClient} from './adapter/stripe/client';
+import {StripePayment} from './adapter/stripe/stripe-payment';
 
 export interface Closeable {
     close(): Promise<void>
@@ -56,6 +58,9 @@ container.register('EventSource', {
 container.register('PayPalClient', {
     useFactory: (c) => paypalClient(c.resolve('AppConfig'))
 });
+container.register('StripeClient', {
+    useFactory: (c) => stripeClient(c.resolve('AppConfig'))
+});
 container.registerSingleton('DiscordRoleRepository', SQLiteDiscordRoleRepository);
 container.registerSingleton('Closeable', 'DiscordRoleRepository');
 container.registerSingleton('OrderRepository', SQLiteOrderRepository);
@@ -65,7 +70,9 @@ container.registerSingleton('Closeable', 'SubscriptionPlanRepository');
 container.registerSingleton('SubscriptionsRepository', SQLiteSubscriptionsRepository);
 container.registerSingleton('Closeable', 'SubscriptionsRepository');
 
+container.registerType('SubscriptionPaymentProvider', PaypalPayment);
 container.registerType('Payment', PaypalPayment);
+container.registerType('Payment', StripePayment);
 container.registerType('RedeemPackage', RedeemPackage);
 container.registerType('Subscriptions', Subscriptions);
 container.registerType('Closeable', DiscordRoleRecorder);
@@ -152,7 +159,7 @@ parseConfig(log).then(async (config) => {
 
 async function initSubscriptions(app: Express) {
     const packages: Package[] = container.resolve('availablePackages');
-    const payment: Payment = container.resolve('Payment');
+    const payment: SubscriptionPaymentProvider = container.resolve('SubscriptionPaymentProvider');
     const subscriptions: SubscriptionPlanRepository = container.resolve('SubscriptionPlanRepository');
     const subscriptionPackages = packages.filter((p) => p.subscription !== undefined);
     log.debug('Found ' + subscriptionPackages.length + ' packages that support subscriptions');

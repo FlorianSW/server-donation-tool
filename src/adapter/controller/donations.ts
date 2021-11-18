@@ -8,7 +8,7 @@ import {Logger} from 'winston';
 import {SessionData} from 'express-session';
 import csrf from 'csurf';
 import {EventSource} from '../../domain/events';
-import {inject, singleton} from 'tsyringe';
+import {inject, injectAll, singleton} from 'tsyringe';
 import {OrderRepository} from '../../domain/repositories';
 import {Subscriptions} from '../../service/subscriptions';
 import {RedeemPackage} from '../../service/redeem-package';
@@ -20,7 +20,7 @@ export class DonationController {
     constructor(
         @inject('AppConfig') private readonly config: AppConfig,
         @inject('availablePackages') private readonly packages: Package[],
-        @inject('Payment') private readonly payment: Payment,
+        @injectAll('Payment') private readonly payments: Payment[],
         @inject('OrderRepository') private readonly repo: OrderRepository,
         @inject('Subscriptions') private readonly subscriptions: Subscriptions,
         @inject('RedeemPackage') private readonly redeemPackage: RedeemPackage,
@@ -47,6 +47,20 @@ export class DonationController {
                 supportInfo: translate('ERROR_ORDER_NOT_FOUND', {params: {orderId: req.params.orderId}}),
             });
             throw new OrderNotFound();
+        }
+
+        if (order.status !== OrderStatus.PAID) {
+            for (let payment of this.payments) {
+                try {
+                    const info = await payment.details(order.payment.id);
+                    if (info.status === OrderStatus.PAID) {
+                        order.pay(info.transactionId);
+                        await this.repo.save(order);
+                        break;
+                    }
+                } catch (e) {
+                }
+            }
         }
 
         req.session.lastOrder = {
@@ -87,7 +101,8 @@ export class DonationController {
                 type: req.session.selectedPackage.type,
             },
             paypalClientId: this.config.paypal.clientId,
-        })
+            stripePublishableKey: this.config.stripe.publishableKey,
+        });
     }
 
     private async prepareRedeem(req: Request, res: Response) {
@@ -137,6 +152,10 @@ export class DonationController {
 
     private async redeem(req: Request, res: Response) {
         let order = await this.fetchOrderDetails(req, res);
+        if (order.status !== OrderStatus.PAID) {
+            await this.redirectToPrepareRedeem(req, res);
+            return;
+        }
         if (!order.reference) {
             res.sendStatus(400);
             return;
@@ -183,7 +202,12 @@ export class DonationController {
             }
         };
         const steamId = req.session.selectedPackage.forAccount;
-        const paymentOrder = await this.payment.createPaymentOrder({
+        const payment = this.payments.find((provider) => provider.provider() === req.body.provider);
+        if (payment === null) {
+            res.status(400).send();
+            return;
+        }
+        const paymentOrder = await payment.createPaymentOrder({
             forPackage: p,
             steamId: steamId,
             discordId: req.user.discord.id,
@@ -196,17 +220,26 @@ export class DonationController {
         await this.repo.save(order);
 
         res.status(200).json({
-            orderId: order.payment.id
+            orderId: order.payment.id,
+            metadata: {
+                returnUrl: new URL('/donate/' + order.id, this.config.app.publicUrl).toString(),
+                ...paymentOrder.metadata
+            },
         });
     }
 
     private async captureOrder(req: Request, res: Response) {
         const order = (await this.repo.findByPaymentOrder(req.params.orderId))[0];
-        const capture = await this.payment.capturePayment({
+        const payment = this.payments.find((provider) => provider.provider() === req.body.provider);
+        if (payment === null) {
+            res.status(400).send();
+            return;
+        }
+        const capture = await payment.capturePayment({
             orderId: order.payment.id,
         });
         req.session.lastOrder = {
-            id: capture.orderId,
+            id: order.id,
             transactionId: capture.transactionId,
         };
 

@@ -11,7 +11,8 @@
         <% } %>
         <label><%= translate('DONATE_SUMMARY_USER_LABEL') %></label>
         <span>
-            <span><img class="image" src="<%= imagePath('steam_logo.png') %>"> <%= user.steam.name %> (<%= user.steam.id %>)</span>
+            <span><img class="image"
+                       src="<%= imagePath('steam_logo.png') %>"> <%= user.steam.name %> (<%= user.steam.id %>)</span>
             <span><img class="image" src="<%= imagePath('discord.svg') %>"> <%= user.username %></span>
         </span>
     </div>
@@ -25,6 +26,16 @@
     <h5><%= translate('DONATE_PAYMENT_TITLE') %></h5>
     <script src="https://www.paypal.com/sdk/js?client-id=<%= paypalClientId %>&currency=<%= currency %>"></script>
     <div id="paypal-button-container"></div>
+    <% if (locals.stripePublishableKey) { %>
+        <script src="https://js.stripe.com/v3/"></script>
+        <input type="hidden" name="stripe-publishable-key" value="<%= stripePublishableKey %>">
+        <button name="stripe">Stripe</button>
+        <div id="payment-element">
+        </div>
+        <button id="submit">Submit</button>
+        <div id="error-message">
+        </div>
+    <% } %>
     <%- script('steps/donate.js') %>
 </div>
 <%- include('../partials/package-information.ejs') %>

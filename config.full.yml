@@ -122,6 +122,9 @@ paypal:
   # You can create these in the PayPal developer portal: https://developer.paypal.com/developer/applications/
   clientId:
   clientSecret:
+stripe:
+  secretKey: sk_...
+  publishableKey: pk_...
 cftools:
   # Credentials of a CFTools application from https://developer.cftools.cloud/applications
   # Make sure you have granted this app permission to all servers listed in the perks section (cftools.serverApiId) in

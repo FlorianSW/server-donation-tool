@@ -1,11 +1,11 @@
 import {inject, singleton} from 'tsyringe';
 import {
     Order,
-    Payment,
     PendingSubscription,
     Subscription,
     SubscriptionNotFound,
     SubscriptionNotPending,
+    SubscriptionPaymentProvider,
     SubscriptionPlan
 } from '../domain/payment';
 import {User} from '../domain/user';
@@ -21,7 +21,7 @@ export class Subscriptions {
         @inject('SubscriptionsRepository') private readonly subscriptions: SubscriptionsRepository,
         @inject('OrderRepository') private readonly orders: OrderRepository,
         @inject('EventSource') private readonly events: EventSource,
-        @inject('Payment') private readonly payment: Payment,
+        @inject('SubscriptionPaymentProvider') private readonly payment: SubscriptionPaymentProvider,
         @inject('RedeemPackage') private readonly redeem: RedeemPackage,
     ) {
     }

@@ -2,8 +2,6 @@ import {Package} from './package';
 import {v4} from 'uuid';
 import {AppConfig} from './app-config';
 import {User} from './user';
-import {PaypalPayment} from '../adapter/paypal/paypal-payment';
-import {PayPalSubscription} from '../adapter/paypal/types';
 
 export class Reference {
     constructor(public steamId: string | null, public readonly discordId: string, public readonly p: Package) {
@@ -18,6 +16,8 @@ export interface PaymentOrder {
     created: Date;
     id: string;
     transactionId?: string;
+    status?: OrderStatus;
+    metadata?: { [key: string]: any };
 }
 
 export enum OrderStatus {
@@ -86,6 +86,13 @@ export class Subscription {
     ) {
     }
 
+    public static create(plan: SubscriptionPlan, user: User): Subscription {
+        return new Subscription(v4(), plan.id, {}, {
+            steamId: user.steam.id,
+            discordId: user.discord.id
+        }, 'PENDING');
+    }
+
     public cancel(): void {
         this.state = 'CANCELLED';
     }
@@ -119,13 +126,6 @@ export class Subscription {
     public isActive(): boolean {
         return ['PENDING', 'ACTIVE'].includes(this.state);
     }
-
-    public static create(plan: SubscriptionPlan, user: User): Subscription {
-        return new Subscription(v4(), plan.id, {}, {
-            steamId: user.steam.id,
-            discordId: user.discord.id
-        }, 'PENDING');
-    }
 }
 
 export class SubscriptionNotFound extends Error {
@@ -143,7 +143,6 @@ export class SubscriptionNotPending extends Error {
 }
 
 export interface PaymentCapture {
-    orderId: string;
     transactionId: string;
 }
 
@@ -187,11 +186,17 @@ export interface Payment {
 
     capturePayment(request: CapturePaymentRequest): Promise<PaymentCapture>;
 
+    details(paymentOrderId: string): Promise<PaymentOrder>;
+
+    provider(): string;
+}
+
+export interface SubscriptionPaymentProvider {
     persistSubscription(p: Package, plan?: SubscriptionPlan): Promise<SubscriptionPlan>;
 
     subscribe(sub: Subscription, plan: SubscriptionPlan, user: User): Promise<PendingSubscription>;
 
-    subscriptionDetails(sub:Subscription): Promise<SubscriptionPayment>;
+    subscriptionDetails(sub: Subscription): Promise<SubscriptionPayment>;
 
     cancelSubscription(subscription: Subscription): Promise<void>;
 }

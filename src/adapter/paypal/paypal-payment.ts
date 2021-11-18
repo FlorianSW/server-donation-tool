@@ -7,7 +7,7 @@ import {
     PendingSubscription,
     Reference,
     Subscription,
-    SubscriptionPayment,
+    SubscriptionPayment, SubscriptionPaymentProvider,
     SubscriptionPlan
 } from '../../domain/payment';
 import {AppConfig} from '../../domain/app-config';
@@ -44,7 +44,7 @@ export enum Environment {
 }
 
 @singleton()
-export class PaypalPayment implements Payment {
+export class PaypalPayment implements Payment, SubscriptionPaymentProvider {
     constructor(
         @inject('AppConfig') private readonly config: AppConfig,
         @inject('packages') private readonly packages: Package[],
@@ -52,12 +52,19 @@ export class PaypalPayment implements Payment {
     ) {
     }
 
+    details(paymentOrderId: string): Promise<PaymentOrder> {
+        throw new Error('Method not implemented.');
+    }
+
+    provider(): string {
+        return 'paypal';
+    }
+
     async capturePayment(request: CapturePaymentRequest): Promise<PaymentCapture> {
         const r = new paypal.orders.OrdersCaptureRequest(request.orderId);
 
         const capture = await this.client.execute<CaptureOrderResponse>(r);
         return {
-            orderId: capture.result.id,
             transactionId: capture.result.purchase_units[0]?.payments?.captures[0]?.id,
         };
     }
@@ -312,7 +319,7 @@ export class PaypalPayment implements Payment {
     }
 }
 
-export class FakePayment implements Payment {
+export class FakePayment implements Payment, SubscriptionPaymentProvider {
     capturePayment(request: CapturePaymentRequest): Promise<PaymentCapture> {
         return Promise.resolve({
             orderId: v4(),
@@ -348,5 +355,13 @@ export class FakePayment implements Payment {
             state: 'ACTIVE',
             approvalLink: undefined,
         });
+    }
+
+    provider(): string {
+        return 'fake';
+    }
+
+    details(paymentOrderId: string): Promise<PaymentOrder> {
+        throw new Error('not supported');
     }
 }
