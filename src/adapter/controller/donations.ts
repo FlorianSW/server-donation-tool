@@ -117,7 +117,7 @@ export class DonationController {
     }
 
     private canAutoRedeem(order: Order): boolean {
-        return order.redeemedAt === null && order.reference.steamId !== null;
+        return order.status === OrderStatus.PAID && order.redeemedAt === null && order.reference.steamId !== null;
     }
 
     private async subscribe(req: Request, res: Response) {
@@ -140,6 +140,9 @@ export class DonationController {
         if (!order.reference) {
             res.sendStatus(400);
             return;
+        }
+        if (order.status !== OrderStatus.PAID) {
+            return this.redirectToPrepareRedeem(req, res);
         }
 
         const result = await this.redeemPackage.redeem(order, RedeemTarget.fromUser(req.user));
