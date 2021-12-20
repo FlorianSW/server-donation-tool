@@ -5,3 +5,5 @@ config.yml
 string_overrides.yml
 server*.log
 site/
+themes/**/*
+!themes/default/**/*
