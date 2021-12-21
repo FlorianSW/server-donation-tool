@@ -1,0 +1,22 @@
+<div class="stripe-container">
+    <div class="loading" id="background"></div>
+    <div class="loading" id="spinner">
+        <div class="lds-grid">
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+    </div>
+    <script src="https://js.stripe.com/v3/"></script>
+    <input type="hidden" name="stripe-publishable-key" value="<%= data.publishableKey %>">
+    <div id="payment-element"></div>
+    <button id="submit" class="btn">Submit</button>
+    <div id="error-message"></div>
+    <%- script('payments/stripe/index.js') %>
+</div>

@@ -5,7 +5,7 @@ import {
     OrderStatus,
     Payment,
     PaymentCapture,
-    PaymentOrder
+    PaymentOrder, PaymentProvider
 } from '../../domain/payment';
 import {Package} from '../../domain/package';
 import {inject, singleton} from 'tsyringe';
@@ -14,6 +14,8 @@ import Stripe from 'stripe';
 
 @singleton()
 export class StripePayment implements Payment {
+    public static readonly NAME = 'stripe';
+
     constructor(
         @inject('AppConfig') private readonly config: AppConfig,
         @inject('packages') private readonly packages: Package[],
@@ -34,8 +36,14 @@ export class StripePayment implements Payment {
         };
     }
 
-    provider(): string {
-        return 'stripe';
+    provider(): PaymentProvider {
+        return {
+            name: StripePayment.NAME,
+            template: 'payments/stripe/index.ejs',
+            publicRenderData: {
+                publishableKey: this.config.stripe.publishableKey,
+            },
+        };
     }
 
     capturePayment(request: CapturePaymentRequest): Promise<PaymentCapture> {

@@ -3,6 +3,7 @@ import Knex from 'knex';
 import {Order, OrderPayment, OrderStatus, Reference} from '../domain/payment';
 import {Package} from '../domain/package';
 import {inject, singleton} from 'tsyringe';
+import {PaypalPayment} from './paypal/paypal-payment';
 
 const tableName = 'order_repository';
 const columnId = 'id';
@@ -16,6 +17,7 @@ const columnDiscordId = 'discord_id';
 const columnPackageId = 'package_id';
 const columnPrice = 'price';
 const columnRedeemedAt = 'redeemed_at';
+const columnPaymentProvider = 'payment_provider';
 
 @singleton()
 export class SQLiteOrderRepository implements OrderRepository {
@@ -37,6 +39,7 @@ export class SQLiteOrderRepository implements OrderRepository {
                         b.bigInteger(columnPackageId);
                         b.float(columnPrice);
                         b.dateTime(columnRedeemedAt).nullable().defaultTo(null);
+                        b.dateTime(columnPaymentProvider).notNullable().defaultTo(PaypalPayment.NAME);
                     }).then(() => {
                         resolve(true);
                     });
@@ -68,6 +71,12 @@ export class SQLiteOrderRepository implements OrderRepository {
                     if (!c.hasOwnProperty(columnRedeemedAt)) {
                         await con.schema.alterTable(tableName, (b) => {
                             b.dateTime(columnRedeemedAt).nullable().defaultTo(null);
+                        });
+                        await con.raw(`UPDATE ${tableName} SET ${columnRedeemedAt} = ${columnCreated} WHERE ${columnRedeemedAt} IS NULL;`);
+                    }
+                    if (!c.hasOwnProperty(columnPaymentProvider)) {
+                        await con.schema.alterTable(tableName, (b) => {
+                            b.dateTime(columnPaymentProvider).notNullable().defaultTo(PaypalPayment.NAME);
                         });
                         await con.raw(`UPDATE ${tableName} SET ${columnRedeemedAt} = ${columnCreated} WHERE ${columnRedeemedAt} IS NULL;`);
                     }
@@ -141,8 +150,8 @@ export class SQLiteOrderRepository implements OrderRepository {
     async save(order: Order): Promise<void> {
         await this.initialized;
         // @formatter:off
-        await this.con.raw(`REPLACE INTO ${tableName} (${columnId}, ${columnOrderId}, ${columnCreated}, ${columnStatus}, ${columnTransactionId}, ${columnSteamId}, ${columnDiscordId}, ${columnPackageId}, ${columnPrice}, ${columnCustomMessage}, ${columnRedeemedAt}) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, [
-            order.id, order.payment.id, order.created.getTime(), order.status, order.payment.transactionId || null, order.reference.steamId || null, order.reference.discordId, order.reference.p.id, parseFloat(order.reference.p.price.amount), order.customMessage, order.redeemedAt || null
+        await this.con.raw(`REPLACE INTO ${tableName} (${columnId}, ${columnOrderId}, ${columnCreated}, ${columnStatus}, ${columnTransactionId}, ${columnPaymentProvider}, ${columnSteamId}, ${columnDiscordId}, ${columnPackageId}, ${columnPrice}, ${columnCustomMessage}, ${columnRedeemedAt}) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, [
+            order.id, order.payment.id, order.created.getTime(), order.status, order.payment.transactionId || null, order.payment.provider, order.reference.steamId || null, order.reference.discordId, order.reference.p.id, parseFloat(order.reference.p.price.amount), order.customMessage, order.redeemedAt || null
         ]);
         // @formatter:on
     }
@@ -159,6 +168,7 @@ export class SQLiteOrderRepository implements OrderRepository {
         const payment: OrderPayment = {
             id: o[columnOrderId],
             transactionId: o[columnTransactionId],
+            provider: o[columnPaymentProvider],
         };
         return new Order(o[columnId], new Date(o[columnCreated]), reference, o[columnCustomMessage] || null, o[columnRedeemedAt] ? new Date(o[columnRedeemedAt]) : null, o[columnStatus], payment);
     }

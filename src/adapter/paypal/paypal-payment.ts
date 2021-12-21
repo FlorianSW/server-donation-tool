@@ -3,7 +3,7 @@ import {
     CreatePaymentOrderRequest,
     Payment,
     PaymentCapture,
-    PaymentOrder,
+    PaymentOrder, PaymentProvider,
     PendingSubscription,
     Reference,
     Subscription,
@@ -45,6 +45,8 @@ export enum Environment {
 
 @singleton()
 export class PaypalPayment implements Payment, SubscriptionPaymentProvider {
+    public static readonly NAME = 'paypal';
+
     constructor(
         @inject('AppConfig') private readonly config: AppConfig,
         @inject('packages') private readonly packages: Package[],
@@ -56,8 +58,14 @@ export class PaypalPayment implements Payment, SubscriptionPaymentProvider {
         throw new Error('Method not implemented.');
     }
 
-    provider(): string {
-        return 'paypal';
+    provider(): PaymentProvider {
+        return {
+            name: PaypalPayment.NAME,
+            template: 'payments/paypal/index.ejs',
+            publicRenderData: {
+                clientId: this.config.paypal.clientId,
+            },
+        };
     }
 
     async capturePayment(request: CapturePaymentRequest): Promise<PaymentCapture> {
@@ -320,6 +328,8 @@ export class PaypalPayment implements Payment, SubscriptionPaymentProvider {
 }
 
 export class FakePayment implements Payment, SubscriptionPaymentProvider {
+    public static readonly NAME = 'fake';
+
     capturePayment(request: CapturePaymentRequest): Promise<PaymentCapture> {
         return Promise.resolve({
             orderId: v4(),
@@ -357,8 +367,12 @@ export class FakePayment implements Payment, SubscriptionPaymentProvider {
         });
     }
 
-    provider(): string {
-        return 'fake';
+    provider(): PaymentProvider {
+        return {
+            name: FakePayment.NAME,
+            template: '',
+            publicRenderData: {},
+        };
     }
 
     details(paymentOrderId: string): Promise<PaymentOrder> {

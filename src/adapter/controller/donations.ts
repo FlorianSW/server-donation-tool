@@ -50,16 +50,14 @@ export class DonationController {
         }
 
         if (order.status !== OrderStatus.PAID) {
-            for (let payment of this.payments) {
-                try {
-                    const info = await payment.details(order.payment.id);
-                    if (info.status === OrderStatus.PAID) {
-                        order.pay(info.transactionId);
-                        await this.repo.save(order);
-                        break;
-                    }
-                } catch (e) {
-                }
+            const provider = this.payments.find((p) => p.provider().name === order.payment.provider);
+            if (!provider) {
+                throw new Error('non-paid order with an unknown payment provider');
+            }
+            const info = await provider.details(order.payment.id);
+            if (info.status === OrderStatus.PAID) {
+                order.pay(info.transactionId);
+                await this.repo.save(order);
             }
         }
 
@@ -88,6 +86,8 @@ export class DonationController {
         if (req.session.selectedPackage.type === DonationType.Subscription) {
             template = 'steps/subscribe';
         }
+
+        const selectedPayment = this.payments.map((p) => p.provider()).find((p) => p.name === req.query['method']);
         res.render(template, {
             csrfToken: req.csrfToken(),
             user: req.user,
@@ -100,8 +100,11 @@ export class DonationController {
                 subscription: selectedPackage.subscription,
                 type: req.session.selectedPackage.type,
             },
-            paypalClientId: this.config.paypal.clientId,
-            stripePublishableKey: this.config.stripe.publishableKey,
+            paymentMethods: this.payments.map((p) => p.provider().name),
+            selectedMethod: selectedPayment ? {
+                template: selectedPayment.template,
+                data: selectedPayment.publicRenderData,
+            } : undefined,
         });
     }
 
@@ -202,8 +205,8 @@ export class DonationController {
             }
         };
         const steamId = req.session.selectedPackage.forAccount;
-        const payment = this.payments.find((provider) => provider.provider() === req.body.provider);
-        if (payment === null) {
+        const payment = this.payments.find((provider) => provider.provider().name === req.body.provider);
+        if (!payment) {
             res.status(400).send();
             return;
         }
@@ -216,6 +219,7 @@ export class DonationController {
         const order = Order.create(paymentOrder.created, {
             id: paymentOrder.id,
             transactionId: paymentOrder.transactionId,
+            provider: payment.provider().name,
         }, new Reference(steamId, req.user.discord.id, p), customMessage);
         await this.repo.save(order);
 
@@ -231,7 +235,7 @@ export class DonationController {
     private async captureOrder(req: Request, res: Response) {
         const order = (await this.repo.findByPaymentOrder(req.params.orderId))[0];
         const payment = this.payments.find((provider) => provider.provider() === req.body.provider);
-        if (payment === null) {
+        if (!payment) {
             res.status(400).send();
             return;
         }

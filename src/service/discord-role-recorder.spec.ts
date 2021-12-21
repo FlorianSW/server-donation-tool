@@ -8,6 +8,7 @@ import {Client} from 'discord.js';
 import {Logger} from 'winston';
 import {InMemoryDiscordRoleRepository} from '../adapter/discord-role-repository';
 import {aPackage, aUser} from '../adapter/perk/testdata.spec';
+import {FakePayment} from '../adapter/paypal/paypal-payment';
 
 const notExpiring = Object.assign(
     new DiscordRolePerk({} as Client, '11111111', {} as Logger),
@@ -40,6 +41,7 @@ describe('DiscordRoleRecorder', () => {
         await recorder.onSuccessfulRedeem(RedeemTarget.fromUser(aUser), Order.create(new Date(), {
             id: 'ORDER_ID',
             transactionId: 'TRANSACTION_ID',
+            provider: FakePayment.NAME,
         }, new Reference('7592222222222', '11111111111', {
             ...aPackage,
             perks: [notExpiring],
@@ -52,6 +54,7 @@ describe('DiscordRoleRecorder', () => {
         const order = Order.create(new Date('2020-11-01T14:52:12Z'), {
             id: 'ORDER_ID',
             transactionId: 'TRANSACTION_ID',
+            provider: FakePayment.NAME,
         }, new Reference('7592222222222', '11111111111', {
             ...aPackage,
             perks: [expiring],
@@ -72,6 +75,7 @@ describe('DiscordRoleRecorder', () => {
         const order = Order.create(new Date('2020-11-25T14:52:12Z'), {
             id: 'ORDER_ID',
             transactionId: 'TRANSACTION_ID',
+            provider: FakePayment.NAME,
         }, new Reference('7592222222222', '11111111111', {
             ...aPackage,
             perks: [expiring],

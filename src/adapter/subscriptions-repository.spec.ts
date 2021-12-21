@@ -4,6 +4,7 @@ import * as fs from 'fs';
 import {anotherUser, aPackage, aUser} from './perk/testdata.spec';
 import {Subscription, SubscriptionPlan} from '../domain/payment';
 import {SQLiteSubscriptionsRepository} from './subscriptions-repository';
+import {FakePayment} from './paypal/paypal-payment';
 
 const testDbPath = __dirname + '/subscriptions-repository.spec.sqlite';
 
@@ -73,7 +74,7 @@ describe('SubscriptionsRepository', () => {
 
         const sub3 = Subscription.create(aPlan, aUser);
         sub3.agreeBilling('A_PAYMENT_ID3');
-        sub3.pay('A_TRANSACTION_ID', aPackage);
+        sub3.pay('A_TRANSACTION_ID', FakePayment.NAME, aPackage);
         await repository.save(sub3);
 
         const cancelled = Subscription.create(aPlan, aUser);

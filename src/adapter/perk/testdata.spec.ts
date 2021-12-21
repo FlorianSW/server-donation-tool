@@ -1,6 +1,7 @@
 import {User} from '../../domain/user';
 import {Package, PriceType} from '../../domain/package';
 import {Order, Reference, SubscriptionPlan} from '../../domain/payment';
+import {FakePayment} from '../paypal/paypal-payment';
 
 export const aSteamId = '76561198012102485';
 export const anotherSteamId = '76561198012102486';
@@ -42,11 +43,13 @@ export const aPackage: Package = {
 export const anOrder: Order = Order.create(new Date(), {
     id: 'SOME_PAYMENT_ORDER_ID',
     transactionId: 'A_TRANSACTION_ID',
+    provider: FakePayment.NAME,
 }, new Reference(aSteamId, '11111111111', aPackage));
 
 export const aRedeemedOrder: Order = Order.create(new Date(), {
     id: 'SOME_PAYMENT_ORDER_ID',
     transactionId: 'A_TRANSACTION_ID',
+    provider: FakePayment.NAME,
 }, new Reference(aSteamId, '11111111111', aPackage));
 aRedeemedOrder.redeemedAt = aRedeemedOrder.created;
 

@@ -24,19 +24,14 @@
     </div>
 
     <h5><%= translate('DONATE_PAYMENT_TITLE') %></h5>
-    <script src="https://www.paypal.com/sdk/js?client-id=<%= paypalClientId %>&currency=<%= currency %>"></script>
-    <div id="paypal-button-container"></div>
-    <% if (locals.stripePublishableKey) { %>
-        <script src="https://js.stripe.com/v3/"></script>
-        <input type="hidden" name="stripe-publishable-key" value="<%= stripePublishableKey %>">
-        <button name="stripe">Stripe</button>
-        <div id="payment-element">
-        </div>
-        <button id="submit">Submit</button>
-        <div id="error-message">
-        </div>
-    <% } %>
     <%- script('steps/donate.js') %>
+    <% if (locals.selectedMethod) { %>
+        <%- include('../' + selectedMethod.template, {data: selectedMethod.data}) %>
+    <% } else { %>
+        <% paymentMethods.forEach((p) => { %>
+            <%= p %>
+        <% }); %>
+    <% } %>
 </div>
 <%- include('../partials/package-information.ejs') %>
 <%- include('../partials/footer.ejs') %>

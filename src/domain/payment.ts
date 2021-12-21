@@ -27,6 +27,7 @@ export enum OrderStatus {
 export interface OrderPayment {
     id: string;
     transactionId?: string,
+    provider: string,
 }
 
 export class Order {
@@ -101,10 +102,11 @@ export class Subscription {
         this.payment.id = paymentId;
     }
 
-    public pay(transactionId: string, p: Package): Order {
+    public pay(transactionId: string, provider: string, p: Package): Order {
         const order = Order.create(new Date(), {
             id: this.payment.id,
             transactionId: transactionId,
+            provider: provider,
         }, new Reference(this.user.steamId, this.user.discordId, p));
         order.pay(transactionId);
 
@@ -181,6 +183,12 @@ export interface SubscriptionCancelled {
     id: string;
 }
 
+export interface PaymentProvider {
+    name: string;
+    template: string;
+    publicRenderData: { [key: string]: string };
+}
+
 export interface Payment {
     createPaymentOrder(request: CreatePaymentOrderRequest): Promise<PaymentOrder>;
 
@@ -188,7 +196,7 @@ export interface Payment {
 
     details(paymentOrderId: string): Promise<PaymentOrder>;
 
-    provider(): string;
+    provider(): PaymentProvider;
 }
 
 export interface SubscriptionPaymentProvider {
@@ -199,6 +207,8 @@ export interface SubscriptionPaymentProvider {
     subscriptionDetails(sub: Subscription): Promise<SubscriptionPayment>;
 
     cancelSubscription(subscription: Subscription): Promise<void>;
+
+    provider(): PaymentProvider;
 }
 
 export class OrderNotFound extends Error {
