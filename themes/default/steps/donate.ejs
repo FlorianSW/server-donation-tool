@@ -29,7 +29,9 @@
         <%- include('../' + selectedMethod.template, {data: selectedMethod.data}) %>
     <% } else { %>
         <% paymentMethods.forEach((p) => { %>
-            <%= p %>
+            <div>
+                <%= translate('PAYMENT_METHOD_' + p.toUpperCase()); %>
+            </div>
         <% }); %>
     <% } %>
 </div>
