@@ -116,7 +116,9 @@ export class DonationController {
             return;
         }
 
-        if (this.canAutoRedeem(order)) {
+        if (order.status !== OrderStatus.PAID) {
+            res.render('steps/wait_for_payment');
+        } else if (this.canAutoRedeem(order)) {
             await this.redeem(req, res);
         } else {
             res.render('steps/redeem', {

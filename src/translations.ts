@@ -187,6 +187,9 @@ const messages: { [key: string]: string } = {
     PAYMENT_METHOD_PAYPAL: 'PayPal',
     PAYMENT_METHOD_STRIPE: 'Stripe (Credit Card, Klarna, etc.)',
 
+    WAIT_FOR_PAYMENT_TITLE: 'Payment pending',
+    WAIT_FOR_PAYMENT_DESCRIPTION: 'We are still waiting for the payment to be processed and confirmed by the payment provider. You can only redeem your perks when the payment is confirmed. This should usually not take more than several seconds to some minutes. Please refresh this page to check if the payment succeeded.',
+
     ERROR_STEAM_ID_MISMATCH_TITLE: 'Steam ID mismatch',
     ERROR_STEAM_ID_MISMATCH_DESCRIPTION: 'The Steam ID for this donation is different from the one connected with your profile.',
     ERROR_STEAM_ID_MISMATCH_ORDER_LABEL: 'Steam ID of donation',
