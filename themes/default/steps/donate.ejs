@@ -28,11 +28,19 @@
     <% if (locals.selectedMethod) { %>
         <%- include('../' + selectedMethod.template, {data: selectedMethod.data}) %>
     <% } else { %>
-        <% paymentMethods.forEach((p) => { %>
-            <div>
-                <%= translate('PAYMENT_METHOD_' + p.toUpperCase()); %>
+        <form action="/donate" method="post">
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+            <div class="payment-methods">
+                <% paymentMethods.forEach((p) => { %>
+                    <div>
+                        <%= translate('PAYMENT_METHOD_' + p.toUpperCase()); %>
+                        <button class="btn waves-effect waves-light" name="method" value="<%= p %>" type="submit">
+                            <div></div>
+                        </button>
+                    </div>
+                <% }); %>
             </div>
-        <% }); %>
+        </form>
     <% } %>
 </div>
 <%- include('../partials/package-information.ejs') %>

@@ -3,11 +3,13 @@ import {
     CreatePaymentOrderRequest,
     Payment,
     PaymentCapture,
-    PaymentOrder, PaymentProvider,
+    PaymentOrder,
+    PaymentProvider,
     PendingSubscription,
     Reference,
     Subscription,
-    SubscriptionPayment, SubscriptionPaymentProvider,
+    SubscriptionPayment,
+    SubscriptionPaymentProvider,
     SubscriptionPlan
 } from '../../domain/payment';
 import {AppConfig} from '../../domain/app-config';
@@ -49,7 +51,6 @@ export class PaypalPayment implements Payment, SubscriptionPaymentProvider {
 
     constructor(
         @inject('AppConfig') private readonly config: AppConfig,
-        @inject('packages') private readonly packages: Package[],
         @inject('PayPalClient') private readonly client: PayPalClient,
     ) {
     }
@@ -61,9 +62,11 @@ export class PaypalPayment implements Payment, SubscriptionPaymentProvider {
     provider(): PaymentProvider {
         return {
             name: PaypalPayment.NAME,
-            template: 'payments/paypal/index.ejs',
-            publicRenderData: {
-                clientId: this.config.paypal.clientId,
+            donation: {
+                template: 'payments/paypal/index.ejs',
+                publicRenderData: {
+                    clientId: this.config.paypal.clientId,
+                },
             },
         };
     }
@@ -370,8 +373,6 @@ export class FakePayment implements Payment, SubscriptionPaymentProvider {
     provider(): PaymentProvider {
         return {
             name: FakePayment.NAME,
-            template: '',
-            publicRenderData: {},
         };
     }
 

@@ -111,6 +111,7 @@ steam:
   realm: http://localhost:8080
   # Your steam api key from https://steamcommunity.com/dev/apikey
   apiKey: 'SOME_API_KEY'
+# (Conditional) Configure when you want to accept payments with paypal.com.
 paypal:
   # The environment of PayPal which match to the credentials you configure in the next settings. If you use sandbox
   # credentials, use 'sandbox', if you use live credentials, use 'production'.
@@ -122,9 +123,11 @@ paypal:
   # You can create these in the PayPal developer portal: https://developer.paypal.com/developer/applications/
   clientId:
   clientSecret:
+# (Conditional) Configure when you want to accept payments with stripe.com.
+# When using stripe.com, you need to setup an account and set an account name.
 stripe:
+  # The secret key of your stripe.com account (Developers -> API Keys -> Secret Key).
   secretKey: sk_...
-  publishableKey: pk_...
 cftools:
   # Credentials of a CFTools application from https://developer.cftools.cloud/applications
   # Make sure you have granted this app permission to all servers listed in the perks section (cftools.serverApiId) in

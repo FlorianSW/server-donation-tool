@@ -1,15 +1,16 @@
 import {
     CapturePaymentRequest,
     CreatePaymentOrderRequest,
+    DeferredPaymentOrder,
+    DeferredPaymentOrderRequest,
     OrderNotFound,
     OrderStatus,
     Payment,
     PaymentCapture,
-    PaymentOrder, PaymentProvider
+    PaymentOrder,
+    PaymentProvider
 } from '../../domain/payment';
-import {Package} from '../../domain/package';
 import {inject, singleton} from 'tsyringe';
-import {AppConfig} from '../../domain/app-config';
 import Stripe from 'stripe';
 
 @singleton()
@@ -17,8 +18,6 @@ export class StripePayment implements Payment {
     public static readonly NAME = 'stripe';
 
     constructor(
-        @inject('AppConfig') private readonly config: AppConfig,
-        @inject('packages') private readonly packages: Package[],
         @inject('StripeClient') private readonly client: Stripe,
     ) {
     }
@@ -39,10 +38,7 @@ export class StripePayment implements Payment {
     provider(): PaymentProvider {
         return {
             name: StripePayment.NAME,
-            template: 'payments/stripe/index.ejs',
-            publicRenderData: {
-                publishableKey: this.config.stripe.publishableKey,
-            },
+            deferredDonation: true,
         };
     }
 
@@ -50,22 +46,31 @@ export class StripePayment implements Payment {
         throw Error('not supported');
     }
 
-    async createPaymentOrder(request: CreatePaymentOrderRequest): Promise<PaymentOrder> {
-        const intent = await this.client.paymentIntents.create({
-            amount: parseFloat(request.forPackage.price.amount) * 100,
-            currency: request.forPackage.price.currency,
-            automatic_payment_methods: {
-                enabled: true
-            },
-            description: request.forPackage.payment?.name || request.forPackage.name,
+    async createPaymentOrder(request: CreatePaymentOrderRequest & DeferredPaymentOrderRequest): Promise<PaymentOrder & DeferredPaymentOrder> {
+        const sess = await this.client.checkout.sessions.create({
+            mode: 'payment',
+            line_items: [{
+                quantity: 1,
+                price_data: {
+                    currency: request.forPackage.price.currency,
+                    product_data: {
+                        name: request.forPackage.payment?.name || request.forPackage.name,
+                    },
+                    unit_amount: parseFloat(request.forPackage.price.amount) * 100,
+                },
+            }],
+            submit_type: 'donate',
+            cancel_url: request.cancelUrl.toString(),
+            success_url: request.successUrl.toString(),
         });
+
         return {
-            id: intent.id,
+            id: sess.payment_intent as string,
             transactionId: '',
-            created: new Date(intent.created),
+            created: new Date(),
+            paymentUrl: sess.url,
             metadata: {
-                provider: 'stripe',
-                clientSecret: intent.client_secret,
+                provider: StripePayment.NAME,
             },
         };
     }

@@ -1,7 +1,6 @@
 @import "../partials/header_footer";
 @import "../partials/package-information";
 @import "../payments/paypal/index";
-@import "../payments/stripe/index";
 
 .donate {
   h5 {
@@ -24,6 +23,33 @@
 
       img {
         width: 24px
+      }
+    }
+  }
+
+  .payment-methods {
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+
+    > div {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid grey;
+      padding: 0.75em 0;
+
+      button {
+        padding-left: 10px;
+
+        div {
+          height: 14px;
+          width: 14px;
+
+          border-top: 2px solid white;
+          border-right: 2px solid white;
+          transform: rotate(45deg);
+        }
       }
     }
   }

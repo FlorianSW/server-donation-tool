@@ -55,7 +55,6 @@ export interface AppConfig {
     },
     stripe?: {
         secretKey: string,
-        publishableKey: string,
     },
     battlemetrics: {
         access_token: string,

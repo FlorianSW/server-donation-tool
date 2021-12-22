@@ -135,7 +135,6 @@ class YamlAppConfig implements AppConfig {
     };
     stripe?: {
         secretKey: string;
-        publishableKey: string;
     };
     serverNames: ServerNames;
 

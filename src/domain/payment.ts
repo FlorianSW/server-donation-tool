@@ -20,6 +20,10 @@ export interface PaymentOrder {
     metadata?: { [key: string]: any };
 }
 
+export interface DeferredPaymentOrder {
+    paymentUrl: string;
+}
+
 export enum OrderStatus {
     CREATED = 0, PAID = 1
 }
@@ -46,7 +50,21 @@ export class Order {
         return new Order(v4(), created, reference, customMessage, null, OrderStatus.CREATED, payment);
     }
 
+    public static createDeferred(created: Date, reference: Reference, customMessage: string | null = null): Order {
+        return new Order(v4(), created, reference, customMessage, null, OrderStatus.CREATED, null);
+    }
+
+    public paymentIntent(payment: OrderPayment) {
+        if (this.payment !== null) {
+            throw new Error('can not intent to pay an order with an active payment intent');
+        }
+        this.payment = payment;
+    }
+
     public pay(transactionId: string) {
+        if (this.payment === null) {
+            throw new Error('paying an order which was not intended to be payed, yet');
+        }
         this.payment.transactionId = transactionId;
         this.status = OrderStatus.PAID;
     }
@@ -154,6 +172,12 @@ export interface CreatePaymentOrderRequest {
     discordId: string;
 }
 
+export interface DeferredPaymentOrderRequest {
+    successUrl: URL,
+    cancelUrl: URL,
+    candidateOrderId: string;
+}
+
 export interface CapturePaymentRequest {
     orderId: string;
 }
@@ -185,12 +209,15 @@ export interface SubscriptionCancelled {
 
 export interface PaymentProvider {
     name: string;
-    template: string;
-    publicRenderData: { [key: string]: string };
+    donation?: {
+        template: string;
+        publicRenderData: { [key: string]: string };
+    };
+    deferredDonation?: boolean;
 }
 
 export interface Payment {
-    createPaymentOrder(request: CreatePaymentOrderRequest): Promise<PaymentOrder>;
+    createPaymentOrder(request: CreatePaymentOrderRequest | CreatePaymentOrderRequest & DeferredPaymentOrderRequest): Promise<PaymentOrder | PaymentOrder & DeferredPaymentOrder>;
 
     capturePayment(request: CapturePaymentRequest): Promise<PaymentCapture>;
 
