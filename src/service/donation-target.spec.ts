@@ -3,6 +3,7 @@ import {AppConfig} from '../domain/app-config';
 import {InMemoryOrderRepository} from '../adapter/order-repository';
 import {Order, Reference} from '../domain/payment';
 import {aPackage} from '../adapter/perk/testdata.spec';
+import {FakePayment} from '../adapter/paypal/paypal-payment';
 
 describe('CalculateDonationTarget', () => {
     describe('has monthly target', () => {
@@ -20,7 +21,8 @@ describe('CalculateDonationTarget', () => {
             const r = new InMemoryOrderRepository();
             await r.save(Order.create(new Date(), {
                 id: 'AN_ID',
-                transactionId: 'AN_ID'
+                transactionId: 'AN_ID',
+                provider: FakePayment.NAME,
             }, new Reference(null, 'A_DISCORD_ID', aPackage)));
             const s = new CalculateDonationTarget(r, {app: {community: {donationTarget: {monthly: 10}}}} as AppConfig, [aPackage]);
 

@@ -21,7 +21,7 @@ import {container, instanceCachingFactory} from 'tsyringe';
 import {DiscordDonationTarget} from './adapter/discord/discord-donation-target';
 import {CleanupOrder} from './service/cleanup-order';
 import {WhitelistPerk} from './adapter/perk/whitelist-perk';
-import {fromHttpError, GotHttpClient, httpClient} from 'cftools-sdk/lib/internal/http';
+import {fromHttpError, GotHttpClient} from 'cftools-sdk/lib/internal/http';
 import {DiscordUserNotifier} from './adapter/discord/discord-user-notifier';
 import {ReservedSlotPerk} from './adapter/perk/reserved-slot';
 
@@ -133,6 +133,9 @@ class YamlAppConfig implements AppConfig {
         clientSecret: string;
         manageWebhook: boolean;
     };
+    stripe?: {
+        secretKey: string;
+    };
     serverNames: ServerNames;
 
     private logger: Logger;
@@ -173,12 +176,14 @@ class YamlAppConfig implements AppConfig {
             throw new Error('Not all required configuration for Steam login are set. Refer to the documentation to fix this error.');
         }
 
-        if (this.paypal.environment === undefined) {
-            this.logger.warn('PayPal environment not set. Sandbox credentials are assumed, which might not be intended.');
-            this.paypal.environment = Environment.SANDBOX;
-        }
-        if (this.paypal.manageWebhook === undefined) {
-            this.paypal.manageWebhook = true;
+        if (this.paypal) {
+            if (this.paypal.environment === undefined) {
+                this.logger.warn('PayPal environment not set. Sandbox credentials are assumed, which might not be intended.');
+                this.paypal.environment = Environment.SANDBOX;
+            }
+            if (this.paypal.manageWebhook === undefined) {
+                this.paypal.manageWebhook = true;
+            }
         }
 
         if (this.app.language) {
@@ -190,13 +195,18 @@ class YamlAppConfig implements AppConfig {
                     './document-partials/privacy-policy/intro.txt',
                     './document-partials/privacy-policy/server-logs.txt',
                     './document-partials/privacy-policy/cookies.txt',
-                    './document-partials/privacy-policy/paypal.txt',
                     './document-partials/privacy-policy/cftools.txt',
                     './document-partials/privacy-policy/personal-data.txt',
                 ]
             }
             if (this.app.googleAnalytics?.trackingId) {
                 this.app.privacyPolicy.partials.push('./document-partials/privacy-policy/google-analytics.txt');
+            }
+            if (this.paypal) {
+                this.app.privacyPolicy.partials.push('./document-partials/privacy-policy/paypal.txt');
+            }
+            if (this.stripe) {
+                this.app.privacyPolicy.partials.push('./document-partials/privacy-policy/stripe.txt');
             }
         }
         this.app.publicUrl = new URL(this.discord.redirectUrl.replace('/auth/discord/callback', ''));

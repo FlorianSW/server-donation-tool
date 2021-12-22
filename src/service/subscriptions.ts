@@ -1,11 +1,11 @@
 import {inject, singleton} from 'tsyringe';
 import {
     Order,
-    Payment,
     PendingSubscription,
     Subscription,
     SubscriptionNotFound,
     SubscriptionNotPending,
+    SubscriptionPaymentProvider,
     SubscriptionPlan
 } from '../domain/payment';
 import {User} from '../domain/user';
@@ -21,7 +21,7 @@ export class Subscriptions {
         @inject('SubscriptionsRepository') private readonly subscriptions: SubscriptionsRepository,
         @inject('OrderRepository') private readonly orders: OrderRepository,
         @inject('EventSource') private readonly events: EventSource,
-        @inject('Payment') private readonly payment: Payment,
+        @inject('SubscriptionPaymentProvider') private readonly payment: SubscriptionPaymentProvider,
         @inject('RedeemPackage') private readonly redeem: RedeemPackage,
     ) {
     }
@@ -44,7 +44,7 @@ export class Subscriptions {
             this.events.emit('subscriptionCreated', target, plan, sub);
         }
 
-        const order = sub.pay(transactionId, plan.basePackage);
+        const order = sub.pay(transactionId, this.payment.provider().name, plan.basePackage);
         await this.subscriptions.save(sub);
         await this.orders.save(order);
         await this.redeem.redeem(order, target);
@@ -122,3 +122,5 @@ export interface ViewSubscription {
     pending: PendingSubscription | null;
 }
 
+@singleton()
+export class StubSubscriptions {}

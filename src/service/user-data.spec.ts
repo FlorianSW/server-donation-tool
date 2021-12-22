@@ -5,6 +5,7 @@ import {UserData} from './user-data';
 import {aPackage, aPlan, aUser} from '../adapter/perk/testdata.spec';
 import {Subscription} from '../domain/payment';
 import {AppConfig} from '../domain/app-config';
+import {FakePayment} from '../adapter/paypal/paypal-payment';
 
 describe('UserData', () => {
     const aConfig: AppConfig = {
@@ -29,7 +30,7 @@ describe('UserData', () => {
     it('populates subscriptions', async () => {
         const sub = Subscription.create(aPlan, aUser);
         sub.agreeBilling('A_PAYMENT_ID');
-        sub.pay('A_TRANSACTION_ID', aPackage);
+        sub.pay('A_TRANSACTION_ID', FakePayment.NAME, aPackage);
         await subRepo.save(sub);
         await planRepo.save(aPlan);
 

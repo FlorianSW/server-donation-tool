@@ -1,8 +1,6 @@
 import 'reflect-metadata';
 import express, {Express} from 'express';
-import path from 'path';
 import session from 'express-session';
-import {translate} from './translations';
 import bodyParser from 'body-parser';
 import {Authentication} from './auth';
 import passport from 'passport';
@@ -30,13 +28,15 @@ import {PaypalWebhooksController} from './adapter/controller/paypal-webhooks';
 import {Package, PriceType} from './domain/package';
 import {SQLiteSubscriptionPlanRepository} from './adapter/subscription-plan-repository';
 import {SubscriptionPlanRepository} from './domain/repositories';
-import {Payment} from './domain/payment';
+import {Payment, SubscriptionPaymentProvider} from './domain/payment';
 import {SQLiteSubscriptionsRepository} from './adapter/subscriptions-repository';
 import {RedeemPackage} from './service/redeem-package';
-import {Subscriptions} from './service/subscriptions';
+import {StubSubscriptions, Subscriptions} from './service/subscriptions';
 import {SubscriptionsController} from './adapter/controller/subscriptions';
 import {paypalClient} from './adapter/paypal/client';
 import {Theming} from './service/theming';
+import {stripeClient} from './adapter/stripe/client';
+import {StripePayment} from './adapter/stripe/stripe-payment';
 
 export interface Closeable {
     close(): Promise<void>
@@ -53,9 +53,6 @@ container.register('DonationEvents', {
 container.register('EventSource', {
     useFactory: (c) => c.resolve(EventQueue)
 });
-container.register('PayPalClient', {
-    useFactory: (c) => paypalClient(c.resolve('AppConfig'))
-});
 container.registerSingleton('DiscordRoleRepository', SQLiteDiscordRoleRepository);
 container.registerSingleton('Closeable', 'DiscordRoleRepository');
 container.registerSingleton('OrderRepository', SQLiteOrderRepository);
@@ -65,14 +62,39 @@ container.registerSingleton('Closeable', 'SubscriptionPlanRepository');
 container.registerSingleton('SubscriptionsRepository', SQLiteSubscriptionsRepository);
 container.registerSingleton('Closeable', 'SubscriptionsRepository');
 
-container.registerType('Payment', PaypalPayment);
 container.registerType('RedeemPackage', RedeemPackage);
-container.registerType('Subscriptions', Subscriptions);
 container.registerType('Closeable', DiscordRoleRecorder);
 container.registerType('Closeable', ExpireDiscordRole);
 
+function setupConditionalDependencies(config: AppConfig) {
+    log.info('Initializing dependencies');
+
+    if (config.paypal) {
+        container.register('PayPalClient', {
+            useFactory: (c) => paypalClient(c.resolve('AppConfig'))
+        });
+        container.registerType('Subscriptions', Subscriptions);
+        container.registerType('SubscriptionPaymentProvider', PaypalPayment);
+        container.registerType('Payment', PaypalPayment);
+    } else {
+        const packages: Package[] = container.resolve('availablePackages');
+        if (packages.filter((p) => p.subscription !== undefined).length !== 0) {
+            throw new Error('There is at least one package configured as subscribable, however, there is no payment provider that supports subscriptions.');
+        }
+        container.registerType('Subscriptions', StubSubscriptions);
+    }
+
+    if (config.stripe) {
+        container.register('StripeClient', {
+            useFactory: (c) => stripeClient(c.resolve('AppConfig'))
+        });
+        container.registerType('Payment', StripePayment);
+    }
+}
+
 parseConfig(log).then(async (config) => {
     log.info('Starting server');
+    setupConditionalDependencies(config);
     const app = express();
 
     const port = config.app.port;
@@ -135,7 +157,9 @@ parseConfig(log).then(async (config) => {
     app.use('/', login.router);
     app.use('/', privacyPolicy.router);
 
-    await initSubscriptions(app);
+    if (container.isRegistered('SubscriptionPaymentProvider')) {
+        await initSubscriptions(app);
+    }
 
     app.use(errorHandler);
     app.use(errorLogger({
@@ -152,7 +176,7 @@ parseConfig(log).then(async (config) => {
 
 async function initSubscriptions(app: Express) {
     const packages: Package[] = container.resolve('availablePackages');
-    const payment: Payment = container.resolve('Payment');
+    const payment: SubscriptionPaymentProvider = container.resolve('SubscriptionPaymentProvider');
     const subscriptions: SubscriptionPlanRepository = container.resolve('SubscriptionPlanRepository');
     const subscriptionPackages = packages.filter((p) => p.subscription !== undefined);
     log.debug('Found ' + subscriptionPackages.length + ' packages that support subscriptions');

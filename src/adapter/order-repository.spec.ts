@@ -5,6 +5,7 @@ import {SQLiteOrderRepository} from './order-repository';
 import {Order, Reference} from '../domain/payment';
 import {Package, PriceType} from '../domain/package';
 import {FreetextPerk} from './perk/freetext-perk';
+import {FakePayment} from './paypal/paypal-payment';
 
 const testDbPath = __dirname + '/order-repository.spec.sqlite';
 const packages: Package[] = [{
@@ -21,6 +22,7 @@ const packages: Package[] = [{
 const anOrder: Order = Order.create(new Date('2025-05-16T18:25:49Z'), {
     id: 'PAYMENT_ORDER_ID',
     transactionId: 'SOME_TRANSACTION_ID',
+    provider: FakePayment.NAME,
 }, new Reference('A_STEAM_ID', 'A_DISCORD_ID', packages[0]), 'A_MESSAGE');
 
 describe('OrderRepository', () => {

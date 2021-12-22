@@ -5,6 +5,9 @@ When enabled for a package, a donator can subscribe to that package.
 The price of the package will then be charged to the PayPal account of the donator (which was used to subscribe to the package).
 Also, the perks included in the package will automatically be redeemed on the behalf of the donator.
 
+Subscriptions are currently supported by the following payment providers:
+* PayPal
+
 ## Setup of Subscriptions
 
 To enable the subscriptions feature for a specific package, you simply need to set the billing cycle for that package, using the `subscription` configuration key, e.g.:

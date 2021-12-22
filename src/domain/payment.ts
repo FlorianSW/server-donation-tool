@@ -2,8 +2,6 @@ import {Package} from './package';
 import {v4} from 'uuid';
 import {AppConfig} from './app-config';
 import {User} from './user';
-import {PaypalPayment} from '../adapter/paypal/paypal-payment';
-import {PayPalSubscription} from '../adapter/paypal/types';
 
 export class Reference {
     constructor(public steamId: string | null, public readonly discordId: string, public readonly p: Package) {
@@ -18,6 +16,12 @@ export interface PaymentOrder {
     created: Date;
     id: string;
     transactionId?: string;
+    status?: OrderStatus;
+    metadata?: { [key: string]: any };
+}
+
+export interface DeferredPaymentOrder {
+    paymentUrl: string;
 }
 
 export enum OrderStatus {
@@ -27,6 +31,7 @@ export enum OrderStatus {
 export interface OrderPayment {
     id: string;
     transactionId?: string,
+    provider: string,
 }
 
 export class Order {
@@ -45,7 +50,21 @@ export class Order {
         return new Order(v4(), created, reference, customMessage, null, OrderStatus.CREATED, payment);
     }
 
+    public static createDeferred(created: Date, reference: Reference, customMessage: string | null = null): Order {
+        return new Order(v4(), created, reference, customMessage, null, OrderStatus.CREATED, null);
+    }
+
+    public paymentIntent(payment: OrderPayment) {
+        if (this.payment !== null) {
+            throw new Error('can not intent to pay an order with an active payment intent');
+        }
+        this.payment = payment;
+    }
+
     public pay(transactionId: string) {
+        if (this.payment === null) {
+            throw new Error('paying an order which was not intended to be payed, yet');
+        }
         this.payment.transactionId = transactionId;
         this.status = OrderStatus.PAID;
     }
@@ -86,6 +105,13 @@ export class Subscription {
     ) {
     }
 
+    public static create(plan: SubscriptionPlan, user: User): Subscription {
+        return new Subscription(v4(), plan.id, {}, {
+            steamId: user.steam.id,
+            discordId: user.discord.id
+        }, 'PENDING');
+    }
+
     public cancel(): void {
         this.state = 'CANCELLED';
     }
@@ -94,10 +120,11 @@ export class Subscription {
         this.payment.id = paymentId;
     }
 
-    public pay(transactionId: string, p: Package): Order {
+    public pay(transactionId: string, provider: string, p: Package): Order {
         const order = Order.create(new Date(), {
             id: this.payment.id,
             transactionId: transactionId,
+            provider: provider,
         }, new Reference(this.user.steamId, this.user.discordId, p));
         order.pay(transactionId);
 
@@ -119,13 +146,6 @@ export class Subscription {
     public isActive(): boolean {
         return ['PENDING', 'ACTIVE'].includes(this.state);
     }
-
-    public static create(plan: SubscriptionPlan, user: User): Subscription {
-        return new Subscription(v4(), plan.id, {}, {
-            steamId: user.steam.id,
-            discordId: user.discord.id
-        }, 'PENDING');
-    }
 }
 
 export class SubscriptionNotFound extends Error {
@@ -143,7 +163,6 @@ export class SubscriptionNotPending extends Error {
 }
 
 export interface PaymentCapture {
-    orderId: string;
     transactionId: string;
 }
 
@@ -151,6 +170,12 @@ export interface CreatePaymentOrderRequest {
     forPackage: Package;
     steamId: string;
     discordId: string;
+}
+
+export interface DeferredPaymentOrderRequest {
+    successUrl: URL,
+    cancelUrl: URL,
+    candidateOrderId: string;
 }
 
 export interface CapturePaymentRequest {
@@ -182,18 +207,35 @@ export interface SubscriptionCancelled {
     id: string;
 }
 
+export interface PaymentProvider {
+    name: string;
+    donation?: {
+        template: string;
+        publicRenderData: { [key: string]: string };
+    };
+    deferredDonation?: boolean;
+}
+
 export interface Payment {
-    createPaymentOrder(request: CreatePaymentOrderRequest): Promise<PaymentOrder>;
+    createPaymentOrder(request: CreatePaymentOrderRequest | CreatePaymentOrderRequest & DeferredPaymentOrderRequest): Promise<PaymentOrder | PaymentOrder & DeferredPaymentOrder>;
 
     capturePayment(request: CapturePaymentRequest): Promise<PaymentCapture>;
 
+    details(paymentOrderId: string): Promise<PaymentOrder>;
+
+    provider(): PaymentProvider;
+}
+
+export interface SubscriptionPaymentProvider {
     persistSubscription(p: Package, plan?: SubscriptionPlan): Promise<SubscriptionPlan>;
 
     subscribe(sub: Subscription, plan: SubscriptionPlan, user: User): Promise<PendingSubscription>;
 
-    subscriptionDetails(sub:Subscription): Promise<SubscriptionPayment>;
+    subscriptionDetails(sub: Subscription): Promise<SubscriptionPayment>;
 
     cancelSubscription(subscription: Subscription): Promise<void>;
+
+    provider(): PaymentProvider;
 }
 
 export class OrderNotFound extends Error {

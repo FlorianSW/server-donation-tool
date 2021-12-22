@@ -11,7 +11,8 @@
         <% } %>
         <label><%= translate('DONATE_SUMMARY_USER_LABEL') %></label>
         <span>
-            <span><img class="image" src="<%= imagePath('steam_logo.png') %>"> <%= user.steam.name %> (<%= user.steam.id %>)</span>
+            <span><img class="image"
+                       src="<%= imagePath('steam_logo.png') %>"> <%= user.steam.name %> (<%= user.steam.id %>)</span>
             <span><img class="image" src="<%= imagePath('discord.svg') %>"> <%= user.username %></span>
         </span>
     </div>
@@ -23,9 +24,24 @@
     </div>
 
     <h5><%= translate('DONATE_PAYMENT_TITLE') %></h5>
-    <script src="https://www.paypal.com/sdk/js?client-id=<%= paypalClientId %>&currency=<%= currency %>"></script>
-    <div id="paypal-button-container"></div>
     <%- script('steps/donate.js') %>
+    <% if (locals.selectedMethod) { %>
+        <%- include('../' + selectedMethod.template, {data: selectedMethod.data}) %>
+    <% } else { %>
+        <form action="/donate" method="post">
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+            <div class="payment-methods">
+                <% paymentMethods.forEach((p) => { %>
+                    <div>
+                        <%= translate('PAYMENT_METHOD_' + p.toUpperCase()); %>
+                        <button class="btn waves-effect waves-light" name="method" value="<%= p %>" type="submit">
+                            <div></div>
+                        </button>
+                    </div>
+                <% }); %>
+            </div>
+        </form>
+    <% } %>
 </div>
 <%- include('../partials/package-information.ejs') %>
 <%- include('../partials/footer.ejs') %>

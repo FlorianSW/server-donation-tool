@@ -4,10 +4,12 @@ import {
     Payment,
     PaymentCapture,
     PaymentOrder,
+    PaymentProvider,
     PendingSubscription,
     Reference,
     Subscription,
     SubscriptionPayment,
+    SubscriptionPaymentProvider,
     SubscriptionPlan
 } from '../../domain/payment';
 import {AppConfig} from '../../domain/app-config';
@@ -44,12 +46,29 @@ export enum Environment {
 }
 
 @singleton()
-export class PaypalPayment implements Payment {
+export class PaypalPayment implements Payment, SubscriptionPaymentProvider {
+    public static readonly NAME = 'paypal';
+
     constructor(
         @inject('AppConfig') private readonly config: AppConfig,
-        @inject('packages') private readonly packages: Package[],
         @inject('PayPalClient') private readonly client: PayPalClient,
     ) {
+    }
+
+    details(paymentOrderId: string): Promise<PaymentOrder> {
+        throw new Error('Method not implemented.');
+    }
+
+    provider(): PaymentProvider {
+        return {
+            name: PaypalPayment.NAME,
+            donation: {
+                template: 'payments/paypal/index.ejs',
+                publicRenderData: {
+                    clientId: this.config.paypal.clientId,
+                },
+            },
+        };
     }
 
     async capturePayment(request: CapturePaymentRequest): Promise<PaymentCapture> {
@@ -57,7 +76,6 @@ export class PaypalPayment implements Payment {
 
         const capture = await this.client.execute<CaptureOrderResponse>(r);
         return {
-            orderId: capture.result.id,
             transactionId: capture.result.purchase_units[0]?.payments?.captures[0]?.id,
         };
     }
@@ -312,7 +330,9 @@ export class PaypalPayment implements Payment {
     }
 }
 
-export class FakePayment implements Payment {
+export class FakePayment implements Payment, SubscriptionPaymentProvider {
+    public static readonly NAME = 'fake';
+
     capturePayment(request: CapturePaymentRequest): Promise<PaymentCapture> {
         return Promise.resolve({
             orderId: v4(),
@@ -348,5 +368,15 @@ export class FakePayment implements Payment {
             state: 'ACTIVE',
             approvalLink: undefined,
         });
+    }
+
+    provider(): PaymentProvider {
+        return {
+            name: FakePayment.NAME,
+        };
+    }
+
+    details(paymentOrderId: string): Promise<PaymentOrder> {
+        throw new Error('not supported');
     }
 }

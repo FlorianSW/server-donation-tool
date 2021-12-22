@@ -1,5 +1,13 @@
 import {OrderRepository, SubscriptionPlanRepository, SubscriptionsRepository} from '../domain/repositories';
-import {Order, OrderStatus, Payment, Subscription, SubscriptionNotFound, SubscriptionPlan} from '../domain/payment';
+import {
+    Order,
+    OrderStatus,
+    Payment,
+    Subscription,
+    SubscriptionNotFound,
+    SubscriptionPaymentProvider,
+    SubscriptionPlan
+} from '../domain/payment';
 import {InMemorySubscriptionPlanRepository} from '../adapter/subscription-plan-repository';
 import {FakePayment} from '../adapter/paypal/paypal-payment';
 import {Subscriptions} from './subscriptions';
@@ -16,7 +24,7 @@ describe('Subscriptions', () => {
     let plansRepository: SubscriptionPlanRepository;
     let subRepository: SubscriptionsRepository;
     let orders: OrderRepository;
-    let payment: Payment;
+    let payment: SubscriptionPaymentProvider;
     let events: EventQueue;
     let aPlan: SubscriptionPlan;
     let service: Subscriptions;
