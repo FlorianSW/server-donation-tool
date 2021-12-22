@@ -14,7 +14,9 @@ To install this donation tool has the following minimum requirements:
 * some basic knowledge using a terminal/shell
 * some basic knowledge using yaml/a text editor
 * [NodeJS + npm](https://nodejs.org/en/download/) (NodeJS 16.6 or higher) installed
-* a [PayPal business account](https://developer.paypal.com/developer/accountStatus) (to process payments)
+* One of the supported payment providers: (to process payments)
+  * [PayPal business account](https://developer.paypal.com/developer/accountStatus)
+  * [Stripe.com](https://dashboard.stripe.com/)
 * a [Discord account](https://discord.com/)
 * (Optional) a [CFTools Cloud](https://cftools.cloud/) account and registered server (needed when offering a priority queue perk)
 * (Optional) a [Discord server](https://discord.com/) (needed when offering a Discord roles perk)
@@ -44,20 +46,12 @@ For that, open a new Terminal window:
 
 ## Setup dependent accounts
 
-### PayPal
+### Payment processor
 
-PayPal is the payment processor used by this donation tool.
-To automatically process a transaction from a donator, you need to register a REST Api app in the PayPal developer portal.
-Do so by following these steps:
+See the respective documentation for the payment processor of your choice on how to setup an account.
 
-* Open the [developer.paypal.com](https://developer.paypal.com/) page in your internet browser
-* Login by clicking the top right `Login to dashboard` link and use your PayPal login credentials
-* You should see your dashboard with an overview of your apps and credentials
-* In the `REST Api apps` section, click the `Create App` button
-  * You can choose between an app on the sandbox partition of PayPal, in order to test out this tool before using it
-  * In order to process donations of your donators, you need an app in the `Live` partition of PayPal (you can switch with the buttons under the `My apps & credentials` title)
-* Open the apps overview page by clicking on the apps name
-* Note down the `Client ID` and the Secret value, you'll need these values in the "Configuration" section
+* [PayPal](./payments/paypal.md)
+* [Stripe.com](./payments/stripe.md)
 
 ### Discord login
 
