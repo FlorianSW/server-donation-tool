@@ -195,13 +195,18 @@ class YamlAppConfig implements AppConfig {
                     './document-partials/privacy-policy/intro.txt',
                     './document-partials/privacy-policy/server-logs.txt',
                     './document-partials/privacy-policy/cookies.txt',
-                    './document-partials/privacy-policy/paypal.txt',
                     './document-partials/privacy-policy/cftools.txt',
                     './document-partials/privacy-policy/personal-data.txt',
                 ]
             }
             if (this.app.googleAnalytics?.trackingId) {
                 this.app.privacyPolicy.partials.push('./document-partials/privacy-policy/google-analytics.txt');
+            }
+            if (this.paypal) {
+                this.app.privacyPolicy.partials.push('./document-partials/privacy-policy/paypal.txt');
+            }
+            if (this.stripe) {
+                this.app.privacyPolicy.partials.push('./document-partials/privacy-policy/stripe.txt');
             }
         }
         this.app.publicUrl = new URL(this.discord.redirectUrl.replace('/auth/discord/callback', ''));
