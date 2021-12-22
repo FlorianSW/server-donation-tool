@@ -122,3 +122,5 @@ export interface ViewSubscription {
     pending: PendingSubscription | null;
 }
 
+@singleton()
+export class StubSubscriptions {}

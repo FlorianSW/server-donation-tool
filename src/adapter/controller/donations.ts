@@ -25,7 +25,7 @@ export class DonationController {
         @inject('Subscriptions') private readonly subscriptions: Subscriptions,
         @inject('RedeemPackage') private readonly redeemPackage: RedeemPackage,
         @inject('EventSource') private readonly events: EventSource,
-        @inject('Logger') private readonly logger: Logger
+        @inject('Logger') private readonly logger: Logger,
     ) {
         const csrfProtection = csrf();
         this.router.post('/api/donations', requireAuthentication, csrfProtection, this.createOrder.bind(this));
