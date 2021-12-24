@@ -53,7 +53,7 @@ export class DonationController {
         }
 
         if (order.status !== OrderStatus.PAID) {
-            const provider = this.payments.find((p) => p.provider().name === order.payment.provider);
+            const provider = this.payments.find((p) => p.provider().branding.name === order.payment.provider);
             if (!provider) {
                 throw new Error('non-paid order with an unknown payment provider');
             }
@@ -86,7 +86,7 @@ export class DonationController {
             return;
         }
 
-        const selectedPayment = this.payments.map((p) => p.provider()).find((p) => p.name === req.body.method);
+        const selectedPayment = this.payments.map((p) => p.provider()).find((p) => p.branding.name === req.body.method);
         if (!selectedPayment) {
             res.redirect('/donate');
             return;
@@ -141,7 +141,7 @@ export class DonationController {
                 subscription: selectedPackage.subscription,
                 type: req.session.selectedPackage.type,
             },
-            paymentMethods: this.payments.map((p) => p.provider().name),
+            paymentMethods: this.payments.map((p) => p.provider().branding),
         });
     }
 
@@ -244,7 +244,7 @@ export class DonationController {
             }
         };
         const steamId = req.session.selectedPackage.forAccount;
-        const payment = this.payments.find((provider) => provider.provider().name === req.body.method);
+        const payment = this.payments.find((provider) => provider.provider().branding.name === req.body.method);
         if (!payment) {
             res.status(400).send();
             return;
@@ -253,8 +253,8 @@ export class DonationController {
         const order = Order.createDeferred(new Date(), new Reference(steamId, req.user.discord.id, p), customMessage);
         const paymentOrder = await payment.createPaymentOrder({
             candidateOrderId: order.id,
-            successUrl: new URL('/donate/' + order.id + '?provider=' + payment.provider().name, this.config.app.publicUrl),
-            cancelUrl: new URL('/donate/' + order.id + '/cancel?&provider=' + payment.provider().name, this.config.app.publicUrl),
+            successUrl: new URL('/donate/' + order.id + '?provider=' + payment.provider().branding.name, this.config.app.publicUrl),
+            cancelUrl: new URL('/donate/' + order.id + '/cancel?&provider=' + payment.provider().branding.name, this.config.app.publicUrl),
             forPackage: p,
             steamId: steamId,
             discordId: req.user.discord.id,
@@ -262,7 +262,7 @@ export class DonationController {
         order.paymentIntent({
             id: paymentOrder.id,
             transactionId: paymentOrder.transactionId,
-            provider: payment.provider().name,
+            provider: payment.provider().branding.name,
         });
 
         if ('paymentUrl' in paymentOrder) {
@@ -293,7 +293,7 @@ export class DonationController {
             }
         };
         const steamId = req.session.selectedPackage.forAccount;
-        const payment = this.payments.find((provider) => provider.provider().name === req.body.provider);
+        const payment = this.payments.find((provider) => provider.provider().branding.name === req.body.provider);
         if (!payment) {
             res.status(400).send();
             return;
@@ -307,7 +307,7 @@ export class DonationController {
         const order = Order.create(paymentOrder.created, {
             id: paymentOrder.id,
             transactionId: paymentOrder.transactionId,
-            provider: payment.provider().name,
+            provider: payment.provider().branding.name,
         }, new Reference(steamId, req.user.discord.id, p), customMessage);
         await this.repo.save(order);
 

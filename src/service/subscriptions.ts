@@ -44,7 +44,7 @@ export class Subscriptions {
             this.events.emit('subscriptionCreated', target, plan, sub);
         }
 
-        const order = sub.pay(transactionId, this.payment.provider().name, plan.basePackage);
+        const order = sub.pay(transactionId, this.payment.provider().branding.name, plan.basePackage);
         await this.subscriptions.save(sub);
         await this.orders.save(order);
         await this.redeem.redeem(order, target);

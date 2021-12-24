@@ -208,7 +208,10 @@ export interface SubscriptionCancelled {
 }
 
 export interface PaymentProvider {
-    name: string;
+    branding: {
+       logo?: string;
+       name: string;
+    };
     donation?: {
         template: string;
         publicRenderData: { [key: string]: string };

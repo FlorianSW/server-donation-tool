@@ -61,7 +61,10 @@ export class PaypalPayment implements Payment, SubscriptionPaymentProvider {
 
     provider(): PaymentProvider {
         return {
-            name: PaypalPayment.NAME,
+            branding: {
+                logo: 'paypal.svg',
+                name: PaypalPayment.NAME,
+            },
             donation: {
                 template: 'payments/paypal/index.ejs',
                 publicRenderData: {
@@ -372,7 +375,9 @@ export class FakePayment implements Payment, SubscriptionPaymentProvider {
 
     provider(): PaymentProvider {
         return {
-            name: FakePayment.NAME,
+            branding: {
+                name: FakePayment.NAME,
+            },
         };
     }
 

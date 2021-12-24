@@ -33,8 +33,13 @@
             <div class="payment-methods">
                 <% paymentMethods.forEach((p) => { %>
                     <div>
-                        <%= translate('PAYMENT_METHOD_' + p.toUpperCase()); %>
-                        <button class="btn waves-effect waves-light" name="method" value="<%= p %>" type="submit">
+                        <div class="name">
+                            <% if (p.logo) { %>
+                                <img src="<%= imagePath('payments/' + p.logo) %>">
+                            <% } %>
+                            <%= translate('PAYMENT_METHOD_' + p.name.toUpperCase()); %>
+                        </div>
+                        <button class="btn waves-effect waves-light" name="method" value="<%= p.name %>" type="submit">
                             <div></div>
                         </button>
                     </div>

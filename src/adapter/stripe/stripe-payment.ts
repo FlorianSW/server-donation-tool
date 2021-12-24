@@ -37,7 +37,10 @@ export class StripePayment implements Payment {
 
     provider(): PaymentProvider {
         return {
-            name: StripePayment.NAME,
+            branding: {
+                logo: 'stripe.svg',
+                name: StripePayment.NAME,
+            },
             deferredDonation: true,
         };
     }

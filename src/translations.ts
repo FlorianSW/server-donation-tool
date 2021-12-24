@@ -184,8 +184,8 @@ const messages: { [key: string]: string } = {
     USER_NOTIFICATIONS_SUB_EXECUTED_TEXT: 'Hi :wave:,\n\nThanks again for donating to our community. We received a payment of your recurring subscription :pray:\nAs part of that subscription we automatically extended the included perks for you.\nIf you want to cancel this subscription, please go to your PayPal account -> Settings and cancel the subscription there.\n\nIf you have any questions, feel free to get in touch with us. Thanks again for your donation and have a good day :heart:',
     USER_NOTIFICATIONS_SUB_TRANSACTION_ID: 'This payment will show in your PayPal activity with this Transaction ID',
 
-    PAYMENT_METHOD_PAYPAL: 'PayPal',
-    PAYMENT_METHOD_STRIPE: 'Stripe (Credit Card, Klarna, etc.)',
+    PAYMENT_METHOD_PAYPAL: '',
+    PAYMENT_METHOD_STRIPE: 'Other (Credit Card, Klarna, etc.)',
 
     WAIT_FOR_PAYMENT_TITLE: 'Payment pending',
     WAIT_FOR_PAYMENT_DESCRIPTION: 'We are still waiting for the payment to be processed and confirmed by the payment provider. You can only redeem your perks when the payment is confirmed. This should usually not take more than several seconds to some minutes. Please refresh this page to check if the payment succeeded.',
