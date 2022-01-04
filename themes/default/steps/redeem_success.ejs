@@ -1,0 +1,28 @@
+<%- include('../partials/header.ejs') %>
+<div class="col s12">
+    <div class="card redeem">
+        <div class="card-content">
+            <span class="card-title"><%= translate('REDEEM_SUCCESS_TITLE') %></span>
+            <ul class="collection">
+                <% errors.forEach(function (r) { %>
+                    <li class="collection-item status">
+                        <i class="material-icons error">error</i> <%= translate(...r.params) %>
+                    </li>
+                <% }); %>
+                <% results.forEach(function (r) { %>
+                    <li class="collection-item status">
+                        <i class="material-icons success">check_circle</i> <%= translate(...r) %>
+                    </li>
+                <% }); %>
+            </ul>
+        </div>
+        <div class="card-action">
+            <% if (errors.length !== 0) { %>
+                <a href="#" onclick="window.location.reload();"><%= translate('REDEEM_SUCCESS_RETRY') %></a>
+            <% } else { %>
+                <a href="/"><%= translate('REDEEM_BACK') %></a>
+            <% } %>
+        </div>
+    </div>
+</div>
+<%- include('../partials/footer.ejs') %>
