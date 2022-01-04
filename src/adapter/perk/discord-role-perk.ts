@@ -4,10 +4,13 @@ import {Package, Perk, RedeemError, RedeemTarget} from '../../domain/package';
 import {DiscordRole, OwnedPerk} from '../../domain/user';
 import {Order} from '../../domain/payment';
 import {Logger} from 'winston';
+import {createHash} from 'crypto';
 
 export class DiscordRolePerk implements Perk {
     inPackage: Package;
     type: string;
+
+    private fingerprint: string;
 
     readonly roles: string[];
     readonly amountInDays?: number;
@@ -92,5 +95,19 @@ export class DiscordRolePerk implements Perk {
                 }).join(', '),
             }
         });
+    }
+
+    id(): string {
+        if (!this.fingerprint) {
+            const hash = createHash('sha1');
+            hash.update(this.type);
+            hash.update(this.amountInDays.toString(10));
+            const r = this.roles.sort();
+            for (let role of r) {
+                hash.update(role);
+            }
+            this.fingerprint = hash.digest('hex');
+        }
+        return this.fingerprint;
     }
 }

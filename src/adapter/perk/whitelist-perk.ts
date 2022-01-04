@@ -5,6 +5,7 @@ import {ServerNames} from '../../domain/app-config';
 import {FailedToLoad, OwnedPerk, PriorityQueue, User, Whitelist} from '../../domain/user';
 import {Order} from '../../domain/payment';
 import {Logger} from 'winston';
+import {createHash} from 'crypto';
 
 export class WhitelistPerk implements Perk {
     inPackage: Package;
@@ -15,6 +16,8 @@ export class WhitelistPerk implements Perk {
     };
     readonly amountInDays?: number;
     readonly permanent = false;
+
+    private fingerprint: string;
 
     constructor(
         private readonly client: CFToolsClient,
@@ -150,5 +153,20 @@ Selected product: ${this.inPackage.name}`
 
     asShortString(): string {
         return this.asLongString();
+    }
+
+    id(): string {
+        if (!this.fingerprint) {
+            const hash = createHash('sha1');
+            hash.update(this.type);
+            hash.update(this.cftools.serverApiId);
+            if (this.amountInDays) {
+                hash.update(this.amountInDays.toString(10));
+            } else {
+                hash.update(this.permanent ? 'permanent' : 'not-permanent')
+            }
+            this.fingerprint = hash.digest('hex');
+        }
+        return this.fingerprint
     }
 }

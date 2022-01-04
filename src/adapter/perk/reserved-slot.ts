@@ -4,6 +4,7 @@ import {AppConfig, ServerNames} from '../../domain/app-config';
 import {Order} from '../../domain/payment';
 import * as https from 'https';
 import {OwnedPerk} from '../../domain/user';
+import {createHash} from 'crypto';
 
 interface CreateReservedSlotRequest {
     data: {
@@ -44,6 +45,8 @@ export class ReservedSlotPerk implements Perk {
     };
     readonly amountInDays?: number;
     readonly permanent = false;
+
+    private fingerprint: string;
 
     constructor(
         private readonly serverNames: ServerNames,
@@ -162,5 +165,21 @@ export class ReservedSlotPerk implements Perk {
         expiration.setDate(order.redeemedAt.getDate() + this.amountInDays);
 
         return expiration;
+    }
+
+    id(): string {
+        if (!this.fingerprint) {
+            const hash = createHash('sha1');
+            hash.update(this.type);
+            hash.update(this.battlemetrics.organizationId);
+            hash.update(this.battlemetrics.serverId);
+            if (this.amountInDays) {
+                hash.update(this.amountInDays.toString(10));
+            } else {
+                hash.update(this.permanent ? 'permanent' : 'not-permanent')
+            }
+            this.fingerprint = hash.digest('hex');
+        }
+        return this.fingerprint;
     }
 }

@@ -1,5 +1,11 @@
 @import "../partials/header_footer";
 
+.card .card-content {
+  p {
+    margin-bottom: 1.5rem;
+  }
+}
+
 .redeem-share {
   .input-field {
     margin-top: 2rem;

@@ -110,14 +110,18 @@ const messages: { [key: string]: string } = {
     PERKS_OWNED_WHITELIST_UNTIL: 'until: ',
     PERKS_OWNED_FAILED_TO_LOAD: 'We\'re having troubles getting this perk\'s information. But no worries, it is still being applied if you own it.',
 
-    REDEEM_TITLE: 'Thank you for your donation',
+    REDEEM_SUBMIT: 'Redeem now',
+
+    REDEEM_SUCCESS_TITLE: 'Thank you for your donation',
+    REDEEM_SUCCESS_RETRY: 'Retry',
+
+    REDEEM_TITLE_WITH_PERKS: 'One step away to profit from your perks!',
+    REDEEM_TITLE_WITHOUT_PERKS: 'Thanks for your donation',
+    REDEEM_DESCRIPTION_WITH_PERKS: 'Thanks for your donation. The package you donated for includes the following perks, which you can redeem by clicking on the below button. You can unselect the perks you do not want to redeem.',
+    REDEEM_DESCRIPTION_WITHOUT_PERKS: 'We appreciate your support to our community.',
     REDEEM_SHARE_TITLE: 'Share the earned perks',
     REDEEM_SHARE_DESCRIPTION: 'You can share this link with someone you want to gift the perks to. Perks can only be redeemed by one person.',
-    REDEEM_DESCRIPTION_WITH_PERKS: 'You can now redeem your perks to profit from the following benefits:',
-    REDEEM_DESCRIPTION_WITHOUT_PERKS: 'We appreciate your support to our community.',
-    REDEEM_SUBMIT: 'Redeem now',
     REDEEM_BACK: 'Back to Start',
-    REDEEM_RETRY: 'Retry',
 
     SUBSCRIPTION_TITLE: 'Subscriptions',
     SUBSCRIPTION_DESCRIPTION: 'With subscriptions you can opt into automatically donating for your favourite package on a recurring basis. The subscription will automatically debit the price from your PayPal account and setup the perks included in the package for you. On this page you can manage your subscription.',

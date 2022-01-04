@@ -13,6 +13,8 @@ export interface Perk {
     asLongString(): string;
 
     asShortString(): string;
+
+    id(): string;
 }
 
 export class RedeemTarget {

@@ -1,6 +1,6 @@
 import {inject, singleton} from 'tsyringe';
 import {TranslateParams} from '../translations';
-import {RedeemError, RedeemTarget} from '../domain/package';
+import {Perk, RedeemError, RedeemTarget} from '../domain/package';
 import {Order} from '../domain/payment';
 import {OrderRepository} from '../domain/repositories';
 import {Logger} from 'winston';
@@ -20,7 +20,7 @@ export class RedeemPackage {
     ) {
     }
 
-    async redeem(order: Order, target: RedeemTarget): Promise<RedeemResults> {
+    async redeem(order: Order, target: RedeemTarget, perks: Perk[]): Promise<RedeemResults> {
         if (order.reference.steamId === null) {
             order.reference.steamId = target.steamId;
         }
@@ -31,7 +31,7 @@ export class RedeemPackage {
 
         const success: TranslateParams[] = [];
         const errors: RedeemError[] = [];
-        for (let perk of order.reference.p.perks) {
+        for (let perk of perks) {
             try {
                 success.push(await perk.redeem(target, order));
             } catch (e) {

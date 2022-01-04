@@ -1,48 +1,35 @@
 <%- include('../partials/header.ejs') %>
 <div class="col s12">
     <div class="card redeem">
-        <div class="card-content">
-            <span class="card-title"><%= translate('REDEEM_TITLE') %></span>
-            <% if (redeemStatus === 'COMPLETE') { %>
-                <ul class="collection">
-                    <% errors.forEach(function (r) { %>
-                        <li class="collection-item status">
-                            <i class="material-icons error">error</i> <%= translate(...r.params) %>
-                        </li>
-                    <% }); %>
-                    <% results.forEach(function (r) { %>
-                        <li class="collection-item status">
-                            <i class="material-icons success">check_circle</i> <%= translate(...r) %>
-                        </li>
-                    <% }); %>
-                </ul>
-            <% } else if (hasPerks) { %>
-                <p><%= translate('REDEEM_DESCRIPTION_WITH_PERKS') %></p>
-                <ul class="collection">
+        <form method="post" action="<%= redeemLink %>">
+            <div class="card-content">
+                <% if (hasPerks) { %>
+                    <span class="card-title"><%= translate('REDEEM_TITLE_WITH_PERKS') %></span>
+                    <p><%= translate('REDEEM_DESCRIPTION_WITH_PERKS') %></p>
                     <% perks.forEach(function (p) { %>
-                        <li class="collection-item">
-                            <span><%= p.asLongString() %></span>
-                        </li>
+                        <div>
+                            <label>
+                                <input type="checkbox" class="filled-in" checked="checked" name="<%= p.id() %>" />
+                                <span><%= p.asLongString() %></span>
+                            </label>
+                        </div>
                     <% }); %>
-                </ul>
-            <% } else { %>
-                <p><%= translate('REDEEM_DESCRIPTION_WITHOUT_PERKS') %></p>
-            <% } %>
-        </div>
-        <div class="card-action">
-            <% if (redeemStatus !== 'COMPLETE' && hasPerks) { %>
-                <form method="post" action="<%= redeemLink %>">
+                <% } else { %>
+                    <span class="card-title"><%= translate('REDEEM_TITLE_WITHOUT_PERKS') %></span>
+                    <p><%= translate('REDEEM_DESCRIPTION_WITHOUT_PERKS') %></p>
+                <% } %>
+            </div>
+            <div class="card-action">
+                <% if (hasPerks) { %>
                     <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                     <button class="btn waves-effect waves-light" type="submit">
                         <%= translate('REDEEM_SUBMIT') %>
                     </button>
-                </form>
-            <% } else if (errors.length !== 0) { %>
-                <a href="#" onclick="window.location.reload();"><%= translate('REDEEM_RETRY') %></a>
-            <% } else { %>
-                <a href="/"><%= translate('REDEEM_BACK') %></a>
-            <% } %>
-        </div>
+                <% } else { %>
+                    <a href="/"><%= translate('REDEEM_BACK') %></a>
+                <% } %>
+            </div>
+        </form>
     </div>
     <% if (isUnclaimed && canShare) { %>
         <div class="card redeem-share">

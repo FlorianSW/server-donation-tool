@@ -155,8 +155,6 @@ export class DonationController {
 
         if (order.status !== OrderStatus.PAID) {
             res.render('steps/wait_for_payment');
-        } else if (this.canAutoRedeem(order)) {
-            await this.redeem(req, res);
         } else {
             res.render('steps/redeem', {
                 user: req.user,
@@ -171,10 +169,6 @@ export class DonationController {
                 errors: []
             });
         }
-    }
-
-    private canAutoRedeem(order: Order): boolean {
-        return order.status === OrderStatus.PAID && order.redeemedAt === null && order.reference.steamId !== null;
     }
 
     private async subscribe(req: Request, res: Response) {
@@ -193,7 +187,7 @@ export class DonationController {
     }
 
     private async redeem(req: Request, res: Response) {
-        let order = await this.fetchOrderDetails(req, res);
+        const order = await this.fetchOrderDetails(req, res);
         if (order.status !== OrderStatus.PAID) {
             await this.redirectToPrepareRedeem(req, res);
             return;
@@ -206,12 +200,15 @@ export class DonationController {
             return this.redirectToPrepareRedeem(req, res);
         }
 
-        const result = await this.redeemPackage.redeem(order, RedeemTarget.fromUser(req.user));
-        res.render('steps/redeem', {
+        const perks = [];
+        for (let perk of order.reference.p.perks) {
+            if (req.body[perk.id()]) {
+                perks.push(perk);
+            }
+        }
+        const result = await this.redeemPackage.redeem(order, RedeemTarget.fromUser(req.user), perks);
+        res.render('steps/redeem_success', {
             user: req.user,
-            isUnclaimed: false,
-            canShare: false,
-            redeemStatus: 'COMPLETE',
             results: result.success,
             errors: result.errors,
         });

@@ -4,8 +4,12 @@ body {
   background-color: #212121;
   color: #fff;
 
-  input[type="text"], textarea {
+  input[type="text"], textarea, label {
     color: white;
+  }
+
+  [type=checkbox].filled-in:not(:checked)+span:not(.lever):after {
+    border-color: white;
   }
 
   .card {
