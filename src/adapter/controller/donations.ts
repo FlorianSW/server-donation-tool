@@ -322,7 +322,7 @@ export class DonationController {
 
     private async captureOrder(req: Request, res: Response) {
         const order = (await this.repo.findByPaymentOrder(req.params.orderId))[0];
-        const payment = this.payments.find((provider) => provider.provider() === req.body.provider);
+        const payment = this.payments.find((provider) => provider.provider().branding.name === req.body.provider);
         if (!payment) {
             res.status(400).send();
             return;
