@@ -196,7 +196,8 @@ export class DiscordNotifier {
                 name: translate('NOTIFICATIONS_REDEEM_SUCCESSFUL_TRANSACTION'), value: `Order ID: ${order.id}
 PayPal Order ID: ${order.payment.id}
 Transaction ID: ${order.payment.transactionId}
-Order created at: ${order.created}`
+Order created at: ${order.created}
+Perks: ${order.reference.p.perks.map((p) => p.asShortString()).join(', ')}`
             }
         ]
     }
