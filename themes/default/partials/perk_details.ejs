@@ -1,0 +1,14 @@
+<% if (needsFurtherSelection) { %>
+    <h5><%= translate('DONATE_PERKS_SUBJECT_SELECTION_TITLE', {params: {index: index++}}) %></h5>
+    <p><%= translate('DONATE_PERKS_SUBJECT_SELECTION_DESCRIPTION') %></p>
+    <% selectedPackage.perks.forEach(function (perk) { %>
+        <% if (perk.subjects() !== null) { %>
+            <label><%= perk.asShortString() %></label>
+            <select class="browser-default" name="<%= perk.id() %>">
+                <% perk.subjects().forEach(function (label, id) { %>
+                    <option value="<%= id %>"><%= label %></option>
+                <% }); %>
+            </select>
+        <% } %>
+    <% }); %>
+<% } %>
