@@ -2,9 +2,9 @@ async function createOrder(provider) {
     var csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
     var customMessage = null;
-    var textarea = document.querySelector('textarea');
-    if (textarea && textarea.value !== '') {
-        customMessage = textarea.value;
+    var messageElement = document.querySelector('#custom-message');
+    if (messageElement && messageElement.textContent.trim() !== '') {
+        customMessage = messageElement.textContent.trim();
     }
 
     return await fetch('/api/donations', {

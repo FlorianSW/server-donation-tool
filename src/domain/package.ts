@@ -8,6 +8,8 @@ export interface Perk {
 
     redeem(forUser: RedeemTarget, order: Order): Promise<TranslateParams>;
 
+    subjects(): Map<string, string> | null;
+
     ownedBy(target: RedeemTarget): Promise<OwnedPerk[] | null>;
 
     asLongString(): string;

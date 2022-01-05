@@ -42,16 +42,17 @@ export class Order {
         public readonly customMessage: string | null,
         public redeemedAt: Date | null,
         public status: OrderStatus,
-        public payment: OrderPayment
+        public payment: OrderPayment,
+        public perkDetails: Map<string, string>,
     ) {
     }
 
     public static create(created: Date, payment: OrderPayment, reference: Reference, customMessage: string | null = null): Order {
-        return new Order(v4(), created, reference, customMessage, null, OrderStatus.CREATED, payment);
+        return new Order(v4(), created, reference, customMessage, null, OrderStatus.CREATED, payment, new Map());
     }
 
     public static createDeferred(created: Date, reference: Reference, customMessage: string | null = null): Order {
-        return new Order(v4(), created, reference, customMessage, null, OrderStatus.CREATED, null);
+        return new Order(v4(), created, reference, customMessage, null, OrderStatus.CREATED, null, new Map());
     }
 
     public paymentIntent(payment: OrderPayment) {
@@ -67,6 +68,15 @@ export class Order {
         }
         this.payment.transactionId = transactionId;
         this.status = OrderStatus.PAID;
+    }
+
+    public pushPerkDetails(details: Map<string, string>) {
+        for (let detail of details) {
+            if (this.perkDetails.has(detail[0])) {
+                throw new Error('can not overwrite existing perk details: ' + detail[0]);
+            }
+            this.perkDetails.set(detail[0], detail[1]);
+        }
     }
 
     public asLink(config: AppConfig): URL {

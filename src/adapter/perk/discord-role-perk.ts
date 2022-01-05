@@ -9,11 +9,9 @@ import {createHash} from 'crypto';
 export class DiscordRolePerk implements Perk {
     inPackage: Package;
     type: string;
-
-    private fingerprint: string;
-
     readonly roles: string[];
     readonly amountInDays?: number;
+    private fingerprint: string;
     private guild: Guild;
 
     constructor(
@@ -31,6 +29,10 @@ export class DiscordRolePerk implements Perk {
                 this.log.warn(`Discord role with ID ${r} does not exist in the configured guild.`);
             }
         }
+    }
+
+    subjects(): Map<string, string> {
+        return null;
     }
 
     async redeem(target: RedeemTarget, order: Order): Promise<TranslateParams> {
@@ -83,20 +85,6 @@ export class DiscordRolePerk implements Perk {
         return this.asTranslatedString('PERK_DISCORD_ROLE_SHORT');
     }
 
-    private asTranslatedString(key: string): string {
-        return translate(key, {
-            params: {
-                roles: this.roles.map((r) => {
-                    const role = this.guild.roles.cache.get(r);
-                    if (role) {
-                        return role.name;
-                    }
-                    return r;
-                }).join(', '),
-            }
-        });
-    }
-
     id(): string {
         if (!this.fingerprint) {
             const hash = createHash('sha1');
@@ -109,5 +97,19 @@ export class DiscordRolePerk implements Perk {
             this.fingerprint = hash.digest('hex');
         }
         return this.fingerprint;
+    }
+
+    private asTranslatedString(key: string): string {
+        return translate(key, {
+            params: {
+                roles: this.roles.map((r) => {
+                    const role = this.guild.roles.cache.get(r);
+                    if (role) {
+                        return role.name;
+                    }
+                    return r;
+                }).join(', '),
+            }
+        });
     }
 }

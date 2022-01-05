@@ -92,14 +92,44 @@ export class DonationController {
             return;
         }
 
+        for (let perk of selectedPackage.perks) {
+            if (perk.subjects() === null) {
+                continue;
+            }
+            const subject = req.body[perk.id()];
+            if (!subject) {
+                this.logger.debug('attempted to pay a donation package without selecting perk details for ' + perk.id());
+                res.redirect('/donate');
+                return;
+            }
+            if (!Array.from(perk.subjects().values()).some((s) => s === subject)) {
+                this.logger.debug('attempted to select a non-existing subject ' + subject + ' for ' + perk.id());
+                res.redirect('/donate');
+                return;
+            }
+            req.session.selectedPackage.perkDetails.set(perk.id(), subject);
+        }
+
+        let customMessage = req.body.customMessage;
+        if (customMessage && customMessage.length > 255) {
+            res.sendStatus(400).write(JSON.stringify({
+                error: 'custom message an not exceed 255 characters'
+            }));
+            return;
+        }
+        if (!customMessage) {
+            customMessage = null;
+        }
+
         if (selectedPayment.deferredDonation) {
-            await this.deferredDonation(req, res);
+            await this.deferredDonation(req, res, customMessage);
             return;
         } else if (selectedPayment.donation) {
             res.render('steps/donate', {
                 csrfToken: req.csrfToken(),
                 user: req.user,
                 currency: req.session.selectedPackage.price.currency,
+                customMessage: customMessage || '',
                 selectedPackage: {
                     name: selectedPackage.name,
                     price: req.session.selectedPackage.price,
@@ -141,6 +171,7 @@ export class DonationController {
                 subscription: selectedPackage.subscription,
                 type: req.session.selectedPackage.type,
             },
+            needsFurtherSelection: selectedPackage.perks.some((p) => p.subjects() !== null),
             paymentMethods: this.payments.map((p) => p.provider().branding),
         });
     }
@@ -221,18 +252,7 @@ export class DonationController {
         return this.packages.find((p) => session.selectedPackage.id === p.id);
     }
 
-    private async deferredDonation(req: Request, res: Response) {
-        let customMessage = req.body.customMessage;
-        if (customMessage && customMessage.length > 255) {
-            res.sendStatus(400).write(JSON.stringify({
-                error: 'custom message an not exceed 255 characters'
-            }));
-            return;
-        }
-        if (!customMessage) {
-            customMessage = null;
-        }
-
+    private async deferredDonation(req: Request, res: Response, customMessage: string) {
         const p = {
             ...this.selectedPackage(req.session),
             price: {
@@ -261,6 +281,7 @@ export class DonationController {
             transactionId: paymentOrder.transactionId,
             provider: payment.provider().branding.name,
         });
+        order.pushPerkDetails(req.session.selectedPackage.perkDetails);
 
         if ('paymentUrl' in paymentOrder) {
             await this.repo.save(order);
@@ -306,6 +327,7 @@ export class DonationController {
             transactionId: paymentOrder.transactionId,
             provider: payment.provider().branding.name,
         }, new Reference(steamId, req.user.discord.id, p), customMessage);
+        order.pushPerkDetails(req.session.selectedPackage.perkDetails);
         await this.repo.save(order);
 
         res.status(200).json({

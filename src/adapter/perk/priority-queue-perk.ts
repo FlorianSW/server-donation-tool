@@ -19,7 +19,7 @@ export class PriorityQueuePerk implements Perk {
     type: string;
 
     readonly cftools: {
-        serverApiId: string,
+        serverApiId: string | string[],
     };
     readonly amountInDays?: number;
     readonly permanent = false;
@@ -33,50 +33,83 @@ export class PriorityQueuePerk implements Perk {
     }
 
     async redeem(target: RedeemTarget, order: Order): Promise<TranslateParams> {
-        const steamId = SteamId64.of(target.steamId)
+        const steamId = SteamId64.of(target.steamId);
+        const serverId = ServerApiId.of(this.cftools.serverApiId as string);
 
         const successParams: TranslateParams = ['PRIORITY_QUEUE_REDEEM_COMPLETE', {
             params: {
                 until: this.expiration(order).toLocaleString(),
-                serverName: this.serverNames[this.cftools.serverApiId],
+                serverName: this.serverNames[serverId.id],
             }
         }];
         try {
-            await this.createPriority(steamId, order);
+            await this.createPriority(serverId, steamId, order);
         } catch (e) {
             if (e instanceof DuplicateResourceCreation) {
                 try {
-                    await this.replacePriorityIfOlder(steamId, order);
+                    await this.replacePriorityIfOlder(serverId, steamId, order);
                 } catch (e) {
-                    this.throwRedeemError(e);
+                    this.throwRedeemError(serverId, e);
                 }
                 return successParams;
             }
-            this.throwRedeemError(e);
+            this.throwRedeemError(serverId, e);
         }
         return successParams;
     }
 
     async ownedBy(target: RedeemTarget): Promise<OwnedPerk[] | null> {
         try {
-            return [await this.fetchPriorityQueue(SteamId64.of(target.steamId), ServerApiId.of(this.cftools.serverApiId))];
-        } catch(e) {
+            const result: OwnedPerk[] = [];
+            if (Array.isArray(this.cftools.serverApiId)) {
+                for (let id of this.cftools.serverApiId) {
+                    result.push(await this.fetchPriorityQueue(SteamId64.of(target.steamId), ServerApiId.of(id)));
+                }
+            } else {
+                result.push(await this.fetchPriorityQueue(SteamId64.of(target.steamId), ServerApiId.of(this.cftools.serverApiId)));
+            }
+            return result;
+        } catch (e) {
             this.log.error(`Could not request Priority queue information for server API ID: ${this.cftools.serverApiId}. Error: ` + e);
             return [new FailedToLoad()];
         }
     }
 
     asLongString(): string {
+        if (Array.isArray(this.cftools.serverApiId)) {
+            return this.longStringForMulti(this.cftools.serverApiId);
+        } else {
+            return this.longStringForSingle(this.cftools.serverApiId);
+        }
+    }
+
+    longStringForSingle(id: string): string {
         if (this.permanent) {
             return translate('PERK_PRIORITY_QUEUE_PERMANENT_DESCRIPTION', {
                 params: {
-                    serverName: this.serverNames[this.cftools.serverApiId],
+                    serverName: this.serverNames[id],
                 }
             });
         }
         return translate('PERK_PRIORITY_QUEUE_DESCRIPTION', {
             params: {
-                serverName: this.serverNames[this.cftools.serverApiId],
+                serverName: this.serverNames[id],
+                amountInDays: this.amountInDays.toString(10),
+            }
+        });
+    }
+
+    longStringForMulti(id: string[]): string {
+        if (this.permanent) {
+            return translate('PERK_PRIORITY_QUEUE_MULTI_PERMANENT_DESCRIPTION', {
+                params: {
+                    serverNames: id.map((s) => this.serverNames[s]).join(', '),
+                }
+            });
+        }
+        return translate('PERK_PRIORITY_QUEUE_MULTI_DESCRIPTION', {
+            params: {
+                serverNames: id.map((s) => this.serverNames[s]).join(', '),
                 amountInDays: this.amountInDays.toString(10),
             }
         });
@@ -84,6 +117,27 @@ export class PriorityQueuePerk implements Perk {
 
     asShortString(): string {
         return this.asLongString();
+    }
+
+    id(): string {
+        if (!this.fingerprint) {
+            const hash = createHash('sha1');
+            hash.update(this.type);
+            if (Array.isArray(this.cftools.serverApiId)) {
+                for (let id of this.cftools.serverApiId) {
+                    hash.update(id);
+                }
+            } else {
+                hash.update(this.cftools.serverApiId);
+            }
+            if (this.amountInDays) {
+                hash.update(this.amountInDays.toString(10));
+            } else {
+                hash.update(this.permanent ? 'permanent' : 'not-permanent')
+            }
+            this.fingerprint = hash.digest('hex');
+        }
+        return this.fingerprint;
     }
 
     private async fetchPriorityQueue(steamId: SteamId64, server: ServerApiId): Promise<PriorityQueue> {
@@ -109,27 +163,27 @@ export class PriorityQueuePerk implements Perk {
         return p.expiration.getTime() <= new Date().getTime();
     }
 
-    private throwRedeemError(e: Error) {
+    private throwRedeemError(serverId: ServerApiId, e: Error) {
         if (e instanceof TokenExpired) {
             this.log.error(e.message, e.info, e);
         }
         throw new RedeemError(['PRIORITY_QUEUE_REDEEM_ERROR', {
             params: {
-                serverName: this.serverNames[this.cftools.serverApiId],
+                serverName: this.serverNames[serverId.id],
                 reason: e.message,
             }
         }]);
     }
 
-    private async replacePriorityIfOlder(steamId: SteamId64, order: Order): Promise<void> {
+    private async replacePriorityIfOlder(serverId: ServerApiId, steamId: SteamId64, order: Order): Promise<void> {
         const newExpiration = this.expiration(order);
         const request = {
-            serverApiId: ServerApiId.of(this.cftools.serverApiId),
+            serverApiId: serverId,
             playerId: steamId,
         };
         const item = await this.client.getPriorityQueue(request);
         if (!item) {
-            return await this.createPriority(steamId, order);
+            return await this.createPriority(serverId, steamId, order);
         }
         if (item.expiration === 'Permanent') {
             return;
@@ -139,7 +193,7 @@ export class PriorityQueuePerk implements Perk {
         }
         await this.client.deletePriorityQueue(request);
 
-        return await this.createPriority(steamId, order);
+        return await this.createPriority(serverId, steamId, order);
     }
 
     private expiration(order: Order): Date | 'Permanent' {
@@ -152,9 +206,20 @@ export class PriorityQueuePerk implements Perk {
         return expiration;
     }
 
-    private async createPriority(steamId: SteamId64, order: Order): Promise<void> {
+    subjects(): Map<string, string> | null {
+        if (!Array.isArray(this.cftools.serverApiId)) {
+            return null;
+        }
+        const result = new Map();
+        for (let serverId of this.cftools.serverApiId) {
+            result.set(serverId, this.serverNames[serverId]);
+        }
+        return result;
+    }
+
+    private async createPriority(serverId: ServerApiId, steamId: SteamId64, order: Order): Promise<void> {
         await this.client.putPriorityQueue({
-            serverApiId: ServerApiId.of(this.cftools.serverApiId),
+            serverApiId: serverId,
             id: steamId,
             expires: this.expiration(order),
             comment: `Created by CFTools Server Donation bot.
@@ -163,20 +228,5 @@ PayPal Transaction ID: ${order.payment.transactionId}
 PayPal Order ID: ${order.payment.id}
 Selected product: ${this.inPackage.name}`
         });
-    }
-
-    id(): string {
-        if (!this.fingerprint) {
-            const hash = createHash('sha1');
-            hash.update(this.type);
-            hash.update(this.cftools.serverApiId);
-            if (this.amountInDays) {
-                hash.update(this.amountInDays.toString(10));
-            } else {
-                hash.update(this.permanent ? 'permanent' : 'not-permanent')
-            }
-            this.fingerprint = hash.digest('hex');
-        }
-        return this.fingerprint;
     }
 }

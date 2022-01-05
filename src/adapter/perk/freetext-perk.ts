@@ -15,6 +15,10 @@ export class FreetextPerk implements Perk {
         return ['FREETEXT_TEXT', {params: {text: this.text}}];
     }
 
+    subjects(): Map<string, string> | null {
+        return null;
+    }
+
     async ownedBy(target: RedeemTarget): Promise<OwnedPerk[] | null> {
         return null;
     }

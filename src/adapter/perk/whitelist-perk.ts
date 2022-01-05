@@ -2,7 +2,7 @@ import {CFToolsClient, DuplicateResourceCreation, PriorityQueueItem, ServerApiId
 import {translate, TranslateParams} from '../../translations';
 import {Package, Perk, RedeemError, RedeemTarget} from '../../domain/package';
 import {ServerNames} from '../../domain/app-config';
-import {FailedToLoad, OwnedPerk, PriorityQueue, User, Whitelist} from '../../domain/user';
+import {FailedToLoad, OwnedPerk, Whitelist} from '../../domain/user';
 import {Order} from '../../domain/payment';
 import {Logger} from 'winston';
 import {createHash} from 'crypto';
@@ -58,6 +58,45 @@ export class WhitelistPerk implements Perk {
             this.log.error(`Could not request Whitelist entry information for server API ID: ${this.cftools.serverApiId}. Error: ` + e);
             return [new FailedToLoad()];
         }
+    }
+
+    asLongString(): string {
+        if (this.permanent) {
+            return translate('PERK_WHITELIST_PERMANENT_DESCRIPTION', {
+                params: {
+                    serverName: this.serverNames[this.cftools.serverApiId],
+                }
+            });
+        }
+        return translate('PERK_WHITELIST_DESCRIPTION', {
+            params: {
+                serverName: this.serverNames[this.cftools.serverApiId],
+                amountInDays: this.amountInDays.toString(10),
+            }
+        });
+    }
+
+    asShortString(): string {
+        return this.asLongString();
+    }
+
+    subjects(): Map<string, string> | null {
+        return null;
+    }
+
+    id(): string {
+        if (!this.fingerprint) {
+            const hash = createHash('sha1');
+            hash.update(this.type);
+            hash.update(this.cftools.serverApiId);
+            if (this.amountInDays) {
+                hash.update(this.amountInDays.toString(10));
+            } else {
+                hash.update(this.permanent ? 'permanent' : 'not-permanent')
+            }
+            this.fingerprint = hash.digest('hex');
+        }
+        return this.fingerprint
     }
 
     private async fetchWhitelist(steamId: SteamId64, server: ServerApiId): Promise<Whitelist> {
@@ -133,40 +172,5 @@ PayPal Transaction ID: ${order.payment.transactionId}
 PayPal Order ID: ${order.payment.id}
 Selected product: ${this.inPackage.name}`
         });
-    }
-
-    asLongString(): string {
-        if (this.permanent) {
-            return translate('PERK_WHITELIST_PERMANENT_DESCRIPTION', {
-                params: {
-                    serverName: this.serverNames[this.cftools.serverApiId],
-                }
-            });
-        }
-        return translate('PERK_WHITELIST_DESCRIPTION', {
-            params: {
-                serverName: this.serverNames[this.cftools.serverApiId],
-                amountInDays: this.amountInDays.toString(10),
-            }
-        });
-    }
-
-    asShortString(): string {
-        return this.asLongString();
-    }
-
-    id(): string {
-        if (!this.fingerprint) {
-            const hash = createHash('sha1');
-            hash.update(this.type);
-            hash.update(this.cftools.serverApiId);
-            if (this.amountInDays) {
-                hash.update(this.amountInDays.toString(10));
-            } else {
-                hash.update(this.permanent ? 'permanent' : 'not-permanent')
-            }
-            this.fingerprint = hash.digest('hex');
-        }
-        return this.fingerprint
     }
 }

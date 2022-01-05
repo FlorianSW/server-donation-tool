@@ -1,7 +1,8 @@
 <%- include('../partials/header.ejs') %>
 <div class="donate col s12 m7 l7">
+    <% let index = 1; %>
     <h3><%= translate('DONATE_TITLE') %></h3>
-    <h5><%= translate('DONATE_SUMMARY_TITLE') %></h5>
+    <h5><%= translate('DONATE_SUMMARY_TITLE', {params: {index: index++}}) %></h5>
     <div class="summary">
         <label><%= translate('DONATE_SUMMARY_PERKS_FOR_LABEL') %></label>
         <% if (selectedPackage.forAccount !== null) { %>
@@ -16,19 +17,41 @@
             <span><img class="image" src="<%= imagePath('discord.svg') %>"> <%= user.username %></span>
         </span>
     </div>
-
-    <h5><%= translate('DONATE_CUSTOM_MESSAGE_TITLE') %></h5>
-    <div class="input-field custom-message">
-        <textarea id="custom-message" class="materialize-textarea" maxlength="255"></textarea>
-        <label for="custom-message" class="active"><%= translate('DONATE_CUSTOM_MESSAGE_LABEL') %></label>
-    </div>
-
-    <h5><%= translate('DONATE_PAYMENT_TITLE') %></h5>
     <%- script('steps/donate.js') %>
+
     <% if (locals.selectedMethod) { %>
+        <% if (customMessage !== '') { %>
+            <h5><%= translate('DONATE_CUSTOM_MESSAGE_TITLE', {params: {index: index++}}) %></h5>
+            <span id="custom-message"><%= customMessage %></span>
+        <% } %>
+
+        <h5><%= translate('DONATE_PAYMENT_TITLE', {params: {index: index++}}) %></h5>
         <%- include('../' + selectedMethod.template, {data: selectedMethod.data}) %>
     <% } else { %>
         <form action="/donate" method="post">
+            <% if (needsFurtherSelection) { %>
+                <h5><%= translate('DONATE_PERKS_SUBJECT_SELECTION_TITLE', {params: {index: index++}}) %></h5>
+                <p><%= translate('DONATE_PERKS_SUBJECT_SELECTION_DESCRIPTION') %></p>
+                <% selectedPackage.perks.forEach(function (perk) { %>
+                    <% if (perk.subjects() !== null) { %>
+                        <label><%= perk.asShortString() %></label>
+                        <select class="browser-default" name="<% perk.id() %>">
+                            <% perk.subjects().forEach(function (label, id) { %>
+                                <option value="<%= id %>"><%= label %></option>
+                            <% }); %>
+                        </select>
+                    <% } %>
+                <% }); %>
+            <% } %>
+
+            <h5><%= translate('DONATE_CUSTOM_MESSAGE_TITLE', {params: {index: index++}}) %></h5>
+            <div class="input-field custom-message">
+                <textarea id="custom-message" name="customMessage" class="materialize-textarea"
+                          maxlength="255"></textarea>
+                <label for="custom-message" class="active"><%= translate('DONATE_CUSTOM_MESSAGE_LABEL') %></label>
+            </div>
+
+            <h5><%= translate('DONATE_PAYMENT_TITLE', {params: {index: index++}}) %></h5>
             <input type="hidden" name="_csrf" value="<%= csrfToken %>">
             <div class="payment-methods">
                 <% paymentMethods.forEach((p) => { %>

@@ -94,6 +94,26 @@ export class ReservedSlotPerk implements Perk {
         return this.asLongString();
     }
 
+    subjects(): Map<string, string> | null {
+        return null;
+    }
+
+    id(): string {
+        if (!this.fingerprint) {
+            const hash = createHash('sha1');
+            hash.update(this.type);
+            hash.update(this.battlemetrics.organizationId);
+            hash.update(this.battlemetrics.serverId);
+            if (this.amountInDays) {
+                hash.update(this.amountInDays.toString(10));
+            } else {
+                hash.update(this.permanent ? 'permanent' : 'not-permanent')
+            }
+            this.fingerprint = hash.digest('hex');
+        }
+        return this.fingerprint;
+    }
+
     private createReservedSlot(target: RedeemTarget, order: Order): Promise<void> {
         return new Promise((resolve, reject) => {
             const req = https.request('https://api.battlemetrics.com/reserved-slots', {
@@ -165,21 +185,5 @@ export class ReservedSlotPerk implements Perk {
         expiration.setDate(order.redeemedAt.getDate() + this.amountInDays);
 
         return expiration;
-    }
-
-    id(): string {
-        if (!this.fingerprint) {
-            const hash = createHash('sha1');
-            hash.update(this.type);
-            hash.update(this.battlemetrics.organizationId);
-            hash.update(this.battlemetrics.serverId);
-            if (this.amountInDays) {
-                hash.update(this.amountInDays.toString(10));
-            } else {
-                hash.update(this.permanent ? 'permanent' : 'not-permanent')
-            }
-            this.fingerprint = hash.digest('hex');
-        }
-        return this.fingerprint;
     }
 }
