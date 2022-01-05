@@ -24,7 +24,7 @@ const anOrder: Order = Order.create(new Date('2025-05-16T18:25:49Z'), {
     transactionId: 'SOME_TRANSACTION_ID',
     provider: FakePayment.NAME,
 }, new Reference('A_STEAM_ID', 'A_DISCORD_ID', packages[0]), 'A_MESSAGE');
-anOrder.pushPerkDetails(new Map([['SOME_ID', 'SOME_VALUE']]));
+anOrder.pushPerkDetails({SOME_ID: 'SOME_VALUE'});
 
 describe('OrderRepository', () => {
     let repository: OrderRepository;

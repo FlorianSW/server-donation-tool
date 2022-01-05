@@ -35,7 +35,7 @@
                 <% selectedPackage.perks.forEach(function (perk) { %>
                     <% if (perk.subjects() !== null) { %>
                         <label><%= perk.asShortString() %></label>
-                        <select class="browser-default" name="<% perk.id() %>">
+                        <select class="browser-default" name="<%= perk.id() %>">
                             <% perk.subjects().forEach(function (label, id) { %>
                                 <option value="<%= id %>"><%= label %></option>
                             <% }); %>

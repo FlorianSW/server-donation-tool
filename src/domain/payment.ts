@@ -70,8 +70,8 @@ export class Order {
         this.status = OrderStatus.PAID;
     }
 
-    public pushPerkDetails(details: Map<string, string>) {
-        for (let detail of details) {
+    public pushPerkDetails(details: { [key: string]: string }) {
+        for (let detail of Object.entries(details)) {
             if (this.perkDetails.has(detail[0])) {
                 throw new Error('can not overwrite existing perk details: ' + detail[0]);
             }
@@ -219,8 +219,8 @@ export interface SubscriptionCancelled {
 
 export interface PaymentProvider {
     branding: {
-       logo?: string;
-       name: string;
+        logo?: string;
+        name: string;
     };
     donation?: {
         template: string;

@@ -76,7 +76,7 @@ export class StartController {
                 id: selectedPackage.id,
                 price: this.price(req, selectedPackage),
                 forAccount: forAccount,
-                perkDetails: new Map(),
+                perkDetails: {},
                 type: type,
             };
             res.redirect('/donate');

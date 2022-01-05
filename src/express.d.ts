@@ -18,7 +18,7 @@ declare module 'express-session' {
             id: number;
             price: Price;
             forAccount: string | undefined;
-            perkDetails: Map<string, string>;
+            perkDetails: { [key: string]: string };
             type: DonationType;
         };
         afterLoginTarget?: string;

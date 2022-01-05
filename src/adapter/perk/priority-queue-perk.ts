@@ -34,7 +34,19 @@ export class PriorityQueuePerk implements Perk {
 
     async redeem(target: RedeemTarget, order: Order): Promise<TranslateParams> {
         const steamId = SteamId64.of(target.steamId);
-        const serverId = ServerApiId.of(this.cftools.serverApiId as string);
+        let serverId: ServerApiId;
+        if (Array.isArray(this.cftools.serverApiId)) {
+            if (!order.perkDetails.has(this.id())) {
+                throw new Error('perk ' + this.id() + ' requires further details, but order does not contain them');
+            }
+            const perkServerId = order.perkDetails.get(this.id());
+            if (!this.cftools.serverApiId.some((id) => id === perkServerId)) {
+                throw new Error('the priority queue perk ' + this.id() + ' does not have a valid server API ID available for selected ' + perkServerId);
+            }
+            serverId = ServerApiId.of(perkServerId);
+        } else {
+            serverId = ServerApiId.of(this.cftools.serverApiId);
+        }
 
         const successParams: TranslateParams = ['PRIORITY_QUEUE_REDEEM_COMPLETE', {
             params: {
@@ -140,6 +152,17 @@ export class PriorityQueuePerk implements Perk {
         return this.fingerprint;
     }
 
+    subjects(): Map<string, string> | null {
+        if (!Array.isArray(this.cftools.serverApiId)) {
+            return null;
+        }
+        const result = new Map();
+        for (let serverId of this.cftools.serverApiId) {
+            result.set(serverId, this.serverNames[serverId]);
+        }
+        return result;
+    }
+
     private async fetchPriorityQueue(steamId: SteamId64, server: ServerApiId): Promise<PriorityQueue> {
         try {
             const entry = await this.client.getPriorityQueue({
@@ -204,17 +227,6 @@ export class PriorityQueuePerk implements Perk {
         expiration.setDate(order.redeemedAt.getDate() + this.amountInDays);
 
         return expiration;
-    }
-
-    subjects(): Map<string, string> | null {
-        if (!Array.isArray(this.cftools.serverApiId)) {
-            return null;
-        }
-        const result = new Map();
-        for (let serverId of this.cftools.serverApiId) {
-            result.set(serverId, this.serverNames[serverId]);
-        }
-        return result;
     }
 
     private async createPriority(serverId: ServerApiId, steamId: SteamId64, order: Order): Promise<void> {

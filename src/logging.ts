@@ -15,16 +15,22 @@ export const consoleFormat = winston.format.combine(
     })
 );
 
+let level = 'info';
+if (process.env.DEBUG) {
+    level = 'debug';
+}
+
 const log = winston.createLogger({
     transports: [
         new winston.transports.Console({
+            level: level,
             format: consoleFormat
         }),
         new winston.transports.File({
             format: winston.format.combine(
                 winston.format.metadata()
             ),
-            level: 'info',
+            level: level,
             filename: 'server.log',
             maxsize: 5 * 1024 * 1024,
             maxFiles: 3,

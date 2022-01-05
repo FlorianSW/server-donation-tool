@@ -102,18 +102,18 @@ export class DonationController {
                 res.redirect('/donate');
                 return;
             }
-            if (!Array.from(perk.subjects().values()).some((s) => s === subject)) {
+            if (!Array.from(perk.subjects().keys()).some((s) => s === subject)) {
                 this.logger.debug('attempted to select a non-existing subject ' + subject + ' for ' + perk.id());
                 res.redirect('/donate');
                 return;
             }
-            req.session.selectedPackage.perkDetails.set(perk.id(), subject);
+            req.session.selectedPackage.perkDetails[perk.id()] = subject;
         }
 
         let customMessage = req.body.customMessage;
         if (customMessage && customMessage.length > 255) {
             res.sendStatus(400).write(JSON.stringify({
-                error: 'custom message an not exceed 255 characters'
+                error: 'custom message can not exceed 255 characters'
             }));
             return;
         }
