@@ -29,20 +29,7 @@
         <%- include('../' + selectedMethod.template, {data: selectedMethod.data}) %>
     <% } else { %>
         <form action="/donate" method="post">
-            <% if (needsFurtherSelection) { %>
-                <h5><%= translate('DONATE_PERKS_SUBJECT_SELECTION_TITLE', {params: {index: index++}}) %></h5>
-                <p><%= translate('DONATE_PERKS_SUBJECT_SELECTION_DESCRIPTION') %></p>
-                <% selectedPackage.perks.forEach(function (perk) { %>
-                    <% if (perk.subjects() !== null) { %>
-                        <label><%= perk.asShortString() %></label>
-                        <select class="browser-default" name="<%= perk.id() %>">
-                            <% perk.subjects().forEach(function (label, id) { %>
-                                <option value="<%= id %>"><%= label %></option>
-                            <% }); %>
-                        </select>
-                    <% } %>
-                <% }); %>
-            <% } %>
+            <%- include('../partials/perk_details.ejs', {index: index}) %>
 
             <h5><%= translate('DONATE_CUSTOM_MESSAGE_TITLE', {params: {index: index++}}) %></h5>
             <div class="input-field custom-message">

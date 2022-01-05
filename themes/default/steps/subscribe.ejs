@@ -15,6 +15,8 @@
         </span>
     </div>
 
+    <%- include('../partials/perk_details.ejs', {index: index}) %>
+
     <h5><%= translate('DONATE_SUBSCRIBE_TITLE', {params: {index: index++}}) %></h5>
     <p>
         <%= translate('PAYPAL_SUBSCRIPTION_DESCRIPTION') %>
