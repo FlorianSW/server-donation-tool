@@ -19,6 +19,8 @@ export interface Perk {
     id(): string;
 }
 
+export type PerkDetails = { [key: string]: string };
+
 export class RedeemTarget {
     constructor(
         public readonly steamId: string,

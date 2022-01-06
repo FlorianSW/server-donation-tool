@@ -9,7 +9,7 @@ import {
     SubscriptionPlan
 } from '../domain/payment';
 import {User} from '../domain/user';
-import {Package, RedeemTarget} from '../domain/package';
+import {Package, PerkDetails, RedeemTarget} from '../domain/package';
 import {OrderRepository, SubscriptionPlanRepository, SubscriptionsRepository} from '../domain/repositories';
 import {RedeemPackage} from './redeem-package';
 import {EventSource} from '../domain/events';
@@ -26,9 +26,10 @@ export class Subscriptions {
     ) {
     }
 
-    async subscribe(p: Package, user: User): Promise<PendingSubscription> {
+    async subscribe(p: Package, perkDetails: PerkDetails, user: User): Promise<PendingSubscription> {
         const plan = await this.subscriptionPlans.findByPackage(p);
         const sub = Subscription.create(plan, user);
+        sub.pushPerkDetails(perkDetails);
         const result = await this.payment.subscribe(sub, plan, user);
         sub.agreeBilling(result.id);
         await this.subscriptions.save(sub);
@@ -45,6 +46,7 @@ export class Subscriptions {
         }
 
         const order = sub.pay(transactionId, this.payment.provider().branding.name, plan.basePackage);
+        order.pushPerkDetails(Object.fromEntries(sub.perkDetails.entries()));
         await this.subscriptions.save(sub);
         await this.orders.save(order);
         await this.redeem.redeem(order, target, order.reference.p.perks);
@@ -123,4 +125,5 @@ export interface ViewSubscription {
 }
 
 @singleton()
-export class StubSubscriptions {}
+export class StubSubscriptions {
+}

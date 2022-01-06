@@ -2,7 +2,6 @@ import {OrderRepository, SubscriptionPlanRepository, SubscriptionsRepository} fr
 import {
     Order,
     OrderStatus,
-    Payment,
     Subscription,
     SubscriptionNotFound,
     SubscriptionPaymentProvider,
@@ -43,7 +42,7 @@ describe('Subscriptions', () => {
     });
 
     it('creates a new subscription for a donator', async () => {
-        const result = await service.subscribe(aPackage, aUser);
+        const result = await service.subscribe(aPackage, {}, aUser);
 
         const subscription = await subRepository.findByPayment(result.id);
         expect(result.approvalLink).not.toBe('');
@@ -55,12 +54,13 @@ describe('Subscriptions', () => {
     });
 
     it('redeems perks for a subscription payment', (done: DoneCallback) => {
-        service.subscribe(aPackage, aUser).then((sub) => {
+        service.subscribe(aPackage, {SOME_ID: 'SOME_DATA'}, aUser).then((sub) => {
             events.on('subscriptionExecuted', (target: RedeemTarget, plan: SubscriptionPlan, sub: Subscription, order: Order) => {
                 expect(target.discordId).toEqual(aUser.discord.id);
                 expect(target.steamId).toEqual(aUser.steam.id);
                 expect(order.payment.transactionId).toEqual('A_TRANSACTION_ID');
                 expect(order.status).toEqual(OrderStatus.PAID);
+                expect(order.perkDetails).toEqual(new Map([['SOME_ID', 'SOME_DATA']]));
                 subRepository.findByPayment(sub.payment.id).then((subscription) => {
                     expect(subscription.state).toBe('ACTIVE');
                     done();
@@ -75,7 +75,7 @@ describe('Subscriptions', () => {
     });
 
     it('cancels subscription', async () => {
-        const ps = await service.subscribe(aPackage, aUser);
+        const ps = await service.subscribe(aPackage, {}, aUser);
         const sub = await subRepository.findByPayment(ps.id);
 
         await service.cancel(sub.id, aUser);
@@ -85,7 +85,7 @@ describe('Subscriptions', () => {
     });
 
     it('notifies subscription about cancellation', async () => {
-        const ps = await service.subscribe(aPackage, aUser);
+        const ps = await service.subscribe(aPackage, {}, aUser);
         const sub = await subRepository.findByPayment(ps.id);
 
         await service.notifyCancel(ps.id);
@@ -95,14 +95,17 @@ describe('Subscriptions', () => {
     });
 
     it('errors when other\'s subscription cancelled', async () => {
-        const ps = await service.subscribe(aPackage, aUser);
+        const ps = await service.subscribe(aPackage, {}, aUser);
         const sub = await subRepository.findByPayment(ps.id);
 
-        await expect(() => service.cancel(sub.id, {...aUser, discord: {id: 'ANOTHER_DISCORD_ID'}})).rejects.toBeInstanceOf(SubscriptionNotFound);
+        await expect(() => service.cancel(sub.id, {
+            ...aUser,
+            discord: {id: 'ANOTHER_DISCORD_ID'}
+        })).rejects.toBeInstanceOf(SubscriptionNotFound);
     });
 
     it('views subscriptions details and history', async () => {
-        const ps = await service.subscribe(aPackage, aUser);
+        const ps = await service.subscribe(aPackage, {}, aUser);
         const sub = await subRepository.findByPayment(ps.id);
         const first = await service.redeemSubscriptionPayment(sub.payment.id, 'A_PAYMENT_ID');
         const second = await service.redeemSubscriptionPayment(sub.payment.id, 'A_PAYMENT_ID');

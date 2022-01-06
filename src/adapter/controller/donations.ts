@@ -92,22 +92,9 @@ export class DonationController {
             return;
         }
 
-        for (let perk of selectedPackage.perks) {
-            if (perk.subjects() === null) {
-                continue;
-            }
-            const subject = req.body[perk.id()];
-            if (!subject) {
-                this.logger.debug('attempted to pay a donation package without selecting perk details for ' + perk.id());
-                res.redirect('/donate');
-                return;
-            }
-            if (!Array.from(perk.subjects().keys()).some((s) => s === subject)) {
-                this.logger.debug('attempted to select a non-existing subject ' + subject + ' for ' + perk.id());
-                res.redirect('/donate');
-                return;
-            }
-            req.session.selectedPackage.perkDetails[perk.id()] = subject;
+        if (!this.populatePerkDetails(selectedPackage, req)) {
+            res.redirect('/donate');
+            return;
         }
 
         let customMessage = req.body.customMessage;
@@ -146,6 +133,25 @@ export class DonationController {
         } else {
             res.status(400).write('payment method can not be rendered');
         }
+    }
+
+    private populatePerkDetails(p: Package, req: Request): boolean {
+        for (let perk of p.perks) {
+            if (perk.subjects() === null) {
+                continue;
+            }
+            const subject = req.body[perk.id()];
+            if (!subject) {
+                this.logger.debug('attempted to pay a donation package without selecting perk details for ' + perk.id());
+                return false;
+            }
+            if (!Array.from(perk.subjects().keys()).some((s) => s === subject)) {
+                this.logger.debug('attempted to select a non-existing subject ' + subject + ' for ' + perk.id());
+                return false;
+            }
+            req.session.selectedPackage.perkDetails[perk.id()] = subject;
+        }
+        return true;
     }
 
     private async prepareDonation(req: Request, res: Response) {
@@ -208,8 +214,12 @@ export class DonationController {
             res.redirect('/');
             return;
         }
+        if (!this.populatePerkDetails(selectedPackage, req)) {
+            res.redirect('/');
+            return;
+        }
 
-        const result = await this.subscriptions.subscribe(selectedPackage, req.user);
+        const result = await this.subscriptions.subscribe(selectedPackage, req.session.selectedPackage.perkDetails, req.user);
         res.redirect(result.approvalLink);
     }
 

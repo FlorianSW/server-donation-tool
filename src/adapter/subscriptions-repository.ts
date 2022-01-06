@@ -11,6 +11,7 @@ const columnPaymentId = 'payment_id';
 const columnUserSteamId = 'steam_id';
 const columnUserDiscordId = 'discord_id';
 const columnState = 'state';
+const columnPerkDetails = 'perk_details';
 
 @singleton()
 export class SQLiteSubscriptionsRepository implements SubscriptionsRepository {
@@ -18,7 +19,7 @@ export class SQLiteSubscriptionsRepository implements SubscriptionsRepository {
 
     constructor(@inject('DonationsDB') private readonly con: Knex) {
         this.initialized = new Promise((resolve) => {
-            con.schema.hasTable(tableName).then((hasTable) => {
+            con.schema.hasTable(tableName).then(async (hasTable) => {
                 if (!hasTable) {
                     con.schema.createTable(tableName, (b) => {
                         b.string(columnId).primary('primary_id');
@@ -27,10 +28,17 @@ export class SQLiteSubscriptionsRepository implements SubscriptionsRepository {
                         b.string(columnUserSteamId);
                         b.string(columnUserDiscordId).index('idx_discord_id');
                         b.string(columnState);
+                        b.text(columnPerkDetails).nullable().defaultTo('[]');
                     }).then(() => {
                         resolve(true);
                     });
                 } else {
+                    const c = await con.table(tableName).columnInfo() as any as {}[];
+                    if (!c.hasOwnProperty(columnPerkDetails)) {
+                        await con.schema.alterTable(tableName, (b) => {
+                            b.text(columnPerkDetails).nullable().defaultTo('[]');
+                        });
+                    }
                     resolve(true);
                 }
             });
@@ -40,8 +48,8 @@ export class SQLiteSubscriptionsRepository implements SubscriptionsRepository {
     async save(s: Subscription): Promise<void> {
         await this.initialized;
         // @formatter:off
-        await this.con.raw(`REPLACE INTO ${tableName} (${columnId}, ${columnPlanId}, ${columnPaymentId}, ${columnUserSteamId}, ${columnUserDiscordId}, ${columnState}) VALUES (?, ?, ?, ?, ?, ?)`, [
-            s.id, s.planId, s.payment.id, s.user.steamId, s.user.discordId, s.state
+        await this.con.raw(`REPLACE INTO ${tableName} (${columnId}, ${columnPlanId}, ${columnPaymentId}, ${columnUserSteamId}, ${columnUserDiscordId}, ${columnState}, ${columnPerkDetails}) VALUES (?, ?, ?, ?, ?, ?, ?)`, [
+            s.id, s.planId, s.payment.id, s.user.steamId, s.user.discordId, s.state, JSON.stringify(Array.from(s.perkDetails.entries()))
         ]);
         // @formatter:on
     }
@@ -117,6 +125,7 @@ export class SQLiteSubscriptionsRepository implements SubscriptionsRepository {
                         steamId: o[columnUserSteamId],
                     },
                     o[columnState],
+                    new Map(JSON.parse(o[columnPerkDetails])),
                 )
             );
         }

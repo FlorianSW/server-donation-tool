@@ -1,4 +1,4 @@
-import {Package} from './package';
+import {Package, PerkDetails} from './package';
 import {v4} from 'uuid';
 import {AppConfig} from './app-config';
 import {User} from './user';
@@ -70,7 +70,7 @@ export class Order {
         this.status = OrderStatus.PAID;
     }
 
-    public pushPerkDetails(details: { [key: string]: string }) {
+    public pushPerkDetails(details: PerkDetails) {
         for (let detail of Object.entries(details)) {
             if (this.perkDetails.has(detail[0])) {
                 throw new Error('can not overwrite existing perk details: ' + detail[0]);
@@ -112,6 +112,7 @@ export class Subscription {
             discordId: string,
         },
         public state: 'PENDING' | 'ACTIVE' | 'CANCELLED',
+        public perkDetails: Map<string, string>,
     ) {
     }
 
@@ -119,7 +120,16 @@ export class Subscription {
         return new Subscription(v4(), plan.id, {}, {
             steamId: user.steam.id,
             discordId: user.discord.id
-        }, 'PENDING');
+        }, 'PENDING', new Map());
+    }
+
+    public pushPerkDetails(details: PerkDetails) {
+        for (let detail of Object.entries(details)) {
+            if (this.perkDetails.has(detail[0])) {
+                throw new Error('can not overwrite existing perk details: ' + detail[0]);
+            }
+            this.perkDetails.set(detail[0], detail[1]);
+        }
     }
 
     public cancel(): void {

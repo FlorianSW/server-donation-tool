@@ -27,6 +27,7 @@ describe('SubscriptionsRepository', () => {
     it('persists subscription', async () => {
         const sub = Subscription.create(aPlan, aUser);
         sub.agreeBilling('A_PAYMENT_ID');
+        sub.pushPerkDetails({SOME_ID: 'SOME_DATA'});
         await repository.save(sub);
         const subs = await repository.findByPayment('A_PAYMENT_ID');
 
@@ -40,6 +41,7 @@ describe('SubscriptionsRepository', () => {
             },
             state: 'PENDING',
             planId: aPlan.id,
+            perkDetails: new Map([['SOME_ID', 'SOME_DATA']]),
         } as Subscription);
     });
 
