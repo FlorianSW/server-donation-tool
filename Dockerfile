@@ -4,7 +4,7 @@ WORKDIR /code
 COPY . .
 RUN npm ci && npm run build
 
-FROM node:14-alpine
+FROM node:16-alpine
 
 ENV NODE_ENV=production
 
