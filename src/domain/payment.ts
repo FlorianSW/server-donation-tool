@@ -254,7 +254,7 @@ export interface SubscriptionPaymentProvider {
 
     subscribe(sub: Subscription, plan: SubscriptionPlan, user: User): Promise<PendingSubscription>;
 
-    subscriptionDetails(sub: Subscription): Promise<SubscriptionPayment>;
+    subscriptionDetails(sub: Subscription): Promise<SubscriptionPayment | undefined>;
 
     cancelSubscription(subscription: Subscription): Promise<void>;
 

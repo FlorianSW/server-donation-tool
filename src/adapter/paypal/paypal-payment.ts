@@ -175,9 +175,17 @@ export class PaypalPayment implements Payment, SubscriptionPaymentProvider {
         };
     }
 
-    async subscriptionDetails(sub: Subscription): Promise<SubscriptionPayment> {
+    async subscriptionDetails(sub: Subscription): Promise<SubscriptionPayment | undefined> {
         const r = new GetSubscriptionRequest(sub.payment.id);
-        const result = await this.client.execute<PayPalSubscription>(r);
+        let result;
+        try {
+            result = await this.client.execute<PayPalSubscription>(r);
+        } catch (e) {
+            if (e.statusCode === 404) {
+                return undefined;
+            }
+            throw e;
+        }
 
         let status: SubscriptionPayment['state'];
         switch (result.result.status) {

@@ -13,6 +13,7 @@ import {Package, PerkDetails, RedeemTarget} from '../domain/package';
 import {OrderRepository, SubscriptionPlanRepository, SubscriptionsRepository} from '../domain/repositories';
 import {RedeemPackage} from './redeem-package';
 import {EventSource} from '../domain/events';
+import {CANCELLED} from 'dns';
 
 @singleton()
 export class Subscriptions {
@@ -56,16 +57,23 @@ export class Subscriptions {
     }
 
     async viewSubscription(id: string, forUser: User): Promise<ViewSubscription> {
-        const subscription = await this.subscription(id, forUser);
+        let subscription = await this.subscription(id, forUser);
         const orders = await this.orders.findByPaymentOrder(subscription.payment.id);
         const plan = await this.subscriptionPlans.find(subscription.planId);
-        const paymentStatus = await this.payment.subscriptionDetails(subscription);
+
         let pending: PendingSubscription | null;
-        if (paymentStatus.state === 'APPROVAL_PENDING') {
-            pending = {
-                id: subscription.payment.id,
-                approvalLink: paymentStatus.approvalLink
-            } as PendingSubscription;
+        if (subscription.state !== 'CANCELLED') {
+            const paymentStatus = await this.payment.subscriptionDetails(subscription);
+            if (!paymentStatus) {
+                await this.cancel(subscription.id, forUser);
+                subscription = await this.subscription(id, forUser);
+            }
+            if (paymentStatus && paymentStatus.state === 'APPROVAL_PENDING') {
+                pending = {
+                    id: subscription.payment.id,
+                    approvalLink: paymentStatus.approvalLink
+                } as PendingSubscription;
+            }
         }
 
         return {
@@ -79,7 +87,7 @@ export class Subscriptions {
     async cancel(id: string, forUser: User): Promise<void> {
         const subscription = await this.subscription(id, forUser);
         const paymentStatus = await this.payment.subscriptionDetails(subscription);
-        if (paymentStatus.state === 'APPROVED' || paymentStatus.state === 'ACTIVE') {
+        if (paymentStatus && (paymentStatus.state === 'APPROVED' || paymentStatus.state === 'ACTIVE')) {
             await this.payment.cancelSubscription(subscription);
         }
         subscription.cancel();
