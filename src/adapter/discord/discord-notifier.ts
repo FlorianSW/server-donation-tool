@@ -197,7 +197,7 @@ export class DiscordNotifier {
 PayPal Order ID: ${order.payment.id}
 Transaction ID: ${order.payment.transactionId}
 Order created at: ${order.created}
-Perks: ${order.reference.p.perks.map((p) => p.asShortString()).join(', ')}`
+Perks: ${order.reference.p.perks.map((p) => p.asShortString(order)).join(', ')}`
             }
         ]
     }
