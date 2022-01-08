@@ -110,7 +110,6 @@ export class DonationController {
 
         if (selectedPayment.deferredDonation) {
             await this.deferredDonation(req, res, customMessage);
-            return;
         } else if (selectedPayment.donation) {
             res.render('steps/donate', {
                 csrfToken: req.csrfToken(),
@@ -260,17 +259,21 @@ export class DonationController {
         if (!session.selectedPackage) {
             return;
         }
-        return this.packages.find((p) => session.selectedPackage.id === p.id);
+        const p = this.packages.find((p) => session.selectedPackage.id === p.id);
+        if (p == null) {
+            return null;
+        }
+        return {
+            ...p,
+            price: {
+                ...p.price,
+                ...session.selectedPackage.price
+            }
+        }
     }
 
     private async deferredDonation(req: Request, res: Response, customMessage: string) {
-        const p = {
-            ...this.selectedPackage(req.session),
-            price: {
-                ...this.selectedPackage(req.session).price,
-                ...req.session.selectedPackage.price
-            }
-        };
+        const p = this.selectedPackage(req.session);
         const steamId = req.session.selectedPackage.forAccount;
         const payment = this.payments.find((provider) => provider.provider().branding.name === req.body.method);
         if (!payment) {
@@ -314,13 +317,7 @@ export class DonationController {
             customMessage = null;
         }
 
-        const p = {
-            ...this.selectedPackage(req.session),
-            price: {
-                ...this.selectedPackage(req.session).price,
-                ...req.session.selectedPackage.price
-            }
-        };
+        const p = this.selectedPackage(req.session);
         const steamId = req.session.selectedPackage.forAccount;
         const payment = this.payments.find((provider) => provider.provider().branding.name === req.body.provider);
         if (!payment) {
