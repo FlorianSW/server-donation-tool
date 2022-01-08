@@ -136,6 +136,17 @@ This perk requires the following additional configuration options:
   You find this ID in the server you want the Priority Queue setup for.
   Go to Manage -> Settings and look into the `API Key` section.
 
+  You may specify an array of multiple `Server Ids` in the `serverApiId` property. A donator then needs to select the server they
+  want to have the priority queue on, e.g.:
+```yaml
+- type: PRIORITY_QUEUE
+  amountInDays: 30
+  cftools:
+    serverApiId:
+      - A_SERVER_ID
+      - ANOTHER_SERVER_ID
+```
+
 ### Whitelist
 
 The whitelist perk works together with CFTools Cloud.
