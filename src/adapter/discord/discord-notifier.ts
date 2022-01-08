@@ -67,7 +67,7 @@ export class DiscordNotifier {
                     .setColor('GREEN')
                     .setTitle(translate('NOTIFICATIONS_PAYMENT_SUCCESSFUL_TITLE'))
                     .setURL(this.config.app.publicUrl.toString())
-                    .setFooter('Server Donation Tool by FlorianSW')
+                    .setFooter({text: 'Server Donation Tool by FlorianSW'})
                     .setDescription(translate('NOTIFICATIONS_PAYMENT_SUCCESSFUL_PUBLIC_DESCRIPTION', {
                         params: {
                             user: `<@${target.discordId}> ${target.username ? `(${target.username})` : ''}`,
