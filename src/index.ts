@@ -131,6 +131,7 @@ parseConfig(log).then(async (config) => {
             httpOnly: true,
             maxAge: 30 * 60 * 1000, // 30 minutes
             sameSite: 'lax',
+            secure: 'auto',
         },
         store: container.resolve('sessionStore'),
     }));
