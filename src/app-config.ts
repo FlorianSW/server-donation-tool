@@ -11,8 +11,7 @@ import * as yaml from 'js-yaml';
 import {DiscordNotification, DiscordNotifier} from './adapter/discord/discord-notifier';
 import {FreetextPerk} from './adapter/perk/freetext-perk';
 import session from 'express-session';
-import {StoreFactory} from 'connect-session-knex';
-import Knex from 'knex';
+import {Knex, knex} from 'knex';
 import {Environment} from './adapter/paypal/paypal-payment';
 import settings from './translations';
 import {DiscordRoleRecorder} from './service/discord-role-recorder';
@@ -26,7 +25,7 @@ import {DiscordUserNotifier} from './adapter/discord/discord-user-notifier';
 import {ReservedSlotPerk} from './adapter/perk/reserved-slot';
 
 const initSessionStore = require('connect-session-knex');
-const sessionStore: StoreFactory = initSessionStore(session);
+const sessionStore = initSessionStore(session);
 
 function isWebUrl(urlAsString: string): boolean {
     try {
@@ -148,15 +147,15 @@ class YamlAppConfig implements AppConfig {
             .build());
         container.register('DonationsDB', {
             useFactory: instanceCachingFactory((c) => {
-                const knex = Knex({
+                const client = knex({
                     client: 'sqlite3',
                     connection: {
                         filename: './db/donations.sqlite',
                     },
                     useNullAsDefault: true,
                 });
-                enableSqLiteWal(knex, c.resolve('Logger'));
-                return knex;
+                enableSqLiteWal(client, c.resolve('Logger'));
+                return client;
             })
         });
 
@@ -231,16 +230,16 @@ class YamlAppConfig implements AppConfig {
         if (!this.app.sessionSecret || this.app.sessionSecret.length === 0) {
             throw new Error('app.sessionSecret can not be an empty string. Choose an individual, random, secure string');
         }
-        const knex = Knex({
+        const client = knex({
             client: 'sqlite3',
             connection: {
                 filename: this.app.sessionStore.filename,
             },
             useNullAsDefault: true,
         });
-        await enableSqLiteWal(knex, this.logger);
+        await enableSqLiteWal(client, this.logger);
         container.registerInstance('sessionStore', new sessionStore({
-            knex: knex
+            knex: client
         }));
     }
 

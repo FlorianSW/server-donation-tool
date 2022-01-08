@@ -1,5 +1,5 @@
 import {OrderRepository} from '../domain/repositories';
-import Knex from 'knex';
+import {Knex} from 'knex';
 import {Order, OrderPayment, OrderStatus, Reference} from '../domain/payment';
 import {Package} from '../domain/package';
 import {inject, singleton} from 'tsyringe';

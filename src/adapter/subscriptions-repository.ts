@@ -1,5 +1,5 @@
 import {SubscriptionsRepository} from '../domain/repositories';
-import Knex from 'knex';
+import {Knex} from 'knex';
 import {inject, singleton} from 'tsyringe';
 import {Subscription} from '../domain/payment';
 import {User} from '../domain/user';

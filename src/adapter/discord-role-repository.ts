@@ -1,5 +1,5 @@
 import {DiscordRoleRepository, ExpiringDiscordRole} from '../domain/repositories';
-import Knex from 'knex';
+import {Knex} from 'knex';
 import {inject, singleton} from 'tsyringe';
 
 const tableName = 'expiring_discord_roles';
