@@ -195,6 +195,7 @@ export class DonationController {
         } else {
             res.render('steps/redeem', {
                 user: req.user,
+                order: order,
                 canShare: order.reference.discordId === req.user.discord.id,
                 shareLink: new URL(`/donate/${order.id}`, this.config.app.publicUrl).toString(),
                 redeemLink: `/donate/${order.id}/redeem`,

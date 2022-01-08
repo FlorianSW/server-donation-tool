@@ -87,8 +87,10 @@ export class PriorityQueuePerk implements Perk {
         }
     }
 
-    asLongString(): string {
-        if (Array.isArray(this.cftools.serverApiId)) {
+    asLongString(context: Order | null): string {
+        if (context && context.perkDetails.has(this.id()) && Array.isArray(this.cftools.serverApiId)) {
+            return this.longStringForSingle(context.perkDetails.get(this.id()));
+        } else if (Array.isArray(this.cftools.serverApiId)) {
             return this.longStringForMulti(this.cftools.serverApiId);
         } else {
             return this.longStringForSingle(this.cftools.serverApiId);
@@ -127,8 +129,8 @@ export class PriorityQueuePerk implements Perk {
         });
     }
 
-    asShortString(): string {
-        return this.asLongString();
+    asShortString(context: Order | null): string {
+        return this.asLongString(context);
     }
 
     id(): string {

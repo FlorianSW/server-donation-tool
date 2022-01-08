@@ -12,9 +12,9 @@ export interface Perk {
 
     ownedBy(target: RedeemTarget): Promise<OwnedPerk[] | null>;
 
-    asLongString(): string;
+    asLongString(context?: Order | undefined): string;
 
-    asShortString(): string;
+    asShortString(context?: Order | undefined): string;
 
     id(): string;
 }
