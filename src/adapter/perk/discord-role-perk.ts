@@ -89,7 +89,7 @@ export class DiscordRolePerk implements Perk {
         if (!this.fingerprint) {
             const hash = createHash('sha1');
             hash.update(this.type);
-            hash.update(this.amountInDays.toString(10));
+            hash.update(this.amountInDays?.toString(10) || 'permanent');
             const r = this.roles.sort();
             for (let role of r) {
                 hash.update(role);
