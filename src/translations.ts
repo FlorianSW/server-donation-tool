@@ -40,6 +40,9 @@ const messages: { [key: string]: string } = {
     DISCORD_ACCOUNT_TITLE: 'Discord Account',
     DISCORD_LOGOUT: 'Login with another account',
 
+    ACCOUNT_INFO_TITLE: 'Your linked accounts',
+    ACCOUNT_RECENT_DONATIONS_TITLE: 'Recent donations',
+
     PERK_SELECTION_TITLE: 'Select package',
     PERK_SELECTION_WHO_DESCRIPTION: 'Do you want to redeem the donation perks by your self of should this be a gift to someone else? Please select one option to proceed with the donation.',
     PERK_SELECTION_DONATE: 'Donate',

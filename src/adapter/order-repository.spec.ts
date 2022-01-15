@@ -79,6 +79,21 @@ describe('OrderRepository', () => {
         expect(result[1].id).toEqual(thirdOrder.id);
     });
 
+    it('finds orders for specific user', async () => {
+        const secondOrder = Order.create(new Date('2025-05-17T18:25:49Z'), anOrder.payment, anOrder.reference);
+        const thirdOrder = Order.create(new Date('2025-05-18T18:25:49Z'), anOrder.payment, new Reference('A_STEAM_ID', 'ANOTHER_DISCORD_ID', packages[0]));
+        anOrder.pay(anOrder.payment.transactionId);
+        secondOrder.pay(secondOrder.payment.transactionId);
+        thirdOrder.pay(thirdOrder.payment.transactionId);
+        await repository.save(anOrder);
+        await repository.save(secondOrder);
+        await repository.save(thirdOrder);
+
+        const result = await repository.findLastFor({discord: {id: anOrder.reference.discordId}, username: 'A_NAME', subscribedPackages: {}}, 1);
+        expect(result).toHaveLength(1);
+        expect(result[0].id).toEqual(secondOrder.id);
+    });
+
     it('finds unpaid orders created before', async () => {
         const secondOrder = Order.create(new Date('2025-05-17T18:25:49Z'), anOrder.payment, anOrder.reference);
         const thirdOrder = Order.create(new Date('2025-05-18T18:25:49Z'), anOrder.payment, anOrder.reference);

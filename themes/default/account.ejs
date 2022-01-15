@@ -1,0 +1,41 @@
+<%- include('partials/header.ejs') %>
+
+<div class="row">
+    <div class="col s12">
+        <%- include('./partials/perks_you_own.ejs'); %>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col s12">
+        <h4><%= translate('ACCOUNT_RECENT_DONATIONS_TITLE') %></h4>
+        <div class="card">
+            <div class="card-content">
+                <ul class="collection">
+                    <% orders.forEach(function (o) {%>
+                        <li class="collection-item avatar">
+                            <i class="circle"><%= o.reference.p.name[0] %></i>
+                            <span class="title"><%= o.reference.p.name %></span>
+                            <p>
+                                <%= o.created.toLocaleString() %><br>
+                                <%= o.reference.p.price.currency %> <%= o.reference.p.price.amount %>
+                            </p>
+                            <a href="/donate/<%= o.id %>" class="secondary-content"><i class="material-icons">send</i></a>
+                        </li>
+                    <% }); %>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<h4><%= translate('ACCOUNT_INFO_TITLE') %></h4>
+<div class="row">
+    <div class="col col s10 m4 offset-s1 offset-m2">
+        <%- include('./partials/steam_info.ejs'); %>
+    </div>
+    <div class="col col s10 m4">
+        <%- include('./partials/discord_info.ejs'); %>
+    </div>
+</div>
+<%- include('partials/footer.ejs') %>

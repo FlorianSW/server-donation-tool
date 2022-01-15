@@ -1,12 +1,11 @@
-import {inject, singleton} from 'tsyringe';
+import {singleton} from 'tsyringe';
 import {Request, Response, Router} from 'express';
-import {AppConfig} from '../../domain/app-config';
 
 @singleton()
 export class LoginController {
     public readonly router: Router = Router();
 
-    constructor(@inject('AppConfig') private readonly config: AppConfig) {
+    constructor() {
         this.router.get('/login', this.render.bind(this));
     }
 
@@ -14,7 +13,6 @@ export class LoginController {
         res.render('login', {
             loginRedirect: '/auth/discord/redirect',
             withOpenGraph: true,
-            absoluteLogoUrl: this.config.logoUrl(true),
         });
     }
 }

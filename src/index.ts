@@ -37,6 +37,7 @@ import {paypalClient} from './adapter/paypal/client';
 import {Theming} from './service/theming';
 import {stripeClient} from './adapter/stripe/client';
 import {StripePayment} from './adapter/stripe/stripe-payment';
+import {AccountController} from './adapter/controller/account';
 
 export interface Closeable {
     close(): Promise<void>
@@ -101,6 +102,7 @@ parseConfig(log).then(async (config) => {
     const start = container.resolve(StartController);
     const donations = container.resolve(DonationController);
     const donators = container.resolve(DonatorsController);
+    const account = container.resolve(AccountController);
     const authentication = container.resolve(Authentication);
     const statistics = container.resolve(StatisticsController);
     const login = container.resolve(LoginController);
@@ -153,6 +155,7 @@ parseConfig(log).then(async (config) => {
     app.use('/', start.router);
     app.use('/', donations.router);
     app.use('/', donators.router);
+    app.use('/', account.router);
     app.use('/', authentication.router);
     app.use('/', statistics.router);
     app.use('/', login.router);

@@ -14,7 +14,8 @@
         <% } else { %>
             <meta property="og:title" content="Easily donate to our community and get rewarded">
         <% } %>
-        <meta property="og:description" content="With this server donation tool, donating to this community is easily done in a fraction of your time. We appreciate your support!">
+        <meta property="og:description"
+              content="With this server donation tool, donating to this community is easily done in a fraction of your time. We appreciate your support!">
         <% if (locals.absoluteLogoUrl) { %>
             <meta property="og:image" content="<%= absoluteLogoUrl %>">
         <% } %>
@@ -29,13 +30,18 @@
     <% }); %>
 
     <% if (locals.googleAnalyticsTrackingId) { %>
-        <script async src="https://www.googletagmanager.com/gtag/js?id=<%= locals.googleAnalyticsTrackingId %>"></script>
+        <script async
+                src="https://www.googletagmanager.com/gtag/js?id=<%= locals.googleAnalyticsTrackingId %>"></script>
         <script>
             window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
+
+            function gtag() {
+                dataLayer.push(arguments);
+            }
+
             gtag('js', new Date());
 
-            gtag('config', '<%= locals.googleAnalyticsTrackingId %>', { 'anonymize_ip': true });
+            gtag('config', '<%= locals.googleAnalyticsTrackingId %>', {'anonymize_ip': true});
         </script>
     <% } %>
 </head>
@@ -60,9 +66,14 @@
                         </a>
                     </li>
                 </ul>
-                <ul id="nav-mobile" class="logout hide-on-med-and-down">
-                    <li><a href="/auth/logout">Logout</a></li>
-                </ul>
+                <div class="right">
+                    <ul class="right">
+                        <li><a href="/account"><i class="material-icons">account_circle</i></a></li>
+                    </ul>
+                    <ul id="nav-mobile" class="logout hide-on-med-and-down">
+                        <li><a href="/auth/logout">Logout</a></li>
+                    </ul>
+                </div>
             </div>
         </div>
     </div>

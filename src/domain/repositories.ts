@@ -20,6 +20,7 @@ export interface OrderRepository extends Closeable {
     find(id: string): Promise<Order | undefined>
     findByPaymentOrder(id: string): Promise<Order[]>
     findCreatedAfter(after: Date): Promise<Order[]>
+    findLastFor(user: User, limit: number): Promise<Order[]>
     findUnpaidBefore(after: Date): Promise<Order[]>
     delete(order: Order): Promise<void>
 }

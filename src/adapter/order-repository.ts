@@ -4,6 +4,7 @@ import {Order, OrderPayment, OrderStatus, Reference} from '../domain/payment';
 import {Package} from '../domain/package';
 import {inject, singleton} from 'tsyringe';
 import {PaypalPayment} from './paypal/paypal-payment';
+import {User} from '../domain/user';
 
 const tableName = 'order_repository';
 const columnId = 'id';
@@ -137,6 +138,18 @@ export class SQLiteOrderRepository implements OrderRepository {
             });
     }
 
+    async findLastFor(user: User, limit: number): Promise<Order[]> {
+        await this.initialized;
+        return this.con
+            .table(tableName)
+            .where(columnDiscordId, user.discord.id)
+            .orderBy(columnCreated, 'desc')
+            .limit(limit)
+            .then((result) => {
+                return result.map((o) => this.toOrder(o));
+            });
+    }
+
     async delete(order: Order): Promise<void> {
         await this.initialized;
         await this.con.table(tableName).where(columnId, order.id).delete();
@@ -208,5 +221,12 @@ export class InMemoryOrderRepository implements OrderRepository {
     }
 
     async close(): Promise<void> {
+    }
+
+    async findLastFor(user: User, limit: number): Promise<Order[]> {
+        return Array.from(this.orders.values())
+            .filter((o) => o.reference.discordId === user.discord.id)
+            .sort((o1, o2) => o1.created.getTime() - o2.created.getTime())
+            .slice(0, limit - 1);
     }
 }

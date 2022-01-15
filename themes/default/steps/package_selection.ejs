@@ -11,19 +11,20 @@
 </div>
 <%- include('../partials/donation_target.ejs') %>
 
-<div class="col s12">
-    <h3>
-        <%= translate('PERK_SELECTION_TITLE') %>
-    </h3>
+<div class="row">
+    <div class="col s12">
+        <h3>
+            <%= translate('PERK_SELECTION_TITLE') %>
+        </h3>
 
-    <div class="packages">
-        <% availablePackages.forEach(function (pack) { %>
-            <form action="/selectPackage" method="post">
-                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-                <input type="hidden" name="package" value="<%= pack.id %>">
-                <div class="card package">
-                    <div class="card-content">
-                        <div>
+        <div class="packages">
+            <% availablePackages.forEach(function (pack) { %>
+                <form action="/selectPackage" method="post">
+                    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                    <input type="hidden" name="package" value="<%= pack.id %>">
+                    <div class="card package">
+                        <div class="card-content">
+                            <div>
                     <span class="card-title">
                         <%= pack.name %>
                         <% if (pack.subscription) { %>
@@ -32,62 +33,59 @@
                         <% } %>
                     </span>
 
-                            <% if (pack.description) { %>
-                                <div><%= pack.description %></div>
-                            <% } %>
-                            <div class="package-information">
-                                <% if (pack.price.type === 'VARIABLE') { %>
-                                    <div class="input-field">
-                                        <input id="price" name="price-<%= pack.id %>" type="text"
-                                               pattern="^(([0-9]+)|(([0-9]+)?[.,][0-9]{1,2}))$"
-                                               title="<%= translate('PERK_SELECTION_VARIABLE_TITLE') %>"
-                                               value="<%= pack.price.amount %>">
-                                        <label for="price"
-                                               class="active"><%= translate('PERK_SELECTION_VARIABLE_LABEL', {params: {currency: pack.price.currency}}) %></label>
-                                    </div>
+                                <% if (pack.description) { %>
+                                    <div><%= pack.description %></div>
                                 <% } %>
-                                <% if (pack.perks.length !== 0) { %>
-                                    <%= translate('PERK_INCLUDED') %>
-                                    <% pack.perks.forEach(function (p) { %>
-                                        <span><%= p.asLongString() %></span>
-                                    <% }); %>
-                                <% } %>
+                                <div class="package-information">
+                                    <% if (pack.price.type === 'VARIABLE') { %>
+                                        <div class="input-field">
+                                            <input id="price" name="price-<%= pack.id %>" type="text"
+                                                   pattern="^(([0-9]+)|(([0-9]+)?[.,][0-9]{1,2}))$"
+                                                   title="<%= translate('PERK_SELECTION_VARIABLE_TITLE') %>"
+                                                   value="<%= pack.price.amount %>">
+                                            <label for="price"
+                                                   class="active"><%= translate('PERK_SELECTION_VARIABLE_LABEL', {params: {currency: pack.price.currency}}) %></label>
+                                        </div>
+                                    <% } %>
+                                    <% if (pack.perks.length !== 0) { %>
+                                        <%= translate('PERK_INCLUDED') %>
+                                        <% pack.perks.forEach(function (p) { %>
+                                            <span><%= p.asLongString() %></span>
+                                        <% }); %>
+                                    <% } %>
+                                </div>
                             </div>
+                            <% if (pack.price.type === 'FIXED') { %>
+                                <div class="price">
+                                    <%= pack.price.currency %> <%= pack.price.amount %>
+                                </div>
+                            <% } %>
                         </div>
-                        <% if (pack.price.type === 'FIXED') { %>
-                            <div class="price">
-                                <%= pack.price.currency %> <%= pack.price.amount %>
-                            </div>
-                        <% } %>
-                    </div>
-                    <div class="card-action">
-                        <button class="btn waves-effect waves-light" name="perks-for" value="donate" type="submit">
-                            <%= translate('PERK_SELECTION_DONATE') %>
-                        </button>
-                        <% if (subscribedPackages[pack.id] === undefined) { %>
-                            <% if (pack.subscription) { %>
-                                <button class="btn waves-effect waves-light" name="perks-for" value="subscribe"
-                                        type="submit">
-                                    <%= translate('PERK_SELECTION_SUBSCRIBE') %>
-                                </button>
+                        <div class="card-action">
+                            <button class="btn waves-effect waves-light" name="perks-for" value="donate" type="submit">
+                                <%= translate('PERK_SELECTION_DONATE') %>
+                            </button>
+                            <% if (subscribedPackages[pack.id] === undefined) { %>
+                                <% if (pack.subscription) { %>
+                                    <button class="btn waves-effect waves-light" name="perks-for" value="subscribe"
+                                            type="submit">
+                                        <%= translate('PERK_SELECTION_SUBSCRIBE') %>
+                                    </button>
+                                <% } %>
+                            <% } else { %>
+                                <a class="btn waves-effect waves-light" href="<%= subscribedPackages[pack.id] %>">
+                                    <%= translate('PERK_SELECTION_VIEW_SUBSCRIPTION') %>
+                                </a>
                             <% } %>
-                        <% } else { %>
-                            <a class="btn waves-effect waves-light" href="<%= subscribedPackages[pack.id] %>">
-                                <%= translate('PERK_SELECTION_VIEW_SUBSCRIPTION') %>
-                            </a>
-                        <% } %>
+                        </div>
                     </div>
-                </div>
-            </form>
-        <% }); %>
+                </form>
+            <% }); %>
+        </div>
     </div>
 </div>
 
-<div class="row">
-    <div class="col s12">
-        <%- include('../partials/perks_you_own.ejs'); %>
-    </div>
-</div>
+<h4><%= translate('ACCOUNT_INFO_TITLE') %></h4>
 <div class="row">
     <div class="col col s10 m4 offset-s1 offset-m2">
         <%- include('../partials/steam_info.ejs'); %>
