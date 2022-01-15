@@ -143,4 +143,8 @@ export class InMemoryCFToolsClient implements CFToolsClient {
         });
         return Promise.resolve(undefined);
     }
+
+    resolve(id: GenericId | { playerId: GenericId; }): Promise<CFToolsId> {
+        return Promise.resolve(undefined);
+    }
 }
