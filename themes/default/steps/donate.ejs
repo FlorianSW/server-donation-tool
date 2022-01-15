@@ -5,11 +5,7 @@
     <h5><%= translate('DONATE_SUMMARY_TITLE', {params: {index: index++}}) %></h5>
     <div class="summary">
         <label><%= translate('DONATE_SUMMARY_PERKS_FOR_LABEL') %></label>
-        <% if (selectedPackage.forAccount !== null) { %>
-            <span><%= translate('DONATE_SUMMARY_PERKS_FOR_YOURSELF') %></span>
-        <% } else { %>
-            <span><%= translate('DONATE_SUMMARY_PERKS_FOR_GIFT') %></span>
-        <% } %>
+        <span><%= translate('DONATE_SUMMARY_PERKS_FOR_VALUE') %></span>
         <label><%= translate('DONATE_SUMMARY_USER_LABEL') %></label>
         <span>
             <span><img class="image"

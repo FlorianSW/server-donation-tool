@@ -60,9 +60,7 @@ export class StartController {
 
         let forAccount;
         let type = DonationType.OneTime;
-        if (req.body['perks-for'] === 'me') {
-            forAccount = req.user.steam.id;
-        } else if (req.body['perks-for'] === 'other') {
+        if (req.body['perks-for'] === 'donate') {
             forAccount = null;
         } else if (req.body['perks-for'] === 'subscribe') {
             forAccount = req.user.steam.id;
