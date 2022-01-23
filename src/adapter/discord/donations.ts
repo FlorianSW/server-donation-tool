@@ -17,6 +17,7 @@ import {Package} from '../../domain/package';
 const fileExists = promisify(fs.exists);
 const readFile = promisify(fs.readFile);
 const writeFile = promisify(fs.writeFile);
+const rmFile = promisify(fs.rm);
 const mkdir = promisify(fs.mkdir);
 
 const configPath = './db/config/discord/';
@@ -35,13 +36,17 @@ export class Donations {
         @inject('availablePackages') private readonly packages: Package[],
         @inject('Logger') private readonly logger: Logger,
     ) {
+        const disabled = !!this.config.discord.commands?.donate.disabled;
         fileExists(configPath + configFile).then(async (exists) => {
             try {
                 await mkdir(configPath, {recursive: true});
                 if (exists) {
-                    // TODO: Remove command when not configured anymore.
                     this.appCommandId = (await readFile(configPath + configFile)).toString('utf-8');
-                } else if (!this.config.discord.commands?.donate) {
+                    if (disabled) {
+                        await this.deleteAppCommand(this.appCommandId, this.config.discord.commands.donate.guildId);
+                        await rmFile(configPath + configFile);
+                    }
+                } else if (disabled) {
                     logger.debug('Donate command not configured, ignoring setup.');
                 } else {
                     this.appCommandId = await this.createAppCommand();
@@ -64,6 +69,10 @@ export class Donations {
         }, this.config.discord.commands.donate.guildId);
 
         return cmd.id;
+    }
+
+    private async deleteAppCommand(id: string, guildId: string): Promise<void> {
+        await this.client.application.commands.delete(id, guildId);
     }
 
     private async onInteractionCreate(interaction: Interaction): Promise<void> {

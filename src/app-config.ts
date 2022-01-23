@@ -118,6 +118,7 @@ class YamlAppConfig implements AppConfig {
         notifications?: DiscordNotification[],
         commands?: {
             donate?: {
+                disabled: boolean;
                 guildId: string;
             }
         },
