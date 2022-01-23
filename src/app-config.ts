@@ -115,7 +115,12 @@ class YamlAppConfig implements AppConfig {
             guildId: string,
             expireRolesEvery?: number,
         },
-        notifications?: DiscordNotification[]
+        notifications?: DiscordNotification[],
+        commands?: {
+            donate?: {
+                guildId: string;
+            }
+        },
     };
     steam?: {
         apiKey: string;

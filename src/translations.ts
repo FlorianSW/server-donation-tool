@@ -68,6 +68,16 @@ const messages: { [key: string]: string } = {
     PAYPAL_SUBSCRIPTION: 'Subscription',
     PAYPAL_SUBSCRIBE: 'Subscribe',
 
+    CMD_DONATE_NAME: 'donate',
+    CMD_DONATE_DESCRIPTION: 'Donate to this community. Thanks for your contribution :heart:',
+    CMD_DONATE_PACKAGE_LABEL: 'Package',
+    CMD_DONATE_PACKAGE_DOES_NOT_EXIST_LABEL: 'Your selected package does not exist. Please start over and select another package.',
+    CMD_DONATE_START_OVER: 'Start over',
+    CMD_DONATE_PACKAGE_DETAILS: 'Here are the details for package {{name}}:\n{{perks}}\n\nPrice: {{currency}} {{amount}}',
+    CMD_DONATE_SELECT_ANOTHER: 'Select another package',
+    CMD_DONATE_DONATE: 'Donate',
+    CMD_DONATE_INTRO: 'Hi {{name}} :wave:\n\nThank you that you consider donating to our community. Below are our available donation packages. Please select the one you would like to donate for.',
+
     DONATE_TITLE: 'Donate',
     DONATE_SUMMARY_TITLE: '{{index}}. Summary',
     DONATE_SUMMARY_PERKS_FOR_LABEL: 'Perks for:',

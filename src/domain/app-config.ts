@@ -41,6 +41,11 @@ export interface AppConfig {
             expireRolesEvery?: number,
         },
         notifications?: DiscordNotification[],
+        commands?: {
+            donate?: {
+                guildId: string;
+            }
+        },
     },
     steam?: {
         realm: string,
