@@ -1,6 +1,8 @@
 import {
     CapturePaymentRequest,
     CreatePaymentOrderRequest,
+    DeferredPaymentOrder,
+    DeferredPaymentOrderRequest, OrderStatus,
     Payment,
     PaymentCapture,
     PaymentOrder,
@@ -55,8 +57,22 @@ export class PaypalPayment implements Payment, SubscriptionPaymentProvider {
     ) {
     }
 
-    details(paymentOrderId: string): Promise<PaymentOrder> {
-        throw new Error('Method not implemented.');
+    async details(paymentOrderId: string): Promise<PaymentOrder> {
+        const r = new paypal.orders.OrdersGetRequest(paymentOrderId);
+
+        let order = await this.client.execute<Order>(r);
+        if (order.result.status === 'APPROVED') {
+            await this.capturePayment({
+                orderId: paymentOrderId,
+            });
+            order = await this.client.execute<Order>(r);
+        }
+        return {
+            created: new Date(order.result.create_time),
+            id: order.result.id,
+            transactionId: order.result.purchase_units[0]?.payments?.captures[0]?.id,
+            status: order.result.status === 'COMPLETED' ? OrderStatus.PAID : OrderStatus.CREATED,
+        };
     }
 
     provider(): PaymentProvider {
@@ -83,11 +99,11 @@ export class PaypalPayment implements Payment, SubscriptionPaymentProvider {
         };
     }
 
-    async createPaymentOrder(request: CreatePaymentOrderRequest): Promise<PaymentOrder> {
+    async createPaymentOrder(request: CreatePaymentOrderRequest | CreatePaymentOrderRequest & DeferredPaymentOrderRequest): Promise<PaymentOrder | PaymentOrder & DeferredPaymentOrder> {
         const communityTitle = this.config.app.community?.title || translate('PAYPAL_DEFAULT_COMMUNITY_NAME');
         const r = new paypal.orders.OrdersCreateRequest();
         r.prefer('return=representation');
-        r.requestBody({
+        const body: { [key: string]: any } = {
             intent: 'CAPTURE',
             application_context: {
                 brand_name: communityTitle,
@@ -121,14 +137,27 @@ export class PaypalPayment implements Payment, SubscriptionPaymentProvider {
                     quantity: 1,
                 }],
             }],
-        });
+        };
+        if ('successUrl' in request) {
+            body.application_context.return_url = request.successUrl;
+            body.application_context.cancel_url = request.cancelUrl;
+        }
+        r.requestBody(body);
 
         const order = await this.client.execute<Order>(r);
-        return {
+        const result: PaymentOrder = {
             created: new Date(order.result.create_time),
             id: order.result.id,
             transactionId: order.result.purchase_units[0]?.payments?.captures[0]?.id,
         };
+        if ('successUrl' in request) {
+            return {
+                ...result,
+                paymentUrl: order.result.links.find((l) => l.rel === 'approve').href,
+            }
+        } else {
+            return result;
+        }
     }
 
     async persistSubscription(p: Package, sp?: SubscriptionPlan): Promise<SubscriptionPlan> {

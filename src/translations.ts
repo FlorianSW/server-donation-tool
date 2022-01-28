@@ -73,7 +73,9 @@ const messages: { [key: string]: string } = {
     CMD_DONATE_PACKAGE_LABEL: 'Package',
     CMD_DONATE_PACKAGE_DOES_NOT_EXIST_LABEL: 'Your selected package does not exist. Please start over and select another package.',
     CMD_DONATE_START_OVER: 'Start over',
-    CMD_DONATE_PACKAGE_DETAILS: 'Here are the details for package {{name}}:\n{{perks}}\n\nPrice: {{currency}} {{amount}}',
+    CMD_DONATE_PACKAGE_DETAILS_TITLE: 'Here are the details for package {{name}}',
+    CMD_DONATE_PACKAGE_DETAILS_PERKS: 'Perks',
+    CMD_DONATE_PACKAGE_DETAILS_PRICE: 'Price',
     CMD_DONATE_SELECT_ANOTHER: 'Select another package',
     CMD_DONATE_DONATE: 'Donate',
     CMD_DONATE_INTRO: 'Hi {{name}} :wave:\n\nThank you that you consider donating to our community. Below are our available donation packages. Please select the one you would like to donate for.',
@@ -203,7 +205,7 @@ const messages: { [key: string]: string } = {
     USER_NOTIFICATIONS_SUB_EXECUTED_TEXT: 'Hi :wave:,\n\nThanks again for donating to our community. We received a payment of your recurring subscription :pray:\nAs part of that subscription we automatically extended the included perks for you.\nIf you want to cancel this subscription, please go to your PayPal account -> Settings and cancel the subscription there.\n\nIf you have any questions, feel free to get in touch with us. Thanks again for your donation and have a good day :heart:',
     USER_NOTIFICATIONS_SUB_TRANSACTION_ID: 'This payment will show in your PayPal activity with this Transaction ID',
 
-    PAYMENT_METHOD_PAYPAL: '',
+    PAYMENT_METHOD_PAYPAL: 'PayPal',
     PAYMENT_METHOD_STRIPE: 'Other (Credit Card, Klarna, etc.)',
 
     WAIT_FOR_PAYMENT_TITLE: 'Payment pending',
