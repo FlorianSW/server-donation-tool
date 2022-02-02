@@ -1,4 +1,4 @@
-<h4>Persoanl data</h4>
+<h4>Personal data</h4>
 
 <p>The website operator collects, processes and transfers your personal data only, if it is within the legal regulations and required to provide the functionality of this website.
 
