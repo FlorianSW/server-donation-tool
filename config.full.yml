@@ -200,6 +200,19 @@ serverNames:
 # the donator:
 # * text: The text to show to the donator. There's no strict length limitation, however, for the sake of simplicity and
 #   ease of use, you should try to keep it short (other than this documentation ;)).
+#
+# - LB_AG_PG
+# A perk that aims to provision the donator's steam UID into the configured Advanced Groups prefix group (a DayZ mod from LBmaster)
+# to show an in-game tag (e.g. VIP).
+# This perk only works together with the https://github.com/FlorianSW/lbmaster-advanced-groups-api You need to setup this API
+# first, before you can use this perk.
+# The following configuration is offered by this perk:
+# * apiUrl: the URL which the donation tool uses to reach the API (see the repository above), e.g. http://111.222.111.222:8080
+# * apiKey: the auto-generated API key from the tool (see the config.json of the tool linked above for more info)
+# * serverName: an individual (freetext) name of the server the tag will be added for (e.g. "My fancy server")
+# * prefixGroup: an object of:
+#   * name: the name of the prefix group (also a freetext field); does not need to match the one in your Advanced Groups config
+#   * index: the index of the prefix group (needs to match the group within your Advanced Groups config, starting at 0)
 packages:
   - name: Allpass
     id: 1
@@ -220,6 +233,13 @@ packages:
           - '1111111111111'
       - type: FREETEXT_ONLY
         text: Some text to show to the donator
+      - type: LB_AG_PG
+        apiUrl: http://111.222.111.222:8080
+        apiKey: abc123...
+        serverName: My fancy Server
+        prefixGroup:
+          name: VIP
+          index: 0
   - name: Fastpass
     id: 2
     price:
