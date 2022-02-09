@@ -79,6 +79,7 @@ const messages: { [key: string]: string } = {
     CMD_DONATE_SELECT_ANOTHER: 'Select another package',
     CMD_DONATE_DONATE: 'Donate',
     CMD_DONATE_INTRO: 'Hi {{name}} :wave:\n\nThank you that you consider donating to our community. Below are our available donation packages. Please select the one you would like to donate for.',
+    CMD_DONATE_HIDDEN_PACKAGES: 'Some packages are not available through Discord. If you do not find what you\'re looking for, visit the [full donation page]({{fullSite}}).',
 
     DONATE_TITLE: 'Donate',
     DONATE_SUMMARY_TITLE: '{{index}}. Summary',

@@ -97,7 +97,6 @@ export class Donations {
 
     private async onDonateCommand(interaction: CommandInteraction | ButtonInteraction): Promise<void> {
         const options: MessageSelectOptionData[] = this.packages
-            // TODO: Some perks require more info, this is not supported here right now
             .filter((p) => p.perks.every((p) => p.subjects() === null))
             .map((p) => {
                 return {
@@ -107,9 +106,14 @@ export class Donations {
                 };
             });
 
+        const embeds: MessageEmbed[] = [];
+        if (this.packages.length !== options.length) {
+            embeds.push(new MessageEmbed().setDescription(translate('CMD_DONATE_HIDDEN_PACKAGES', {params: {fullSite: this.config.app.publicUrl.toString()}})))
+        }
+
         const payload = {
             ephemeral: true,
-            embeds: [] as MessageEmbed[],
+            embeds: embeds,
             content: translate('CMD_DONATE_INTRO', {params: {name: interaction.user.username}}),
             components: [{
                 type: 1,
@@ -148,18 +152,6 @@ export class Donations {
             return;
         }
 
-        const packageDetails = new MessageEmbed()
-            .setColor('DARK_BLUE')
-            .setDescription(translate('CMD_DONATE_PACKAGE_DETAILS_TITLE', {params: {name: selectedPackage.name}}))
-            .addFields([{
-                name: translate('CMD_DONATE_PACKAGE_DETAILS_PERKS'),
-                value: selectedPackage.perks.map((p) => '* ' + p.asShortString()).join('\n'),
-            }, {
-                name: translate('CMD_DONATE_PACKAGE_DETAILS_PRICE'),
-                value: `${selectedPackage.price.currency} ${selectedPackage.price.amount}`,
-                inline: true,
-            }]);
-
         const buttons = this.payments.map((p) => ({
             type: 2,
             label: translate('PAYMENT_METHOD_' + p.provider().branding.name.toUpperCase()),
@@ -168,7 +160,8 @@ export class Donations {
         }));
 
         await interaction.update({
-            embeds: [packageDetails],
+            embeds: [this.buildPackageDetails(selectedPackage)],
+            content: null,
             components: [{
                 type: 1,
                 components: [
@@ -182,6 +175,20 @@ export class Donations {
                 ],
             }],
         });
+    }
+
+    private buildPackageDetails(selectedPackage: Package): MessageEmbed {
+        return new MessageEmbed()
+            .setColor('DARK_BLUE')
+            .setDescription(translate('CMD_DONATE_PACKAGE_DETAILS_TITLE', {params: {name: selectedPackage.name}}))
+            .addFields([{
+                name: translate('CMD_DONATE_PACKAGE_DETAILS_PERKS'),
+                value: selectedPackage.perks.map((p) => '* ' + p.asShortString()).join('\n'),
+            }, {
+                name: translate('CMD_DONATE_PACKAGE_DETAILS_PRICE'),
+                value: `${selectedPackage.price.currency} ${selectedPackage.price.amount}`,
+                inline: true,
+            }]);
     }
 
     private async onDonateMoney(interaction: ButtonInteraction): Promise<void> {
@@ -224,15 +231,8 @@ export class Donations {
 
         await this.repo.save(order);
         await interaction.update({
-            embeds: [],
-            content: translate('CMD_DONATE_PACKAGE_DETAILS', {
-                params: {
-                    name: selectedPackage.name,
-                    perks: selectedPackage.perks.map((p) => '* ' + p.asShortString()).join('\n'),
-                    currency: selectedPackage.price.currency,
-                    amount: selectedPackage.price.amount,
-                }
-            }),
+            embeds: [this.buildPackageDetails(selectedPackage)],
+            content: null,
             components: [{
                 type: 1,
                 components: [{
