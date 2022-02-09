@@ -23,6 +23,7 @@ import {WhitelistPerk} from './adapter/perk/whitelist-perk';
 import {fromHttpError, GotHttpClient} from 'cftools-sdk/lib/internal/http';
 import {DiscordUserNotifier} from './adapter/discord/discord-user-notifier';
 import {ReservedSlotPerk} from './adapter/perk/reserved-slot';
+import {LbMasterAdvancedGroupPrefixGroupPerk} from './adapter/perk/lb-ag-pg-perk';
 
 const initSessionStore = require('connect-session-knex');
 const sessionStore = initSessionStore(session);
@@ -359,6 +360,8 @@ export async function parseConfig(logger: Logger): Promise<AppConfig> {
                 p.perks[i] = Object.assign(new WhitelistPerk(container.resolve('CFToolsClient'), intermediate.serverNames, logger), perk);
             } else if (perk.type === 'RESERVED_SLOT') {
                 p.perks[i] = Object.assign(new ReservedSlotPerk(intermediate.serverNames, intermediate), perk);
+            } else if (perk.type === 'LB_AG_PG') {
+                p.perks[i] = Object.assign(new LbMasterAdvancedGroupPrefixGroupPerk(logger), perk);
             } else {
                 throw new Error('No available provider can redeem perk: ' + perk.type);
             }

@@ -102,6 +102,9 @@ const messages: { [key: string]: string } = {
     PRIORITY_QUEUE_REDEEM_COMPLETE: 'Your priority queue slot for {{serverName}} was created successfully. It will expire at: {{until}}',
     PRIORITY_QUEUE_REDEEM_ERROR: 'Could not setup priority queue for {{serverName}}. Error: {{reason}}',
 
+    LB_AG_PG_REDEEM_COMPLETE: 'Your {{pgName}} in game tag for {{serverName}} was created successfully. It will be applied with the next server restart.',
+    LB_AG_PG_REDEEM_ERROR: 'Your {{pgName}} in game tag for {{serverName}} could not be set up. Error: {{reason}}',
+
     RESERVED_SLOT_REDEEM_COMPLETE: 'Your reserved slot for {{serverName}} was created successfully. It will expire at: {{until}}',
     RESERVED_SLOT_REDEEM_ERROR: 'Could not setup reserved slot for {{serverName}}. Error: {{reason}}',
 
@@ -122,6 +125,7 @@ const messages: { [key: string]: string } = {
 
     PERKS_OWNED_TITLE: 'Perks you own',
     PERKS_OWNED_DISCORD_ROLE: '{{role}} role in Discord',
+    PERKS_OWNED_LB_AG_PREFIX_GROUP_MEMBER: '{{pgName}} in-game tag on {{serverName}}',
     PERKS_OWNED_PRIORITY_QUEUE_UNTIL: 'until: ',
     PERKS_OWNED_WHITELIST_UNTIL: 'until: ',
     PERKS_OWNED_FAILED_TO_LOAD: 'We\'re having troubles getting this perk\'s information. But no worries, it is still being applied if you own it.',
@@ -170,6 +174,8 @@ const messages: { [key: string]: string } = {
     PERK_WHITELIST_PERMANENT_DESCRIPTION: 'Permanently whitelisted on {{serverName}}',
     PERK_RESERVED_SLOT_DESCRIPTION: 'Reserved slot on {{serverName}} for {{amountInDays}} days',
     PERK_RESERVED_SLOT_PERMANENT_DESCRIPTION: 'Permanent reserved slot on {{serverName}}',
+    PERK_LB_AG_PG_DESCRIPTION: 'Permanent {{pgName}} in game tag in chat on {{serverName}}',
+    PERK_LB_AG_PG_SHORT: '{{pgName}} in game tag in chat on {{serverName}}',
 
     NOTIFICATIONS_REDEEM_SUCCESSFUL_TITLE: 'Donation redeemed',
     NOTIFICATIONS_REDEEM_SUCCESSFUL_DESCRIPTION: 'A donator redeemed perks of the package they donated for.',

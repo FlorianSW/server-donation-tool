@@ -66,6 +66,25 @@ export class DiscordRole implements OwnedPerk {
     }
 }
 
+export class PrefixGroupMember implements OwnedPerk {
+    type = 'LB_AG_PREFIX_GROUP_MEMBER';
+
+    constructor(private readonly pgName: string, private readonly serverName: string) {
+    }
+
+    asString(): string {
+        return translate('PERKS_OWNED_LB_AG_PREFIX_GROUP_MEMBER', {params: {pgName: this.pgName, serverName: this.serverName}});
+    }
+
+    equals(other: OwnedPerk): boolean {
+        if (other.type !== this.type) {
+            return false;
+        }
+        const o = other as PrefixGroupMember;
+        return this.pgName === o.pgName && this.serverName === o.serverName;
+    }
+}
+
 export interface OwnedPerk {
     type: string;
 

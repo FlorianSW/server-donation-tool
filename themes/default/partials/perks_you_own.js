@@ -13,6 +13,8 @@
             image.src = imagePath + '/rocket-svgrepo-com.svg';
         } else if (p.type === 'WHITELIST') {
             image.src = imagePath + '/guest-svgrepo-com.svg';
+        } else if (p.type === 'LB_AG_PREFIX_GROUP_MEMBER') {
+            image.src = imagePath + '/tag-svgrepo-com.svg';
         }
         imgContainer.append(image);
 
