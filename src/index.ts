@@ -38,6 +38,7 @@ import {Theming} from './service/theming';
 import {stripeClient} from './adapter/stripe/client';
 import {StripePayment} from './adapter/stripe/stripe-payment';
 import {AccountController} from './adapter/controller/account';
+import {Donations} from './adapter/discord/donations';
 
 export interface Closeable {
     close(): Promise<void>
@@ -108,6 +109,7 @@ parseConfig(log).then(async (config) => {
     const login = container.resolve(LoginController);
     const privacyPolicy = container.resolve(PrivacyPolicyController);
     const theming = container.resolve(Theming);
+    container.resolve(Donations);
 
     theming.setup(app);
     app.set('trust proxy', 'loopback');

@@ -1,0 +1,1 @@
+- OAuth2 permissions: scope `applications.commands`
