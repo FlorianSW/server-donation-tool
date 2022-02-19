@@ -175,7 +175,7 @@ const messages: { [key: string]: string } = {
     PERK_RESERVED_SLOT_DESCRIPTION: 'Reserved slot on {{serverName}} for {{amountInDays}} days',
     PERK_RESERVED_SLOT_PERMANENT_DESCRIPTION: 'Permanent reserved slot on {{serverName}}',
     PERK_LB_AG_PG_DESCRIPTION: 'Permanent {{pgName}} in game tag in chat on {{serverName}}',
-    PERK_LB_AG_PG_SHORT: '{{pgName}} in game tag in chat on {{serverName}}',
+    PERK_LB_AG_PG_DESCRIPTION_MULTI: 'Permanent {{pgName}} in game tag in chat on one of these servers: {{serverNames}}',
 
     NOTIFICATIONS_REDEEM_SUCCESSFUL_TITLE: 'Donation redeemed',
     NOTIFICATIONS_REDEEM_SUCCESSFUL_DESCRIPTION: 'A donator redeemed perks of the package they donated for.',

@@ -1,6 +1,6 @@
 import {Authorization, AuthorizationProvider, CFToolsClientBuilder, TokenExpired} from 'cftools-sdk';
 import {Client} from 'discord.js';
-import {AppConfig, ServerNames} from './domain/app-config';
+import {AppConfig, LbAgPgServer, ServerNames} from './domain/app-config';
 import {Package, PriceType} from './domain/package';
 import {DiscordRolePerk} from './adapter/perk/discord-role-perk';
 import {PriorityQueuePerk} from './adapter/perk/priority-queue-perk';
@@ -107,6 +107,7 @@ class YamlAppConfig implements AppConfig {
         };
     };
     cftools: { applicationId: string; secret: string };
+    lb_ag_pg: {[serverId: string]: LbAgPgServer};
     discord: {
         clientId: string;
         clientSecret: string;
@@ -361,7 +362,7 @@ export async function parseConfig(logger: Logger): Promise<AppConfig> {
             } else if (perk.type === 'RESERVED_SLOT') {
                 p.perks[i] = Object.assign(new ReservedSlotPerk(intermediate.serverNames, intermediate), perk);
             } else if (perk.type === 'LB_AG_PG') {
-                p.perks[i] = Object.assign(new LbMasterAdvancedGroupPrefixGroupPerk(logger), perk);
+                p.perks[i] = Object.assign(new LbMasterAdvancedGroupPrefixGroupPerk(logger, intermediate), perk);
             } else {
                 throw new Error('No available provider can redeem perk: ' + perk.type);
             }

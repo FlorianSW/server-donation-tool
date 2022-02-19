@@ -5,6 +5,12 @@ export type ServerNames = {
     [serverApiId: string]: string
 };
 
+export type LbAgPgServer = {
+    apiUrl: string;
+    apiKey: string;
+    serverName: string;
+}
+
 export interface AppConfig {
     app: {
         port: number,
@@ -69,6 +75,7 @@ export interface AppConfig {
         applicationId: string,
         secret: string,
     },
+    lb_ag_pg: {[serverId: string]: LbAgPgServer}
     serverNames: ServerNames,
 
     logoUrl(absolute?: boolean): string;

@@ -134,6 +134,20 @@ cftools:
   # order to allow the website to manage the priority queue entries.
   applicationId:
   secret:
+# Configuration for servers that support the lb_ag_pg perk. This is an object where the key is a server ID (which can be used
+# in the lb_ag_pg perk) and information about that server. That configuration is:
+# * apiUrl: the URL which the donation tool uses to reach the API (see the repository above), e.g. http://111.222.111.222:8080
+# * apiKey: the auto-generated API key from the tool (see the config.json of the tool linked above for more info)
+# * serverName: an individual (freetext) name of the server the tag will be added for (e.g. "My fancy server")
+lb_ag_pg:
+  serverOne:
+    apiUrl: http://111.222.111.222:8080
+    apiKey: abc123...
+    serverName: My fancy Server
+  serverTwo:
+    apiUrl: http://111.222.111.222:8081
+    apiKey: abc123...
+    serverName: My other Server
 # A mapping between serverApiId and a human readable server name. This information is used on the overview page where
 # a potential donator sees the servers they have priority queue already. I suggest to use a name your donators will
 # easily recognize.
@@ -207,12 +221,11 @@ serverNames:
 # This perk only works together with the https://github.com/FlorianSW/lbmaster-advanced-groups-api You need to setup this API
 # first, before you can use this perk.
 # The following configuration is offered by this perk:
-# * apiUrl: the URL which the donation tool uses to reach the API (see the repository above), e.g. http://111.222.111.222:8080
-# * apiKey: the auto-generated API key from the tool (see the config.json of the tool linked above for more info)
-# * serverName: an individual (freetext) name of the server the tag will be added for (e.g. "My fancy server")
 # * prefixGroup: an object of:
 #   * name: the name of the prefix group (also a freetext field); does not need to match the one in your Advanced Groups config
 #   * index: the index of the prefix group (needs to match the group within your Advanced Groups config, starting at 0)
+# * servers: an array of server IDs. Each ID listed in this list needs to be configured in the lb_ag_pg config. The ID is the key of
+#   object in this configuration.
 packages:
   - name: Allpass
     id: 1
@@ -234,12 +247,12 @@ packages:
       - type: FREETEXT_ONLY
         text: Some text to show to the donator
       - type: LB_AG_PG
-        apiUrl: http://111.222.111.222:8080
-        apiKey: abc123...
-        serverName: My fancy Server
         prefixGroup:
           name: VIP
           index: 0
+        servers:
+          - serverOne
+          - serverTwo
   - name: Fastpass
     id: 2
     price:
