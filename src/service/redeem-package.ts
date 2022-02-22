@@ -45,7 +45,7 @@ export class RedeemPackage {
             }
         }
         if (success.length !== 0) {
-            this.events.emit('successfulRedeem', target, order);
+            this.events.emit('successfulRedeem', target, order, perks);
         }
 
         return {

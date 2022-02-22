@@ -1,7 +1,7 @@
 import {Order, Subscription, SubscriptionPlan} from '../../domain/payment';
 import {EmbedFieldData, MessageEmbed, WebhookClient} from 'discord.js';
 import {translate} from '../../translations';
-import {RedeemError, RedeemTarget} from '../../domain/package';
+import {Perk, RedeemError, RedeemTarget} from '../../domain/package';
 import {DonationEvents} from '../../domain/events';
 import {inject, singleton} from 'tsyringe';
 import {AppConfig} from '../../domain/app-config';
@@ -140,7 +140,7 @@ export class DiscordNotifier {
             });
     }
 
-    async onSuccessfulRedeem(target: RedeemTarget, order: Order): Promise<void> {
+    async onSuccessfulRedeem(target: RedeemTarget, order: Order, perks: Perk[]): Promise<void> {
         this.notifications
             .filter((n) => n.types.includes(Type.SUCCESSFUL_REDEEM))
             .forEach((d) => {
@@ -152,7 +152,7 @@ export class DiscordNotifier {
                             .setTitle(translate('NOTIFICATIONS_REDEEM_SUCCESSFUL_TITLE'))
                             .setDescription(translate('NOTIFICATIONS_REDEEM_SUCCESSFUL_DESCRIPTION'))
                             .addFields(this.donatorMetaFields(target))
-                            .addFields(this.orderMetaFields(order))
+                            .addFields(this.orderMetaFields(order, perks))
                     ],
                 });
             });
@@ -189,7 +189,11 @@ export class DiscordNotifier {
         ];
     }
 
-    private orderMetaFields(order: Order): EmbedFieldData[] {
+    private orderMetaFields(order: Order, perks: Perk[] = []): EmbedFieldData[] {
+        let redeemedPerks = '';
+        if (perks.length !== 0) {
+            redeemedPerks = `Redeemed perks: ${perks.map((p) => p.asShortString(order))}`;
+        }
         return [
             {name: translate('NOTIFICATIONS_REDEEM_SUCCESSFUL_PACKAGE'), value: order.reference.p.name, inline: true},
             {
@@ -197,7 +201,8 @@ export class DiscordNotifier {
 PayPal Order ID: ${order.payment.id}
 Transaction ID: ${order.payment.transactionId}
 Order created at: ${order.created}
-Perks: ${order.reference.p.perks.map((p) => p.asShortString(order)).join(', ')}`
+Perks: ${order.reference.p.perks.map((p) => p.asShortString(order)).join(', ')}
+${redeemedPerks}`
             }
         ]
     }

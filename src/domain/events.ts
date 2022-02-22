@@ -1,5 +1,5 @@
 import {Order, Subscription, SubscriptionPlan} from './payment';
-import {RedeemError, RedeemTarget} from './package';
+import {Perk, RedeemError, RedeemTarget} from './package';
 
 export interface DonationEvents {
     on(event: 'successfulPayment', listener: (user: RedeemTarget, order: Order) => void): this;
@@ -19,7 +19,7 @@ export interface DonationEvents {
 
 export interface EventSource {
     emit(event: 'successfulPayment', user: RedeemTarget, order: Order): void;
-    emit(event: 'successfulRedeem', user: RedeemTarget, order: Order): void;
+    emit(event: 'successfulRedeem', user: RedeemTarget, order: Order, perks: Perk[]): void;
     emit(event: 'subscriptionExecuted', user: RedeemTarget, plan: SubscriptionPlan, sub: Subscription, order: Order): void;
     emit(event: 'subscriptionCreated', user: RedeemTarget, plan: SubscriptionPlan, sub: Subscription): void;
     emit(event: 'subscriptionCancelled', user: RedeemTarget, plan: SubscriptionPlan, sub: Subscription): void;
