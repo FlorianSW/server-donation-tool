@@ -39,6 +39,7 @@ import {stripeClient} from './adapter/stripe/client';
 import {StripePayment} from './adapter/stripe/stripe-payment';
 import {AccountController} from './adapter/controller/account';
 import {Donations} from './adapter/discord/donations';
+import {HttpSteamClient} from './adapter/steam-client';
 
 export interface Closeable {
     close(): Promise<void>
@@ -63,6 +64,7 @@ container.registerSingleton('SubscriptionPlanRepository', SQLiteSubscriptionPlan
 container.registerSingleton('Closeable', 'SubscriptionPlanRepository');
 container.registerSingleton('SubscriptionsRepository', SQLiteSubscriptionsRepository);
 container.registerSingleton('Closeable', 'SubscriptionsRepository');
+container.registerSingleton('SteamClient', HttpSteamClient);
 
 container.registerType('RedeemPackage', RedeemPackage);
 container.registerType('Closeable', DiscordRoleRecorder);

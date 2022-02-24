@@ -5,6 +5,9 @@
     <div class="card-content">
         <span class="card-title"><%= translate('DISCORD_ACCOUNT_TITLE') %></span>
         <div class="status">
+            <% if (user.discord.avatarUrl) { %>
+                <img class="avatar" src="<%= user.discord.avatarUrl %>">
+            <% } %>
             <%= user.username %>
         </div>
         <br>

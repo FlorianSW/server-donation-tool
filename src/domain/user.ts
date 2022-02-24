@@ -103,9 +103,11 @@ export interface User {
 export interface SteamConnection {
     id: string;
     name: string;
+    avatarUrl?: string;
     source: 'DISCORD' | 'STEAM';
 }
 
 export interface DiscordConnection {
     id: string;
+    avatarUrl?: string;
 }
