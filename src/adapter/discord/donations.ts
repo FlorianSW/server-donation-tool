@@ -42,7 +42,7 @@ export class Donations {
         @injectAll('Payment') private readonly payments: Payment[],
         @inject('Logger') private readonly logger: Logger,
     ) {
-        const disabled = !!this.config.discord.commands?.donate.disabled;
+        const disabled = !!this.config.discord.commands?.donate.disabled || true;
         fileExists(configPath + configFile).then(async (exists) => {
             try {
                 await mkdir(configPath, {recursive: true});
