@@ -2,7 +2,6 @@ import {inject, singleton} from 'tsyringe';
 import {Request, Response, Router} from 'express';
 import {AppConfig} from '../../domain/app-config';
 import {OrderRepository} from '../../domain/repositories';
-import {Subscriptions} from '../../service/subscriptions';
 import {requireAuthentication} from '../../auth';
 
 @singleton()
