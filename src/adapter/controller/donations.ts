@@ -12,6 +12,7 @@ import {inject, injectAll, singleton} from 'tsyringe';
 import {OrderRepository} from '../../domain/repositories';
 import {Subscriptions} from '../../service/subscriptions';
 import {RedeemPackage} from '../../service/redeem-package';
+import {User} from '../../domain/user';
 
 @singleton()
 export class DonationController {
@@ -59,8 +60,7 @@ export class DonationController {
             }
             const info = await provider.details(order.payment.id);
             if (info.status === OrderStatus.PAID) {
-                order.pay(info.transactionId);
-                await this.repo.save(order);
+                await this.markOrderPaid(req.user, order, info.transactionId);
             }
         }
 
@@ -77,6 +77,15 @@ export class DonationController {
         } else {
             return order;
         }
+    }
+
+    private async markOrderPaid(user: User, order: Order, transactionId: string): Promise<Order> {
+        order.pay(transactionId);
+        await this.repo.save(order);
+        setTimeout(async () => {
+            this.events.emit('successfulPayment', RedeemTarget.fromUser(user), order);
+        });
+        return order;
     }
 
     private async donate(req: Request, res: Response) {
@@ -348,7 +357,7 @@ export class DonationController {
     }
 
     private async captureOrder(req: Request, res: Response) {
-        const order = (await this.repo.findByPaymentOrder(req.params.orderId))[0];
+        let order = (await this.repo.findByPaymentOrder(req.params.orderId))[0];
         const payment = this.payments.find((provider) => provider.provider().branding.name === req.body.provider);
         if (!payment) {
             res.status(400).send();
@@ -362,15 +371,10 @@ export class DonationController {
             transactionId: capture.transactionId,
         };
 
-        order.pay(capture.transactionId);
-        await this.repo.save(order);
+        order = await this.markOrderPaid(req.user, order, capture.transactionId);
 
         res.status(200).json({
             orderId: order.id,
-        });
-
-        setTimeout(async () => {
-            this.events.emit('successfulPayment', RedeemTarget.fromUser(req.user), order);
         });
     }
 
