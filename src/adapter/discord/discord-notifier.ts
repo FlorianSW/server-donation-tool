@@ -198,7 +198,7 @@ export class DiscordNotifier {
             {name: translate('NOTIFICATIONS_REDEEM_SUCCESSFUL_PACKAGE'), value: order.reference.p.name, inline: true},
             {
                 name: translate('NOTIFICATIONS_REDEEM_SUCCESSFUL_TRANSACTION'), value: `Order ID: ${order.id}
-PayPal Order ID: ${order.payment.id}
+Payment Order ID: ${order.payment.id}
 Transaction ID: ${order.payment.transactionId}
 Order created at: ${order.created}
 Perks: ${order.reference.p.perks.map((p) => p.asShortString(order)).join(', ')}
@@ -213,9 +213,9 @@ ${redeemedPerks}`
             {
                 name: translate('NOTIFICATIONS_SUBSCRIPTION_DETAILS'), value: `Subscription ID: ${sub.id}
 Plan ID: ${sub.planId}
-PayPal Subscription ID: ${sub.payment.id}
-PayPal Product ID: ${plan.payment.productId}
-PayPal Plan ID: ${plan.payment.planId}
+Provider Subscription ID: ${sub.payment.id}
+Provider Product ID: ${plan.payment.productId}
+Provider Plan ID: ${plan.payment.planId}
 Price per cycle: ${plan.basePackage.price.currency} ${plan.basePackage.price.amount}
 Billing cycle: ${plan.basePackage.subscription}
 `
