@@ -1,6 +1,4 @@
 import {inject, injectAll, singleton} from 'tsyringe';
-import {promisify} from 'util';
-import fs from 'fs';
 import {Logger} from 'winston';
 import {
     ButtonInteraction,
@@ -16,15 +14,6 @@ import {translate} from '../../translations';
 import {Package} from '../../domain/package';
 import {DeferredPaymentOrder, Order, Payment, PaymentOrder, Reference} from '../../domain/payment';
 import {OrderRepository} from '../../domain/repositories';
-
-const fileExists = promisify(fs.exists);
-const readFile = promisify(fs.readFile);
-const writeFile = promisify(fs.writeFile);
-const rmFile = promisify(fs.rm);
-const mkdir = promisify(fs.mkdir);
-
-const configPath = './db/config/discord/';
-const configFile = 'donation_command';
 
 const PACKAGE_SELECTION = 'packageSelection';
 const SELECT_PACKAGE = 'selectPackage';
@@ -42,29 +31,34 @@ export class Donations {
         @injectAll('Payment') private readonly payments: Payment[],
         @inject('Logger') private readonly logger: Logger,
     ) {
-        const disabled = this.config.discord.commands?.donate?.disabled ?? false;
-        fileExists(configPath + configFile).then(async (exists) => {
-            try {
-                await mkdir(configPath, {recursive: true});
-                if (exists) {
-                    this.appCommandId = (await readFile(configPath + configFile)).toString('utf-8');
-                    if (disabled) {
-                        await this.deleteAppCommand(this.appCommandId, this.config.discord.commands.donate.guildId);
-                        await rmFile(configPath + configFile);
-                    }
-                } else if (disabled) {
-                    logger.debug('Donate command not configured, ignoring setup.');
-                } else {
-                    this.appCommandId = await this.createAppCommand();
-                    await writeFile(configPath + configFile, this.appCommandId);
-                }
-            } catch (e) {
-                logger.error('Unknown error while managing Discord app command.', e);
-                process.exit(1);
-            }
+        this.manageAppCommand().then(() => {
+            this.client.on('interactionCreate', this.onInteractionCreate.bind(this));
         });
+    }
 
-        this.client.on('interactionCreate', this.onInteractionCreate.bind(this));
+    private async manageAppCommand() {
+        const guildId = this.config.discord.commands.donate.guildId;
+        const disabled = this.config.discord.commands?.donate?.disabled ?? false;
+        const commands = await this.client.application.commands.fetch({
+            guildId: guildId,
+        });
+        const command = commands.find((c) => c.name === translate('CMD_DONATE_NAME'));
+
+        try {
+            if (command) {
+                this.appCommandId = command.id;
+                if (disabled) {
+                    await this.deleteAppCommand(this.appCommandId, this.config.discord.commands.donate.guildId);
+                }
+            } else if (disabled) {
+                this.logger.debug('Donate command not configured, ignoring setup.');
+            } else {
+                this.appCommandId = await this.createAppCommand();
+            }
+        } catch (e) {
+            this.logger.error('Unknown error while managing Discord app command.', e);
+            process.exit(1);
+        }
     }
 
     private async createAppCommand(): Promise<string> {
