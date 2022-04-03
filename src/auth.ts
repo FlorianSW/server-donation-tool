@@ -14,6 +14,8 @@ export function discordUserCallback(steamClient: SteamClient, accessToken: strin
         username: profile.username,
         discord: {
             id: profile.id,
+            username: profile.username,
+            discriminator: profile.discriminator,
         },
         subscribedPackages: {},
     };

@@ -1,7 +1,7 @@
 import {requireAuthentication} from '../../auth';
 import {Request, Response, Router} from 'express';
 import {translate} from '../../translations';
-import {DonationType, Package, RedeemTarget} from '../../domain/package';
+import {DonationType, Hints, Package, RedeemTarget} from '../../domain/package';
 import {AppConfig} from '../../domain/app-config';
 import {Order, OrderNotFound, OrderStatus, Payment, Reference, SteamIdMismatch} from '../../domain/payment';
 import {Logger} from 'winston';
@@ -173,6 +173,11 @@ export class DonationController {
             template = 'steps/subscribe';
         }
 
+        const hints: (readonly [string, Hints])[] = await Promise.all(selectedPackage.perks.map(async (p) => {
+            const hints = await p.interfaceHints(req.user);
+            return [p.id(), hints];
+        }));
+        const perkHints = new Map(hints);
         res.render(template, {
             csrfToken: req.csrfToken(),
             user: req.user,
@@ -186,6 +191,7 @@ export class DonationController {
                 type: req.session.selectedPackage.type,
             },
             needsFurtherSelection: selectedPackage.perks.some((p) => p.subjects() !== null),
+            interfaceHints: perkHints,
             paymentMethods: this.payments.map((p) => p.provider().branding),
         });
     }

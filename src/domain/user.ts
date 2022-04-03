@@ -109,5 +109,7 @@ export interface SteamConnection {
 
 export interface DiscordConnection {
     id: string;
+    username: string;
+    discriminator: string;
     avatarUrl?: string;
 }

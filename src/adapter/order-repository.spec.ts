@@ -89,7 +89,7 @@ describe('OrderRepository', () => {
         await repository.save(secondOrder);
         await repository.save(thirdOrder);
 
-        const result = await repository.findLastFor({discord: {id: anOrder.reference.discordId}, username: 'A_NAME', subscribedPackages: {}}, 1);
+        const result = await repository.findLastFor({discord: {id: anOrder.reference.discordId, username: 'A_USERNAME', discriminator: '0001'}, username: 'A_NAME', subscribedPackages: {}}, 1);
         expect(result).toHaveLength(1);
         expect(result[0].id).toEqual(secondOrder.id);
     });

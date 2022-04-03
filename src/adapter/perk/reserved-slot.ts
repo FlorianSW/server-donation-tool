@@ -1,9 +1,9 @@
 import {translate, TranslateParams} from '../../translations';
-import {Package, Perk, RedeemError, RedeemTarget} from '../../domain/package';
+import {Hints, Package, Perk, RedeemError, RedeemTarget} from '../../domain/package';
 import {AppConfig, ServerNames} from '../../domain/app-config';
 import {Order} from '../../domain/payment';
 import * as https from 'https';
-import {OwnedPerk} from '../../domain/user';
+import {OwnedPerk, User} from '../../domain/user';
 import {createHash} from 'crypto';
 
 interface CreateReservedSlotRequest {
@@ -96,6 +96,10 @@ export class ReservedSlotPerk implements Perk {
 
     subjects(): Map<string, string> | null {
         return null;
+    }
+
+    async interfaceHints(forUser: User): Promise<Hints> {
+        return {};
     }
 
     id(): string {

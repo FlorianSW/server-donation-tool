@@ -1,7 +1,7 @@
 import {translate, TranslateParams} from '../../translations';
-import {Client, Guild} from 'discord.js';
-import {Package, Perk, RedeemError, RedeemTarget} from '../../domain/package';
-import {DiscordRole, OwnedPerk} from '../../domain/user';
+import {Client, Constants, DiscordAPIError, Guild} from 'discord.js';
+import {Hints, Package, Perk, RedeemError, RedeemTarget} from '../../domain/package';
+import {DiscordRole, OwnedPerk, User} from '../../domain/user';
 import {Order} from '../../domain/payment';
 import {Logger} from 'winston';
 import {createHash} from 'crypto';
@@ -31,8 +31,31 @@ export class DiscordRolePerk implements Perk {
         }
     }
 
-    subjects(): Map<string, string> {
+    subjects(): Map<string, string> | null {
         return null;
+    }
+
+    async interfaceHints(forUser: User): Promise<Hints> {
+        const unknownMember = translate('DISCORD_ROLE_UNKNOWN_MEMBER', {
+            params: {
+                username: forUser.discord.username,
+                discriminator: forUser.discord.discriminator
+            }
+        });
+        const notices: string[] = [unknownMember];
+        const guild = await this.client.guilds.fetch(this.guildId);
+        try {
+            await guild.members.fetch(forUser.discord.id);
+        } catch (e) {
+            if (e instanceof DiscordAPIError && e.code === Constants.APIErrors.UNKNOWN_MEMBER) {
+                notices.push(unknownMember);
+            } else {
+                throw e;
+            }
+        }
+        return {
+            notices: notices,
+        };
     }
 
     async redeem(target: RedeemTarget, order: Order): Promise<TranslateParams> {

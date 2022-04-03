@@ -14,6 +14,8 @@ export const aUser: User = {
     },
     discord: {
         id: 'A_DISCORD_ID',
+        username: 'A_USERNAME',
+        discriminator: '0001',
     },
     username: 'A_USERNAME',
     subscribedPackages: {},
@@ -26,6 +28,8 @@ export const anotherUser: User = {
     },
     discord: {
         id: 'ANOTHER_DISCORD_ID',
+        username: 'A_USERNAME',
+        discriminator: '0001',
     },
     username: 'ANOTHER_USERNAME',
     subscribedPackages: {},

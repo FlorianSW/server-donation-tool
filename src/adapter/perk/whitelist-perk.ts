@@ -1,8 +1,8 @@
 import {CFToolsClient, DuplicateResourceCreation, PriorityQueueItem, ServerApiId, SteamId64} from 'cftools-sdk';
 import {translate, TranslateParams} from '../../translations';
-import {Package, Perk, RedeemError, RedeemTarget} from '../../domain/package';
+import {Hints, Package, Perk, RedeemError, RedeemTarget} from '../../domain/package';
 import {ServerNames} from '../../domain/app-config';
-import {FailedToLoad, OwnedPerk, Whitelist} from '../../domain/user';
+import {FailedToLoad, OwnedPerk, User, Whitelist} from '../../domain/user';
 import {Order} from '../../domain/payment';
 import {Logger} from 'winston';
 import {createHash} from 'crypto';
@@ -82,6 +82,10 @@ export class WhitelistPerk implements Perk {
 
     subjects(): Map<string, string> | null {
         return null;
+    }
+
+    async interfaceHints(forUser: User): Promise<Hints> {
+        return {};
     }
 
     id(): string {

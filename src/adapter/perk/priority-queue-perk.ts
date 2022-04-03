@@ -7,9 +7,9 @@ import {
     TokenExpired
 } from 'cftools-sdk';
 import {translate, TranslateParams} from '../../translations';
-import {Package, Perk, RedeemError, RedeemTarget} from '../../domain/package';
+import {Hints, Package, Perk, RedeemError, RedeemTarget} from '../../domain/package';
 import {ServerNames} from '../../domain/app-config';
-import {FailedToLoad, OwnedPerk, PriorityQueue} from '../../domain/user';
+import {FailedToLoad, OwnedPerk, PriorityQueue, User} from '../../domain/user';
 import {Order} from '../../domain/payment';
 import {Logger} from 'winston';
 import {createHash} from 'crypto';
@@ -163,6 +163,10 @@ export class PriorityQueuePerk implements Perk {
             result.set(serverId, this.serverNames[serverId]);
         }
         return result;
+    }
+
+    async interfaceHints(forUser: User): Promise<Hints> {
+        return {};
     }
 
     private async fetchPriorityQueue(steamId: SteamId64, server: ServerApiId): Promise<PriorityQueue> {

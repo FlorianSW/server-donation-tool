@@ -1,6 +1,6 @@
 import {translate, TranslateParams} from '../../translations';
-import {Package, Perk, RedeemError, RedeemTarget} from '../../domain/package';
-import {FailedToLoad, OwnedPerk, PrefixGroupMember} from '../../domain/user';
+import {Hints, Package, Perk, RedeemError, RedeemTarget} from '../../domain/package';
+import {FailedToLoad, OwnedPerk, PrefixGroupMember, User} from '../../domain/user';
 import {Order} from '../../domain/payment';
 import {Logger} from 'winston';
 import {createHash} from 'crypto';
@@ -34,6 +34,10 @@ export class LbMasterAdvancedGroupPrefixGroupPerk implements Perk {
             result.set(serverId, server.serverName);
         }
         return result;
+    }
+
+    async interfaceHints(forUser: User): Promise<Hints> {
+        return {};
     }
 
     async redeem(target: RedeemTarget, order: Order): Promise<TranslateParams> {

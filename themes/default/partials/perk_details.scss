@@ -1,0 +1,18 @@
+.perk-notice {
+  border: 1.5px solid white;
+  color: white;
+  border-radius: 2px;
+  display: flex;
+  gap: 26px;
+  align-items: center;
+  background-color: #616161;
+  padding: 18px 48px 18px 18px;
+
+  img {
+    width: 24px;
+  }
+}
+
+h6 {
+  margin-top: 2rem;
+}

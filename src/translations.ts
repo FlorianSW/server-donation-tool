@@ -93,8 +93,8 @@ const messages: { [key: string]: string } = {
     DONATE_SELECTED_PACKAGE: 'Selected Package',
     DONATE_SELECTED_PACKAGE_EDIT: 'Change',
     DONATE_PERK_INCLUDED: 'Incl.',
-    DONATE_PERKS_SUBJECT_SELECTION_TITLE: '{{index}}. Select perk details',
-    DONATE_PERKS_SUBJECT_SELECTION_DESCRIPTION: 'Some perks require you to select for what you want to redeem the perk. Please select them here.',
+    DONATE_PERKS_SUBJECT_SELECTION_TITLE: '{{index}}. Perk details',
+    DONATE_PERKS_SUBJECT_SELECTION_DESCRIPTION: 'Some perks require you to select for what you want to redeem them or have additional information. Please review that and make changes if necessary.',
 
     SUBSCRIBE_CYCLE_LABEL: 'Subscription cycle',
     SUBSCRIBE_CYCLE_MONTHLY: 'monthly',
@@ -113,6 +113,7 @@ const messages: { [key: string]: string } = {
 
     DISCORD_ROLE_REDEEM_COMPLETE: 'You got assigned the following discord roles: {{roles}}',
     DISCORD_ROLE_REDEEM_ERROR: 'Could not assign discord roles. Error: {{reason}}',
+    DISCORD_ROLE_UNKNOWN_MEMBER: 'The Discord User you logged in with ({{username}}#{{discriminator}}) is not a member of this communities discord. This discord role will not be assigned to your user.',
     ASSIGNED_DISCORD_ROLE: 'Discord roles you have already',
 
     DONATION_TARGET_CLAIM: 'We need your help to cover our monthly costs of {{target}}{{currency}}. Thanks to all community members who already donated a total amount of {{totalAmount}}{{currency}}.',

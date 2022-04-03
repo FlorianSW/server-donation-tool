@@ -8,6 +8,8 @@ export interface Perk {
 
     redeem(forUser: RedeemTarget, order: Order): Promise<TranslateParams>;
 
+    interfaceHints(forUser: User): Promise<Hints>;
+
     subjects(): Map<string, string> | null;
 
     ownedBy(target: RedeemTarget): Promise<OwnedPerk[] | null>;
@@ -17,6 +19,10 @@ export interface Perk {
     asShortString(context?: Order | undefined): string;
 
     id(): string;
+}
+
+export interface Hints {
+    notices?: string[];
 }
 
 export type PerkDetails = { [key: string]: string };

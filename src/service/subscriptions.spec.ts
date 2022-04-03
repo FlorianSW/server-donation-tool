@@ -100,7 +100,7 @@ describe('Subscriptions', () => {
 
         await expect(() => service.cancel(sub.id, {
             ...aUser,
-            discord: {id: 'ANOTHER_DISCORD_ID'}
+            discord: {id: 'ANOTHER_DISCORD_ID', username: 'A_USERNAME', discriminator: '0001'}
         })).rejects.toBeInstanceOf(SubscriptionNotFound);
     });
 

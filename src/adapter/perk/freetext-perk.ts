@@ -1,6 +1,6 @@
 import {TranslateParams} from '../../translations';
-import {Package, Perk, RedeemTarget} from '../../domain/package';
-import {OwnedPerk} from '../../domain/user';
+import {Hints, Package, Perk, RedeemTarget} from '../../domain/package';
+import {OwnedPerk, User} from '../../domain/user';
 import {Order} from '../../domain/payment';
 import {createHash} from 'crypto';
 
@@ -17,6 +17,10 @@ export class FreetextPerk implements Perk {
 
     subjects(): Map<string, string> | null {
         return null;
+    }
+
+    async interfaceHints(forUser: User): Promise<Hints> {
+        return {};
     }
 
     async ownedBy(target: RedeemTarget): Promise<OwnedPerk[] | null> {
