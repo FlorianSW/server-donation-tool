@@ -3,7 +3,7 @@
     <p><%= translate('DONATE_PERKS_SUBJECT_SELECTION_DESCRIPTION') %></p>
     <% selectedPackage.perks.forEach(function (perk) { %>
         <% const hints = interfaceHints.get(perk.id()); %>
-        <% if (perk.subjects() || hints.notices) { %>
+        <% if (perk.subjects() || (hints.notices && hints.notices.length !== 0)) { %>
             <h6><%= perk.asShortString() %></h6>
         <% } %>
         <% if (perk.subjects()) { %>

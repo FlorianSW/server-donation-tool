@@ -42,7 +42,7 @@ export class DiscordRolePerk implements Perk {
                 discriminator: forUser.discord.discriminator
             }
         });
-        const notices: string[] = [unknownMember];
+        const notices: string[] = [];
         const guild = await this.client.guilds.fetch(this.guildId);
         try {
             await guild.members.fetch(forUser.discord.id);
