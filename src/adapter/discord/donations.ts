@@ -37,8 +37,11 @@ export class Donations {
     }
 
     private async manageAppCommand() {
-        const guildId = this.config.discord.commands.donate.guildId;
+        const guildId = this.config.discord.commands?.donate?.guildId;
         const disabled = this.config.discord.commands?.donate?.disabled ?? false;
+        if (!guildId) {
+            return;
+        }
         const commands = await this.client.application.commands.fetch({
             guildId: guildId,
         });
