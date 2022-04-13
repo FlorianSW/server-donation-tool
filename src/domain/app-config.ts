@@ -1,6 +1,14 @@
 import {DiscordNotification} from '../adapter/discord/discord-notifier';
 import {PathLike} from 'fs';
 
+export interface Properties {
+    find(context: string, key: string): Promise<any | null>
+
+    set(context: string, key: string, value: any): Promise<void>
+
+    delete(context: string, key: string): Promise<void>
+}
+
 export type ServerNames = {
     [serverApiId: string]: string
 };
@@ -75,7 +83,7 @@ export interface AppConfig {
         applicationId: string,
         secret: string,
     },
-    lb_ag_pg: {[serverId: string]: LbAgPgServer}
+    lb_ag_pg: { [serverId: string]: LbAgPgServer }
     serverNames: ServerNames,
 
     logoUrl(absolute?: boolean): string;

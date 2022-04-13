@@ -1,5 +1,5 @@
 import {Request, Response, Router} from 'express';
-import {AppConfig} from '../../domain/app-config';
+import {AppConfig, Properties} from '../../domain/app-config';
 import {Logger} from 'winston';
 import {inject, singleton} from 'tsyringe';
 import {Subscriptions} from '../../service/subscriptions';
@@ -18,8 +18,7 @@ import {promisify} from 'util';
 
 const fileExists = promisify(fs.exists);
 const readFile = promisify(fs.readFile);
-const writeFile = promisify(fs.writeFile);
-const mkdir = promisify(fs.mkdir);
+const unlinkFile = promisify(fs.unlink);
 
 enum EventType {
     SaleCompleted = 'PAYMENT.SALE.COMPLETED', SubscriptionCancelled = 'BILLING.SUBSCRIPTION.CANCELLED',
@@ -30,6 +29,9 @@ interface WebhookEvent {
     event_type: EventType;
 }
 
+const propertiesContext = 'paypal';
+const propertySubscriptionWebhookId = 'subscriptionWebhookId';
+
 const configPath = './db/config/paypal/';
 const configFile = 'subscription_webhook_id';
 
@@ -39,35 +41,45 @@ export class PaypalWebhooksController {
 
     constructor(
         @inject('AppConfig') private readonly config: AppConfig,
+        @inject('Properties') private readonly props: Properties,
         @inject('Subscriptions') private readonly subscriptions: Subscriptions,
         @inject('PayPalClient') private readonly client: PayPalClient,
         @inject('Logger') private readonly logger: Logger,
     ) {
-        if (config.paypal.manageWebhook) {
-            if (this.config.app.publicUrl.protocol.startsWith('http:')) {
-                logger.error('Requested to manage PayPal webhooks for subscriptions, but public URL is http instead of https. Consult the documentation regarding subscriptions.');
-                process.exit(1);
-            }
-            fileExists(configPath + configFile).then(async (exists) => {
+        this.migrateFileBasedConfig().then(async () => {
+            if (config.paypal.manageWebhook) {
+                if (this.config.app.publicUrl.protocol.startsWith('http:')) {
+                    logger.error('Requested to manage PayPal webhooks for subscriptions, but public URL is http instead of https. Consult the documentation regarding subscriptions.');
+                    process.exit(1);
+                }
+                const id = await props.find(propertiesContext, propertySubscriptionWebhookId);
+
                 try {
-                    await mkdir(configPath, {recursive: true});
-                    if (exists) {
+                    if (id !== null) {
                         logger.info('PayPal webhook exists, updating to current URL');
-                        const id = (await readFile(configPath + configFile)).toString('utf-8');
                         const webhook = await this.getWebhook(id);
                         await this.updateWebhook(webhook);
                     } else {
                         logger.info('PayPal webhook does not exist, hence creating one');
                         const wh = await this.createWebhook();
-                        await writeFile(configPath + configFile, wh.id);
+                        await props.set(propertiesContext, propertySubscriptionWebhookId, wh.id);
                     }
                 } catch (e) {
                     logger.error('Unknown error while managing PayPal webhook.', e);
                     process.exit(1);
                 }
-            });
-        }
+            }
+        });
         this.router.post('/api/paypal/webhook', this.incoming.bind(this));
+    }
+
+    private async migrateFileBasedConfig(): Promise<void> {
+        const exists = await fileExists(configPath + configFile);
+        if (exists) {
+            const id = (await readFile(configPath + configFile)).toString('utf-8');
+            await this.props.set(propertiesContext, propertySubscriptionWebhookId, id);
+            await unlinkFile(configPath + configFile);
+        }
     }
 
     private async incoming(req: Request, res: Response): Promise<void> {
