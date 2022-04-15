@@ -42,7 +42,7 @@ export class Theming {
         app.locals.googleAnalyticsTrackingId = this.config.app.googleAnalytics?.trackingId;
         app.set('views', this.themeBasePath);
         app.set('view engine', 'ejs');
-        app.use(this.renderCssHook());
+        app.use(this.renderHook());
 
         return app;
     }
@@ -59,7 +59,7 @@ export class Theming {
         return path.join(this.remoteBasePath.replace('{type}', 'images'), name).replace(/\\/g, '/');
     }
 
-    private renderCssHook(): NextHandleFunction {
+    private renderHook(): NextHandleFunction {
         return (req: Request, res: Response, next: NextFunction) => {
             res.locals.stylesheets = [
                 ...this.globalStyles,
@@ -71,7 +71,7 @@ export class Theming {
                 if (exists) {
                     res.locals.stylesheets.push(this.cssPath(view + '.css'));
                 }
-                original(view, options, (err: Error, html: string) => {
+                original(view, generalOptions(req, options), (err: Error, html: string) => {
                     if (callback) {
                         callback(err, html);
                         return;
@@ -85,4 +85,13 @@ export class Theming {
             next();
         };
     }
+}
+
+function generalOptions(req: Request, currentOptions?: object): { [key: string]: any } {
+    let opt: { [key: string]: any } = {};
+    if (currentOptions) {
+        opt = currentOptions;
+    }
+    opt.user = req.user;
+    return opt;
 }

@@ -18,7 +18,6 @@ export class AccountController {
     private async render(req: Request, res: Response) {
         const orders = await this.repo.findLastFor(req.user, 20);
         res.render('account', {
-            user: req.user,
             orders: orders,
         });
     }

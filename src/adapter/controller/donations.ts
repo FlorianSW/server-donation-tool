@@ -122,7 +122,6 @@ export class DonationController {
         } else if (selectedPayment.donation) {
             res.render('steps/donate', {
                 csrfToken: req.csrfToken(),
-                user: req.user,
                 currency: req.session.selectedPackage.price.currency,
                 customMessage: customMessage || '',
                 selectedPackage: {
@@ -180,7 +179,6 @@ export class DonationController {
         const perkHints = new Map(hints);
         res.render(template, {
             csrfToken: req.csrfToken(),
-            user: req.user,
             currency: req.session.selectedPackage.price.currency,
             selectedPackage: {
                 name: selectedPackage.name,
@@ -208,7 +206,6 @@ export class DonationController {
             res.render('steps/wait_for_payment');
         } else {
             res.render('steps/redeem', {
-                user: req.user,
                 order: order,
                 canShare: order.reference.discordId === req.user.discord.id,
                 shareLink: new URL(`/donate/${order.id}`, this.config.app.publicUrl).toString(),
@@ -264,7 +261,6 @@ export class DonationController {
         }
         const result = await this.redeemPackage.redeem(order, RedeemTarget.fromUser(req.user), perks);
         res.render('steps/redeem_success', {
-            user: req.user,
             results: result.success,
             errors: result.errors,
         });

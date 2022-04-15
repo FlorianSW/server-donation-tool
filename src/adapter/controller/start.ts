@@ -27,7 +27,6 @@ export class StartController {
         req.user = await this.data.onRefresh(req.user);
 
         res.render('steps/package_selection', {
-            user: req.user,
             csrfToken: req.csrfToken(),
             showDonationTarget: !!this.config.app.community?.donationTarget?.monthly,
             availablePackages: this.packages,

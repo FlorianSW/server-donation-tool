@@ -66,14 +66,16 @@
                         </a>
                     </li>
                 </ul>
-                <div class="right">
-                    <ul class="right">
-                        <li><a href="/account"><i class="material-icons">account_circle</i></a></li>
-                    </ul>
-                    <ul id="nav-mobile" class="logout hide-on-med-and-down">
-                        <li><a href="/auth/logout">Logout</a></li>
-                    </ul>
-                </div>
+                <% if (user) { %>
+                    <div class="right">
+                        <ul class="right">
+                            <li><a href="/account"><i class="material-icons">account_circle</i></a></li>
+                        </ul>
+                        <ul id="nav-mobile" class="logout hide-on-med-and-down">
+                            <li><a href="/auth/logout">Logout</a></li>
+                        </ul>
+                    </div>
+                <% } %>
             </div>
         </div>
     </div>

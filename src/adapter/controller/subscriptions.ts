@@ -25,7 +25,6 @@ export class SubscriptionsController {
     private async renderSubscription(req: Request, res: Response) {
         const view = await this.subs.viewSubscription(req.params.subscriptionId, req.user);
         res.render('subscription', {
-            user: req.user,
             subscription: view.subscription,
             pending: view.pending,
             plan: view.plan,
