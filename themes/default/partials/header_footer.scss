@@ -1,5 +1,7 @@
+@use "../colors";
+
 nav, .page-footer {
-  background-color: #616161;
+  background-color: #1c1c24;
 
   .nav-wrapper .row {
     height: 100%;
@@ -39,17 +41,21 @@ nav, .page-footer {
   }
 }
 
+.container {
+  flex: 1;
+}
+
 .page-footer {
   .footer-copyright .container {
     display: flex;
     justify-content: space-between;
 
     a {
-      color: #ffab40;
+      color: colors.$secondary;
       transition: color .3s ease;
 
       &:hover {
-        color: #ffd8a6;
+        color: colors.$primary;
       }
     }
   }

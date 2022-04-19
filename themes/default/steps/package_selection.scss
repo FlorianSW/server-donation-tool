@@ -7,9 +7,10 @@
   display: flex;
   gap: 1em;
   flex-wrap: wrap;
-  justify-content: center;
+  justify-content: start;
 
   > form {
+    flex: 1 1 auto;
     max-width: 360px;
   }
 }
@@ -33,6 +34,16 @@
 
     img {
       height: 16px;
+    }
+  }
+
+  .card-action {
+    button {
+      width: 100%;
+
+      &:not(:first-of-type) {
+        margin-top: 0.75em;
+      }
     }
   }
 
