@@ -6,25 +6,9 @@ import {Order, Reference} from '../domain/payment';
 import {Package, PriceType} from '../domain/package';
 import {FreetextPerk} from './perk/freetext-perk';
 import {FakePayment} from './paypal/paypal-payment';
+import {anOrder, somePackages} from '../test-data.spec';
 
 const testDbPath = __dirname + '/order-repository.spec.sqlite';
-const packages: Package[] = [{
-    id: 1,
-    perks: [new FreetextPerk()],
-    price: {
-        type: PriceType.FIXED,
-        amount: '10.00',
-        currency: 'USD',
-    },
-    name: 'SOME_PACKAGE_NAME',
-}];
-
-const anOrder: Order = Order.create(new Date('2025-05-16T18:25:49Z'), {
-    id: 'PAYMENT_ORDER_ID',
-    transactionId: 'SOME_TRANSACTION_ID',
-    provider: FakePayment.NAME,
-}, new Reference('A_STEAM_ID', 'A_DISCORD_ID', packages[0]), 'A_MESSAGE');
-anOrder.pushPerkDetails({SOME_ID: 'SOME_VALUE'});
 
 describe('OrderRepository', () => {
     let repository: OrderRepository;
@@ -38,7 +22,7 @@ describe('OrderRepository', () => {
             useNullAsDefault: true,
         });
 
-        repository = new SQLiteOrderRepository(knex, packages);
+        repository = new SQLiteOrderRepository(knex, somePackages);
     });
 
     it('persists order', async () => {
@@ -81,7 +65,7 @@ describe('OrderRepository', () => {
 
     it('finds orders for specific user', async () => {
         const secondOrder = Order.create(new Date('2025-05-17T18:25:49Z'), anOrder.payment, anOrder.reference);
-        const thirdOrder = Order.create(new Date('2025-05-18T18:25:49Z'), anOrder.payment, new Reference('A_STEAM_ID', 'ANOTHER_DISCORD_ID', packages[0]));
+        const thirdOrder = Order.create(new Date('2025-05-18T18:25:49Z'), anOrder.payment, new Reference('A_STEAM_ID', 'ANOTHER_DISCORD_ID', somePackages[0]));
         anOrder.pay(anOrder.payment.transactionId);
         secondOrder.pay(secondOrder.payment.transactionId);
         thirdOrder.pay(thirdOrder.payment.transactionId);

@@ -24,9 +24,7 @@ export class RedeemPackage {
         if (order.reference.steamId === null) {
             order.reference.steamId = target.steamId;
         }
-        if (order.redeemedAt === null) {
-            order.redeemedAt = new Date();
-        }
+        order.redeem();
         await this.repo.save(order);
 
         const success: TranslateParams[] = [];

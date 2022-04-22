@@ -1,19 +1,17 @@
 import {ExpiringDiscordRole} from '../domain/repositories';
 import {DiscordRoleRecorder} from './discord-role-recorder';
 import {EventQueue} from '../adapter/event-queue';
-import {Order, Reference} from '../domain/payment';
 import {DiscordRolePerk} from '../adapter/perk/discord-role-perk';
 import {RedeemTarget} from '../domain/package';
 import {Client} from 'discord.js';
 import {Logger} from 'winston';
 import {InMemoryDiscordRoleRepository} from '../adapter/discord-role-repository';
-import {aPackage, aUser} from '../adapter/perk/testdata.spec';
-import {FakePayment} from '../adapter/paypal/paypal-payment';
+import {asRedeemed, aUser, makeOrder, somePackages, withCreatedDate, withPerks} from '../test-data.spec';
 
 const notExpiring = Object.assign(
     new DiscordRolePerk({} as Client, '11111111', {} as Logger),
     {
-        inPackage: aPackage,
+        inPackage: somePackages[0],
         roles: ['A_ROLE', 'ANOTHER_ROLE'],
     }
 );
@@ -21,7 +19,7 @@ const notExpiring = Object.assign(
 const expiring = Object.assign(
     new DiscordRolePerk({} as Client, '11111111', {} as Logger),
     {
-        inPackage: aPackage,
+        inPackage: somePackages[0],
         roles: ['A_ROLE', 'ANOTHER_ROLE'],
         amountInDays: 2,
     }
@@ -38,28 +36,14 @@ describe('DiscordRoleRecorder', () => {
     });
 
     it('does not record non-expiring discord role', async () => {
-        await recorder.onSuccessfulRedeem(RedeemTarget.fromUser(aUser), Order.create(new Date(), {
-            id: 'ORDER_ID',
-            transactionId: 'TRANSACTION_ID',
-            provider: FakePayment.NAME,
-        }, new Reference('7592222222222', '11111111111', {
-            ...aPackage,
-            perks: [notExpiring],
-        })));
+        await recorder.onSuccessfulRedeem(RedeemTarget.fromUser(aUser), makeOrder(withPerks([notExpiring])));
 
         expect(repository.count()).toBe(0);
     });
 
     it('records expiring discord role', async () => {
-        const order = Order.create(new Date('2020-11-01T14:52:12Z'), {
-            id: 'ORDER_ID',
-            transactionId: 'TRANSACTION_ID',
-            provider: FakePayment.NAME,
-        }, new Reference('7592222222222', '11111111111', {
-            ...aPackage,
-            perks: [expiring],
-        }));
-        order.redeemedAt = order.created;
+        const d = new Date('2020-11-01T14:52:12Z');
+        const order = makeOrder(withCreatedDate(d), asRedeemed(d), withPerks([expiring]));
         await recorder.onSuccessfulRedeem(RedeemTarget.fromUser(aUser), order);
 
         expect(repository.count()).toBe(2);
@@ -72,15 +56,8 @@ describe('DiscordRoleRecorder', () => {
     });
 
     it('does not return not yet expired roles', async () => {
-        const order = Order.create(new Date('2020-11-25T14:52:12Z'), {
-            id: 'ORDER_ID',
-            transactionId: 'TRANSACTION_ID',
-            provider: FakePayment.NAME,
-        }, new Reference('7592222222222', '11111111111', {
-            ...aPackage,
-            perks: [expiring],
-        }));
-        order.redeemedAt = order.created
+        const d = new Date('2020-11-25T14:52:12Z');
+        const order = makeOrder(withCreatedDate(d), asRedeemed(d), withPerks([expiring]));
         await recorder.onSuccessfulRedeem(RedeemTarget.fromUser(aUser), order);
 
         expect(await repository.find(new Date('2020-11-25T14:52:11Z'))).toHaveLength(0);

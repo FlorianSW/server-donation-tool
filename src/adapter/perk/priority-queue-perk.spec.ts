@@ -1,9 +1,9 @@
 import {PriorityQueuePerk} from './priority-queue-perk';
 import {CFToolsClient, SteamId64} from 'cftools-sdk';
 import {InMemoryCFToolsClient} from './testhelper';
-import {aRedeemedOrder, aPackage, aServerApiId, aSteamId, aUser} from './testdata.spec';
 import {createLogger} from 'winston';
 import {RedeemTarget} from '../../domain/package';
+import {aRedeemedOrder, aServerApiId, aSteamId, aUser, somePackages} from '../../test-data.spec';
 
 describe('PriorityQueuePerk', () => {
     let client: CFToolsClient;
@@ -14,7 +14,7 @@ describe('PriorityQueuePerk', () => {
         perk = Object.assign(
             new PriorityQueuePerk(client as CFToolsClient, {aServerApiId: 'A_NAME'}, createLogger()),
             {
-                inPackage: aPackage,
+                inPackage: somePackages[0],
                 cftools: {
                     serverApiId: aServerApiId
                 },
@@ -41,7 +41,7 @@ describe('PriorityQueuePerk', () => {
             perk = Object.assign(
                 new PriorityQueuePerk(client as CFToolsClient, {aServerApiId: 'A_NAME'}, createLogger()),
                 {
-                    inPackage: aPackage,
+                    inPackage: somePackages[0],
                     cftools: {
                         serverApiId: aServerApiId
                     },

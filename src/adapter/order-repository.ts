@@ -189,7 +189,7 @@ export class SQLiteOrderRepository implements OrderRepository {
             transactionId: o[columnTransactionId],
             provider: o[columnPaymentProvider],
         };
-        return new Order(o[columnId], new Date(o[columnCreated]), reference, o[columnCustomMessage] || null, o[columnRedeemedAt] ? new Date(o[columnRedeemedAt]) : null, o[columnStatus], payment, new Map(JSON.parse(o[columnPerkDetails])));
+        return new Order(o[columnId], new Date(o[columnCreated]), reference, o[columnCustomMessage] || null, o[columnRedeemedAt] ? new Date(o[columnRedeemedAt]) : null, o[columnStatus], payment, new Map(JSON.parse(o[columnPerkDetails])), null);
     }
 }
 

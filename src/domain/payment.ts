@@ -25,7 +25,7 @@ export interface DeferredPaymentOrder {
 }
 
 export enum OrderStatus {
-    CREATED = 0, PAID = 1
+    CREATED = 0, PAID = 1, REFUNDED = 2,
 }
 
 export interface OrderPayment {
@@ -44,15 +44,16 @@ export class Order {
         public status: OrderStatus,
         public payment: OrderPayment,
         public perkDetails: Map<string, string>,
+        public refundedAt: Date | null,
     ) {
     }
 
     public static create(created: Date, payment: OrderPayment, reference: Reference, customMessage: string | null = null): Order {
-        return new Order(v4(), created, reference, customMessage, null, OrderStatus.CREATED, payment, new Map());
+        return new Order(v4(), created, reference, customMessage, null, OrderStatus.CREATED, payment, new Map(), null);
     }
 
     public static createDeferred(created: Date, reference: Reference, customMessage: string | null = null): Order {
-        return new Order(v4(), created, reference, customMessage, null, OrderStatus.CREATED, null, new Map());
+        return new Order(v4(), created, reference, customMessage, null, OrderStatus.CREATED, null, new Map(), null);
     }
 
     public paymentIntent(payment: OrderPayment) {
@@ -68,6 +69,17 @@ export class Order {
         }
         this.payment.transactionId = transactionId;
         this.status = OrderStatus.PAID;
+    }
+
+    public redeem() {
+        if (this.redeemedAt === null) {
+            this.redeemedAt = new Date();
+        }
+    }
+
+    public refund() {
+        this.refundedAt = new Date();
+        this.status = OrderStatus.REFUNDED;
     }
 
     public pushPerkDetails(details: PerkDetails) {
