@@ -87,6 +87,7 @@ export class PaypalWebhooksController {
         const resource = await this.webhookEvent(event.id);
         if (resource === null) {
             this.logger.error('Received invalid webhook (not originating from PayPal: ' + event.id);
+            res.status(200).end();
         }
         switch (event.event_type) {
             case EventType.SaleCompleted:
@@ -105,12 +106,20 @@ export class PaypalWebhooksController {
 
     private async webhookEvent<T extends SaleCompleted | SubscriptionCancelled>(id: string): Promise<T | null> {
         const r = new GetWebhookEvent(id);
-        const event = await this.client.execute<WebhookEventResponse>(r);
 
-        if (event.statusCode !== 200) {
-            return null;
+        try {
+            const event = await this.client.execute<WebhookEventResponse>(r);
+
+            if (event.statusCode !== 200) {
+                return null;
+            }
+            return event.result.resource as T;
+        } catch (e) {
+            if (e.statusCode === 404) {
+                return null;
+            }
+            throw e;
         }
-        return event.result.resource as T;
     }
 
     private async createWebhook(): Promise<Webhook> {
