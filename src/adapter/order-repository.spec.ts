@@ -6,7 +6,7 @@ import {Order, Reference} from '../domain/payment';
 import {Package, PriceType} from '../domain/package';
 import {FreetextPerk} from './perk/freetext-perk';
 import {FakePayment} from './paypal/paypal-payment';
-import {anOrder, somePackages} from '../test-data.spec';
+import {anOrder, asRedeemed, asRefunded, makeOrder, somePackages, withCreatedDate} from '../test-data.spec';
 
 const testDbPath = __dirname + '/order-repository.spec.sqlite';
 
@@ -26,12 +26,13 @@ describe('OrderRepository', () => {
     });
 
     it('persists order', async () => {
-        await repository.save(anOrder);
+        const order = makeOrder(withCreatedDate(new Date('2025-05-16T18:25:49Z')), asRedeemed(new Date('2025-05-16T18:25:49Z')), asRefunded(new Date('2025-05-16T18:25:49Z')));
+        await repository.save(order);
 
-        const order = await repository.find(anOrder.id);
+        const saved = await repository.find(order.id);
 
-        expect(order).not.toBeUndefined();
-        expect(order).toEqual(anOrder);
+        expect(saved).not.toBeUndefined();
+        expect(saved).toEqual(order);
     });
 
     it('finds order by payment order ID', async () => {

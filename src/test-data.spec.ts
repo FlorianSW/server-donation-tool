@@ -93,6 +93,18 @@ export function asRedeemed(d?: Date): modifier {
     }
 }
 
+export function asRefunded(d?: Date): modifier {
+    return (c) => {
+        if (c instanceof Order) {
+            c.refund();
+            if (d) {
+                c.refundedAt = d;
+            }
+        }
+        return c;
+    }
+}
+
 export function withPerkDetails(d: { [key: string]: string }): modifier {
     return (c) => {
         if (c instanceof Order) {

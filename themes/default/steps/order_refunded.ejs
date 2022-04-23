@@ -1,0 +1,26 @@
+<%- include('../partials/header.ejs') %>
+<div class="col s12">
+    <div class="card">
+        <div class="card-content">
+            <span class="card-title"><%= translate('REFUNDED_TITLE') %></span>
+            <p>
+                <%= translate('REFUNDED_DESCRIPTION') %>
+            </p>
+            <div class="details">
+                <div><%= translate('REFUNDED_STATE') %></div>
+                <div>
+                    <span class="refunded"><%= translate('REFUNDED_STATE_REFUNDED') %></span>
+                </div>
+                <div><%= translate('REFUNDED_DATE') %></div>
+                <div>
+                    <%= order.refundedAt %>
+                </div>
+                <div><%= translate('REFUNDED_PACKAGE_NAME') %></div>
+                <div>
+                    <%= order.reference.p.name %>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<%- include('../partials/footer.ejs') %>
