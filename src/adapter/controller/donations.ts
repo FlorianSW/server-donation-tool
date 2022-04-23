@@ -53,7 +53,7 @@ export class DonationController {
             throw new OrderNotFound();
         }
 
-        if (order.status !== OrderStatus.PAID) {
+        if (order.status === OrderStatus.CREATED) {
             const provider = this.payments.find((p) => p.provider().branding.name === order.payment.provider);
             if (!provider) {
                 throw new Error('non-paid order with an unknown payment provider');
@@ -202,9 +202,13 @@ export class DonationController {
             return;
         }
 
-        if (order.status !== OrderStatus.PAID) {
+        if (order.status === OrderStatus.CREATED) {
             res.render('steps/wait_for_payment');
-        } else {
+        } else if (order.status === OrderStatus.REFUNDED)  {
+            res.render('steps/order_refunded', {
+                order: order,
+            });
+        } else if (order.status === OrderStatus.PAID) {
             res.render('steps/redeem', {
                 order: order,
                 canShare: order.reference.discordId === req.user.discord.id,
@@ -242,15 +246,11 @@ export class DonationController {
     private async redeem(req: Request, res: Response) {
         const order = await this.fetchOrderDetails(req, res);
         if (order.status !== OrderStatus.PAID) {
-            await this.redirectToPrepareRedeem(req, res);
-            return;
+            return this.redirectToPrepareRedeem(req, res);
         }
         if (!order.reference) {
             res.sendStatus(400);
             return;
-        }
-        if (order.status !== OrderStatus.PAID) {
-            return this.redirectToPrepareRedeem(req, res);
         }
 
         const perks = [];

@@ -1,9 +1,9 @@
 import {CFToolsClient, SteamId64} from 'cftools-sdk';
 import {InMemoryCFToolsClient} from './testhelper';
 import {WhitelistPerk} from './whitelist-perk';
-import {aRedeemedOrder, aPackage, aServerApiId, aSteamId, aUser} from './testdata.spec';
 import {RedeemTarget} from '../../domain/package';
 import {createLogger} from 'winston';
+import {aRedeemedOrder, aServerApiId, aSteamId, aUser, somePackages} from '../../test-data.spec';
 
 describe('WhitelistPerk', () => {
     let client: CFToolsClient;
@@ -14,7 +14,7 @@ describe('WhitelistPerk', () => {
         perk = Object.assign(
             new WhitelistPerk(client as CFToolsClient, {aServerApiId: 'A_NAME'}, createLogger()),
             {
-                inPackage: aPackage,
+                inPackage: somePackages[0],
                 cftools: {
                     serverApiId: aServerApiId
                 },
@@ -32,16 +32,16 @@ describe('WhitelistPerk', () => {
             const expected = new Date();
             expected.setDate(expected.getDate() + perk.amountInDays);
             expect(expiration.toLocaleString().slice(0, -2)).toBe(expected.toLocaleString().slice(0, -2));
-            expect(result.comment).toContain('A_PACKAGE');
+            expect(result.comment).toContain(somePackages[0].name);
             expect(result.comment).toContain(aRedeemedOrder.id);
-            expect(result.comment).toContain('A_TRANSACTION_ID');
+            expect(result.comment).toContain(aRedeemedOrder.payment.transactionId);
         });
 
         it('creates permanent whitelist entry', async () => {
             perk = Object.assign(
                 new WhitelistPerk(client as CFToolsClient, {aServerApiId: 'A_NAME'}, createLogger()),
                 {
-                    inPackage: aPackage,
+                    inPackage: somePackages[0],
                     cftools: {
                         serverApiId: aServerApiId
                     },
@@ -98,7 +98,7 @@ describe('WhitelistPerk', () => {
             const expected = new Date();
             expected.setDate(expected.getDate() + perk.amountInDays);
             expect(expiration.toLocaleString().slice(0, -2)).toBe(expected.toLocaleString().slice(0, -2));
-            expect(result.comment).toContain('A_PACKAGE');
+            expect(result.comment).toContain(somePackages[0].name);
         });
     });
 });

@@ -85,7 +85,7 @@ export function asRedeemed(d?: Date): modifier {
     return (c) => {
         if (c instanceof Order) {
             c.redeem();
-            if (d !== null) {
+            if (d) {
                 c.redeemedAt = d;
             }
         }

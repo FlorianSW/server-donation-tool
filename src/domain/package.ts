@@ -21,6 +21,14 @@ export interface Perk {
     id(): string;
 }
 
+export interface Refundable {
+    refund(forUser: RedeemTarget, order: Order): Promise<void>;
+}
+
+export function isRefundable(object: any): object is Refundable {
+    return 'refund' in object;
+}
+
 export interface Hints {
     notices?: string[];
 }

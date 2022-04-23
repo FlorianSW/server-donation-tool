@@ -1,15 +1,15 @@
 import {SubscriptionsRepository} from '../domain/repositories';
 import Knex from 'knex';
 import * as fs from 'fs';
-import {anotherUser, aPackage, aUser} from './perk/testdata.spec';
 import {Subscription, SubscriptionPlan} from '../domain/payment';
 import {SQLiteSubscriptionsRepository} from './subscriptions-repository';
 import {FakePayment} from './paypal/paypal-payment';
+import {anotherUser, aUser, somePackages} from '../test-data.spec';
 
 const testDbPath = __dirname + '/subscriptions-repository.spec.sqlite';
 
 describe('SubscriptionsRepository', () => {
-    const aPlan = SubscriptionPlan.create(aPackage, 'A_PRODUCT_ID', 'A_PLAN_ID')
+    const aPlan = SubscriptionPlan.create(somePackages[0], 'A_PRODUCT_ID', 'A_PLAN_ID')
     let repository: SubscriptionsRepository;
 
     beforeEach(() => {
@@ -76,7 +76,7 @@ describe('SubscriptionsRepository', () => {
 
         const sub3 = Subscription.create(aPlan, aUser);
         sub3.agreeBilling('A_PAYMENT_ID3');
-        sub3.pay('A_TRANSACTION_ID', FakePayment.NAME, aPackage);
+        sub3.pay('A_TRANSACTION_ID', FakePayment.NAME, somePackages[0]);
         await repository.save(sub3);
 
         const cancelled = Subscription.create(aPlan, aUser);

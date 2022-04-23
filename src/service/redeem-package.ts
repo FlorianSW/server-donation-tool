@@ -1,6 +1,6 @@
 import {inject, singleton} from 'tsyringe';
 import {TranslateParams} from '../translations';
-import {Perk, RedeemError, RedeemTarget} from '../domain/package';
+import {isRefundable, Perk, RedeemError, RedeemTarget} from '../domain/package';
 import {Order} from '../domain/payment';
 import {OrderRepository} from '../domain/repositories';
 import {Logger} from 'winston';
@@ -48,6 +48,33 @@ export class RedeemPackage {
 
         return {
             success: success,
+            errors: errors,
+        };
+    }
+
+    async refund(order: Order, target: RedeemTarget): Promise<RedeemResults> {
+        order.refund();
+        await this.repo.save(order);
+
+        const errors: RedeemError[] = [];
+        for (let perk of order.reference.p.perks) {
+            if (isRefundable(perk)) {
+                try {
+                    await perk.refund(target, order);
+                } catch (e) {
+                    this.logger.error(`Could not refund perk ${perk.type}:`, e);
+                    if (e instanceof RedeemError) {
+                        errors.push(e);
+                        this.events.emit('failedRedeemPerk', target, order, e);
+                    } else {
+                        throw e;
+                    }
+                }
+            }
+        }
+
+        return {
+            success: [],
             errors: errors,
         };
     }

@@ -2,8 +2,8 @@ import {SubscriptionPlanRepository} from '../domain/repositories';
 import Knex from 'knex';
 import * as fs from 'fs';
 import {SQLiteSubscriptionPlanRepository} from './subscription-plan-repository';
-import {aPackage} from './perk/testdata.spec';
 import {SubscriptionPlan} from '../domain/payment';
+import {somePackages} from '../test-data.spec';
 
 const testDbPath = __dirname + '/subscription-plan-repository.spec.sqlite';
 
@@ -19,25 +19,25 @@ describe('SubscriptionPlanRepository', () => {
             useNullAsDefault: true,
         });
 
-        repository = new SQLiteSubscriptionPlanRepository(knex, [aPackage]);
+        repository = new SQLiteSubscriptionPlanRepository(knex, [somePackages[0]]);
     });
 
     it('persists plan', async () => {
-        await repository.save(SubscriptionPlan.create(aPackage, 'A_PRODUCT_ID', 'A_PLAN_ID'));
+        await repository.save(SubscriptionPlan.create(somePackages[0], 'A_PRODUCT_ID', 'A_PLAN_ID'));
 
-        const roles = await repository.findByPackage(aPackage);
+        const roles = await repository.findByPackage(somePackages[0]);
 
         expect(roles).toMatchObject({
             payment: {
                 productId: 'A_PRODUCT_ID',
                 planId: 'A_PLAN_ID',
             },
-            basePackage: aPackage,
+            basePackage: somePackages[0],
         } as SubscriptionPlan);
     });
 
     it('finds by ID', async () => {
-        const plan = SubscriptionPlan.create(aPackage, 'A_PRODUCT_ID', 'A_PLAN_ID');
+        const plan = SubscriptionPlan.create(somePackages[0], 'A_PRODUCT_ID', 'A_PLAN_ID');
         await repository.save(plan);
 
         const roles = await repository.find(plan.id);
@@ -47,7 +47,7 @@ describe('SubscriptionPlanRepository', () => {
                 productId: 'A_PRODUCT_ID',
                 planId: 'A_PLAN_ID',
             },
-            basePackage: aPackage,
+            basePackage: somePackages[0],
         } as SubscriptionPlan);
     });
 

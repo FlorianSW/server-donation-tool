@@ -219,6 +219,13 @@ const messages: { [key: string]: string } = {
     WAIT_FOR_PAYMENT_TITLE: 'Payment pending',
     WAIT_FOR_PAYMENT_DESCRIPTION: 'We are still waiting for the payment to be processed and confirmed by the payment provider. You can only redeem your perks when the payment is confirmed. This should usually not take more than several seconds to some minutes. Please refresh this page to check if the payment succeeded.',
 
+    REFUNDED_TITLE: 'This donation was refunded',
+    REFUNDED_DESCRIPTION: 'Perks of a refunded donation cannot be redeemed again. However, you can view the details of your donation here.',
+    REFUNDED_STATE: 'State',
+    REFUNDED_STATE_REFUNDED: 'Refunded',
+    REFUNDED_PACKAGE_NAME: 'Package donated for',
+    REFUNDED_DATE: 'Refunded at',
+
     ERROR_STEAM_ID_MISMATCH_TITLE: 'Steam ID mismatch',
     ERROR_STEAM_ID_MISMATCH_DESCRIPTION: 'The Steam ID for this donation is different from the one connected with your profile.',
     ERROR_STEAM_ID_MISMATCH_ORDER_LABEL: 'Steam ID of donation',

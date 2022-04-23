@@ -1,6 +1,6 @@
 import {Subscription} from './payment';
-import {aPackage, aPlan, aUser} from '../adapter/perk/testdata.spec';
 import {FakePayment} from '../adapter/paypal/paypal-payment';
+import {aPlan, aUser, somePackages} from '../test-data.spec';
 
 describe('Subscriptions', () => {
     describe('isActive', () => {
@@ -12,7 +12,7 @@ describe('Subscriptions', () => {
             const subscription = Subscription.create(aPlan, aUser);
 
             subscription.agreeBilling('A_PAYMENT_ID');
-            subscription.pay('A_TRANSACTION_ID', FakePayment.NAME, aPackage);
+            subscription.pay('A_TRANSACTION_ID', FakePayment.NAME, somePackages[0]);
 
             expect(subscription.isActive()).toBe(true);
         });
