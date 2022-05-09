@@ -74,7 +74,7 @@
     ],
     "testPathIgnorePatterns": [
       "/node_modules/",
-      "testdata.spec.ts"
+      "test-data.spec.ts"
     ],
     "transform": {
       "^.+\\.tsx?$": "ts-jest"

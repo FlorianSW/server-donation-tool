@@ -3,7 +3,6 @@ import {FreetextPerk} from './adapter/perk/freetext-perk';
 import {Order, OrderPayment, Reference, SubscriptionPlan} from './domain/payment';
 import {FakePayment} from './adapter/paypal/paypal-payment';
 import {User} from './domain/user';
-import {CreatePlanRequest} from './adapter/paypal/types';
 
 export const aSteamId = '76561198012102485';
 export const anotherSteamId = '76561198012102486';
