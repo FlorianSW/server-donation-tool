@@ -1,4 +1,4 @@
-# Payment provider: PayPal
+# PayPal
 
 PayPal.com is a supported payment processor for the donation tool. It is used to process a donation payment to transfer funds from the donator to your community.
 

@@ -12,9 +12,11 @@ nav:
       - 'Subscriptions': 'subscriptions.md'
       - 'Setup Additional Steam Login': 'steam-login.md'
       - 'Discord Notifications': 'discord-notifications.md'
-  - 'Payment Providers':
-      - PayPal: 'payments/paypal.md'
-      - Stripe.com: 'payments/stripe.md'
+  - 'Payments':
+      - Refunds: 'payments/refunds.md'
+      - 'Providers':
+        - PayPal: 'payments/paypal.md'
+        - Stripe.com: 'payments/stripe.md'
   - Security:
       - 'Setup/Use https/secure connections': 'secure-connections.md'
   - Customizations:
