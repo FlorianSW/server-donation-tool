@@ -7,14 +7,14 @@ import {
     TokenExpired
 } from 'cftools-sdk';
 import {translate, TranslateParams} from '../../translations';
-import {Hints, Package, Perk, RedeemError, RedeemTarget} from '../../domain/package';
+import {Hints, Package, Perk, RedeemError, RedeemTarget, Refundable} from '../../domain/package';
 import {ServerNames} from '../../domain/app-config';
 import {FailedToLoad, OwnedPerk, PriorityQueue, User} from '../../domain/user';
 import {Order} from '../../domain/payment';
 import {Logger} from 'winston';
 import {createHash} from 'crypto';
 
-export class PriorityQueuePerk implements Perk {
+export class PriorityQueuePerk implements Perk, Refundable {
     inPackage: Package;
     type: string;
 
@@ -34,19 +34,7 @@ export class PriorityQueuePerk implements Perk {
 
     async redeem(target: RedeemTarget, order: Order): Promise<TranslateParams> {
         const steamId = SteamId64.of(target.steamId);
-        let serverId: ServerApiId;
-        if (Array.isArray(this.cftools.serverApiId)) {
-            if (!order.perkDetails.has(this.id())) {
-                throw new Error('perk ' + this.id() + ' requires further details, but order does not contain them');
-            }
-            const perkServerId = order.perkDetails.get(this.id());
-            if (!this.cftools.serverApiId.some((id) => id === perkServerId)) {
-                throw new Error('the priority queue perk ' + this.id() + ' does not have a valid server API ID available for selected ' + perkServerId);
-            }
-            serverId = ServerApiId.of(perkServerId);
-        } else {
-            serverId = ServerApiId.of(this.cftools.serverApiId);
-        }
+        const serverId = this.serverApiId(order);
 
         const successParams: TranslateParams = ['PRIORITY_QUEUE_REDEEM_COMPLETE', {
             params: {
@@ -68,6 +56,40 @@ export class PriorityQueuePerk implements Perk {
             this.throwRedeemError(serverId, e);
         }
         return successParams;
+    }
+
+    private serverApiId(order: Order): ServerApiId {
+        let serverId: ServerApiId;
+        if (Array.isArray(this.cftools.serverApiId)) {
+            if (!order.perkDetails.has(this.id())) {
+                throw new Error('perk ' + this.id() + ' requires further details, but order does not contain them');
+            }
+            const perkServerId = order.perkDetails.get(this.id());
+            if (!this.cftools.serverApiId.some((id) => id === perkServerId)) {
+                throw new Error('the priority queue perk ' + this.id() + ' does not have a valid server API ID available for selected ' + perkServerId);
+            }
+            serverId = ServerApiId.of(perkServerId);
+        } else {
+            serverId = ServerApiId.of(this.cftools.serverApiId);
+        }
+        return serverId;
+    }
+
+    async refund(forUser: RedeemTarget, order: Order): Promise<void> {
+        const steamId = SteamId64.of(forUser.steamId);
+        const serverId = this.serverApiId(order);
+        const request = {
+            serverApiId: serverId,
+            playerId: steamId,
+        };
+        const item = await this.client.getPriorityQueue(request);
+        if (!item) {
+            return;
+        }
+        if (item.comment.indexOf(order.payment.transactionId) === -1) {
+            return;
+        }
+        await this.client.deletePriorityQueue(request);
     }
 
     async ownedBy(target: RedeemTarget): Promise<OwnedPerk[] | null> {

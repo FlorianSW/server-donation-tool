@@ -3,7 +3,17 @@ import {InMemoryCFToolsClient} from './testhelper';
 import {WhitelistPerk} from './whitelist-perk';
 import {RedeemTarget} from '../../domain/package';
 import {createLogger} from 'winston';
-import {aRedeemedOrder, aServerApiId, aSteamId, aUser, somePackages} from '../../test-data.spec';
+import {
+    aRedeemedOrder,
+    aServerApiId,
+    asRedeemed,
+    aSteamId,
+    aUser,
+    makeOrder,
+    somePackages,
+    withTransaction
+} from '../../test-data.spec';
+import {FakePayment} from '../paypal/paypal-payment';
 
 describe('WhitelistPerk', () => {
     let client: CFToolsClient;
@@ -99,6 +109,37 @@ describe('WhitelistPerk', () => {
             expected.setDate(expected.getDate() + perk.amountInDays);
             expect(expiration.toLocaleString().slice(0, -2)).toBe(expected.toLocaleString().slice(0, -2));
             expect(result.comment).toContain(somePackages[0].name);
+        });
+    });
+
+    describe('refund', () => {
+        it('refunds whitelist entry', async () => {
+            await perk.redeem(RedeemTarget.fromUser(aUser), aRedeemedOrder);
+
+            await perk.refund(RedeemTarget.fromUser(aUser), aRedeemedOrder);
+
+            const result = await client.getWhitelist(SteamId64.of(aSteamId));
+            expect(result).toBeUndefined();
+        });
+
+        it('does nothing when no whitelist entry added', async () => {
+            await perk.refund(RedeemTarget.fromUser(aUser), aRedeemedOrder);
+
+            const result = await client.getWhitelist(SteamId64.of(aSteamId));
+            expect(result).toBeUndefined();
+        });
+
+        it('does not refund when redeemed by another transaction', async () => {
+            await perk.redeem(RedeemTarget.fromUser(aUser), aRedeemedOrder);
+
+            await perk.refund(RedeemTarget.fromUser(aUser), makeOrder(asRedeemed(), withTransaction({
+                transactionId: 'ANOTHER_TRANSACTION_ID',
+                id: 'ANOTHER_PAYMENT_ID',
+                provider: FakePayment.NAME,
+            })));
+
+            const result = await client.getWhitelist(SteamId64.of(aSteamId));
+            expect(result).not.toBeUndefined();
         });
     });
 });

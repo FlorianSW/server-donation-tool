@@ -1,13 +1,13 @@
 import {CFToolsClient, DuplicateResourceCreation, PriorityQueueItem, ServerApiId, SteamId64} from 'cftools-sdk';
 import {translate, TranslateParams} from '../../translations';
-import {Hints, Package, Perk, RedeemError, RedeemTarget} from '../../domain/package';
+import {Hints, Package, Perk, RedeemError, RedeemTarget, Refundable} from '../../domain/package';
 import {ServerNames} from '../../domain/app-config';
 import {FailedToLoad, OwnedPerk, User, Whitelist} from '../../domain/user';
 import {Order} from '../../domain/payment';
 import {Logger} from 'winston';
 import {createHash} from 'crypto';
 
-export class WhitelistPerk implements Perk {
+export class WhitelistPerk implements Perk, Refundable {
     inPackage: Package;
     type: string;
 
@@ -49,6 +49,22 @@ export class WhitelistPerk implements Perk {
             this.throwRedeemError(e);
         }
         return successParams;
+    }
+
+    async refund(forUser: RedeemTarget, order: Order): Promise<void> {
+        const steamId = SteamId64.of(forUser.steamId);
+        const request = {
+            serverApiId: ServerApiId.of(this.cftools.serverApiId),
+            playerId: steamId,
+        };
+        const item = await this.client.getWhitelist(request);
+        if (!item) {
+            return;
+        }
+        if (item.comment.indexOf(order.payment.transactionId) === -1) {
+            return;
+        }
+        await this.client.deleteWhitelist(request);
     }
 
     async ownedBy(target: RedeemTarget): Promise<OwnedPerk[] | null> {

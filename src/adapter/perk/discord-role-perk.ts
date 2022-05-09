@@ -1,12 +1,12 @@
 import {translate, TranslateParams} from '../../translations';
 import {Client, Constants, DiscordAPIError, Guild} from 'discord.js';
-import {Hints, Package, Perk, RedeemError, RedeemTarget} from '../../domain/package';
+import {Hints, Package, Perk, RedeemError, RedeemTarget, Refundable} from '../../domain/package';
 import {DiscordRole, OwnedPerk, User} from '../../domain/user';
 import {Order} from '../../domain/payment';
 import {Logger} from 'winston';
 import {createHash} from 'crypto';
 
-export class DiscordRolePerk implements Perk {
+export class DiscordRolePerk implements Perk, Refundable {
     inPackage: Package;
     type: string;
     readonly roles: string[];
@@ -87,6 +87,22 @@ export class DiscordRolePerk implements Perk {
             roles: addedRoles.join(', '),
         };
         return successParams;
+    }
+
+    async refund(forUser: RedeemTarget, order: Order): Promise<void> {
+        try {
+            const guild = await this.client.guilds.fetch(this.guildId);
+            const guildMember = await guild.members.fetch(forUser.discordId);
+            for (let roleId of this.roles) {
+                await guildMember.roles.remove(roleId);
+            }
+        } catch (e) {
+            throw new RedeemError(['DISCORD_ROLE_REDEEM_ERROR', {
+                params: {
+                    reason: e.message,
+                }
+            }]);
+        }
     }
 
     async ownedBy(target: RedeemTarget): Promise<OwnedPerk[] | null> {

@@ -1,5 +1,5 @@
 import {translate, TranslateParams} from '../../translations';
-import {Hints, Package, Perk, RedeemError, RedeemTarget} from '../../domain/package';
+import {Hints, Package, Perk, RedeemError, RedeemTarget, Refundable} from '../../domain/package';
 import {FailedToLoad, OwnedPerk, PrefixGroupMember, User} from '../../domain/user';
 import {Order} from '../../domain/payment';
 import {Logger} from 'winston';
@@ -7,7 +7,7 @@ import {createHash} from 'crypto';
 import fetch, {Response} from 'node-fetch';
 import {AppConfig, LbAgPgServer} from '../../domain/app-config';
 
-export class LbMasterAdvancedGroupPrefixGroupPerk implements Perk {
+export class LbMasterAdvancedGroupPrefixGroupPerk implements Perk, Refundable {
     inPackage: Package;
     type: string;
     readonly servers: string[];
@@ -41,14 +41,7 @@ export class LbMasterAdvancedGroupPrefixGroupPerk implements Perk {
     }
 
     async redeem(target: RedeemTarget, order: Order): Promise<TranslateParams> {
-        let server: LbAgPgServer = this.config.lb_ag_pg[this.servers[0]];
-        if (this.servers.length > 1) {
-            const serverId = order.perkDetails.get(this.id());
-            server = this.config.lb_ag_pg[serverId];
-            if (!server) {
-                throw new Error('the lb_ag_pg perk ' + this.id() + ' does not have a valid server for selected ID ' + serverId);
-            }
-        }
+        const server = this.server(order);
         try {
             await this.uidRequest(server, target.steamId, 'PUT');
 
@@ -60,6 +53,34 @@ export class LbMasterAdvancedGroupPrefixGroupPerk implements Perk {
             }];
         } catch (e) {
             this.log.error('Could not setup in-game tag. Error: ' + e);
+            throw new RedeemError(['LB_AG_PG_REDEEM_ERROR', {
+                params: {
+                    serverName: server.serverName,
+                    pgName: this.prefixGroup.name,
+                    reason: e.message,
+                }
+            }]);
+        }
+    }
+
+    private server(order: Order): LbAgPgServer {
+        let server: LbAgPgServer = this.config.lb_ag_pg[this.servers[0]];
+        if (this.servers.length > 1) {
+            const serverId = order.perkDetails.get(this.id());
+            server = this.config.lb_ag_pg[serverId];
+            if (!server) {
+                throw new Error('the lb_ag_pg perk ' + this.id() + ' does not have a valid server for selected ID ' + serverId);
+            }
+        }
+        return server;
+    }
+
+    async refund(forUser: RedeemTarget, order: Order): Promise<void> {
+        const server = this.server(order);
+        try {
+            await this.uidRequest(server, forUser.steamId, 'DELETE');
+        } catch (e) {
+            this.log.error('Could not refund in-game tag. Error: ' + e);
             throw new RedeemError(['LB_AG_PG_REDEEM_ERROR', {
                 params: {
                     serverName: server.serverName,
@@ -142,7 +163,7 @@ export class LbMasterAdvancedGroupPrefixGroupPerk implements Perk {
         return this.fingerprint;
     }
 
-    private async uidRequest(server: LbAgPgServer, uid: string, method: 'GET' | 'PUT' = 'GET'): Promise<Response> {
+    private async uidRequest(server: LbAgPgServer, uid: string, method: 'GET' | 'PUT' | 'DELETE' = 'GET'): Promise<Response> {
         const url = new URL(`/api/prefixGroups/${this.prefixGroup.index}/${uid}`, server.apiUrl);
         const response
             = await fetch(url.toString(), {
