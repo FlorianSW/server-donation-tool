@@ -94,7 +94,6 @@ export class PaypalWebhooksController {
             this.logger.error('Received invalid webhook (not originating from PayPal: ' + event.id);
             res.status(200).end();
         }
-        this.logger.info('Received a webhook event type: ' + event.event_type);
         switch (event.event_type) {
             case EventType.SaleCompleted:
                 const completed = resource as SaleCompleted;

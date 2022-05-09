@@ -52,8 +52,16 @@ You can configure multiple notifications, which take different (or even the same
             <td>A donator redeemed the perks of a package. This notification can be sent multiple times for a single donation.</td>
         </tr>
         <tr>
+            <td>SUCCESSFUL_REFUND</td>
+            <td>A donation was refunded by the payment provider. Perks granted by the donation were rolled back if possible.</td>
+        </tr>
+        <tr>
             <td>REDEEM_ERROR</td>
             <td>A donator tried to redeem perks for their package and there was an error. This notification might occur multiple times for the same donation, one for each errored perk.</td>
+        </tr>
+        <tr>
+            <td>REFUND_ERROR</td>
+            <td>It was tried to rollback a perk granted to a donator after the donation was refunded, but the refund of that perk failed.</td>
         </tr>
         <tr>
             <td>SUBSCRIPTION_ACTIVATED</td>

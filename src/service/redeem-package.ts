@@ -65,7 +65,7 @@ export class RedeemPackage {
                     this.logger.error(`Could not refund perk ${perk.type}:`, e);
                     if (e instanceof RedeemError) {
                         errors.push(e);
-                        this.events.emit('failedRedeemPerk', target, order, e);
+                        this.events.emit('failedRefundPerk', target, order, e);
                     } else {
                         throw e;
                     }
@@ -73,6 +73,7 @@ export class RedeemPackage {
             }
         }
 
+        this.events.emit('successfulRefund', target, order);
         return {
             success: [],
             errors: errors,

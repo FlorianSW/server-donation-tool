@@ -188,6 +188,8 @@ const messages: { [key: string]: string } = {
     NOTIFICATIONS_REDEEM_ERROR_TITLE: 'Redeem of perk errored',
     NOTIFICATIONS_REDEEM_ERROR_RETRY_TITLE: 'Donator retry link',
     NOTIFICATIONS_REDEEM_ERROR_RETRY_LINK: 'Retry link',
+    NOTIFICATIONS_REFUND_SUCCESSFUL_TITLE: 'Donation refunded',
+    NOTIFICATIONS_REFUND_SUCCESSFUL_DESCRIPTION: 'A donation was refunded. Perks were removed on a best-effort base.',
     NOTIFICATIONS_PAYMENT_SUCCESSFUL_TITLE: 'New Donation',
     NOTIFICATIONS_PAYMENT_SUCCESSFUL_DESCRIPTION: 'A new donation was received. The payment succeeded.',
     NOTIFICATIONS_PAYMENT_SUCCESSFUL_PUBLIC_DESCRIPTION: 'Thanks {{user}} for donating and supporting our community! :heart:',
@@ -201,6 +203,7 @@ const messages: { [key: string]: string } = {
     NOTIFICATIONS_SUBSCRIPTION_ID: 'Subscription ID',
     NOTIFICATIONS_SUBSCRIPTION_PACKAGE: 'Subscribed to package',
     NOTIFICATIONS_SUBSCRIPTION_DETAILS: 'Subscription details',
+    NOTIFICATIONS_REFUND_ERROR_TITLE: 'Refund of perk errored',
     USER_NOTIFICATIONS_SUB_DETAILS_LINK: 'Details incl. Cancel Link',
     USER_NOTIFICATIONS_SUB_DETAILS_LINK_CAPTION: 'Subscription details',
 

@@ -8,7 +8,9 @@ import {AppConfig} from '../../domain/app-config';
 
 export enum Type {
     SUCCESSFUL_REDEEM = 'SUCCESSFUL_REDEEM',
+    SUCCESSFUL_REFUND = 'SUCCESSFUL_REFUND',
     REDEEM_ERROR = 'REDEEM_ERROR',
+    REFUND_ERROR = 'REFUND_ERROR',
     DONATED = 'DONATED',
     DONATED_PUBLIC = 'DONATED_PUBLIC',
     SUBSCRIPTION_EXECUTED = 'SUBSCRIPTION_EXECUTED',
@@ -30,11 +32,13 @@ function webhookClient(notification: DiscordNotification): WebhookClient {
 export class DiscordNotifier {
     constructor(@inject('DonationEvents') private readonly events: DonationEvents, @inject('AppConfig') private readonly config: AppConfig) {
         events.on('successfulPayment', this.onSuccessfulPayment.bind(this));
+        events.on('successfulRefund', this.onSuccessfulRefund.bind(this));
         events.on('subscriptionCreated', this.onSubscriptionCreated.bind(this));
         events.on('subscriptionCancelled', this.onSubscriptionCancelled.bind(this));
         events.on('subscriptionExecuted', this.onSubscriptionExecuted.bind(this));
         events.on('successfulRedeem', this.onSuccessfulRedeem.bind(this));
         events.on('failedRedeemPerk', this.onFailedRedeemPerk.bind(this));
+        events.on('failedRefundPerk', this.failedRefundPerk.bind(this));
     }
 
     get notifications(): DiscordNotification[] {
@@ -80,6 +84,24 @@ export class DiscordNotifier {
 
                 webhookClient(d).send({
                     username: d.username || 'Donations',
+                    embeds: [embed],
+                });
+            });
+    }
+
+    async onSuccessfulRefund(target: RedeemTarget, order: Order): Promise<void> {
+        this.notifications
+            .filter((n) => n.types.includes(Type.SUCCESSFUL_REFUND))
+            .forEach((d) => {
+                const embed = new MessageEmbed()
+                    .setColor('DARK_GREY')
+                    .setTitle(translate('NOTIFICATIONS_REFUND_SUCCESSFUL_TITLE'))
+                    .setDescription(translate('NOTIFICATIONS_REFUND_SUCCESSFUL_DESCRIPTION'))
+                    .addFields(this.donatorMetaFields(target))
+                    .addFields(this.orderMetaFields(order));
+
+                webhookClient(d).send({
+                    username: d.username || 'Donation Refunds',
                     embeds: [embed],
                 });
             });
@@ -172,6 +194,24 @@ export class DiscordNotifier {
                             .addFields(this.donatorMetaFields(target))
                             .addFields(this.orderMetaFields(order))
                             .addField(translate('NOTIFICATIONS_REDEEM_ERROR_RETRY_TITLE'), `[${translate('NOTIFICATIONS_REDEEM_ERROR_RETRY_LINK')}](${order.asLink(this.config)})`, true)
+                    ],
+                });
+            });
+    }
+
+    async failedRefundPerk(target: RedeemTarget, order: Order, error: RedeemError): Promise<void> {
+        this.notifications
+            .filter((n) => n.types.includes(Type.REFUND_ERROR))
+            .forEach((d) => {
+                webhookClient(d).send({
+                    username: d.username || 'Donation Refund Errors',
+                    embeds: [
+                        new MessageEmbed()
+                            .setColor('YELLOW')
+                            .setTitle(translate('NOTIFICATIONS_REFUND_ERROR_TITLE'))
+                            .setDescription(translate(...error.params))
+                            .addFields(this.donatorMetaFields(target))
+                            .addFields(this.orderMetaFields(order))
                     ],
                 });
             });
