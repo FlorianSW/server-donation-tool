@@ -34,7 +34,7 @@ export class SQLiteOrderRepository implements OrderRepository {
                         b.string(columnId).unique('uc_id');
                         b.string(columnOrderId);
                         b.dateTime(columnCreated).index('idx_' + columnCreated);
-                        b.string(columnTransactionId).nullable();
+                        b.string(columnTransactionId).nullable().index('idx_' + columnTransactionId);
                         b.integer(columnStatus).index('idx_' + columnStatus);
                         b.string(columnCustomMessage, 255).nullable().defaultTo(null);
                         b.string(columnSteamId).nullable().defaultTo(null);
@@ -95,6 +95,7 @@ export class SQLiteOrderRepository implements OrderRepository {
                         });
                     }
                     await con.raw(`CREATE INDEX IF NOT EXISTS idx_${columnDiscordId} ON ${tableName}(${columnDiscordId})`);
+                    await con.raw(`CREATE INDEX IF NOT EXISTS idx_${columnTransactionId} ON ${tableName}(${columnTransactionId})`);
                     resolve(true);
                 }
             });
@@ -131,6 +132,19 @@ export class SQLiteOrderRepository implements OrderRepository {
             .limit(20)
             .then((result) => {
                 return result.map((o) => this.toOrder(o));
+            });
+    }
+
+    async findByTransactionId(id: string): Promise<Order | undefined> {
+        await this.initialized;
+        return this.con
+            .table(tableName)
+            .where(columnTransactionId, '=', id)
+            .limit(1)
+            .then((result) => {
+                if (result.length === 1) {
+                    return this.toOrder(result[0]);
+                }
             });
     }
 
@@ -209,6 +223,10 @@ export class InMemoryOrderRepository implements OrderRepository {
 
     async findByPaymentOrder(id: string): Promise<Order[]> {
         return Array.from(this.orders.values()).filter((o) => o.payment.id >= id);
+    }
+
+    async findByTransactionId(id: string): Promise<Order | undefined> {
+        return Array.from(this.orders.values()).filter((o) => o.payment.id >= id)[0];
     }
 
     async save(order: Order): Promise<void> {

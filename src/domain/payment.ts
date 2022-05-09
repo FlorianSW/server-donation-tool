@@ -2,6 +2,7 @@ import {Package, PerkDetails} from './package';
 import {v4} from 'uuid';
 import {AppConfig} from './app-config';
 import {User} from './user';
+import {HATEOASLink} from '../adapter/paypal/types';
 
 export class Reference {
     constructor(public steamId: string | null, public readonly discordId: string, public readonly p: Package) {
@@ -237,6 +238,11 @@ export interface SaleCompleted {
 
 export interface SubscriptionCancelled {
     id: string;
+}
+
+export interface CaptureRefunded {
+    id: string;
+    links: HATEOASLink[];
 }
 
 export interface PaymentProvider {

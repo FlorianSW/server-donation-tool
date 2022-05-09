@@ -38,10 +38,19 @@ describe('OrderRepository', () => {
     it('finds order by payment order ID', async () => {
         await repository.save(anOrder);
 
-        const roles = await repository.findByPaymentOrder('PAYMENT_ORDER_ID');
+        const roles = await repository.findByPaymentOrder(anOrder.payment.id);
 
         expect(roles).not.toBeUndefined();
         expect(roles).toEqual([anOrder]);
+    });
+
+    it('finds order by transaction ID', async () => {
+        await repository.save(anOrder);
+
+        const roles = await repository.findByTransactionId(anOrder.payment.transactionId);
+
+        expect(roles).not.toBeUndefined();
+        expect(roles).toEqual(anOrder);
     });
 
     it('returns undefined on unknown order Id', async () => {

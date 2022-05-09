@@ -1,5 +1,5 @@
 import {TranslateParams} from '../translations';
-import {Order} from './payment';
+import {Order, Reference} from './payment';
 import {OwnedPerk, User} from './user';
 
 export interface Perk {
@@ -45,6 +45,10 @@ export class RedeemTarget {
 
     public static fromUser(user: User): RedeemTarget {
         return new RedeemTarget(user.steam.id, user.discord.id, user.username);
+    }
+
+    public static fromReference(ref: Reference): RedeemTarget {
+        return new RedeemTarget(ref.steamId, ref.discordId, '');
     }
 }
 

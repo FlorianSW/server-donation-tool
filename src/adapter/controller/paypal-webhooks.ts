@@ -3,7 +3,7 @@ import {AppConfig, Properties} from '../../domain/app-config';
 import {Logger} from 'winston';
 import {inject, singleton} from 'tsyringe';
 import {Subscriptions} from '../../service/subscriptions';
-import {SaleCompleted, SubscriptionCancelled} from '../../domain/payment';
+import {CaptureRefunded, SaleCompleted, SubscriptionCancelled} from '../../domain/payment';
 import {PayPalClient} from '../paypal/client';
 import {
     CreateWebhookRequest,
@@ -15,13 +15,16 @@ import {
 } from '../paypal/types';
 import fs from 'fs';
 import {promisify} from 'util';
+import {RedeemPackage} from '../../service/redeem-package';
+import {OrderRepository} from '../../domain/repositories';
+import {RedeemTarget} from '../../domain/package';
 
 const fileExists = promisify(fs.exists);
 const readFile = promisify(fs.readFile);
 const unlinkFile = promisify(fs.unlink);
 
 enum EventType {
-    SaleCompleted = 'PAYMENT.SALE.COMPLETED', SubscriptionCancelled = 'BILLING.SUBSCRIPTION.CANCELLED',
+    SaleCompleted = 'PAYMENT.SALE.COMPLETED', SubscriptionCancelled = 'BILLING.SUBSCRIPTION.CANCELLED', CaptureRefunded = 'PAYMENT.CAPTURE.REFUNDED',
 }
 
 interface WebhookEvent {
@@ -43,6 +46,8 @@ export class PaypalWebhooksController {
         @inject('AppConfig') private readonly config: AppConfig,
         @inject('Properties') private readonly props: Properties,
         @inject('Subscriptions') private readonly subscriptions: Subscriptions,
+        @inject('OrderRepository') private readonly repo: OrderRepository,
+        @inject('RedeemPackage') private readonly redeemPackage: RedeemPackage,
         @inject('PayPalClient') private readonly client: PayPalClient,
         @inject('Logger') private readonly logger: Logger,
     ) {
@@ -89,6 +94,7 @@ export class PaypalWebhooksController {
             this.logger.error('Received invalid webhook (not originating from PayPal: ' + event.id);
             res.status(200).end();
         }
+        this.logger.info('Received a webhook event type: ' + event.event_type);
         switch (event.event_type) {
             case EventType.SaleCompleted:
                 const completed = resource as SaleCompleted;
@@ -98,10 +104,29 @@ export class PaypalWebhooksController {
                 const cancelled = resource as SubscriptionCancelled;
                 await this.subscriptions.notifyCancel(cancelled.id);
                 break;
+            case EventType.CaptureRefunded:
+                const refunded = resource as CaptureRefunded;
+                await this.refundPayment(refunded);
+                break;
             default:
                 this.logger.debug('Received a webhook event type, which is not handled: ' + event.event_type);
         }
         res.status(200).end();
+    }
+
+    private async refundPayment(refunded: CaptureRefunded) {
+        const up = refunded.links.find((l) => l.rel === 'up');
+        if (!up) {
+            this.logger.error('Refund event lacks the relation to refunded capture. Cannot refund. Refund ID: ' + refunded.id);
+            return;
+        }
+        const transactionId = up.href.split('/').pop();
+        const order = await this.repo.findByTransactionId(transactionId);
+        if (!order) {
+            this.logger.error(`Order with transaction ID ${transactionId} (of refund ${refunded.id}) does not exist in our records.`);
+        } else {
+            await this.redeemPackage.refund(order, RedeemTarget.fromReference(order.reference));
+        }
     }
 
     private async webhookEvent<T extends SaleCompleted | SubscriptionCancelled>(id: string): Promise<T | null> {
