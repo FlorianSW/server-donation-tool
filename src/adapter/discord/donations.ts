@@ -4,9 +4,16 @@ import {
     ApplicationCommandType,
     ButtonInteraction,
     ButtonStyle,
-    Client, Colors,
-    CommandInteraction, EmbedBuilder,
-    Interaction, InteractionReplyOptions, InteractionUpdateOptions, MessageEditOptions, SelectMenuComponentOptionData,
+    Client,
+    Colors,
+    CommandInteraction,
+    EmbedBuilder,
+    Interaction,
+    InteractionButtonComponentData,
+    InteractionReplyOptions,
+    InteractionUpdateOptions,
+    MessageEditOptions,
+    SelectMenuComponentOptionData,
     SelectMenuInteraction
 } from 'discord.js';
 import {AppConfig} from '../../domain/app-config';
@@ -153,8 +160,8 @@ export class Donations {
             type: 2,
             label: translate('PAYMENT_METHOD_' + p.provider().branding.name.toUpperCase()),
             customId: withPrefix(withPrefix(p.provider().branding.name, packageId.toString(10)), DONATE_MONEY),
-            style: 'PRIMARY',
-        }));
+            style: ButtonStyle.Primary,
+        } as InteractionButtonComponentData));
 
         await interaction.update({
             embeds: [this.buildPackageDetails(selectedPackage)],
@@ -167,8 +174,8 @@ export class Donations {
                         type: 2,
                         label: translate('CMD_DONATE_SELECT_ANOTHER'),
                         customId: PACKAGE_SELECTION,
-                        style: 'PRIMARY',
-                    }
+                        style: ButtonStyle.Primary,
+                    } as InteractionButtonComponentData,
                 ],
             }],
         });
