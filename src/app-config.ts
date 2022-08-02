@@ -1,5 +1,5 @@
 import {Authorization, AuthorizationProvider, CFToolsClientBuilder, TokenExpired} from 'cftools-sdk';
-import {Client} from 'discord.js';
+import {Client, GatewayIntentBits} from 'discord.js';
 import {AppConfig, LbAgPgServer, ServerNames} from './domain/app-config';
 import {Package, PriceType} from './domain/package';
 import {DiscordRolePerk} from './adapter/perk/discord-role-perk';
@@ -107,7 +107,7 @@ class YamlAppConfig implements AppConfig {
         };
     };
     cftools: { applicationId: string; secret: string };
-    lb_ag_pg: {[serverId: string]: LbAgPgServer};
+    lb_ag_pg: { [serverId: string]: LbAgPgServer };
     discord: {
         clientId: string;
         clientSecret: string;
@@ -272,7 +272,7 @@ class YamlAppConfig implements AppConfig {
 
         if (this.discord.bot?.token) {
             const client = new Client({
-                intents: ['GUILD_MEMBERS', 'GUILDS'],
+                intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMembers],
             });
             await new Promise(async (resolve, reject) => {
                 client.on('ready', () => {

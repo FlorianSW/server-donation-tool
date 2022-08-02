@@ -79,8 +79,9 @@ export class Authentication {
             res.render('login_error');
         });
         this.router.get('/auth/logout', (req, res) => {
-            req.logout();
-            res.redirect('/');
+            req.logout(() => {
+                res.redirect('/');
+            });
         });
     }
 

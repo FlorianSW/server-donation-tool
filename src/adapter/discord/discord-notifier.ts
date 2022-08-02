@@ -1,5 +1,5 @@
 import {Order, Subscription, SubscriptionPlan} from '../../domain/payment';
-import {EmbedFieldData, MessageEmbed, WebhookClient} from 'discord.js';
+import {APIEmbedField, Colors, EmbedBuilder, WebhookClient} from 'discord.js';
 import {translate} from '../../translations';
 import {Perk, RedeemError, RedeemTarget} from '../../domain/package';
 import {DonationEvents} from '../../domain/events';
@@ -49,15 +49,18 @@ export class DiscordNotifier {
         this.notifications
             .filter((n) => n.types.includes(Type.DONATED))
             .forEach((d) => {
-                const embed = new MessageEmbed()
-                    .setColor('DARK_BLUE')
+                const embed = new EmbedBuilder()
+                    .setColor(Colors.DarkBlue)
                     .setTitle(translate('NOTIFICATIONS_PAYMENT_SUCCESSFUL_TITLE'))
                     .setDescription(translate('NOTIFICATIONS_PAYMENT_SUCCESSFUL_DESCRIPTION'))
                     .addFields(this.donatorMetaFields(target))
                     .addFields(this.orderMetaFields(order));
 
                 if (order.customMessage) {
-                    embed.addField(translate('NOTIFICATIONS_PAYMENT_SUCCESSFUL_CUSTOM_MESSAGE'), order.customMessage);
+                    embed.addFields([{
+                        name: translate('NOTIFICATIONS_PAYMENT_SUCCESSFUL_CUSTOM_MESSAGE'),
+                        value: order.customMessage
+                    }]);
                 }
                 webhookClient(d).send({
                     username: d.username || 'Donations',
@@ -67,8 +70,8 @@ export class DiscordNotifier {
         this.notifications
             .filter((n) => n.types.includes(Type.DONATED_PUBLIC))
             .forEach((d) => {
-                const embed = new MessageEmbed()
-                    .setColor('GREEN')
+                const embed = new EmbedBuilder()
+                    .setColor(Colors.Green)
                     .setTitle(translate('NOTIFICATIONS_PAYMENT_SUCCESSFUL_TITLE'))
                     .setURL(this.config.app.publicUrl.toString())
                     .setFooter({text: 'Server Donation Tool by FlorianSW'})
@@ -93,8 +96,8 @@ export class DiscordNotifier {
         this.notifications
             .filter((n) => n.types.includes(Type.SUCCESSFUL_REFUND))
             .forEach((d) => {
-                const embed = new MessageEmbed()
-                    .setColor('DARK_GREY')
+                const embed = new EmbedBuilder()
+                    .setColor(Colors.DarkGrey)
                     .setTitle(translate('NOTIFICATIONS_REFUND_SUCCESSFUL_TITLE'))
                     .setDescription(translate('NOTIFICATIONS_REFUND_SUCCESSFUL_DESCRIPTION'))
                     .addFields(this.donatorMetaFields(target))
@@ -111,8 +114,8 @@ export class DiscordNotifier {
         this.notifications
             .filter((n) => n.types.includes(Type.SUBSCRIPTION_CREATED))
             .forEach((d) => {
-                const embed = new MessageEmbed()
-                    .setColor('DARK_BLUE')
+                const embed = new EmbedBuilder()
+                    .setColor(Colors.DarkBlue)
                     .setTitle(translate('NOTIFICATIONS_SUBSCRIPTION_CREATED_TITLE'))
                     .setDescription(translate('NOTIFICATIONS_SUBSCRIPTION_CREATED_DESCRIPTION'))
                     .addFields(this.donatorMetaFields(target))
@@ -129,8 +132,8 @@ export class DiscordNotifier {
         this.notifications
             .filter((n) => n.types.includes(Type.SUBSCRIPTION_CANCELLED))
             .forEach((d) => {
-                const embed = new MessageEmbed()
-                    .setColor('DARK_RED')
+                const embed = new EmbedBuilder()
+                    .setColor(Colors.DarkRed)
                     .setTitle(translate('NOTIFICATIONS_SUBSCRIPTION_CANCELLED_TITLE'))
                     .setDescription(translate('NOTIFICATIONS_SUBSCRIPTION_CANCELLED_DESCRIPTION'))
                     .addFields(this.donatorMetaFields(target))
@@ -147,8 +150,8 @@ export class DiscordNotifier {
         this.notifications
             .filter((n) => n.types.includes(Type.SUBSCRIPTION_EXECUTED))
             .forEach((d) => {
-                const embed = new MessageEmbed()
-                    .setColor('DARK_GREEN')
+                const embed = new EmbedBuilder()
+                    .setColor(Colors.DarkGreen)
                     .setTitle(translate('NOTIFICATIONS_SUBSCRIPTION_EXECUTED_TITLE'))
                     .setDescription(translate('NOTIFICATIONS_SUBSCRIPTION_EXECUTED_DESCRIPTION'))
                     .addFields(this.donatorMetaFields(target))
@@ -169,8 +172,8 @@ export class DiscordNotifier {
                 webhookClient(d).send({
                     username: d.username || 'Donations',
                     embeds: [
-                        new MessageEmbed()
-                            .setColor('DARK_GREEN')
+                        new EmbedBuilder()
+                            .setColor(Colors.DarkGreen)
                             .setTitle(translate('NOTIFICATIONS_REDEEM_SUCCESSFUL_TITLE'))
                             .setDescription(translate('NOTIFICATIONS_REDEEM_SUCCESSFUL_DESCRIPTION'))
                             .addFields(this.donatorMetaFields(target))
@@ -187,13 +190,17 @@ export class DiscordNotifier {
                 webhookClient(d).send({
                     username: d.username || 'Donations',
                     embeds: [
-                        new MessageEmbed()
-                            .setColor('DARK_RED')
+                        new EmbedBuilder()
+                            .setColor(Colors.DarkRed)
                             .setTitle(translate('NOTIFICATIONS_REDEEM_ERROR_TITLE'))
                             .setDescription(translate(...error.params))
                             .addFields(this.donatorMetaFields(target))
                             .addFields(this.orderMetaFields(order))
-                            .addField(translate('NOTIFICATIONS_REDEEM_ERROR_RETRY_TITLE'), `[${translate('NOTIFICATIONS_REDEEM_ERROR_RETRY_LINK')}](${order.asLink(this.config)})`, true)
+                            .addFields([{
+                                name: translate('NOTIFICATIONS_REDEEM_ERROR_RETRY_TITLE'),
+                                value: `[${translate('NOTIFICATIONS_REDEEM_ERROR_RETRY_LINK')}](${order.asLink(this.config)})`,
+                                inline: true,
+                            }])
                     ],
                 });
             });
@@ -206,8 +213,8 @@ export class DiscordNotifier {
                 webhookClient(d).send({
                     username: d.username || 'Donation Refund Errors',
                     embeds: [
-                        new MessageEmbed()
-                            .setColor('YELLOW')
+                        new EmbedBuilder()
+                            .setColor(Colors.Yellow)
                             .setTitle(translate('NOTIFICATIONS_REFUND_ERROR_TITLE'))
                             .setDescription(translate(...error.params))
                             .addFields(this.donatorMetaFields(target))
@@ -217,7 +224,7 @@ export class DiscordNotifier {
             });
     }
 
-    private donatorMetaFields(target: RedeemTarget): EmbedFieldData[] {
+    private donatorMetaFields(target: RedeemTarget): APIEmbedField[] {
         return [
             {
                 name: translate('NOTIFICATIONS_REDEEM_SUCCESSFUL_USERNAME'),
@@ -229,7 +236,7 @@ export class DiscordNotifier {
         ];
     }
 
-    private orderMetaFields(order: Order, perks: Perk[] = []): EmbedFieldData[] {
+    private orderMetaFields(order: Order, perks: Perk[] = []): APIEmbedField[] {
         let redeemedPerks = '';
         if (perks.length !== 0) {
             redeemedPerks = `Redeemed perks: ${perks.map((p) => p.asShortString(order))}`;
@@ -247,7 +254,7 @@ ${redeemedPerks}`
         ]
     }
 
-    private subscriptionMetaFields(sub: Subscription, plan: SubscriptionPlan): EmbedFieldData[] {
+    private subscriptionMetaFields(sub: Subscription, plan: SubscriptionPlan): APIEmbedField[] {
         return [
             {name: translate('NOTIFICATIONS_SUBSCRIPTION_PACKAGE'), value: plan.basePackage.name, inline: true},
             {

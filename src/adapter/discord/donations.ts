@@ -1,12 +1,12 @@
 import {inject, injectAll, singleton} from 'tsyringe';
 import {Logger} from 'winston';
 import {
+    ApplicationCommandType,
     ButtonInteraction,
-    Client,
-    CommandInteraction,
-    Interaction,
-    MessageEmbed,
-    MessageSelectOptionData,
+    ButtonStyle,
+    Client, Colors,
+    CommandInteraction, EmbedBuilder,
+    Interaction, InteractionReplyOptions, InteractionUpdateOptions, MessageEditOptions, SelectMenuComponentOptionData,
     SelectMenuInteraction
 } from 'discord.js';
 import {AppConfig} from '../../domain/app-config';
@@ -68,7 +68,7 @@ export class Donations {
         const cmd = await this.client.application.commands.create({
             name: translate('CMD_DONATE_NAME'),
             description: translate('CMD_DONATE_DESCRIPTION'),
-            type: 'CHAT_INPUT',
+            type: ApplicationCommandType.ChatInput,
         }, this.config.discord.commands.donate.guildId);
 
         return cmd.id;
@@ -93,7 +93,7 @@ export class Donations {
     }
 
     private async onDonateCommand(interaction: CommandInteraction | ButtonInteraction): Promise<void> {
-        const options: MessageSelectOptionData[] = this.packages
+        const options: SelectMenuComponentOptionData[] = this.packages
             .filter((p) => p.perks.every((p) => p.subjects() === null))
             .map((p) => {
                 return {
@@ -103,9 +103,9 @@ export class Donations {
                 };
             });
 
-        const embeds: MessageEmbed[] = [];
+        const embeds: EmbedBuilder[] = [];
         if (this.packages.length !== options.length) {
-            embeds.push(new MessageEmbed().setDescription(translate('CMD_DONATE_HIDDEN_PACKAGES', {params: {fullSite: this.config.app.publicUrl.toString()}})))
+            embeds.push(new EmbedBuilder().setDescription(translate('CMD_DONATE_HIDDEN_PACKAGES', {params: {fullSite: this.config.app.publicUrl.toString()}})))
         }
 
         const payload = {
@@ -121,7 +121,7 @@ export class Donations {
                     options: options,
                 }],
             }],
-        };
+        } as InteractionReplyOptions & InteractionUpdateOptions;
         if (interaction instanceof ButtonInteraction) {
             await interaction.update(payload);
         } else {
@@ -142,7 +142,7 @@ export class Donations {
                         type: 2,
                         label: translate('CMD_DONATE_START_OVER'),
                         customId: PACKAGE_SELECTION,
-                        style: 'PRIMARY',
+                        style: ButtonStyle.Primary,
                     }],
                 }],
             });
@@ -174,9 +174,9 @@ export class Donations {
         });
     }
 
-    private buildPackageDetails(selectedPackage: Package): MessageEmbed {
-        return new MessageEmbed()
-            .setColor('DARK_BLUE')
+    private buildPackageDetails(selectedPackage: Package): EmbedBuilder {
+        return new EmbedBuilder()
+            .setColor(Colors.DarkBlue)
             .setDescription(translate('CMD_DONATE_PACKAGE_DETAILS_TITLE', {params: {name: selectedPackage.name}}))
             .addFields([{
                 name: translate('CMD_DONATE_PACKAGE_DETAILS_PERKS'),
@@ -202,7 +202,7 @@ export class Donations {
                         type: 2,
                         label: translate('CMD_DONATE_START_OVER'),
                         customId: PACKAGE_SELECTION,
-                        style: 'PRIMARY',
+                        style: ButtonStyle.Primary,
                     }],
                 }],
             });
@@ -236,7 +236,7 @@ export class Donations {
                     type: 2,
                     url: (paymentOrder as PaymentOrder & DeferredPaymentOrder).paymentUrl,
                     label: translate('CMD_DONATE_DONATE'),
-                    style: 'LINK',
+                    style: ButtonStyle.Link,
                 }],
             }],
         });

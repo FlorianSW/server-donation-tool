@@ -3,7 +3,7 @@ import {Request, Response, Router} from 'express';
 import {Package, Perk, RedeemTarget} from '../../domain/package';
 import {AppConfig} from '../../domain/app-config';
 import {OwnedPerk} from '../../domain/user';
-import {Constants, DiscordAPIError} from 'discord.js';
+import {DiscordAPIError, RESTJSONErrorCodes} from 'discord.js';
 import {inject, singleton} from 'tsyringe';
 
 @singleton()
@@ -34,7 +34,7 @@ export class DonatorsController {
                     text: p.asString(),
                 })));
         } catch (e) {
-            if (e instanceof DiscordAPIError && e.code === Constants.APIErrors.UNKNOWN_MEMBER && this.config.app.community?.discord) {
+            if (e instanceof DiscordAPIError && e.code === RESTJSONErrorCodes.UnknownMember && this.config.app.community?.discord) {
                 res.redirect(this.config.app.community.discord);
                 return;
             }

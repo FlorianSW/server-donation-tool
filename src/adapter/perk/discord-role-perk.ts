@@ -1,5 +1,5 @@
 import {translate, TranslateParams} from '../../translations';
-import {Client, Constants, DiscordAPIError, Guild} from 'discord.js';
+import {Client, DiscordAPIError, Guild, RESTJSONErrorCodes} from 'discord.js';
 import {Hints, Package, Perk, RedeemError, RedeemTarget, Refundable} from '../../domain/package';
 import {DiscordRole, OwnedPerk, User} from '../../domain/user';
 import {Order} from '../../domain/payment';
@@ -47,7 +47,7 @@ export class DiscordRolePerk implements Perk, Refundable {
         try {
             await guild.members.fetch(forUser.discord.id);
         } catch (e) {
-            if (e instanceof DiscordAPIError && e.code === Constants.APIErrors.UNKNOWN_MEMBER) {
+            if (e instanceof DiscordAPIError && e.code === RESTJSONErrorCodes.UnknownMember) {
                 notices.push(unknownMember);
             } else {
                 throw e;
