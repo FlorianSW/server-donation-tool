@@ -14,6 +14,7 @@ nav:
       - 'Discord Notifications': 'discord-notifications.md'
   - 'Payments':
       - Refunds: 'payments/refunds.md'
+      - Taxes: 'payments/vat.md'
       - 'Providers':
         - PayPal: 'payments/paypal.md'
         - Stripe.com: 'payments/stripe.md'
