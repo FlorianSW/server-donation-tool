@@ -11,6 +11,7 @@ interface VATStackRate {
     country_code: string;
     country_name: string;
     standard_rate: number;
+    vat_local_name: string;
 }
 
 function toVATRate(r: VATStackRate, p?: Price): VATRate {
@@ -26,6 +27,7 @@ function toVATRate(r: VATStackRate, p?: Price): VATRate {
         rate: r.categories?.eservice || r.standard_rate,
         amount,
         countryName: r.country_name,
+        displayName: r.vat_local_name,
     }
 }
 

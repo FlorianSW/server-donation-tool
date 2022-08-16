@@ -50,6 +50,25 @@ export class StripePayment implements Payment {
     }
 
     async createPaymentOrder(request: CreatePaymentOrderRequest & DeferredPaymentOrderRequest): Promise<PaymentOrder & DeferredPaymentOrder> {
+        let rate: Stripe.TaxRate;
+        if (request.vat) {
+            const rates = await this.client.taxRates.list({
+                active: true,
+            });
+            rate = rates.data.find((r) => r.country === request.vat.countryCode);
+            if (!rate) {
+                rate = await this.client.taxRates.create({
+                    active: true,
+                    display_name: request.vat.displayName,
+                    country: request.vat.countryCode,
+                    description: 'Added by Server Donation Tool',
+                    inclusive: false,
+                    percentage: request.vat.rate,
+                    tax_type: 'vat',
+                });
+            }
+        }
+
         const sess = await this.client.checkout.sessions.create({
             mode: 'payment',
             line_items: [{
@@ -60,7 +79,9 @@ export class StripePayment implements Payment {
                         name: request.forPackage.payment?.name || request.forPackage.name,
                     },
                     unit_amount: parseFloat(request.forPackage.price.amount) * 100,
+                    tax_behavior: 'exclusive',
                 },
+                tax_rates: [rate.id],
             }],
             submit_type: 'donate',
             cancel_url: request.cancelUrl.toString(),
