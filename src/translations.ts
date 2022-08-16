@@ -99,6 +99,7 @@ const messages: { [key: string]: string } = {
     DONATE_VAT_TITLE: '{{index}}. Country Selection (VAT)',
     DONATE_VAT_DESCRIPTION: 'To add the correct VAT to your donation, please select your country of residence.',
     DONATE_VAT_OTHER: 'Other',
+    DONATE_VAT_ABBREVIATION: 'Taxes (VAT)',
 
     SUBSCRIBE_CYCLE_LABEL: 'Subscription cycle',
     SUBSCRIBE_CYCLE_MONTHLY: 'monthly',

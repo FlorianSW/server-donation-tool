@@ -110,7 +110,9 @@ export class DonationController {
                 res.redirect('/donate');
                 return;
             }
-            if (selectedCountry !== 'other') {
+            if (selectedCountry === 'other') {
+                req.session.vat = undefined;
+            } else {
                 req.session.vat = await this.vats.forCountry(selectedPackage.price, selectedCountry);
             }
         }
@@ -150,6 +152,7 @@ export class DonationController {
                     template: selectedPayment.donation.template,
                     data: selectedPayment.donation.publicRenderData,
                 },
+                appliedVat: req.session.vat,
             });
         } else {
             res.status(400).write('payment method can not be rendered');
@@ -257,7 +260,9 @@ export class DonationController {
                 res.redirect('/');
                 return;
             }
-            if (selectedCountry !== 'other') {
+            if (selectedCountry === 'other') {
+                req.session.vat = undefined;
+            } else {
                 req.session.vat = await this.vats.forCountry(selectedPackage.price, selectedCountry);
             }
         }

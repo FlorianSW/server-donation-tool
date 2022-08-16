@@ -12,5 +12,11 @@
                 <span><%= translate('DONATE_PERK_INCLUDED') %></span>
             <% }); %>
         </div>
+        <% if (locals.appliedVat) { %>
+            <div>
+                <span><%= translate('DONATE_VAT_ABBREVIATION') %></span>
+                <span><%= selectedPackage.price.currency + ' ' + appliedVat.amount %></span>
+            </div>
+        <% } %>
     </div>
 </div>
