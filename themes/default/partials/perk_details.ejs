@@ -1,5 +1,5 @@
 <% if (needsFurtherSelection) { %>
-    <h5><%= translate('DONATE_PERKS_SUBJECT_SELECTION_TITLE', {params: {index: index++}}) %></h5>
+    <h5><%= translate('DONATE_PERKS_SUBJECT_SELECTION_TITLE', {params: {index: index}}) %></h5>
     <p><%= translate('DONATE_PERKS_SUBJECT_SELECTION_DESCRIPTION') %></p>
     <% selectedPackage.perks.forEach(function (perk) { %>
         <% const hints = interfaceHints.get(perk.id()); %>

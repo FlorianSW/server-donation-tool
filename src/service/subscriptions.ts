@@ -14,6 +14,7 @@ import {OrderRepository, SubscriptionPlanRepository, SubscriptionsRepository} fr
 import {RedeemPackage} from './redeem-package';
 import {EventSource} from '../domain/events';
 import {CANCELLED} from 'dns';
+import {VATRate} from '../domain/vat';
 
 @singleton()
 export class Subscriptions {
@@ -27,11 +28,11 @@ export class Subscriptions {
     ) {
     }
 
-    async subscribe(p: Package, perkDetails: PerkDetails, user: User): Promise<PendingSubscription> {
+    async subscribe(p: Package, perkDetails: PerkDetails, user: User, vat?: VATRate): Promise<PendingSubscription> {
         const plan = await this.subscriptionPlans.findByPackage(p);
         const sub = Subscription.create(plan, user);
         sub.pushPerkDetails(perkDetails);
-        const result = await this.payment.subscribe(sub, plan, user);
+        const result = await this.payment.subscribe(sub, plan, user, vat);
         sub.agreeBilling(result.id);
         await this.subscriptions.save(sub);
 

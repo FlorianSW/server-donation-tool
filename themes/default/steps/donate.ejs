@@ -26,6 +26,7 @@
     <% } else { %>
         <form action="/donate" method="post">
             <%- include('../partials/perk_details.ejs', {index: index}) %>
+            <%- include('../partials/vats.ejs', {index: index}) %>
 
             <h5><%= translate('DONATE_CUSTOM_MESSAGE_TITLE', {params: {index: index++}}) %></h5>
             <div class="input-field custom-message">

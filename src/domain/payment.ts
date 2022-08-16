@@ -3,6 +3,7 @@ import {v4} from 'uuid';
 import {AppConfig} from './app-config';
 import {User} from './user';
 import {HATEOASLink} from '../adapter/paypal/types';
+import {VATRate} from './vat';
 
 export class Reference {
     constructor(public steamId: string | null, public readonly discordId: string, public readonly p: Package) {
@@ -41,6 +42,7 @@ export class Order {
         public readonly created: Date,
         public readonly reference: Reference,
         public readonly customMessage: string | null,
+        public readonly country: string,
         public redeemedAt: Date | null,
         public status: OrderStatus,
         public payment: OrderPayment,
@@ -49,12 +51,12 @@ export class Order {
     ) {
     }
 
-    public static create(created: Date, payment: OrderPayment, reference: Reference, customMessage: string | null = null): Order {
-        return new Order(v4(), created, reference, customMessage, null, OrderStatus.CREATED, payment, new Map(), null);
+    public static create(created: Date, payment: OrderPayment, reference: Reference, customMessage: string | null = null, country: string = 'XX'): Order {
+        return new Order(v4(), created, reference, customMessage, country, null, OrderStatus.CREATED, payment, new Map(), null);
     }
 
-    public static createDeferred(created: Date, reference: Reference, customMessage: string | null = null): Order {
-        return new Order(v4(), created, reference, customMessage, null, OrderStatus.CREATED, null, new Map(), null);
+    public static createDeferred(created: Date, reference: Reference, customMessage: string | null = null, country: string = 'XX'): Order {
+        return new Order(v4(), created, reference, customMessage, country, null, OrderStatus.CREATED, null, new Map(), null);
     }
 
     public paymentIntent(payment: OrderPayment) {
@@ -203,6 +205,7 @@ export interface CreatePaymentOrderRequest {
     forPackage: Package;
     steamId: string;
     discordId: string;
+    vat?: VATRate;
 }
 
 export interface DeferredPaymentOrderRequest {
@@ -270,7 +273,7 @@ export interface Payment {
 export interface SubscriptionPaymentProvider {
     persistSubscription(p: Package, plan?: SubscriptionPlan): Promise<SubscriptionPlan>;
 
-    subscribe(sub: Subscription, plan: SubscriptionPlan, user: User): Promise<PendingSubscription>;
+    subscribe(sub: Subscription, plan: SubscriptionPlan, user: User, vat?: VATRate): Promise<PendingSubscription>;
 
     subscriptionDetails(sub: Subscription): Promise<SubscriptionPayment | undefined>;
 

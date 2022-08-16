@@ -96,6 +96,10 @@ const messages: { [key: string]: string } = {
     DONATE_PERKS_SUBJECT_SELECTION_TITLE: '{{index}}. Perk details',
     DONATE_PERKS_SUBJECT_SELECTION_DESCRIPTION: 'Some perks require you to select for what you want to redeem them or have additional information. Please review that and make changes if necessary.',
 
+    DONATE_VAT_TITLE: '{{index}}. Country Selection (VAT)',
+    DONATE_VAT_DESCRIPTION: 'To add the correct VAT to your donation, please select your country of residence.',
+    DONATE_VAT_OTHER: 'Other',
+
     SUBSCRIBE_CYCLE_LABEL: 'Subscription cycle',
     SUBSCRIBE_CYCLE_MONTHLY: 'monthly',
 

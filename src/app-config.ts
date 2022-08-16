@@ -24,6 +24,7 @@ import {fromHttpError, GotHttpClient} from 'cftools-sdk/lib/internal/http';
 import {DiscordUserNotifier} from './adapter/discord/discord-user-notifier';
 import {ReservedSlotPerk} from './adapter/perk/reserved-slot';
 import {LbMasterAdvancedGroupPrefixGroupPerk} from './adapter/perk/lb-ag-pg-perk';
+import {NoOpVats, VATStack} from './adapter/vat_stack';
 
 const initSessionStore = require('connect-session-knex');
 const sessionStore = initSessionStore(session);
@@ -125,6 +126,12 @@ class YamlAppConfig implements AppConfig {
             }
         },
     };
+    vats?: {
+        enabled: boolean;
+        vatStack?: {
+            publicKey: string;
+        };
+    };
     steam?: {
         apiKey: string;
         redirectUrl: string;
@@ -170,6 +177,7 @@ class YamlAppConfig implements AppConfig {
         this.assertValidPackages();
         await this.configureSessionStore();
         await this.configureDiscord();
+        await this.configureVats();
         await this.configureExpiringDiscordRoles();
         await this.configureOrders();
         container.resolve(DiscordDonationTarget);
@@ -296,6 +304,14 @@ class YamlAppConfig implements AppConfig {
             container.resolve(DiscordNotifier);
         }
         container.resolve(DiscordUserNotifier);
+    }
+
+    private async configureVats() {
+        if (this.vats?.enabled === true && this.vats.vatStack?.publicKey !== undefined) {
+            container.registerSingleton('VATs', VATStack);
+        } else {
+            container.registerSingleton('VATs', NoOpVats);
+        }
     }
 
     private async configureExpiringDiscordRoles(): Promise<void> {

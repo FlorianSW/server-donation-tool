@@ -1,5 +1,6 @@
 import {User as DomainUser} from './domain/user';
 import {DonationType, PerkDetails, Price} from './domain/package';
+import {VATRate} from './domain/vat';
 
 declare global {
     namespace Express {
@@ -21,6 +22,7 @@ declare module 'express-session' {
             perkDetails: PerkDetails;
             type: DonationType;
         };
+        vat?: VATRate,
         afterLoginTarget?: string;
         lastOrder?: {
             id: string,

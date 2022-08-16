@@ -73,6 +73,12 @@ export interface AppConfig {
         clientSecret: string,
         manageWebhook: boolean,
     },
+    vats?: {
+        enabled: boolean;
+        vatStack?: {
+            publicKey: string;
+        };
+    },
     stripe?: {
         secretKey: string,
     },

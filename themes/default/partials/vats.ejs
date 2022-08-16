@@ -1,0 +1,12 @@
+<% if (vatRates.length !== 0) { %>
+    <h5><%= translate('DONATE_VAT_TITLE', {params: {index: index}}) %></h5>
+    <p>
+        <%= translate('DONATE_VAT_DESCRIPTION') %>
+    </p>
+    <select class="browser-default" name="vat-country">
+        <% vatRates.forEach(function (rate) { %>
+            <option value="<%= rate.countryCode %>"><%= rate.countryName %></option>
+        <% }); %>
+        <option value="other"><%= translate('DONATE_VAT_OTHER') %></option>
+    </select>
+<% } %>

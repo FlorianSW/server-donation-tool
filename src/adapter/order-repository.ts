@@ -21,6 +21,7 @@ const columnRedeemedAt = 'redeemed_at';
 const columnRefundedAt = 'refunded_at';
 const columnPaymentProvider = 'payment_provider';
 const columnPerkDetails = 'perk_details';
+const columnCountryCode = 'country_code';
 
 @singleton()
 export class SQLiteOrderRepository implements OrderRepository {
@@ -45,6 +46,7 @@ export class SQLiteOrderRepository implements OrderRepository {
                         b.dateTime(columnRefundedAt).nullable().defaultTo(null);
                         b.string(columnPaymentProvider, 10).notNullable().defaultTo(PaypalPayment.NAME);
                         b.text(columnPerkDetails).nullable().defaultTo(null);
+                        b.string(columnCountryCode, 5).defaultTo('XX');
                     }).then(() => {
                         resolve(true);
                     });
@@ -92,6 +94,11 @@ export class SQLiteOrderRepository implements OrderRepository {
                     if (!c.hasOwnProperty(columnRefundedAt)) {
                         await con.schema.alterTable(tableName, (b) => {
                             b.dateTime(columnRefundedAt).nullable().defaultTo(null);
+                        });
+                    }
+                    if (!c.hasOwnProperty(columnCountryCode)) {
+                        await con.schema.alterTable(tableName, (b) => {
+                            b.string(columnCountryCode, 5).defaultTo('XX');
                         });
                     }
                     await con.raw(`CREATE INDEX IF NOT EXISTS idx_${columnDiscordId} ON ${tableName}(${columnDiscordId})`);
@@ -210,7 +217,7 @@ export class SQLiteOrderRepository implements OrderRepository {
             transactionId: o[columnTransactionId],
             provider: o[columnPaymentProvider],
         };
-        return new Order(o[columnId], new Date(o[columnCreated]), reference, o[columnCustomMessage] || null, o[columnRedeemedAt] ? new Date(o[columnRedeemedAt]) : null, o[columnStatus], payment, new Map(JSON.parse(o[columnPerkDetails])), o[columnRefundedAt] ? new Date(o[columnRefundedAt]) : null);
+        return new Order(o[columnId], new Date(o[columnCreated]), reference, o[columnCustomMessage] || null, o[columnCountryCode] || 'XX', o[columnRedeemedAt] ? new Date(o[columnRedeemedAt]) : null, o[columnStatus], payment, new Map(JSON.parse(o[columnPerkDetails])), o[columnRefundedAt] ? new Date(o[columnRefundedAt]) : null);
     }
 }
 

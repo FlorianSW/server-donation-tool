@@ -13,6 +13,7 @@ import {OrderRepository} from '../../domain/repositories';
 import {Subscriptions} from '../../service/subscriptions';
 import {RedeemPackage} from '../../service/redeem-package';
 import {User} from '../../domain/user';
+import {VATs} from '../../domain/vat';
 
 @singleton()
 export class DonationController {
@@ -21,6 +22,7 @@ export class DonationController {
     constructor(
         @inject('AppConfig') private readonly config: AppConfig,
         @inject('availablePackages') private readonly packages: Package[],
+        @inject('VATs') private readonly vats: VATs,
         @injectAll('Payment') private readonly payments: Payment[],
         @inject('OrderRepository') private readonly repo: OrderRepository,
         @inject('Subscriptions') private readonly subscriptions: Subscriptions,
@@ -101,6 +103,18 @@ export class DonationController {
             return;
         }
 
+        const rates = await this.vats.countries(selectedPackage.price);
+        if (rates.length !== 0) {
+            const selectedCountry = req.body['vat-country'];
+            if (!selectedCountry) {
+                res.redirect('/donate');
+                return;
+            }
+            if (selectedCountry !== 'other') {
+                req.session.vat = await this.vats.forCountry(selectedPackage.price, selectedCountry);
+            }
+        }
+
         if (!this.populatePerkDetails(selectedPackage, req)) {
             res.redirect('/donate');
             return;
@@ -167,6 +181,7 @@ export class DonationController {
             res.redirect('/');
             return;
         }
+        const rates = await this.vats.countries(selectedPackage.price);
         let template = 'steps/donate';
         if (req.session.selectedPackage.type === DonationType.Subscription) {
             template = 'steps/subscribe';
@@ -188,6 +203,7 @@ export class DonationController {
                 subscription: selectedPackage.subscription,
                 type: req.session.selectedPackage.type,
             },
+            vatRates: rates,
             needsFurtherSelection: selectedPackage.perks.some((p) => p.subjects() !== null),
             interfaceHints: perkHints,
             paymentMethods: this.payments.map((p) => p.provider().branding),
@@ -234,8 +250,19 @@ export class DonationController {
             res.redirect('/');
             return;
         }
+        const rates = await this.vats.countries(selectedPackage.price);
+        if (rates.length !== 0) {
+            const selectedCountry = req.body['vat-country'];
+            if (!selectedCountry) {
+                res.redirect('/');
+                return;
+            }
+            if (selectedCountry !== 'other') {
+                req.session.vat = await this.vats.forCountry(selectedPackage.price, selectedCountry);
+            }
+        }
 
-        const result = await this.subscriptions.subscribe(selectedPackage, req.session.selectedPackage.perkDetails, req.user);
+        const result = await this.subscriptions.subscribe(selectedPackage, req.session.selectedPackage.perkDetails, req.user, req.session.vat);
         res.redirect(result.approvalLink);
     }
 
@@ -292,7 +319,7 @@ export class DonationController {
             return;
         }
 
-        const order = Order.createDeferred(new Date(), new Reference(steamId, req.user.discord.id, p), customMessage);
+        const order = Order.createDeferred(new Date(), new Reference(steamId, req.user.discord.id, p), customMessage, req.session.vat.countryCode || 'XX');
         const paymentOrder = await payment.createPaymentOrder({
             candidateOrderId: order.id,
             successUrl: new URL('/donate/' + order.id + '?provider=' + payment.provider().branding.name, this.config.app.publicUrl),
@@ -300,6 +327,7 @@ export class DonationController {
             forPackage: p,
             steamId: steamId,
             discordId: req.user.discord.id,
+            vat: req.session.vat,
         });
         order.paymentIntent({
             id: paymentOrder.id,
@@ -339,13 +367,14 @@ export class DonationController {
             forPackage: p,
             steamId: steamId,
             discordId: req.user.discord.id,
+            vat: req.session.vat,
         });
 
         const order = Order.create(paymentOrder.created, {
             id: paymentOrder.id,
             transactionId: paymentOrder.transactionId,
             provider: payment.provider().branding.name,
-        }, new Reference(steamId, req.user.discord.id, p), customMessage);
+        }, new Reference(steamId, req.user.discord.id, p), customMessage, req.session.vat?.countryCode || 'XX');
         order.pushPerkDetails(req.session.selectedPackage.perkDetails);
         await this.repo.save(order);
 

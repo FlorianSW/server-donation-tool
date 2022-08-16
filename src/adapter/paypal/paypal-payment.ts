@@ -41,6 +41,7 @@ import {
     UpdatePricingPlanRequest,
     UpdateProductRequest
 } from './types';
+import {VATRate} from '../../domain/vat';
 
 const paypal = require('@paypal/checkout-server-sdk');
 
@@ -104,6 +105,10 @@ export class PaypalPayment implements Payment, SubscriptionPaymentProvider {
         const communityTitle = this.config.app.community?.title || translate('PAYPAL_DEFAULT_COMMUNITY_NAME');
         const r = new paypal.orders.OrdersCreateRequest();
         r.prefer('return=representation');
+        let amount = request.forPackage.price.amount;
+        if (request.vat) {
+            amount = (parseFloat(request.forPackage.price.amount) + parseFloat(request.vat.amount)).toFixed(2);
+        }
         const body: { [key: string]: any } = {
             intent: 'CAPTURE',
             application_context: {
@@ -120,12 +125,16 @@ export class PaypalPayment implements Payment, SubscriptionPaymentProvider {
                 }),
                 amount: {
                     currency_code: request.forPackage.price.currency,
-                    value: request.forPackage.price.amount,
+                    value: amount,
                     breakdown: {
                         item_total: {
                             currency_code: request.forPackage.price.currency,
                             value: request.forPackage.price.amount
                         },
+                        tax_total: request.vat ? {
+                            value: request.vat.amount,
+                            currency_code: request.forPackage.price.currency,
+                        } : undefined,
                     },
                 },
                 items: [{
@@ -136,6 +145,10 @@ export class PaypalPayment implements Payment, SubscriptionPaymentProvider {
                         value: request.forPackage.price.amount
                     },
                     quantity: 1,
+                    tax: request.vat ? {
+                        value: request.vat.amount,
+                        currency_code: request.forPackage.price.currency,
+                    } : undefined,
                 }],
             }],
         };
@@ -183,7 +196,7 @@ export class PaypalPayment implements Payment, SubscriptionPaymentProvider {
         }
     }
 
-    async subscribe(sub: Subscription, plan: SubscriptionPlan, user: User): Promise<PendingSubscription> {
+    async subscribe(sub: Subscription, plan: SubscriptionPlan, user: User, vat?: VATRate): Promise<PendingSubscription> {
         const communityTitle = this.config.app.community?.title || translate('PAYPAL_DEFAULT_COMMUNITY_NAME');
         const r = new CreateSubscriptionRequest();
         r.requestBody({
@@ -196,6 +209,12 @@ export class PaypalPayment implements Payment, SubscriptionPaymentProvider {
                 return_url: sub.asLink(this.config).toString(),
                 cancel_url: sub.abortLink(this.config).toString(),
             },
+            plan: vat ? {
+                taxes: {
+                    inclusive: false,
+                    percentage: vat.rate.toString(),
+                },
+            } : undefined,
         });
         const result = await this.client.execute<PayPalSubscription>(r);
 

@@ -387,6 +387,12 @@ export interface CreateSubscriptionBody {
         cancel_url: string;
     };
     custom_id: string;
+    plan: {
+        taxes: {
+            inclusive: boolean;
+            percentage: string;
+        };
+    };
 }
 
 /**
