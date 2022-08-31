@@ -52,7 +52,9 @@ export class VATStack implements VATs {
 
     private async resolveRates(): Promise<VATStackRate[]> {
         if (this.cachedRates === undefined) {
-            const res = await fetch('https://api.vatstack.com/v1/rates?member_state=true', {
+            // TODO: 100 is the maximum right now, and the current rates do not exceed that limit (34 for now).
+            // Howevever, should qquery in pages until no more results are there.
+            const res = await fetch('https://api.vatstack.com/v1/rates?member_state=true&limit=100', {
                 headers: {
                     'X-API-KEY': this.publicKey,
                 }
