@@ -128,14 +128,15 @@ export class Subscription {
         },
         public state: 'PENDING' | 'ACTIVE' | 'CANCELLED',
         public perkDetails: Map<string, string>,
+        public vat?: VATRate,
     ) {
     }
 
-    public static create(plan: SubscriptionPlan, user: User): Subscription {
+    public static create(plan: SubscriptionPlan, user: User, vat: VATRate | undefined = undefined): Subscription {
         return new Subscription(v4(), plan.id, {}, {
             steamId: user.steam.id,
             discordId: user.discord.id
-        }, 'PENDING', new Map());
+        }, 'PENDING', new Map(), vat);
     }
 
     public pushPerkDetails(details: PerkDetails) {
@@ -160,7 +161,7 @@ export class Subscription {
             id: this.payment.id,
             transactionId: transactionId,
             provider: provider,
-        }, new Reference(this.user.steamId, this.user.discordId, p));
+        }, new Reference(this.user.steamId, this.user.discordId, p), null, this.vat);
         order.pay(transactionId);
 
         this.state = 'ACTIVE';

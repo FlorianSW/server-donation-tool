@@ -3,6 +3,7 @@ import {Knex} from 'knex';
 import {inject, singleton} from 'tsyringe';
 import {Subscription} from '../domain/payment';
 import {User} from '../domain/user';
+import {VATRate} from '../domain/vat';
 
 const tableName = 'subscriptions';
 const columnId = 'id';
@@ -12,6 +13,8 @@ const columnUserSteamId = 'steam_id';
 const columnUserDiscordId = 'discord_id';
 const columnState = 'state';
 const columnPerkDetails = 'perk_details';
+const columnCountryCode = 'country_code';
+const columnVatRate = 'vat_rate';
 
 @singleton()
 export class SQLiteSubscriptionsRepository implements SubscriptionsRepository {
@@ -29,6 +32,8 @@ export class SQLiteSubscriptionsRepository implements SubscriptionsRepository {
                         b.string(columnUserDiscordId).index('idx_discord_id');
                         b.string(columnState);
                         b.text(columnPerkDetails).nullable().defaultTo('[]');
+                        b.string(columnCountryCode, 5).defaultTo('XX');
+                        b.float(columnVatRate).defaultTo(0);
                     }).then(() => {
                         resolve(true);
                     });
@@ -37,6 +42,16 @@ export class SQLiteSubscriptionsRepository implements SubscriptionsRepository {
                     if (!c.hasOwnProperty(columnPerkDetails)) {
                         await con.schema.alterTable(tableName, (b) => {
                             b.text(columnPerkDetails).nullable().defaultTo('[]');
+                        });
+                    }
+                    if (!c.hasOwnProperty(columnCountryCode)) {
+                        await con.schema.alterTable(tableName, (b) => {
+                            b.string(columnCountryCode, 5).nullable();
+                        });
+                    }
+                    if (!c.hasOwnProperty(columnVatRate)) {
+                        await con.schema.alterTable(tableName, (b) => {
+                            b.float(columnVatRate).defaultTo(0);
                         });
                     }
                     resolve(true);
@@ -48,8 +63,8 @@ export class SQLiteSubscriptionsRepository implements SubscriptionsRepository {
     async save(s: Subscription): Promise<void> {
         await this.initialized;
         // @formatter:off
-        await this.con.raw(`REPLACE INTO ${tableName} (${columnId}, ${columnPlanId}, ${columnPaymentId}, ${columnUserSteamId}, ${columnUserDiscordId}, ${columnState}, ${columnPerkDetails}) VALUES (?, ?, ?, ?, ?, ?, ?)`, [
-            s.id, s.planId, s.payment.id, s.user.steamId, s.user.discordId, s.state, JSON.stringify(Array.from(s.perkDetails.entries()))
+        await this.con.raw(`REPLACE INTO ${tableName} (${columnId}, ${columnPlanId}, ${columnPaymentId}, ${columnUserSteamId}, ${columnUserDiscordId}, ${columnState}, ${columnPerkDetails}, ${columnCountryCode}, ${columnVatRate}) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`, [
+            s.id, s.planId, s.payment.id, s.user.steamId, s.user.discordId, s.state, JSON.stringify(Array.from(s.perkDetails.entries())), s.vat?.countryCode || null, s.vat?.rate || 0
         ]);
         // @formatter:on
     }
@@ -113,6 +128,13 @@ export class SQLiteSubscriptionsRepository implements SubscriptionsRepository {
     private toSubscription(dbResult: any[]): Subscription[] {
         const result: Subscription[] = [];
         for (let o of dbResult) {
+            let vat: VATRate | undefined;
+            if (o[columnCountryCode] && o[columnCountryCode] !== '') {
+                vat = {
+                    countryCode: o[columnCountryCode],
+                    rate: o[columnVatRate],
+                };
+            }
             result.push(
                 new Subscription(
                     o[columnId],
@@ -126,6 +148,7 @@ export class SQLiteSubscriptionsRepository implements SubscriptionsRepository {
                     },
                     o[columnState],
                     new Map(JSON.parse(o[columnPerkDetails])),
+                    vat,
                 )
             );
         }
