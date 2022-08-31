@@ -3,9 +3,6 @@ import Knex from 'knex';
 import * as fs from 'fs';
 import {SQLiteOrderRepository} from './order-repository';
 import {Order, Reference} from '../domain/payment';
-import {Package, PriceType} from '../domain/package';
-import {FreetextPerk} from './perk/freetext-perk';
-import {FakePayment} from './paypal/paypal-payment';
 import {anOrder, asRedeemed, asRefunded, makeOrder, somePackages, withCreatedDate} from '../test-data.spec';
 
 const testDbPath = __dirname + '/order-repository.spec.sqlite';
@@ -83,7 +80,13 @@ describe('OrderRepository', () => {
         await repository.save(secondOrder);
         await repository.save(thirdOrder);
 
-        const result = await repository.findLastFor({discord: {id: anOrder.reference.discordId, username: 'A_USERNAME', discriminator: '0001'}, username: 'A_NAME', subscribedPackages: {}}, 1);
+        const result = await repository.findLastFor({
+            discord: {
+                id: anOrder.reference.discordId,
+                username: 'A_USERNAME',
+                discriminator: '0001'
+            }, username: 'A_NAME', subscribedPackages: {}
+        }, 1);
         expect(result).toHaveLength(1);
         expect(result[0].id).toEqual(secondOrder.id);
     });

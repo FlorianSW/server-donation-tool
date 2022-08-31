@@ -161,7 +161,11 @@ export function makeOrder(...m: modifier[]): Order {
         r.createdAt,
         r.payment,
         r.reference,
-        r.message
+        r.message,
+        {
+            rate: 19,
+            countryCode: 'DE',
+        }
     );
 
     for (let mod of m) {

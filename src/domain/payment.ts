@@ -42,7 +42,7 @@ export class Order {
         public readonly created: Date,
         public readonly reference: Reference,
         public readonly customMessage: string | null,
-        public readonly country: string,
+        public readonly vat: VATRate,
         public redeemedAt: Date | null,
         public status: OrderStatus,
         public payment: OrderPayment,
@@ -51,12 +51,12 @@ export class Order {
     ) {
     }
 
-    public static create(created: Date, payment: OrderPayment, reference: Reference, customMessage: string | null = null, country: string = 'XX'): Order {
-        return new Order(v4(), created, reference, customMessage, country, null, OrderStatus.CREATED, payment, new Map(), null);
+    public static create(created: Date, payment: OrderPayment, reference: Reference, customMessage: string | null = null, vat: VATRate | undefined = undefined): Order {
+        return new Order(v4(), created, reference, customMessage, vat, null, OrderStatus.CREATED, payment, new Map(), null);
     }
 
-    public static createDeferred(created: Date, reference: Reference, customMessage: string | null = null, country: string = 'XX'): Order {
-        return new Order(v4(), created, reference, customMessage, country, null, OrderStatus.CREATED, null, new Map(), null);
+    public static createDeferred(created: Date, reference: Reference, customMessage: string | null = null, vat: VATRate | undefined = undefined): Order {
+        return new Order(v4(), created, reference, customMessage, vat, null, OrderStatus.CREATED, null, new Map(), null);
     }
 
     public paymentIntent(payment: OrderPayment) {

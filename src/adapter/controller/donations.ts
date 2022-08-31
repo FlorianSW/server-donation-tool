@@ -324,7 +324,7 @@ export class DonationController {
             return;
         }
 
-        const order = Order.createDeferred(new Date(), new Reference(steamId, req.user.discord.id, p), customMessage, req.session.vat.countryCode || 'XX');
+        const order = Order.createDeferred(new Date(), new Reference(steamId, req.user.discord.id, p), customMessage, req.session.vat);
         const paymentOrder = await payment.createPaymentOrder({
             candidateOrderId: order.id,
             successUrl: new URL('/donate/' + order.id + '?provider=' + payment.provider().branding.name, this.config.app.publicUrl),
@@ -379,7 +379,7 @@ export class DonationController {
             id: paymentOrder.id,
             transactionId: paymentOrder.transactionId,
             provider: payment.provider().branding.name,
-        }, new Reference(steamId, req.user.discord.id, p), customMessage, req.session.vat?.countryCode || 'XX');
+        }, new Reference(steamId, req.user.discord.id, p), customMessage, req.session.vat);
         order.pushPerkDetails(req.session.selectedPackage.perkDetails);
         await this.repo.save(order);
 

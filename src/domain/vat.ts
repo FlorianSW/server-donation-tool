@@ -2,10 +2,10 @@ import {Price} from './package';
 
 export interface VATRate {
     countryCode: string
-    countryName: string
-    displayName: string,
+    countryName?: string
+    displayName?: string,
     rate: number
-    amount: string
+    amount?: string
 }
 
 export interface VATs {

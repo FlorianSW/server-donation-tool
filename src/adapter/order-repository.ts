@@ -5,6 +5,7 @@ import {Package} from '../domain/package';
 import {inject, singleton} from 'tsyringe';
 import {PaypalPayment} from './paypal/paypal-payment';
 import {User} from '../domain/user';
+import {VATRate} from '../domain/vat';
 
 const tableName = 'order_repository';
 const columnId = 'id';
@@ -22,6 +23,7 @@ const columnRefundedAt = 'refunded_at';
 const columnPaymentProvider = 'payment_provider';
 const columnPerkDetails = 'perk_details';
 const columnCountryCode = 'country_code';
+const columnVatRate = 'vat_rate';
 
 @singleton()
 export class SQLiteOrderRepository implements OrderRepository {
@@ -47,6 +49,7 @@ export class SQLiteOrderRepository implements OrderRepository {
                         b.string(columnPaymentProvider, 10).notNullable().defaultTo(PaypalPayment.NAME);
                         b.text(columnPerkDetails).nullable().defaultTo(null);
                         b.string(columnCountryCode, 5).defaultTo('XX');
+                        b.float(columnVatRate).defaultTo(0);
                     }).then(() => {
                         resolve(true);
                     });
@@ -98,7 +101,15 @@ export class SQLiteOrderRepository implements OrderRepository {
                     }
                     if (!c.hasOwnProperty(columnCountryCode)) {
                         await con.schema.alterTable(tableName, (b) => {
-                            b.string(columnCountryCode, 5).defaultTo('XX');
+                            b.string(columnCountryCode, 5).nullable();
+                        });
+                    }
+                    await con.schema.alterTable(tableName, (b) => {
+                        b.setNullable(columnCountryCode);
+                    });
+                    if (!c.hasOwnProperty(columnVatRate)) {
+                        await con.schema.alterTable(tableName, (b) => {
+                            b.float(columnVatRate).defaultTo(0);
                         });
                     }
                     await con.raw(`CREATE INDEX IF NOT EXISTS idx_${columnDiscordId} ON ${tableName}(${columnDiscordId})`);
@@ -197,8 +208,8 @@ export class SQLiteOrderRepository implements OrderRepository {
     async save(order: Order): Promise<void> {
         await this.initialized;
         // @formatter:off
-        await this.con.raw(`REPLACE INTO ${tableName} (${columnId}, ${columnOrderId}, ${columnCreated}, ${columnStatus}, ${columnTransactionId}, ${columnPaymentProvider}, ${columnSteamId}, ${columnDiscordId}, ${columnPackageId}, ${columnPrice}, ${columnCustomMessage}, ${columnRedeemedAt}, ${columnRefundedAt}, ${columnPerkDetails}) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, [
-            order.id, order.payment.id, order.created.getTime(), order.status, order.payment.transactionId || null, order.payment.provider, order.reference.steamId || null, order.reference.discordId, order.reference.p.id, parseFloat(order.reference.p.price.amount), order.customMessage, order.redeemedAt || null, order.refundedAt || null, JSON.stringify(Array.from(order.perkDetails.entries()))
+        await this.con.raw(`REPLACE INTO ${tableName} (${columnId}, ${columnOrderId}, ${columnCreated}, ${columnStatus}, ${columnTransactionId}, ${columnPaymentProvider}, ${columnSteamId}, ${columnDiscordId}, ${columnPackageId}, ${columnPrice}, ${columnCustomMessage}, ${columnRedeemedAt}, ${columnRefundedAt}, ${columnPerkDetails}, ${columnCountryCode}, ${columnVatRate}) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, [
+            order.id, order.payment.id, order.created.getTime(), order.status, order.payment.transactionId || null, order.payment.provider, order.reference.steamId || null, order.reference.discordId, order.reference.p.id, parseFloat(order.reference.p.price.amount), order.customMessage, order.redeemedAt || null, order.refundedAt || null, JSON.stringify(Array.from(order.perkDetails.entries())), order.vat?.countryCode || null, order.vat?.rate || 0,
         ]);
         // @formatter:on
     }
@@ -217,7 +228,25 @@ export class SQLiteOrderRepository implements OrderRepository {
             transactionId: o[columnTransactionId],
             provider: o[columnPaymentProvider],
         };
-        return new Order(o[columnId], new Date(o[columnCreated]), reference, o[columnCustomMessage] || null, o[columnCountryCode] || 'XX', o[columnRedeemedAt] ? new Date(o[columnRedeemedAt]) : null, o[columnStatus], payment, new Map(JSON.parse(o[columnPerkDetails])), o[columnRefundedAt] ? new Date(o[columnRefundedAt]) : null);
+        let vat: VATRate | undefined;
+        if (o[columnCountryCode] && o[columnCountryCode] !== '' && o[columnCountryCode] !== 'XX') {
+            vat = {
+                countryCode: o[columnCountryCode],
+                rate: o[columnVatRate],
+            };
+        }
+        return new Order(
+            o[columnId],
+            new Date(o[columnCreated]),
+            reference,
+            o[columnCustomMessage] || null,
+            vat,
+            o[columnRedeemedAt] ? new Date(o[columnRedeemedAt]) : null,
+            o[columnStatus],
+            payment,
+            new Map(JSON.parse(o[columnPerkDetails])),
+            o[columnRefundedAt] ? new Date(o[columnRefundedAt]) : null
+        );
     }
 }
 
