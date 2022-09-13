@@ -81,7 +81,7 @@ export class StripePayment implements Payment {
                     unit_amount: parseFloat(request.forPackage.price.amount) * 100,
                     tax_behavior: 'exclusive',
                 },
-                tax_rates: [rate.id],
+                tax_rates: rate ? [rate.id] : [],
             }],
             submit_type: 'donate',
             cancel_url: request.cancelUrl.toString(),
