@@ -77,6 +77,8 @@ const messages: { [key: string]: string } = {
     CMD_DONATE_PACKAGE_DETAILS_PERKS: 'Perks',
     CMD_DONATE_PACKAGE_DETAILS_PRICE: 'Price',
     CMD_DONATE_PACKAGE_PRICE_VARIABLE: 'Starting at {{currency}} {{amount}}',
+    CMD_DONATE_PACKAGE_PRICE_VARIABLE_TITLE: 'Choose donation amount',
+    CMD_DONATE_PACKAGE_PRICE_VARIABLE_LABEL: 'Donation amount in {{currency}}',
     CMD_DONATE_SELECT_ANOTHER: 'Select another package',
     CMD_DONATE_DONATE: 'Donate',
     CMD_DONATE_INTRO: 'Hi {{name}} :wave:\n\nThank you that you consider donating to our community. Below are our available donation packages. Please select the one you would like to donate for.',

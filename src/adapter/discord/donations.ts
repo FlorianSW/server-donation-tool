@@ -183,12 +183,12 @@ export class Donations {
         if (selectedPackage.price.type === PriceType.VARIABLE) {
             const modal = new ModalBuilder()
                 .setCustomId(withPrefix(packageId.toString(10), PRICE_SET))
-                .setTitle('Select donation amount');
+                .setTitle(translate('CMD_DONATE_PACKAGE_PRICE_VARIABLE_TITLE'));
 
             const actions = new ActionRowBuilder<TextInputBuilder>().addComponents(
                 new TextInputBuilder()
                     .setCustomId(PRICE_SET)
-                    .setLabel('Donation amount')
+                    .setLabel(translate('CMD_DONATE_PACKAGE_PRICE_VARIABLE_LABEL', {params: {currency: selectedPackage.price.currency}}))
                     .setStyle(1)
                     .setRequired(true)
                     .setValue(selectedPackage.price.amount.toString())
