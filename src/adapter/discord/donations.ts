@@ -110,9 +110,14 @@ export class Donations {
         const options: SelectMenuComponentOptionData[] = this.packages
             .filter((p) => p.perks.every((p) => p.subjects() === null))
             .map((p) => {
+                const price = this.priceDetails(p);
+                let description = `${p.description} (${this.priceDetails(p)})`;
+                if (!p.description) {
+                    description = price;
+                }
                 return {
                     label: p.name,
-                    description: `${p.description} (${this.priceDetails(p)})`,
+                    description: description,
                     value: p.id.toString(10),
                 };
             });
