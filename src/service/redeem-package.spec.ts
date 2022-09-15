@@ -66,7 +66,7 @@ describe('RedeemPackage', () => {
             const o = await repo.find(order.id);
             expect(o.status).toEqual(OrderStatus.REFUNDED);
             expect(o.refundedAt).not.toBeNull();
-            expect(o.refundedAt.getTime()).toBeCloseTo(new Date().getTime(), -1);
+            expect(o.refundedAt.getTime()).toBeCloseTo(new Date().getTime(), -2);
         });
     });
 });
