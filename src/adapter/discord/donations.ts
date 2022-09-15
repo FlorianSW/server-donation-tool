@@ -1,6 +1,7 @@
 import {inject, injectAll, singleton} from 'tsyringe';
 import {Logger} from 'winston';
 import {
+    ActionRowBuilder,
     ApplicationCommandType,
     ButtonInteraction,
     ButtonStyle,
@@ -12,17 +13,21 @@ import {
     InteractionButtonComponentData,
     InteractionReplyOptions,
     InteractionUpdateOptions,
-    MessageEditOptions,
+    ModalBuilder,
+    ModalMessageModalSubmitInteraction,
+    ModalSubmitInteraction,
     SelectMenuComponentOptionData,
-    SelectMenuInteraction
+    SelectMenuInteraction,
+    TextInputBuilder,
 } from 'discord.js';
 import {AppConfig} from '../../domain/app-config';
 import {translate} from '../../translations';
-import {Package} from '../../domain/package';
+import {Package, PriceType} from '../../domain/package';
 import {DeferredPaymentOrder, Order, Payment, PaymentOrder, Reference} from '../../domain/payment';
 import {OrderRepository} from '../../domain/repositories';
 
 const PACKAGE_SELECTION = 'packageSelection';
+const PRICE_SET = 'setPrice';
 const SELECT_PACKAGE = 'selectPackage';
 const DONATE_MONEY = 'donate';
 
@@ -94,6 +99,8 @@ export class Donations {
             await this.onDonateCommand(interaction);
         } else if (interaction instanceof ButtonInteraction && interaction.customId.startsWith(DONATE_MONEY)) {
             await this.onDonateMoney(interaction);
+        } else if (interaction instanceof ModalSubmitInteraction && interaction.isFromMessage() && interaction.customId.startsWith(PRICE_SET)) {
+            await this.onPriceSet(interaction);
         } else {
             this.logger.error('Received unknown interaction', interaction);
         }
@@ -105,7 +112,7 @@ export class Donations {
             .map((p) => {
                 return {
                     label: p.name,
-                    description: `${p.description} (${p.price.currency} ${p.price.amount})`,
+                    description: `${p.description} (${this.priceDetails(p)})`,
                     value: p.id.toString(10),
                 };
             });
@@ -136,6 +143,18 @@ export class Donations {
         }
     }
 
+    private priceDetails(p: Package) {
+        if (p.price.type === PriceType.VARIABLE) {
+            return translate('CMD_DONATE_PACKAGE_PRICE_VARIABLE', {
+                params: {
+                    amount: p.price.amount,
+                    currency: p.price.currency
+                }
+            });
+        }
+        return `${p.price.currency} ${p.price.amount}`;
+    }
+
     private async onPackageSelect(interaction: SelectMenuInteraction): Promise<void> {
         const packageId = parseInt(interaction.values[0]);
         const selectedPackage = this.packages.find((p) => p.id === packageId);
@@ -156,10 +175,31 @@ export class Donations {
             return;
         }
 
+        if (selectedPackage.price.type === PriceType.VARIABLE) {
+            const modal = new ModalBuilder()
+                .setCustomId(withPrefix(packageId.toString(10), PRICE_SET))
+                .setTitle('Select donation amount');
+
+            const actions = new ActionRowBuilder<TextInputBuilder>().addComponents(
+                new TextInputBuilder()
+                    .setCustomId(PRICE_SET)
+                    .setLabel('Donation amount')
+                    .setStyle(1)
+                    .setRequired(true)
+                    .setValue(selectedPackage.price.amount.toString())
+            );
+            modal.addComponents([actions]);
+            await interaction.showModal(modal);
+        } else {
+            await this.paymentOptionsUpdate(interaction, selectedPackage);
+        }
+    }
+
+    private async paymentOptionsUpdate(interaction: SelectMenuInteraction | ModalMessageModalSubmitInteraction, selectedPackage: Package) {
         const buttons = this.payments.map((p) => ({
             type: 2,
             label: translate('PAYMENT_METHOD_' + p.provider().branding.name.toUpperCase()),
-            customId: withPrefix(withPrefix(p.provider().branding.name, packageId.toString(10)), DONATE_MONEY),
+            customId: withPrefix(withPrefix(p.provider().branding.name, withPrefix(selectedPackage.price.amount, selectedPackage.id.toString(10))), DONATE_MONEY),
             style: ButtonStyle.Primary,
         } as InteractionButtonComponentData));
 
@@ -181,6 +221,37 @@ export class Donations {
         });
     }
 
+    private async onPriceSet(interaction: ModalMessageModalSubmitInteraction): Promise<void> {
+        const packageId = parseInt(dropPrefix(interaction.customId));
+        let selectedPackage = this.packages.find((p) => p.id === packageId);
+        if (!selectedPackage) {
+            await interaction.editReply({
+                embeds: [],
+                content: translate('CMD_DONATE_PACKAGE_DOES_NOT_EXIST_LABEL'),
+                components: [{
+                    type: 1,
+                    components: [{
+                        type: 2,
+                        label: translate('CMD_DONATE_START_OVER'),
+                        customId: PACKAGE_SELECTION,
+                        style: ButtonStyle.Primary,
+                    }],
+                }],
+            });
+            return;
+        }
+
+        const price = interaction.fields.getTextInputValue(PRICE_SET);
+        selectedPackage = {
+            ...selectedPackage,
+            price: {
+                ...selectedPackage.price,
+                amount: price,
+            }
+        };
+        await this.paymentOptionsUpdate(interaction, selectedPackage);
+    }
+
     private buildPackageDetails(selectedPackage: Package): EmbedBuilder {
         return new EmbedBuilder()
             .setColor(Colors.DarkBlue)
@@ -198,7 +269,8 @@ export class Donations {
     private async onDonateMoney(interaction: ButtonInteraction): Promise<void> {
         const data = dropPrefix(interaction.customId).split('#');
         const packageId = parseInt(data[0]);
-        const selectedPackage = this.packages.find((p) => p.id === packageId);
+        const price = data[1];
+        let selectedPackage = this.packages.find((p) => p.id === packageId);
         if (!selectedPackage) {
             await interaction.update({
                 embeds: [],
@@ -215,7 +287,16 @@ export class Donations {
             });
             return;
         }
-        const providerName = data[1];
+        if (selectedPackage.price.type === PriceType.VARIABLE) {
+            selectedPackage = {
+                ...selectedPackage,
+                price: {
+                    ...selectedPackage.price,
+                    amount: price,
+                }
+            }
+        }
+        const providerName = data[2];
         const provider = this.payments.find((p) => p.provider().branding.name === providerName);
 
         const order = Order.createDeferred(new Date(), new Reference(null, interaction.user.id, selectedPackage), '');
