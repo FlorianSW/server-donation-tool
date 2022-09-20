@@ -68,8 +68,8 @@ export class Authentication {
             callbackURL: config.discord.redirectUrl,
             scope: ['identify', 'connections'],
         }, (accessToken: string, refreshToken: string, profile: Profile, done: VerifyCallback) => discordUserCallback(steamClient, accessToken, refreshToken, profile, done)));
-        this.router.get('/auth/discord/redirect', passport.authenticate('discord'));
-        this.router.get('/auth/discord/callback', passport.authenticate('discord', {failureRedirect: '/auth/error'}), this.loginCallback);
+        this.router.get('/auth/discord/redirect', passport.authenticate('discord', {keepSessionInfo: true}));
+        this.router.get('/auth/discord/callback', passport.authenticate('discord', {failureRedirect: '/auth/error', keepSessionInfo: true}), this.loginCallback);
 
         if (config.steam) {
             this.registerSteamLogin(config);
@@ -122,8 +122,8 @@ export class Authentication {
             }
         ));
 
-        this.router.get('/auth/steam/redirect', passport.authenticate('steam'));
-        this.router.get('/auth/steam/callback', passport.authenticate('steam', {failureRedirect: '/auth/error'}), this.loginCallback);
+        this.router.get('/auth/steam/redirect', passport.authenticate('steam', {keepSessionInfo: true}));
+        this.router.get('/auth/steam/callback', passport.authenticate('steam', {failureRedirect: '/auth/error', keepSessionInfo: true}), this.loginCallback);
     }
 }
 
