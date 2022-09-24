@@ -24,7 +24,7 @@ const messages: { [key: string]: string } = {
     HEADER_DONATE: 'Donate',
 
     INFO_TITLE: 'Donate',
-    INFO_DESCRIPTION: 'Thanks for considering a donation to our community. Please follow this simple process to donate and get rewarded with getting a slot on our priority queue. Once the priority queue entry is created, it will take until the next server restart to be available.',
+    INFO_DESCRIPTION: 'Thanks for considering a donation to our community. Please follow this simple process to donate and get rewarded by different available perks.',
 
     LOGIN_TITLE: 'Login to continue',
     LOGIN_DESCRIPTION: 'Welcome to our donation tool. In order to ease the process of donating, as well as for you to redeem your perks, we use this website. To be able to process your donation, we would like to know, who you are, please click the login link to start.',
