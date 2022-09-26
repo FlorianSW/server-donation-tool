@@ -61,6 +61,9 @@ export interface AppConfig {
                 guildId: string;
             }
         },
+        roleMapping?: {
+            auditor?: string;
+        },
     },
     steam?: {
         realm: string,

@@ -21,6 +21,7 @@ export const aUser: User = {
     },
     username: 'A_USERNAME',
     subscribedPackages: {},
+    roles: [],
 };
 export const anotherUser: User = {
     steam: {
@@ -35,6 +36,7 @@ export const anotherUser: User = {
     },
     username: 'ANOTHER_USERNAME',
     subscribedPackages: {},
+    roles: [],
 };
 
 export const somePackages: Package[] = [{

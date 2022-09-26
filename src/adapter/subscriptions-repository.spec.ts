@@ -5,6 +5,7 @@ import {Subscription, SubscriptionPlan} from '../domain/payment';
 import {SQLiteSubscriptionsRepository} from './subscriptions-repository';
 import {FakePayment} from './paypal/paypal-payment';
 import {anotherUser, aUser, somePackages} from '../test-data.spec';
+import {VATRate} from '../domain/vat';
 
 const testDbPath = __dirname + '/subscriptions-repository.spec.sqlite';
 
@@ -25,10 +26,7 @@ describe('SubscriptionsRepository', () => {
     });
 
     it('persists subscription', async () => {
-        const sub = Subscription.create(aPlan, aUser, {
-            countryCode: 'DE',
-            rate: 19,
-        });
+        const sub = Subscription.create(aPlan, aUser, new VATRate('DE', 19));
         sub.agreeBilling('A_PAYMENT_ID');
         sub.pushPerkDetails({SOME_ID: 'SOME_DATA'});
         await repository.save(sub);

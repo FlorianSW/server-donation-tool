@@ -108,7 +108,7 @@ describe('OrderRepository', () => {
                 id: anOrder.reference.discordId,
                 username: 'A_USERNAME',
                 discriminator: '0001'
-            }, username: 'A_NAME', subscribedPackages: {}
+            }, username: 'A_NAME', subscribedPackages: {}, roles: [],
         }, 1);
         expect(result).toHaveLength(1);
         expect(result[0].id).toEqual(secondOrder.id);

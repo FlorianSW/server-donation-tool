@@ -41,6 +41,7 @@ import {AccountController} from './adapter/controller/account';
 import {Donations} from './adapter/discord/donations';
 import {HttpSteamClient} from './adapter/steam-client';
 import {SQLitePropertiesRepository} from './adapter/properties-repository';
+import {OrderOverviewController} from './adapter/controller/order-overview';
 
 export interface Closeable {
     close(): Promise<void>
@@ -113,6 +114,7 @@ parseConfig(log).then(async (config) => {
     const statistics = container.resolve(StatisticsController);
     const login = container.resolve(LoginController);
     const privacyPolicy = container.resolve(PrivacyPolicyController);
+    const orderOverview = container.resolve(OrderOverviewController);
     const theming = container.resolve(Theming);
     container.resolve(Donations);
 
@@ -167,6 +169,7 @@ parseConfig(log).then(async (config) => {
     app.use('/', statistics.router);
     app.use('/', login.router);
     app.use('/', privacyPolicy.router);
+    app.use('/', orderOverview.router);
 
     if (container.isRegistered('SubscriptionPaymentProvider')) {
         await initSubscriptions(app);

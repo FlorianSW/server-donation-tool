@@ -93,11 +93,16 @@ export interface OwnedPerk {
     equals(other: OwnedPerk): boolean;
 }
 
+export enum Role {
+    Auditor = 'Auditor'
+}
+
 export interface User {
     steam?: SteamConnection;
     discord: DiscordConnection;
     username: string;
     subscribedPackages: { [packageId: number]: string };
+    roles: Role[];
 }
 
 export interface SteamConnection {

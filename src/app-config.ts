@@ -125,6 +125,9 @@ class YamlAppConfig implements AppConfig {
                 guildId: string;
             }
         },
+        roleMapping: {
+            auditor: string;
+        },
     };
     vats?: {
         enabled: boolean;

@@ -3,12 +3,13 @@ import passport from 'passport';
 import {ConnectionInfo, Profile, Strategy as DiscordStrategy} from 'passport-discord';
 import {Strategy as SteamStrategy} from 'passport-steam';
 import {AppConfig} from './domain/app-config';
-import {User} from './domain/user';
+import {Role, User} from './domain/user';
 import {VerifyCallback} from 'passport-oauth2';
 import {inject, singleton} from 'tsyringe';
 import {SteamClient} from './domain/steam-client';
+import {Client} from 'discord.js';
 
-export function discordUserCallback(steamClient: SteamClient, accessToken: string, refreshToken: string, profile: Profile, done: VerifyCallback) {
+export async function discordUserCallback(steamClient: SteamClient, accessToken: string, refreshToken: string, profile: Profile) {
     const connection: ConnectionInfo | undefined = profile.connections.find((c) => c.type === 'steam');
     const user: User = {
         username: profile.username,
@@ -18,6 +19,7 @@ export function discordUserCallback(steamClient: SteamClient, accessToken: strin
             discriminator: profile.discriminator,
         },
         subscribedPackages: {},
+        roles: [],
     };
     if (profile.avatar) {
         user.discord.avatarUrl = `https://cdn.discordapp.com/avatars/${profile.id}/${profile.avatar}.png`;
@@ -28,14 +30,13 @@ export function discordUserCallback(steamClient: SteamClient, accessToken: strin
             name: connection.name,
             source: 'DISCORD'
         };
-        steamClient.playerProfile(connection.id).then((p) => {
-            if (p) {
-                user.steam.avatarUrl = p.avatar;
-            }
-            done(null, user);
-        });
+        const p = await steamClient.playerProfile(connection.id);
+        if (p) {
+            user.steam.avatarUrl = p.avatar;
+        }
+        return user;
     } else {
-        done(null, user);
+        return user;
     }
 }
 
@@ -51,7 +52,7 @@ interface SteamProfile {
 export class Authentication {
     public readonly router: Router = Router();
 
-    constructor(@inject('AppConfig') config: AppConfig, @inject('SteamClient') steamClient: SteamClient) {
+    constructor(@inject('AppConfig') config: AppConfig, @inject('SteamClient') steamClient: SteamClient, @inject('discord.Client') private readonly client: Client,) {
         passport.serializeUser((user, done) => {
             done(null, user);
         });
@@ -67,9 +68,23 @@ export class Authentication {
             clientSecret: config.discord.clientSecret,
             callbackURL: config.discord.redirectUrl,
             scope: ['identify', 'connections'],
-        }, (accessToken: string, refreshToken: string, profile: Profile, done: VerifyCallback) => discordUserCallback(steamClient, accessToken, refreshToken, profile, done)));
+        }, (accessToken: string, refreshToken: string, profile: Profile, done: VerifyCallback) => {
+            discordUserCallback(steamClient, accessToken, refreshToken, profile).then((u) => {
+                client.guilds.fetch(config.discord.bot.guildId).then((g) => {
+                    g.members.fetch(u.discord.id).then((gu) => {
+                        if (config.discord.roleMapping?.auditor && gu.roles.cache.find((r) => r.id === config.discord.roleMapping.auditor)) {
+                            u.roles.push(Role.Auditor);
+                        }
+                        done(null, u);
+                    });
+                });
+            });
+        }));
         this.router.get('/auth/discord/redirect', passport.authenticate('discord', {keepSessionInfo: true}));
-        this.router.get('/auth/discord/callback', passport.authenticate('discord', {failureRedirect: '/auth/error', keepSessionInfo: true}), this.loginCallback);
+        this.router.get('/auth/discord/callback', passport.authenticate('discord', {
+            failureRedirect: '/auth/error',
+            keepSessionInfo: true
+        }), this.loginCallback);
 
         if (config.steam) {
             this.registerSteamLogin(config);
@@ -123,7 +138,10 @@ export class Authentication {
         ));
 
         this.router.get('/auth/steam/redirect', passport.authenticate('steam', {keepSessionInfo: true}));
-        this.router.get('/auth/steam/callback', passport.authenticate('steam', {failureRedirect: '/auth/error', keepSessionInfo: true}), this.loginCallback);
+        this.router.get('/auth/steam/callback', passport.authenticate('steam', {
+            failureRedirect: '/auth/error',
+            keepSessionInfo: true
+        }), this.loginCallback);
     }
 }
 
@@ -139,4 +157,14 @@ export function requireAuthentication(req: Request, res: Response, next: NextFun
         return;
     }
     return next();
+}
+
+export function requiresRole(role: Role) {
+    return (req: Request, res: Response, next: NextFunction) => {
+        if (req.user.roles.includes(role)) {
+            next();
+            return;
+        }
+        res.render('permission_denied');
+    }
 }

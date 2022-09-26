@@ -130,10 +130,7 @@ export class SQLiteSubscriptionsRepository implements SubscriptionsRepository {
         for (let o of dbResult) {
             let vat: VATRate | undefined;
             if (o[columnCountryCode] && o[columnCountryCode] !== '') {
-                vat = {
-                    countryCode: o[columnCountryCode],
-                    rate: o[columnVatRate],
-                };
+                vat = new VATRate(o[columnCountryCode], o[columnVatRate]);
             }
             result.push(
                 new Subscription(
