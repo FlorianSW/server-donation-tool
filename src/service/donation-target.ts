@@ -41,7 +41,11 @@ export class CalculateDonationTarget {
     async monthly(): Promise<DonationTarget> {
         const now = new Date();
         const startOfMonth = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1, 0, 0, 0));
-        const orders = await this.repository.findCreatedAfter(startOfMonth);
+        const orders: Order[] = [];
+        await this.repository.findCreatedPages(startOfMonth, undefined, (o: Order[]) => {
+            orders.push(...o);
+            return true;
+        });
         const totalDonations = orders.map((o) => parseFloat(o.reference.p.price.amount)).reduce((pv, cv) => pv + cv, 0);
 
         return {

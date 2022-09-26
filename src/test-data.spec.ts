@@ -3,6 +3,7 @@ import {FreetextPerk} from './adapter/perk/freetext-perk';
 import {Order, OrderPayment, Reference, SubscriptionPlan} from './domain/payment';
 import {FakePayment} from './adapter/paypal/paypal-payment';
 import {User} from './domain/user';
+import {VATRate} from './domain/vat';
 
 export const aSteamId = '76561198012102485';
 export const anotherSteamId = '76561198012102486';
@@ -67,6 +68,7 @@ interface CreateOrderRequest {
     payment: OrderPayment,
     reference: Reference,
     message: string,
+    vat?: VATRate | undefined,
 }
 
 type modifier = (c: CreateOrderRequest | Order) => CreateOrderRequest | Order
@@ -114,6 +116,16 @@ export function withPerkDetails(d: { [key: string]: string }): modifier {
     }
 }
 
+export function withVat(v?: VATRate | undefined): modifier {
+    return (c) => {
+        if (c instanceof Order) {
+            return c;
+        }
+        c.vat = v;
+        return c;
+    }
+}
+
 export function withPerks(p: Perk[]): modifier {
     return (c) => {
         if (c instanceof Order) {
@@ -151,6 +163,7 @@ export function makeOrder(...m: modifier[]): Order {
         },
         reference: new Reference(aSteamId, 'A_DISCORD_ID', somePackages[0]),
         message: 'A_MESSAGE',
+        vat: new VATRate('DE', 19),
     }
 
     for (let mod of m) {
@@ -162,10 +175,7 @@ export function makeOrder(...m: modifier[]): Order {
         r.payment,
         r.reference,
         r.message,
-        {
-            rate: 19,
-            countryCode: 'DE',
-        }
+        r.vat,
     );
 
     for (let mod of m) {

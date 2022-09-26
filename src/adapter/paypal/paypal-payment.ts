@@ -107,7 +107,7 @@ export class PaypalPayment implements Payment, SubscriptionPaymentProvider {
         r.prefer('return=representation');
         let amount = request.forPackage.price.amount;
         if (request.vat) {
-            amount = (parseFloat(request.forPackage.price.amount) + parseFloat(request.vat.amount)).toFixed(2);
+            amount = (parseFloat(request.forPackage.price.amount) + parseFloat(request.vat.amount(request.forPackage.price))).toFixed(2);
         }
         const body: { [key: string]: any } = {
             intent: 'CAPTURE',

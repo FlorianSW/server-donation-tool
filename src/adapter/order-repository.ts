@@ -82,7 +82,9 @@ export class SQLiteOrderRepository implements OrderRepository {
                         await con.schema.alterTable(tableName, (b) => {
                             b.dateTime(columnRedeemedAt).nullable().defaultTo(null);
                         });
-                        await con.raw(`UPDATE ${tableName} SET ${columnRedeemedAt} = ${columnCreated} WHERE ${columnRedeemedAt} IS NULL;`);
+                        await con.raw(`UPDATE ${tableName}
+                                       SET ${columnRedeemedAt} = ${columnCreated}
+                                       WHERE ${columnRedeemedAt} IS NULL;`);
                     }
                     if (!c.hasOwnProperty(columnPaymentProvider)) {
                         await con.schema.alterTable(tableName, (b) => {
@@ -166,15 +168,32 @@ export class SQLiteOrderRepository implements OrderRepository {
             });
     }
 
-    async findCreatedAfter(after: Date): Promise<Order[]> {
+    async findCreatedPages(after: Date, before: Date | undefined, iterator: (o: Order[]) => boolean): Promise<boolean> {
         await this.initialized;
-        return this.con
+        let res = this.con
             .table(tableName)
-            .where(columnCreated, '>=', after.getTime())
             .where(columnStatus, '>=', OrderStatus.PAID)
-            .then((result) => {
+            .orderBy(columnCreated);
+
+        if (before) {
+            res = res.whereBetween(columnCreated, [after.getTime(), before.getTime()]);
+        } else {
+            res = res.where(columnCreated, '>=', after.getTime());
+        }
+        const maxResults = await res.clone().count('id as count').first().then((t) => t.count);
+        let counter = 0;
+        while (true) {
+            const o = await res.offset(counter).limit(25).then((result) => {
                 return result.map((o) => this.toOrder(o));
             });
+            counter += o.length;
+            const r = iterator(o);
+            if (r === false) {
+                return false;
+            }
+            if (counter >= maxResults) break;
+        }
+        return true;
     }
 
     async findLastFor(user: User, limit: number): Promise<Order[]> {
@@ -230,10 +249,7 @@ export class SQLiteOrderRepository implements OrderRepository {
         };
         let vat: VATRate | undefined;
         if (o[columnCountryCode] && o[columnCountryCode] !== '' && o[columnCountryCode] !== 'XX') {
-            vat = {
-                countryCode: o[columnCountryCode],
-                rate: o[columnVatRate],
-            };
+            vat = new VATRate(o[columnCountryCode], o[columnVatRate]);
         }
         return new Order(
             o[columnId],
@@ -269,8 +285,14 @@ export class InMemoryOrderRepository implements OrderRepository {
         this.orders.set(order.id, order);
     }
 
-    async findCreatedAfter(after: Date): Promise<Order[]> {
-        return Array.from(this.orders.values()).filter((o) => o.created.getTime() >= after.getTime());
+    async findCreatedPages(after: Date, before: Date | undefined, iterator: (o: Order[]) => boolean): Promise<boolean> {
+        const a = Array.from(this.orders.values()).filter((o) => o.created.getTime() >= after.getTime());
+        if (before) {
+            iterator(a.filter((o) => o.created.getTime() <= before.getTime()));
+        } else {
+            iterator(a);
+        }
+        return true;
     }
 
     async findUnpaidBefore(after: Date): Promise<Order[]> {

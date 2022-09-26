@@ -14,21 +14,8 @@ interface VATStackRate {
     vat_local_name: string;
 }
 
-function toVATRate(r: VATStackRate, p?: Price): VATRate {
-    let amount = '0.00';
-    if (p) {
-        const priceTag = parseFloat(p.amount);
-        const taxRate = r.categories?.eservice || r.standard_rate;
-        const tax =priceTag * (taxRate / 100);
-        amount = tax.toFixed(2)
-    }
-    return {
-        countryCode: r.country_code,
-        rate: r.categories?.eservice || r.standard_rate,
-        amount,
-        countryName: r.country_name,
-        displayName: r.vat_local_name,
-    }
+function toVATRate(r: VATStackRate): VATRate {
+    return new VATRate(r.country_code, r.categories?.eservice || r.standard_rate, r.country_name, r.vat_local_name);
 }
 
 @singleton()
@@ -42,12 +29,12 @@ export class VATStack implements VATs {
 
     async countries(price?: Price): Promise<VATRate[]> {
         const rates = await this.resolveRates();
-        return rates.map((r) => toVATRate(r, price));
+        return rates.map((r) => toVATRate(r));
     }
 
     async forCountry(price: Price, countryCode: string): Promise<VATRate> {
         const rates = await this.resolveRates();
-        return toVATRate(rates.find((r) => r.country_code === countryCode), price);
+        return toVATRate(rates.find((r) => r.country_code === countryCode));
     }
 
     private async resolveRates(): Promise<VATStackRate[]> {

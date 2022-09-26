@@ -64,10 +64,33 @@ describe('OrderRepository', () => {
         await repository.save(secondOrder);
         await repository.save(thirdOrder);
 
-        const result = await repository.findCreatedAfter(new Date('2025-05-17T01:00:00Z'));
+        const result: Order[] = [];
+        await repository.findCreatedPages(new Date('2025-05-17T01:00:00Z'), undefined, (o) => {
+            result.push(...o);
+            return true;
+        });
         expect(result).toHaveLength(2);
         expect(result[0].id).toEqual(secondOrder.id);
         expect(result[1].id).toEqual(thirdOrder.id);
+    });
+
+    it('finds orders created between', async () => {
+        const secondOrder = Order.create(new Date('2025-05-17T18:25:49Z'), anOrder.payment, anOrder.reference);
+        const thirdOrder = Order.create(new Date('2025-05-18T18:25:49Z'), anOrder.payment, anOrder.reference);
+        anOrder.pay(anOrder.payment.transactionId);
+        secondOrder.pay(secondOrder.payment.transactionId);
+        thirdOrder.pay(thirdOrder.payment.transactionId);
+        await repository.save(anOrder);
+        await repository.save(secondOrder);
+        await repository.save(thirdOrder);
+
+        const result: Order[] = [];
+        await repository.findCreatedPages(new Date('2025-05-17T01:00:00Z'), new Date('2025-05-18T00:00:00Z'), (o) => {
+            result.push(...o);
+            return true;
+        });
+        expect(result).toHaveLength(1);
+        expect(result[0].id).toEqual(secondOrder.id);
     });
 
     it('finds orders for specific user', async () => {
@@ -108,7 +131,11 @@ describe('OrderRepository', () => {
         await repository.save(anOrder);
         await repository.save(Order.create(new Date('2025-05-17T18:25:49Z'), anOrder.payment, anOrder.reference));
 
-        const result = await repository.findCreatedAfter(new Date('2025-05-17T18:25:50Z'));
+        const result: Order[] = [];
+        await repository.findCreatedPages(new Date('2025-05-17T18:25:50Z'), undefined, (o) => {
+            result.push(...o);
+            return true;
+        });
         expect(result).toHaveLength(0);
     });
 
