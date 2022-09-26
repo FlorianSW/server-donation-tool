@@ -9,6 +9,13 @@ export class VATRate {
         const tax = priceTag * (this.rate / 100);
         return tax.toFixed(2);
     }
+
+    static fromValueObject(v?: VATRate | undefined): VATRate | undefined {
+        if (v) {
+            return new VATRate(v.countryCode, v.rate, v.countryName, v.displayName);
+        }
+        return undefined;
+    }
 }
 
 export interface VATs {

@@ -15,7 +15,7 @@
         <% if (locals.appliedVat) { %>
             <div>
                 <span><%= translate('DONATE_VAT_ABBREVIATION') %></span>
-                <span><%= selectedPackage.price.currency + ' ' + appliedVat.amount %></span>
+                <span><%= selectedPackage.price.currency + ' ' + appliedVat %></span>
             </div>
         <% } %>
     </div>

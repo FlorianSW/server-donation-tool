@@ -132,7 +132,7 @@ export class PaypalPayment implements Payment, SubscriptionPaymentProvider {
                             value: request.forPackage.price.amount
                         },
                         tax_total: request.vat ? {
-                            value: request.vat.amount,
+                            value: request.vat.amount(request.forPackage.price),
                             currency_code: request.forPackage.price.currency,
                         } : undefined,
                     },
@@ -146,7 +146,7 @@ export class PaypalPayment implements Payment, SubscriptionPaymentProvider {
                     },
                     quantity: 1,
                     tax: request.vat ? {
-                        value: request.vat.amount,
+                        value: request.vat.amount(request.forPackage.price),
                         currency_code: request.forPackage.price.currency,
                     } : undefined,
                 }],

@@ -13,7 +13,7 @@ import {OrderRepository} from '../../domain/repositories';
 import {Subscriptions} from '../../service/subscriptions';
 import {RedeemPackage} from '../../service/redeem-package';
 import {User} from '../../domain/user';
-import {VATs} from '../../domain/vat';
+import {VATRate, VATs} from '../../domain/vat';
 
 @singleton()
 export class DonationController {
@@ -152,7 +152,7 @@ export class DonationController {
                     template: selectedPayment.donation.template,
                     data: selectedPayment.donation.publicRenderData,
                 },
-                appliedVat: req.session.vat,
+                appliedVat: req.session.vat.amount(req.session.selectedPackage.price),
             });
         } else {
             res.status(400).write('payment method can not be rendered');
@@ -332,7 +332,7 @@ export class DonationController {
             forPackage: p,
             steamId: steamId,
             discordId: req.user.discord.id,
-            vat: req.session.vat,
+            vat: VATRate.fromValueObject(req.session.vat),
         });
         order.paymentIntent({
             id: paymentOrder.id,
@@ -372,7 +372,7 @@ export class DonationController {
             forPackage: p,
             steamId: steamId,
             discordId: req.user.discord.id,
-            vat: req.session.vat,
+            vat: VATRate.fromValueObject(req.session.vat),
         });
 
         const order = Order.create(paymentOrder.created, {
