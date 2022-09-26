@@ -7,7 +7,8 @@ import {Role, User} from './domain/user';
 import {VerifyCallback} from 'passport-oauth2';
 import {inject, singleton} from 'tsyringe';
 import {SteamClient} from './domain/steam-client';
-import {Client} from 'discord.js';
+import {Client, DiscordAPIError, RESTJSONErrorCodes} from 'discord.js';
+import {Logger} from 'winston';
 
 export async function discordUserCallback(steamClient: SteamClient, accessToken: string, refreshToken: string, profile: Profile) {
     const connection: ConnectionInfo | undefined = profile.connections.find((c) => c.type === 'steam');
@@ -52,7 +53,12 @@ interface SteamProfile {
 export class Authentication {
     public readonly router: Router = Router();
 
-    constructor(@inject('AppConfig') config: AppConfig, @inject('SteamClient') steamClient: SteamClient, @inject('discord.Client') private readonly client: Client,) {
+    constructor(
+        @inject('AppConfig') config: AppConfig,
+        @inject('SteamClient') steamClient: SteamClient,
+        @inject('discord.Client') client: Client,
+        @inject('Logger') logger: Logger,
+    ) {
         passport.serializeUser((user, done) => {
             done(null, user);
         });
@@ -71,12 +77,21 @@ export class Authentication {
         }, (accessToken: string, refreshToken: string, profile: Profile, done: VerifyCallback) => {
             discordUserCallback(steamClient, accessToken, refreshToken, profile).then((u) => {
                 client.guilds.fetch(config.discord.bot.guildId).then((g) => {
-                    g.members.fetch(u.discord.id).then((gu) => {
-                        if (config.discord.roleMapping?.auditor && gu.roles.cache.find((r) => r.id === config.discord.roleMapping.auditor)) {
-                            u.roles.push(Role.Auditor);
+                    try {
+                        g.members.fetch(u.discord.id).then((gu) => {
+                            if (config.discord.roleMapping?.auditor && gu.roles.cache.find((r) => r.id === config.discord.roleMapping.auditor)) {
+                                u.roles.push(Role.Auditor);
+                            }
+                            done(null, u);
+                        });
+                    } catch (e) {
+                        if (e instanceof DiscordAPIError && e.code === RESTJSONErrorCodes.UnknownMember) {
+                            done(null, u);
+                            return;
                         }
+                        logger.error("could not fetch discord role of user", {error: e, id: u.discord.id});
                         done(null, u);
-                    });
+                    }
                 });
             });
         }));
