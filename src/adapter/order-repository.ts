@@ -278,7 +278,7 @@ export class InMemoryOrderRepository implements OrderRepository {
     }
 
     async findByTransactionId(id: string): Promise<Order | undefined> {
-        return Array.from(this.orders.values()).filter((o) => o.payment.id >= id)[0];
+        return Array.from(this.orders.values()).filter((o) => o.payment.transactionId >= id)[0];
     }
 
     async save(order: Order): Promise<void> {

@@ -13,8 +13,9 @@ import {Package, PerkDetails, RedeemTarget} from '../domain/package';
 import {OrderRepository, SubscriptionPlanRepository, SubscriptionsRepository} from '../domain/repositories';
 import {RedeemPackage} from './redeem-package';
 import {EventSource} from '../domain/events';
-import {CANCELLED} from 'dns';
 import {VATRate} from '../domain/vat';
+import {Logger} from 'winston';
+import {InMemoryOrderRepository} from '../adapter/order-repository';
 
 @singleton()
 export class Subscriptions {
@@ -25,6 +26,7 @@ export class Subscriptions {
         @inject('EventSource') private readonly events: EventSource,
         @inject('SubscriptionPaymentProvider') private readonly payment: SubscriptionPaymentProvider,
         @inject('RedeemPackage') private readonly redeem: RedeemPackage,
+        @inject('Logger') private readonly logger: Logger,
     ) {
     }
 
@@ -39,12 +41,17 @@ export class Subscriptions {
         return result;
     }
 
-    async redeemSubscriptionPayment(paymentId: string, transactionId: string): Promise<Order> {
+    async redeemSubscriptionPayment(paymentId: string, transactionId: string): Promise<Order | undefined> {
         const sub = await this.subscriptions.findByPayment(paymentId);
         const plan = await this.subscriptionPlans.find(sub.planId);
         const target = new RedeemTarget(sub.user.steamId, sub.user.discordId);
         if (sub.state === 'PENDING') {
             this.events.emit('subscriptionCreated', target, plan, sub);
+        }
+
+        if (await this.orders.findByTransactionId(transactionId)) {
+            this.logger.info('Found duplicated subscription execution', {transactionId: transactionId});
+            return;
         }
 
         const order = sub.pay(transactionId, this.payment.provider().branding.name, plan.basePackage);

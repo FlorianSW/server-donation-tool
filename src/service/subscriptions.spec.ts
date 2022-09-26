@@ -16,8 +16,9 @@ import {InMemoryOrderRepository} from '../adapter/order-repository';
 import winston from 'winston';
 import {EventQueue} from '../adapter/event-queue';
 import {RedeemTarget} from '../domain/package';
-import DoneCallback = jest.DoneCallback;
 import {aUser, somePackages} from '../test-data.spec';
+import {randomUUID} from 'crypto';
+import DoneCallback = jest.DoneCallback;
 
 describe('Subscriptions', () => {
     let plansRepository: SubscriptionPlanRepository;
@@ -38,7 +39,8 @@ describe('Subscriptions', () => {
         aPlan = await payment.persistSubscription(somePackages[0]);
         await plansRepository.save(aPlan);
 
-        service = new Subscriptions(plansRepository, subRepository, orders, events, payment, new RedeemPackage(orders, events, winston.createLogger()));
+        const logger = winston.createLogger();
+        service = new Subscriptions(plansRepository, subRepository, orders, events, payment, new RedeemPackage(orders, events, logger), logger);
     });
 
     it('creates a new subscription for a donator', async () => {
@@ -54,11 +56,12 @@ describe('Subscriptions', () => {
     });
 
     it('redeems perks for a subscription payment', (done: DoneCallback) => {
+        const tId = randomUUID();
         service.subscribe(somePackages[0], {SOME_ID: 'SOME_DATA'}, aUser).then((sub) => {
             events.on('subscriptionExecuted', (target: RedeemTarget, plan: SubscriptionPlan, sub: Subscription, order: Order) => {
                 expect(target.discordId).toEqual(aUser.discord.id);
                 expect(target.steamId).toEqual(aUser.steam.id);
-                expect(order.payment.transactionId).toEqual('A_TRANSACTION_ID');
+                expect(order.payment.transactionId).toEqual(tId);
                 expect(order.status).toEqual(OrderStatus.PAID);
                 expect(order.perkDetails).toEqual(new Map([['SOME_ID', 'SOME_DATA']]));
                 subRepository.findByPayment(sub.payment.id).then((subscription) => {
@@ -67,11 +70,24 @@ describe('Subscriptions', () => {
                 });
             });
 
-            service.redeemSubscriptionPayment(sub.id, 'A_TRANSACTION_ID').then((result) => {
+            service.redeemSubscriptionPayment(sub.id, tId).then((result) => {
                 const order = orders.find(result.id);
                 expect(order).not.toBeNull();
             });
         });
+    });
+
+    it('does not redeem duplicated webhook message', async () => {
+        const tId = randomUUID();
+        const sub = await service.subscribe(somePackages[0], {SOME_ID: 'SOME_DATA'}, aUser)
+
+        await service.redeemSubscriptionPayment(sub.id, tId);
+        const r = await orders.findByPaymentOrder(sub.id);
+        expect(r).toHaveLength(1);
+
+        await service.redeemSubscriptionPayment(sub.id, tId);
+        const o = await orders.findByPaymentOrder(sub.id);
+        expect(o).toHaveLength(1);
     });
 
     it('cancels subscription', async () => {
@@ -107,8 +123,8 @@ describe('Subscriptions', () => {
     it('views subscriptions details and history', async () => {
         const ps = await service.subscribe(somePackages[0], {}, aUser);
         const sub = await subRepository.findByPayment(ps.id);
-        const first = await service.redeemSubscriptionPayment(sub.payment.id, 'A_PAYMENT_ID');
-        const second = await service.redeemSubscriptionPayment(sub.payment.id, 'A_PAYMENT_ID');
+        const first = await service.redeemSubscriptionPayment(sub.payment.id, randomUUID());
+        const second = await service.redeemSubscriptionPayment(sub.payment.id, randomUUID());
 
         const result = await service.viewSubscription(sub.id, aUser);
 
