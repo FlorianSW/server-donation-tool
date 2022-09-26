@@ -77,21 +77,19 @@ export class Authentication {
         }, (accessToken: string, refreshToken: string, profile: Profile, done: VerifyCallback) => {
             discordUserCallback(steamClient, accessToken, refreshToken, profile).then((u) => {
                 client.guilds.fetch(config.discord.bot.guildId).then((g) => {
-                    try {
-                        g.members.fetch(u.discord.id).then((gu) => {
-                            if (config.discord.roleMapping?.auditor && gu.roles.cache.find((r) => r.id === config.discord.roleMapping.auditor)) {
-                                u.roles.push(Role.Auditor);
-                            }
-                            done(null, u);
-                        });
-                    } catch (e) {
+                    g.members.fetch(u.discord.id).then((gu) => {
+                        if (config.discord.roleMapping?.auditor && gu.roles.cache.find((r) => r.id === config.discord.roleMapping.auditor)) {
+                            u.roles.push(Role.Auditor);
+                        }
+                        done(null, u);
+                    }).catch((e) => {
                         if (e instanceof DiscordAPIError && e.code === RESTJSONErrorCodes.UnknownMember) {
                             done(null, u);
                             return;
                         }
-                        logger.error("could not fetch discord role of user", {error: e, id: u.discord.id});
+                        logger.error('could not fetch discord role of user', {error: e, id: u.discord.id});
                         done(null, u);
-                    }
+                    });
                 });
             });
         }));
