@@ -4,6 +4,7 @@ import * as fs from 'fs';
 import {SQLiteOrderRepository} from './order-repository';
 import {Order, Reference} from '../domain/payment';
 import {anOrder, asRedeemed, asRefunded, makeOrder, somePackages, withCreatedDate} from '../test-data.spec';
+import winston from 'winston';
 
 const testDbPath = __dirname + '/order-repository.spec.sqlite';
 
@@ -19,7 +20,7 @@ describe('OrderRepository', () => {
             useNullAsDefault: true,
         });
 
-        repository = new SQLiteOrderRepository(knex, somePackages);
+        repository = new SQLiteOrderRepository(knex, somePackages, winston.createLogger());
     });
 
     it('persists order', async () => {

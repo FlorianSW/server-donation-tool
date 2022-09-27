@@ -6,6 +6,7 @@ import {inject, singleton} from 'tsyringe';
 import {PaypalPayment} from './paypal/paypal-payment';
 import {User} from '../domain/user';
 import {VATRate} from '../domain/vat';
+import {Logger} from 'winston';
 
 const tableName = 'order_repository';
 const columnId = 'id';
@@ -29,7 +30,7 @@ const columnVatRate = 'vat_rate';
 export class SQLiteOrderRepository implements OrderRepository {
     private initialized: Promise<boolean>;
 
-    constructor(@inject('DonationsDB') private readonly con: Knex, @inject('packages') private readonly packages: Package[]) {
+    constructor(@inject('DonationsDB') private readonly con: Knex, @inject('packages') private readonly packages: Package[], @inject('Logger') private readonly logger: Logger) {
         this.initialized = new Promise((resolve) => {
             con.schema.hasTable(tableName).then(async (hasTable) => {
                 if (!hasTable) {
@@ -114,12 +115,58 @@ export class SQLiteOrderRepository implements OrderRepository {
                             b.float(columnVatRate).defaultTo(0);
                         });
                     }
+                    if (!(await this.hasIndex('uc_transaction_id'))) {
+                        await this.removeDuplicateSubscriptionOrders();
+                        await this.con.raw(`CREATE UNIQUE INDEX IF NOT EXISTS uc_${columnTransactionId} ON ${tableName}(${columnTransactionId})`);
+                    }
+                    if (await this.hasIndex('idx_transaction_id')) {
+                        await con.schema.alterTable(tableName, (b) => {
+                            b.dropIndex(columnTransactionId, 'idx_transaction_id');
+                        });
+                    }
                     await con.raw(`CREATE INDEX IF NOT EXISTS idx_${columnDiscordId} ON ${tableName}(${columnDiscordId})`);
                     await con.raw(`CREATE INDEX IF NOT EXISTS idx_${columnTransactionId} ON ${tableName}(${columnTransactionId})`);
                     resolve(true);
                 }
             });
         });
+    }
+
+    private async removeDuplicateSubscriptionOrders() {
+        this.logger.warn('Database requires migration, which will take some time and will be done in the background. Part of these migrations will remove orphaned or duplicated orders...');
+        let res = this.con
+            .table(tableName)
+            .select(columnId, columnTransactionId)
+            .where(columnStatus, '>=', OrderStatus.PAID)
+            .groupBy(columnTransactionId);
+
+        let counter = 0;
+        while (true) {
+            const o = await res.offset(counter).limit(25);
+            for (let k in o) {
+                const order = o[k];
+                if (order[columnTransactionId]) {
+                    await this.con.table(tableName)
+                        .where(columnTransactionId, order[columnTransactionId])
+                        .whereNot(columnId, order[columnId])
+                        .delete();
+                }
+            }
+            if (counter >= counter + o.length) break;
+            counter += o.length;
+        }
+        this.logger.warn('Database migration finished...');
+    }
+
+    private async hasIndex(name: string): Promise<boolean> {
+        const idx = await this.con.table('sqlite_master')
+            .where('type', 'index')
+            .where('name', name)
+            .where('tbl_name', tableName)
+            .count('name as count')
+            .first();
+
+        return idx.count === 1;
     }
 
     async clear(): Promise<void> {
