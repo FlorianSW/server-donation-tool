@@ -15,7 +15,18 @@ export class OrderOverviewController {
     }
 
     private async monthlyStatistics(req: Request, res: Response): Promise<void> {
-        const o = await this.service.monthlyOverview();
+        const now = new Date();
+        let year = now.getUTCFullYear();
+        let month = now.getUTCMonth() + 1;
+        if (req.query.month && req.query.year) {
+            year = parseInt(req.query.year as string);
+            month = parseInt(req.query.month as string);
+        }
+        if (year < 1900 || year > 3000 || month < 1 || month > 12) {
+            year = now.getUTCFullYear();
+            month = now.getUTCMonth() + 1;
+        }
+        const o = await this.service.monthlyOverview(month, year);
         res.render('order-overview', {
             data: o,
         });

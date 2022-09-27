@@ -3,23 +3,30 @@
     <div class="col s12">
         <div class="card">
             <div class="card-content">
+                <span class="card-title">
+                    <%= translate('STATISTICS_TITLE', {params: {startOfMonth: data.startOfMonth.toLocaleDateString(), endOfMonth: data.endOfMonth.toLocaleDateString()}}) %>
+                </span>
                 <div>
-                    Total Orders: <%= data.totalOrders %>
+                    <%= translate('STATISTICS_TOTAL_DONATIONS', {params: {donations: data.totalOrders}}) %>
                 </div>
                 <div>
-                    Total Revenue: <%= data.totalRevenue.toFixed(2) %>
+                    <%= translate('STATISTICS_TOTAL_REVENUE', {params: {revenue: data.totalRevenue.toFixed(2), currency: data.currency}}) %>
                 </div>
                 <div>
-                    Total VAT: <%= data.totalVat.toFixed(2) %>
+                    <%= translate('STATISTICS_TOTAL_VAT', {params: {vat: data.totalVat.toFixed(2), currency: data.currency}}) %>
                 </div>
+
+                <h5>
+                    <%= translate('STATISTICS_VAT_BY_COUNTRY') %>
+                </h5>
                 <table>
                     <thead>
                         <tr>
                             <th>
-                                Country Code
+                                <%= translate('STATISTICS_VAT_BY_COUNTRY_COUNTRY_CODE') %>
                             </th>
                             <th>
-                                VAT
+                                <%= translate('STATISTICS_VAT_BY_COUNTRY_VAT') %>
                             </th>
                         </tr>
                     </thead>
@@ -30,7 +37,7 @@
                                 <%= e[0] %>
                             </td>
                             <td>
-                                <%= e[1].toFixed(2) %>
+                                <%= data.currency %> <%= e[1].toFixed(2) %>
                             </td>
                         </tr>
                     <% }); %>

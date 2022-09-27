@@ -12,7 +12,8 @@ describe('OrderOverview', () => {
             await r.save(o2);
             const s = new OrderOverview(r);
 
-            const result = await s.monthlyOverview();
+            const now = new Date();
+            const result = await s.monthlyOverview(now.getUTCFullYear(), now.getMonth() + 1);
 
             expect(result).toEqual({
                 totalVat: parseFloat(o.vat.amount(o.reference.p.price)),

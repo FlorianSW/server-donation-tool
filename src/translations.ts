@@ -237,6 +237,14 @@ const messages: { [key: string]: string } = {
     REFUNDED_PACKAGE_NAME: 'Package donated for',
     REFUNDED_DATE: 'Refunded at',
 
+    STATISTICS_TITLE: 'Donation Statistics from {{startOfMonth}} to {{endOfMonth}}',
+    STATISTICS_TOTAL_DONATIONS: 'Total Donations: {{donations}}',
+    STATISTICS_TOTAL_REVENUE: 'Total Revenue: {{currency}} {{revenue}}',
+    STATISTICS_TOTAL_VAT: 'Total VAT: {{currency}} {{vat}}',
+    STATISTICS_VAT_BY_COUNTRY: 'VAT by country',
+    STATISTICS_VAT_BY_COUNTRY_COUNTRY_CODE: 'Country Code',
+    STATISTICS_VAT_BY_COUNTRY_VAT: 'VAT',
+
     ERROR_STEAM_ID_MISMATCH_TITLE: 'Steam ID mismatch',
     ERROR_STEAM_ID_MISMATCH_DESCRIPTION: 'The Steam ID for this donation is different from the one connected with your profile.',
     ERROR_STEAM_ID_MISMATCH_ORDER_LABEL: 'Steam ID of donation',
