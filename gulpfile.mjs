@@ -30,6 +30,9 @@ async function themes() {
 }
 
 async function backupDatabase() {
+    if (!existsSync('db/donations.sqlite')) {
+        return;
+    }
     if (!existsSync(`db/donations.sqlite.${backupBeforeRemoveDuplicateOrders}`)) {
         copyFileSync('db/donations.sqlite', `db/donations.sqlite.${backupBeforeRemoveDuplicateOrders}`)
     }
