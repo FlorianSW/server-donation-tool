@@ -152,7 +152,7 @@ export class DonationController {
                     template: selectedPayment.donation.template,
                     data: selectedPayment.donation.publicRenderData,
                 },
-                appliedVat: req.session.vat.amount(req.session.selectedPackage.price),
+                appliedVat: req.session.vat?.amount(req.session.selectedPackage.price),
             });
         } else {
             res.status(400).write('payment method can not be rendered');
