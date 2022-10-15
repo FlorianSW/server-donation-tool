@@ -18,12 +18,15 @@ declare module 'express-session' {
         selectedPackage: {
             id: number;
             price: Price;
-            forAccount: string | undefined;
             perkDetails: PerkDetails;
             type: DonationType;
         };
         vat?: VATRate,
-        afterLoginTarget?: string;
+        afterLoginTarget?: {
+            path: string,
+            method: string,
+            body: any,
+        };
         lastOrder?: {
             id: string,
             transactionId: string,

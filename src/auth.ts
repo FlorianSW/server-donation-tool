@@ -9,6 +9,7 @@ import {inject, singleton} from 'tsyringe';
 import {SteamClient} from './domain/steam-client';
 import {Client, DiscordAPIError, RESTJSONErrorCodes} from 'discord.js';
 import {Logger} from 'winston';
+import {UserData} from './service/user-data';
 
 export async function discordUserCallback(steamClient: SteamClient, accessToken: string, refreshToken: string, profile: Profile) {
     const connection: ConnectionInfo | undefined = profile.connections.find((c) => c.type === 'steam');
@@ -57,6 +58,7 @@ export class Authentication {
         @inject('AppConfig') config: AppConfig,
         @inject('SteamClient') steamClient: SteamClient,
         @inject('discord.Client') client: Client,
+        @inject(UserData) data: UserData,
         @inject('Logger') logger: Logger,
     ) {
         passport.serializeUser((user, done) => {
@@ -77,18 +79,31 @@ export class Authentication {
         }, (accessToken: string, refreshToken: string, profile: Profile, done: VerifyCallback) => {
             discordUserCallback(steamClient, accessToken, refreshToken, profile).then((u) => {
                 client.guilds.fetch(config.discord.bot.guildId).then((g) => {
+                    function next(next: any) {
+                        data.onRefresh(u).then((uu: User | undefined) => {
+                            if (uu !== undefined) {
+                                next(null, uu);
+                            } else {
+                                next(null, u);
+                            }
+                        }).catch((e: any) => {
+                            logger.error('could not refresh user', {error: e, id: u.discord.id});
+                            next(null, u);
+                        });
+                    }
+
                     g.members.fetch(u.discord.id).then((gu) => {
                         if (config.discord.roleMapping?.auditor && gu.roles.cache.find((r) => r.id === config.discord.roleMapping.auditor)) {
                             u.roles.push(Role.Auditor);
                         }
-                        done(null, u);
+                        next(done);
                     }).catch((e) => {
                         if (e instanceof DiscordAPIError && e.code === RESTJSONErrorCodes.UnknownMember) {
-                            done(null, u);
+                            next(done);
                             return;
                         }
                         logger.error('could not fetch discord role of user', {error: e, id: u.discord.id});
-                        done(null, u);
+                        next(done);
                     });
                 });
             });
@@ -115,8 +130,8 @@ export class Authentication {
 
     private loginCallback(req: Request, res: Response) {
         const afterLoginTarget = req.session.afterLoginTarget;
-        if (afterLoginTarget) {
-            res.redirect(afterLoginTarget);
+        if (afterLoginTarget && afterLoginTarget.method === 'GET') {
+            res.redirect(afterLoginTarget.path);
         } else {
             res.redirect('/');
         }
@@ -160,12 +175,20 @@ export class Authentication {
 
 export function requireAuthentication(req: Request, res: Response, next: NextFunction) {
     if (!req.isAuthenticated()) {
-        req.session.afterLoginTarget = req.path;
+        req.session.afterLoginTarget = {
+            path: req.path,
+            method: req.method,
+            body: req.body,
+        };
         res.redirect('/login');
         return;
     }
     if (!req.user.steam) {
-        req.session.afterLoginTarget = req.path;
+        req.session.afterLoginTarget = {
+            path: req.path,
+            method: req.method,
+            body: req.body,
+        };
         res.render('missing_steam_connection');
         return;
     }

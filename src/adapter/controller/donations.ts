@@ -14,6 +14,7 @@ import {Subscriptions} from '../../service/subscriptions';
 import {RedeemPackage} from '../../service/redeem-package';
 import {User} from '../../domain/user';
 import {VATRate, VATs} from '../../domain/vat';
+import {UserData} from '../../service/user-data';
 
 @singleton()
 export class DonationController {
@@ -28,6 +29,7 @@ export class DonationController {
         @inject('Subscriptions') private readonly subscriptions: Subscriptions,
         @inject('RedeemPackage') private readonly redeemPackage: RedeemPackage,
         @inject('EventSource') private readonly events: EventSource,
+        @inject(UserData) private readonly data: UserData,
         @inject('Logger') private readonly logger: Logger,
     ) {
         const csrfProtection = csrf();
@@ -143,7 +145,6 @@ export class DonationController {
                 selectedPackage: {
                     name: selectedPackage.name,
                     price: req.session.selectedPackage.price,
-                    forAccount: req.session.selectedPackage.forAccount,
                     perks: selectedPackage.perks,
                     subscription: selectedPackage.subscription,
                     type: req.session.selectedPackage.type,
@@ -184,6 +185,11 @@ export class DonationController {
             res.redirect('/');
             return;
         }
+        req.user = await this.data.onRefresh(req.user);
+        if (req.user.subscribedPackages[selectedPackage.id] !== undefined && req.session.selectedPackage.type === DonationType.Subscription) {
+            res.redirect('/');
+            return;
+        }
         const rates = await this.vats.countries(selectedPackage.price);
         let template = 'steps/donate';
         if (req.session.selectedPackage.type === DonationType.Subscription) {
@@ -201,7 +207,6 @@ export class DonationController {
             selectedPackage: {
                 name: selectedPackage.name,
                 price: req.session.selectedPackage.price,
-                forAccount: req.session.selectedPackage.forAccount,
                 perks: selectedPackage.perks,
                 subscription: selectedPackage.subscription,
                 type: req.session.selectedPackage.type,
@@ -317,20 +322,19 @@ export class DonationController {
 
     private async deferredDonation(req: Request, res: Response, customMessage: string) {
         const p = this.selectedPackage(req.session);
-        const steamId = req.session.selectedPackage.forAccount;
         const payment = this.payments.find((provider) => provider.provider().branding.name === req.body.method);
         if (!payment) {
             res.status(400).send();
             return;
         }
 
-        const order = Order.createDeferred(new Date(), new Reference(steamId, req.user.discord.id, p), customMessage, req.session.vat);
+        const order = Order.createDeferred(new Date(), new Reference(null, req.user.discord.id, p), customMessage, req.session.vat);
         const paymentOrder = await payment.createPaymentOrder({
             candidateOrderId: order.id,
             successUrl: new URL('/donate/' + order.id + '?provider=' + payment.provider().branding.name, this.config.app.publicUrl),
             cancelUrl: new URL('/donate/' + order.id + '/cancel?&provider=' + payment.provider().branding.name, this.config.app.publicUrl),
             forPackage: p,
-            steamId: steamId,
+            steamId: null,
             discordId: req.user.discord.id,
             vat: VATRate.fromValueObject(req.session.vat),
         });
@@ -362,7 +366,6 @@ export class DonationController {
         }
 
         const p = this.selectedPackage(req.session);
-        const steamId = req.session.selectedPackage.forAccount;
         const payment = this.payments.find((provider) => provider.provider().branding.name === req.body.provider);
         if (!payment) {
             res.status(400).send();
@@ -370,7 +373,7 @@ export class DonationController {
         }
         const paymentOrder = await payment.createPaymentOrder({
             forPackage: p,
-            steamId: steamId,
+            steamId: null,
             discordId: req.user.discord.id,
             vat: VATRate.fromValueObject(req.session.vat),
         });
@@ -379,7 +382,7 @@ export class DonationController {
             id: paymentOrder.id,
             transactionId: paymentOrder.transactionId,
             provider: payment.provider().branding.name,
-        }, new Reference(steamId, req.user.discord.id, p), customMessage, req.session.vat);
+        }, new Reference(null, req.user.discord.id, p), customMessage, req.session.vat);
         order.pushPerkDetails(req.session.selectedPackage.perkDetails);
         await this.repo.save(order);
 

@@ -85,13 +85,15 @@
     </div>
 </div>
 
-<h4><%= translate('ACCOUNT_INFO_TITLE') %></h4>
-<div class="row">
-    <div class="col col s10 m4">
-        <%- include('../partials/steam_info.ejs'); %>
+<% if (user) { %>
+    <h4><%= translate('ACCOUNT_INFO_TITLE') %></h4>
+    <div class="row">
+        <div class="col col s10 m4">
+            <%- include('../partials/steam_info.ejs'); %>
+        </div>
+        <div class="col col s10 m4">
+            <%- include('../partials/discord_info.ejs'); %>
+        </div>
     </div>
-    <div class="col col s10 m4">
-        <%- include('../partials/discord_info.ejs'); %>
-    </div>
-</div>
+<% } %>
 <%- include('../partials/footer.ejs') %>

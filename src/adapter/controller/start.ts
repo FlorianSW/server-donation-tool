@@ -1,5 +1,4 @@
 import {Request, Response, Router} from 'express';
-import {requireAuthentication} from '../../auth';
 import {AppConfig} from '../../domain/app-config';
 import {DonationType, Package, Price, PriceType} from '../../domain/package';
 import {Logger} from 'winston';
@@ -19,18 +18,19 @@ export class StartController {
     ) {
         const csrfProtection = csrf();
 
-        this.router.post('/selectPackage', requireAuthentication, csrfProtection, this.selectPackage.bind(this));
-        this.router.get('/', requireAuthentication, csrfProtection, this.startPage.bind(this));
+        this.router.post('/selectPackage', csrfProtection, this.selectPackage.bind(this));
+        this.router.get('/', csrfProtection, this.startPage.bind(this));
     }
 
     private async startPage(req: Request, res: Response) {
         req.user = await this.data.onRefresh(req.user);
 
         res.render('steps/package_selection', {
+            withOpenGraph: true,
             csrfToken: req.csrfToken(),
             showDonationTarget: !!this.config.app.community?.donationTarget?.monthly,
             availablePackages: this.packages,
-            subscribedPackages: req.user.subscribedPackages,
+            subscribedPackages: req.user?.subscribedPackages || {},
         });
     }
 
@@ -53,18 +53,11 @@ export class StartController {
 
     private async selectPackage(req: Request, res: Response) {
         const selectedPackage = this.packages.find((p) => p.id === parseInt(req.body.package));
-        if (!selectedPackage || req.user.subscribedPackages[selectedPackage.id] !== undefined) {
-            res.redirect('/');
-        }
 
-        let forAccount;
         let type = DonationType.OneTime;
-        if (req.body['perks-for'] === 'donate') {
-            forAccount = null;
-        } else if (req.body['perks-for'] === 'subscribe') {
-            forAccount = req.user.steam.id;
+        if (req.body['perks-for'] === 'subscribe') {
             type = DonationType.Subscription;
-        } else {
+        } else if (req.body['perks-for'] !== 'donate') {
             res.redirect('/');
         }
 
@@ -72,7 +65,6 @@ export class StartController {
             req.session.selectedPackage = {
                 id: selectedPackage.id,
                 price: this.price(req, selectedPackage),
-                forAccount: forAccount,
                 perkDetails: {},
                 type: type,
             };

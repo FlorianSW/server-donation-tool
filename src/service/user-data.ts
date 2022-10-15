@@ -12,7 +12,10 @@ export class UserData {
     ) {
     }
 
-    async onRefresh(user: User): Promise<User> {
+    async onRefresh(user?: User | undefined): Promise<User | undefined> {
+        if (user === undefined) {
+            return user;
+        }
         const active = await this.subs.findActive(user);
         const r: { [packageId: number]: string } = {};
         for (let s of active) {

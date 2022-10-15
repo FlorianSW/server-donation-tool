@@ -38,10 +38,10 @@
   }
 
   .card-action {
-    button {
+    button, a {
       width: 100%;
 
-      &:not(:first-of-type) {
+      &:not(:first-child) {
         margin-top: 0.75em;
       }
     }

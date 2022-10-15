@@ -15,7 +15,6 @@ import {RedeemPackage} from './redeem-package';
 import {EventSource} from '../domain/events';
 import {VATRate} from '../domain/vat';
 import {Logger} from 'winston';
-import {InMemoryOrderRepository} from '../adapter/order-repository';
 
 @singleton()
 export class Subscriptions {

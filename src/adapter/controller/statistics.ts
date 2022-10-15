@@ -1,6 +1,5 @@
 import {inject, singleton} from 'tsyringe';
 import {Request, Response, Router} from 'express';
-import {requireAuthentication} from '../../auth';
 import {translate} from '../../translations';
 import {CalculateDonationTarget} from '../../service/donation-target';
 
@@ -10,7 +9,7 @@ export class StatisticsController {
 
     constructor(@inject(CalculateDonationTarget) private readonly service: CalculateDonationTarget) {
         if (service.hasMonthlyTarget()) {
-            this.router.get('/api/statistics/monthly', requireAuthentication, this.monthlyStatistics.bind(this));
+            this.router.get('/api/statistics/monthly', this.monthlyStatistics.bind(this));
         }
     }
 
