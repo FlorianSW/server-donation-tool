@@ -43,17 +43,18 @@ export class Donations {
         @injectAll('Payment') private readonly payments: Payment[],
         @inject('Logger') private readonly logger: Logger,
     ) {
-        this.manageAppCommand().then(() => {
+        const guildId = this.config.discord.commands?.donate?.guildId;
+        const disabled = this.config.discord.commands?.donate?.disabled ?? false;
+
+        this.manageAppCommand(guildId, disabled).then(() => {
+            if (!guildId || disabled) {
+                return;
+            }
             this.client.on('interactionCreate', this.onInteractionCreate.bind(this));
         });
     }
 
-    private async manageAppCommand() {
-        const guildId = this.config.discord.commands?.donate?.guildId;
-        const disabled = this.config.discord.commands?.donate?.disabled ?? false;
-        if (!guildId) {
-            return;
-        }
+    private async manageAppCommand(guildId: string, disabled: boolean) {
         const commands = await this.client.application.commands.fetch({
             guildId: guildId,
         });
