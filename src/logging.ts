@@ -71,7 +71,7 @@ export const errorHandler: ErrorRequestHandler = (err: any, req: Request, res: R
                 selectedPackage: req.session?.selectedPackage?.id,
                 user: {
                     steamId: req.user?.steam?.id,
-                    discordId: req.user?.discord.id,
+                    discordId: req.user?.discord?.id,
                 },
                 lastOrder: {
                     id: req.session?.lastOrder?.id,
