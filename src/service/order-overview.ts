@@ -22,6 +22,8 @@ export class OrderOverview {
         const startOfMonth = new Date(Date.UTC(year, month - 1, 1, 0, 0, 0));
         const endOfMonth = new Date(startOfMonth.getTime());
         endOfMonth.setMonth(endOfMonth.getMonth() + 1);
+        const displayedEndMonth = new Date(endOfMonth.getTime());
+        displayedEndMonth.setDate(endOfMonth.getDate() - 1);
         const result = {
             currency: '',
             totalOrders: 0,
@@ -29,7 +31,7 @@ export class OrderOverview {
             totalVat: 0,
             vatByCountry: {},
             startOfMonth: startOfMonth,
-            endOfMonth: endOfMonth,
+            endOfMonth: displayedEndMonth,
         } as OrderBreakdown;
         await this.repository.findCreatedPages(startOfMonth, endOfMonth, (o: Order[]) => {
             o.forEach((order: Order) => {
