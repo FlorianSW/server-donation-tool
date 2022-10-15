@@ -45,9 +45,12 @@ export class Donations {
     ) {
         const guildId = this.config.discord.commands?.donate?.guildId;
         const disabled = this.config.discord.commands?.donate?.disabled ?? false;
+        if (!guildId) {
+            return;
+        }
 
         this.manageAppCommand(guildId, disabled).then(() => {
-            if (!guildId || disabled) {
+            if (disabled) {
                 return;
             }
             this.client.on('interactionCreate', this.onInteractionCreate.bind(this));
