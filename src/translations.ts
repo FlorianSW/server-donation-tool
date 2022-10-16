@@ -36,6 +36,7 @@ const messages: { [key: string]: string } = {
     STEAM_FROM_DISCORD: 'This Steam account is linked with your Discord user.',
     STEAM_FROM_STEAM: 'You logged in with this Steam account.',
     STEAM_LOGIN_ANOTHER: 'Login with another account',
+    STEAM_NOT_LOGGED_IN: 'Not logged in to Steam',
 
     DISCORD_ACCOUNT_TITLE: 'Discord Account',
     DISCORD_LOGOUT: 'Login with another account',

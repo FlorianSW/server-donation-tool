@@ -4,29 +4,33 @@
     </div>
     <div class="card-content">
         <span class="card-title"><%= translate('STEAM_ACCOUNT_TITLE') %></span>
-        <div class="status">
-            <% if (user.steam.avatarUrl) { %>
-                <img class="avatar" src="<%= user.steam.avatarUrl %>">
+        <% if (user.steam) { %>
+            <div class="status">
+                <% if (user.steam.avatarUrl) { %>
+                    <img class="avatar" src="<%= user.steam.avatarUrl %>">
+                <% } %>
+                <%= user.steam.name %> (<%= user.steam.id %>)
+            </div>
+            <br>
+            <% if (user.steam.source === 'DISCORD') { %>
+                <p>
+                    <%- translate('STEAM_FROM_DISCORD') %>
+                </p>
+            <% } else if (user.steam.source === 'STEAM') { %>
+                <p>
+                    <%- translate('STEAM_FROM_STEAM') %>
+                </p>
             <% } %>
-            <%= user.steam.name %> (<%= user.steam.id %>)
-        </div>
-        <br>
-        <% if (user.steam.source === 'DISCORD') { %>
-            <p>
-                <%- translate('STEAM_FROM_DISCORD') %>
-            </p>
-        <% } else if (user.steam.source === 'STEAM') { %>
-            <p>
-                <%- translate('STEAM_FROM_STEAM') %>
-            </p>
-        <% } %>
-        <br>
-        <% if (supportsSteamLogin) { %>
-            <a href="/auth/steam/redirect">
-                <button class="waves-effect waves-light btn-small">
-                    <%= translate('STEAM_LOGIN_ANOTHER') %>
-                </button>
-            </a>
+            <br>
+            <% if (supportsSteamLogin) { %>
+                <a href="/auth/steam/redirect">
+                    <button class="waves-effect waves-light btn-small">
+                        <%= translate('STEAM_LOGIN_ANOTHER') %>
+                    </button>
+                </a>
+            <% } %>
+        <% } else { %>
+            <span><%= translate('STEAM_NOT_LOGGED_IN') %></span>
         <% } %>
     </div>
 </div>
