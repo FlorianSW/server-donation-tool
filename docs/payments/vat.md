@@ -19,6 +19,6 @@ vats:
 ```
 
 While the value of `publicKey` is the value of your public API key from the [VATStack dashboard](https://dashboard.vatstack.com/keys).
-Restart the server donation tool and it will start collecting taxes for your european donators.
+Restart the server donation tool, and it will start collecting taxes for your european donators.
 
 In order to collect the correct tax rate from your donators, the donation tool will ask the donator about where they live.

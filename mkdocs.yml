@@ -12,6 +12,7 @@ nav:
       - 'Subscriptions': 'subscriptions.md'
       - 'Setup Additional Steam Login': 'steam-login.md'
       - 'Discord Notifications': 'discord-notifications.md'
+      - 'Roles': 'roles.md'
   - 'Payments':
       - Refunds: 'payments/refunds.md'
       - Taxes: 'payments/vat.md'
