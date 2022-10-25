@@ -15,6 +15,8 @@ It holds the information of a unique ID, in order to reference the package durin
 The package will also has a price tag, which a donator will need to pay.
 The most important part of a package is a collection (0 or more) of perks, that a donator gets access to when a donation was successful.
 
+**Important**: Never, ever, delete a package from your configuration or change the unique ID of a package, that you already had live at least once. If you want to disable a package, you can create a new one and [disable](#disabling-packages) the old one.
+
 #### Packages with a variable price
 
 The default setting for a package is, that it has a fixed price tag.
