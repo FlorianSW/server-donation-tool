@@ -1,0 +1,56 @@
+# This is an example configuration, which can be used as a basis with the minimal settings.
+# You still need to go through this and replace the placeholder values with the real ones. See
+# the getting started guide (./docs/getting-started.md) for more info.
+app:
+  port: 443
+  # Put in an auto-generated value (e.g. from https://www.random.org/strings/)
+  sessionSecret: '89430372563244144433'
+  sessionStore:
+    filename: ./db/sessions.sqlite
+  compressResponse: true
+  community:
+    # Fill in the values that describe your community (replacing the existing ones)
+    title: The Traveller Community
+    logo: https://i.ibb.co/QYKyZSt/TTH.png
+    discord: https://discord.gg/thetraveller
+    donationTarget:
+      discordChannelId: '957040173521178655'
+      monthly: 200
+discord:
+  clientId: '1036336059627356323'
+  clientSecret: 1jfHxCFuKPBG5hEar-tpbB0RPBqVbZGJ
+  redirectUrl: 'https://tt-donation-tool.herokuapp.com/auth/discord/callback'
+  bot:
+    token: MTAzNjMzNjA1OTYyNzM1NjMyMw.G87yRV.NMyQqeG4x16v2byjgh6rbOlgqmnIGjcNDaBLwI
+    guildId: '790572076645482496'
+paypal:
+  environment: production
+  clientId: client-id-from-paypal-developer-portal
+  clientSecret: client-secret-from-paypal-developer-portal
+steam:
+  redirectUrl: https://tt-donation-tool.herokuapp.com/auth/steam/callback
+  realm: https://tt-donation-tool.herokuapp.com/
+  apiKey: 3EDD0A3A0A92E32ED8588A0E1024388C
+cftools:
+  applicationId: 635eb98f7ba353a277fd913d
+  secret: o7PytH2rJwIHfBnApz6oJD6k/gNkFJhuhMjLLatU/cQ=
+serverNames:
+  9c4c2983-2f8a-4c86-81d6-13e298588c4c: Cherno
+  61e7f64d-3601-4f39-ba88-08bd50e2b982: Esseker
+  d8bebc8b-c847-4e67-a5f5-b485e2cc8020: DeerIsle
+  b7a78c09-b241-4a03-9705-f97ed57ec1d3: SwanIsland
+packages:
+  - name: 'Traveller Supporter'
+    id: 1
+    price:
+      currency: USD
+      amount: '0.00'
+    perks:
+      - type: DISCORD_ROLE
+        roles:
+          # Donator
+          - '972442505503178793'
+      - type: PRIORITY_QUEUE
+        amountInDays: 30
+        cftools:
+          serverApiId: 9c4c2983-2f8a-4c86-81d6-13e298588c4c
