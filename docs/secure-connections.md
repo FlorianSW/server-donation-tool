@@ -28,7 +28,7 @@ When using nginx as a webserver and following this guide, please make sure you s
 * Navigate to the directory `D:\nginx`: `cd D:\nginx`
 * Start nginx: `start nginx.exe`
 * Copy the example config `nginx.conf` (within the directory of this guide) to the `conf` directory inside the extracted nginx directory
-* Open the configuration file and change the `server_name` property to your domain name
+* Open the configuration file and change the `server_name` property by replacing `localhost` with your domain name
 * Reload the configuration of nginx: `.\nginx.exe -s reload`
 * Verify that you can open your domain name in the browser, e.g.: http://example.com/.well-known/ (it should respond with a 404 - Not Found)
 
