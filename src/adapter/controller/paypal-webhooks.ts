@@ -93,6 +93,7 @@ export class PaypalWebhooksController {
         if (resource === null) {
             this.logger.error('Received invalid webhook (not originating from PayPal: ' + event.id);
             res.status(200).end();
+            return;
         }
         switch (event.event_type) {
             case EventType.SaleCompleted:
@@ -135,11 +136,13 @@ export class PaypalWebhooksController {
             const event = await this.client.execute<WebhookEventResponse>(r);
 
             if (event.statusCode !== 200) {
+                this.logger.info('Expected 200-OK status code, got ' + event.statusCode + ' while reading webhook event ' + id);
                 return null;
             }
             return event.result.resource as T;
         } catch (e) {
             if (e.statusCode === 404) {
+                this.logger.info('Expected 200-OK status code, got error-404 while reading webhook event ' + id);
                 return null;
             }
             throw e;
