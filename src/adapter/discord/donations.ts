@@ -18,6 +18,7 @@ import {
     ModalSubmitInteraction,
     SelectMenuComponentOptionData,
     SelectMenuInteraction,
+    StringSelectMenuInteraction,
     TextInputBuilder,
 } from 'discord.js';
 import {AppConfig} from '../../domain/app-config';
@@ -97,7 +98,7 @@ export class Donations {
     private async onInteractionCreate(interaction: Interaction): Promise<void> {
         if (interaction.isCommand() && interaction.commandName === translate('CMD_DONATE_NAME')) {
             await this.onDonateCommand(interaction);
-        } else if (interaction instanceof SelectMenuInteraction && interaction.customId === SELECT_PACKAGE) {
+        } else if (interaction instanceof StringSelectMenuInteraction && interaction.customId === SELECT_PACKAGE) {
             await this.onPackageSelect(interaction);
         } else if (interaction instanceof ButtonInteraction && interaction.customId === PACKAGE_SELECTION) {
             await this.onDonateCommand(interaction);
@@ -106,6 +107,7 @@ export class Donations {
         } else if (interaction instanceof ModalSubmitInteraction && interaction.isFromMessage() && interaction.customId.startsWith(PRICE_SET)) {
             await this.onPriceSet(interaction);
         } else {
+            console.log(typeof interaction, 'customId' in interaction ? interaction['customId'] : 'none');
             this.logger.error('Received unknown interaction', interaction);
         }
     }
