@@ -93,7 +93,7 @@ export class Authentication {
                     }
 
                     g.members.fetch(u.discord.id).then((gu) => {
-                        if (config.discord.roleMapping?.auditor && gu.roles.cache.find((r) => r.id === config.discord.roleMapping.auditor)) {
+                        if (config.discord.roleMapping?.auditor && gu.roles.cache.find((r) => config.discord.roleMapping.auditor.includes(r.id))) {
                             u.roles.push(Role.Auditor);
                         }
                         next(done);

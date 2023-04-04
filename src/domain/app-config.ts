@@ -62,7 +62,7 @@ export interface AppConfig {
             }
         },
         roleMapping?: {
-            auditor?: string;
+            auditor?: string[];
         },
     },
     steam?: {

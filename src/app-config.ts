@@ -126,7 +126,7 @@ class YamlAppConfig implements AppConfig {
             }
         },
         roleMapping: {
-            auditor: string;
+            auditor: string[];
         },
     };
     vats?: {
@@ -355,6 +355,9 @@ export async function parseConfig(logger: Logger): Promise<AppConfig> {
     }
     if (typeof intermediate.discord.bot.guildId === 'number') {
         logger.warn(warnYamlNumber('discord bot GuildID', intermediate.discord.bot.guildId));
+    }
+    if (typeof intermediate.discord.roleMapping?.auditor === 'string') {
+        intermediate.discord.roleMapping.auditor = [intermediate.discord.roleMapping.auditor];
     }
     logger.info('Validating package and perk configuration');
     for (const p of intermediate.packages) {

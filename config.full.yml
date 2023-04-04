@@ -103,6 +103,26 @@ discord:
         # Send whenever a perk of a package could not be redeemed (the error message will contain more information on
         # what happened)
         - REDEEM_ERROR
+  commands:
+    # The /donate slash command is an alternative way for users to start a donation process from your discord server.
+    donate:
+      # The guild ID where the slash command should be installed to. The bot.token user requires the permission to manage application
+      # commands in this guild in order to install the slash command and react on interactions of users with it.
+      guildId: '837085224197423185'
+      # If you want to stop using the slash command, set this option to true. The tool will, on the next restart, remove
+      # the app command from your discord. If you just remove the whole configuration block, users will still be able
+      # to see and use the slash command in your discord (given they have appropriate permission to do so), however the
+      # donation tool will not respond to any interaction anymore.
+      disabled: false
+  # Map discord roles a user (who logs in) might have, to roles the donation tool has. You can have a 1-n mapping, meaning
+  # one donation tool role can be mapped to multiple discord roles.
+  roleMapping:
+    # The auditor role allows users, who have this role, to see the /statistics endpoint in the donation tool. This page
+    # shows all your donations from one month, be careful to whom you give this role to.
+    auditor:
+      # These IDs are role IDs from your discord.
+      - '864472446031101971'
+      - '864472446031101972'
 steam:
   # The absolute redirect URL of your website. Should be the public facing URL of your website ending on /auth/steam/callback
   redirectUrl: '/auth/steam/callback'
