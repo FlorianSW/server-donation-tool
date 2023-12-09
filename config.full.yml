@@ -37,6 +37,15 @@ app:
       # - ./document-partials/privacy-policy/paypal.txt
       # - ./document-partials/privacy-policy/cftools.txt
       # - ./document-partials/privacy-policy/personal-data.txt
+  orders:
+    # Donators can redeem an order again after some time, mostly as a use case to resolve errors or when a redeem was marked
+    # as successful but because of an error of the perk, that it did not work as expected.
+    # Some perk providers have a (strict) rate limit, which users could abuse when they can redeem at any time, as many times as
+    # they want.
+    # With this setting, you can configure how long a cooldown after a redeem of an order should be enforced.
+    # When a donator redeems, they cannot redeem again as long as this cooldown did not pass. The cooldown is measured in
+    # hours and need to be a positive, absolute number greater than 0.
+    redeemCooldownHours: 1
 discord:
   # The OAuth credentials of the application (https://discord.com/developers/applications) used to sign users in. You
   # find these values in the app settings in the section 'OAuth2' -> 'Client information'

@@ -18,7 +18,7 @@ export class DiscordRoleRecorder implements Closeable {
             .filter((p: DiscordRolePerk) => p.amountInDays !== undefined);
 
         for (const p of perks as DiscordRolePerk[]) {
-            const expires = new Date(order.redeemedAt);
+            const expires = new Date(order.firstRedeemed);
             expires.setDate(expires.getDate() + p.amountInDays);
             for (const r of p.roles) {
                 await this.repository.save({

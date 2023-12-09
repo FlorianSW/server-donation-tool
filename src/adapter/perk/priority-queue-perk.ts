@@ -251,8 +251,8 @@ export class PriorityQueuePerk implements Perk, Refundable {
         if (this.permanent) {
             return 'Permanent';
         }
-        const expiration = new Date(order.redeemedAt.valueOf());
-        expiration.setDate(order.redeemedAt.getDate() + this.amountInDays);
+        const expiration = new Date(order.firstRedeemed.valueOf());
+        expiration.setDate(order.firstRedeemed.getDate() + this.amountInDays);
 
         return expiration;
     }

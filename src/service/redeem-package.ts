@@ -5,6 +5,7 @@ import {Order} from '../domain/payment';
 import {OrderRepository} from '../domain/repositories';
 import {Logger} from 'winston';
 import {EventSource} from '../domain/events';
+import {AppConfig} from '../domain/app-config';
 
 export interface RedeemResults {
     success: TranslateParams[],
@@ -17,6 +18,7 @@ export class RedeemPackage {
         @inject('OrderRepository') private readonly repo: OrderRepository,
         @inject('EventSource') private readonly events: EventSource,
         @inject('Logger') private readonly logger: Logger,
+        @inject('AppConfig') private readonly config: AppConfig,
     ) {
     }
 
@@ -24,8 +26,14 @@ export class RedeemPackage {
         if (order.reference.steamId === null) {
             order.reference.steamId = target.steamId;
         }
-        order.redeem();
-        await this.repo.save(order);
+
+        const error = order.redeem(this.config.app.orders.redeemCooldownHours);
+        if (error) {
+            return {
+                success: [],
+                errors: [error],
+            }
+        }
 
         const success: TranslateParams[] = [];
         const errors: RedeemError[] = [];
@@ -44,6 +52,10 @@ export class RedeemPackage {
         }
         if (success.length !== 0) {
             this.events.emit('successfulRedeem', target, order, perks);
+        }
+
+        if (errors.length === 0) {
+            await this.repo.save(order);
         }
 
         return {

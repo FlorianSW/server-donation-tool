@@ -88,9 +88,9 @@ export function withCreatedDate(d: Date): modifier {
 export function asRedeemed(d?: Date): modifier {
     return (c) => {
         if (c instanceof Order) {
-            c.redeem();
+            c.redeem(1);
             if (d) {
-                c.redeemedAt = d;
+                c.firstRedeemed = d;
             }
         }
         return c;

@@ -185,8 +185,8 @@ export class ReservedSlotPerk implements Perk {
         if (this.permanent) {
             return null;
         }
-        const expiration = new Date(order.redeemedAt.valueOf());
-        expiration.setDate(order.redeemedAt.getDate() + this.amountInDays);
+        const expiration = new Date(order.firstRedeemed.valueOf());
+        expiration.setDate(order.firstRedeemed.getDate() + this.amountInDays);
 
         return expiration;
     }

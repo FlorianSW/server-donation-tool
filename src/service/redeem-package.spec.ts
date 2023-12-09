@@ -8,6 +8,7 @@ import {Order, OrderStatus} from '../domain/payment';
 import {OwnedPerk, User} from '../domain/user';
 import {TranslateParams} from '../translations';
 import {OrderRepository} from '../domain/repositories';
+import {AppConfig} from '../domain/app-config';
 
 describe('RedeemPackage', () => {
     let repo: OrderRepository;
@@ -15,7 +16,7 @@ describe('RedeemPackage', () => {
 
     beforeEach(() => {
         repo = new InMemoryOrderRepository();
-        service = new RedeemPackage(repo, new EventQueue(), winston.createLogger());
+        service = new RedeemPackage(repo, new EventQueue(), winston.createLogger(), {orders: {redeemCooldownHours: 1}} as any as AppConfig);
     });
 
     describe('redeem', () => {
@@ -39,8 +40,8 @@ describe('RedeemPackage', () => {
             await service.redeem(order, RedeemTarget.fromUser(aUser), [new FakePerk()]);
 
             const o = await repo.find(order.id);
-            expect(o.redeemedAt).not.toBeNull();
-            expect(o.redeemedAt.getTime()).toBeCloseTo(new Date().getTime(), -1);
+            expect(o.firstRedeemed).not.toBeNull();
+            expect(o.firstRedeemed.getTime()).toBeCloseTo(new Date().getTime(), -1);
         });
     });
 

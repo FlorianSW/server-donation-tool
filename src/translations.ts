@@ -257,6 +257,8 @@ const messages: { [key: string]: string } = {
     ERROR_LOGIN_AGAIN: 'Login again',
 
     ERROR_ORDER_NOT_FOUND: 'Order with ID {{orderId}} not found',
+    ERROR_ORDER_REDEEM_NOT_PAID: 'This order is not yet paid and cannot be redeemed. Please proceed to the payment page and retry redeeming once the order is paid.',
+    ERROR_ORDER_REDEEM_RATE_LIMITED: 'You recently redeemed this order already. You can redeem again at earliest {{redeemAt}}',
 
     ERROR_GENERIC_TITLE: 'Something went wrong 😥',
     ERROR_GENERIC_DESCRIPTION: 'There was an error while processing your request from which we can not recover automatically. If the error persists, please contact the community support channel and report this error using the below additional error information.',

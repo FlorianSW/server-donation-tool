@@ -19,6 +19,7 @@ import {RedeemTarget} from '../domain/package';
 import {aUser, somePackages} from '../test-data.spec';
 import {randomUUID} from 'crypto';
 import DoneCallback = jest.DoneCallback;
+import {AppConfig} from '../domain/app-config';
 
 describe('Subscriptions', () => {
     let plansRepository: SubscriptionPlanRepository;
@@ -40,7 +41,7 @@ describe('Subscriptions', () => {
         await plansRepository.save(aPlan);
 
         const logger = winston.createLogger();
-        service = new Subscriptions(plansRepository, subRepository, orders, events, payment, new RedeemPackage(orders, events, logger), logger);
+        service = new Subscriptions(plansRepository, subRepository, orders, events, payment, new RedeemPackage(orders, events, logger, {orders: {redeemCooldownHours: 1}} as any as AppConfig), logger);
     });
 
     it('creates a new subscription for a donator', async () => {

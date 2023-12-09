@@ -20,6 +20,7 @@ const columnDiscordId = 'discord_id';
 const columnPackageId = 'package_id';
 const columnPrice = 'price';
 const columnRedeemedAt = 'redeemed_at';
+const columnLastRedeemedAt = 'last_redeemed_at';
 const columnRefundedAt = 'refunded_at';
 const columnPaymentProvider = 'payment_provider';
 const columnPerkDetails = 'perk_details';
@@ -46,6 +47,7 @@ export class SQLiteOrderRepository implements OrderRepository {
                         b.bigInteger(columnPackageId);
                         b.float(columnPrice);
                         b.dateTime(columnRedeemedAt).nullable().defaultTo(null);
+                        b.dateTime(columnLastRedeemedAt).nullable().defaultTo(null);
                         b.dateTime(columnRefundedAt).nullable().defaultTo(null);
                         b.string(columnPaymentProvider, 10).notNullable().defaultTo(PaypalPayment.NAME);
                         b.text(columnPerkDetails).nullable().defaultTo(null);
@@ -86,6 +88,14 @@ export class SQLiteOrderRepository implements OrderRepository {
                         await con.raw(`UPDATE ${tableName}
                                        SET ${columnRedeemedAt} = ${columnCreated}
                                        WHERE ${columnRedeemedAt} IS NULL;`);
+                    }
+                    if (!c.hasOwnProperty(columnLastRedeemedAt)) {
+                        await con.schema.alterTable(tableName, (b) => {
+                            b.dateTime(columnLastRedeemedAt).nullable().defaultTo(null);
+                        });
+                        await con.raw(`UPDATE ${tableName}
+                                       SET ${columnLastRedeemedAt} = ${columnRedeemedAt}
+                                       WHERE ${columnLastRedeemedAt} IS NULL;`);
                     }
                     if (!c.hasOwnProperty(columnPaymentProvider)) {
                         await con.schema.alterTable(tableName, (b) => {
@@ -130,43 +140,6 @@ export class SQLiteOrderRepository implements OrderRepository {
                 }
             });
         });
-    }
-
-    private async removeDuplicateSubscriptionOrders() {
-        this.logger.warn('Database requires migration, which will take some time and will be done in the background. Part of these migrations will remove orphaned or duplicated orders...');
-        let res = this.con
-            .table(tableName)
-            .select(columnId, columnTransactionId)
-            .where(columnStatus, '>=', OrderStatus.PAID)
-            .groupBy(columnTransactionId);
-
-        let counter = 0;
-        while (true) {
-            const o = await res.offset(counter).limit(25);
-            for (let k in o) {
-                const order = o[k];
-                if (order[columnTransactionId]) {
-                    await this.con.table(tableName)
-                        .where(columnTransactionId, order[columnTransactionId])
-                        .whereNot(columnId, order[columnId])
-                        .delete();
-                }
-            }
-            if (counter >= counter + o.length) break;
-            counter += o.length;
-        }
-        this.logger.warn('Database migration finished...');
-    }
-
-    private async hasIndex(name: string): Promise<boolean> {
-        const idx = await this.con.table('sqlite_master')
-            .where('type', 'index')
-            .where('name', name)
-            .where('tbl_name', tableName)
-            .count('name as count')
-            .first();
-
-        return idx.count === 1;
     }
 
     async clear(): Promise<void> {
@@ -274,10 +247,47 @@ export class SQLiteOrderRepository implements OrderRepository {
     async save(order: Order): Promise<void> {
         await this.initialized;
         // @formatter:off
-        await this.con.raw(`REPLACE INTO ${tableName} (${columnId}, ${columnOrderId}, ${columnCreated}, ${columnStatus}, ${columnTransactionId}, ${columnPaymentProvider}, ${columnSteamId}, ${columnDiscordId}, ${columnPackageId}, ${columnPrice}, ${columnCustomMessage}, ${columnRedeemedAt}, ${columnRefundedAt}, ${columnPerkDetails}, ${columnCountryCode}, ${columnVatRate}) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, [
-            order.id, order.payment.id, order.created.getTime(), order.status, order.payment.transactionId || null, order.payment.provider, order.reference.steamId || null, order.reference.discordId, order.reference.p.id, parseFloat(order.reference.p.price.amount), order.customMessage, order.redeemedAt || null, order.refundedAt || null, JSON.stringify(Array.from(order.perkDetails.entries())), order.vat?.countryCode || null, order.vat?.rate || 0,
+        await this.con.raw(`REPLACE INTO ${tableName} (${columnId}, ${columnOrderId}, ${columnCreated}, ${columnStatus}, ${columnTransactionId}, ${columnPaymentProvider}, ${columnSteamId}, ${columnDiscordId}, ${columnPackageId}, ${columnPrice}, ${columnCustomMessage}, ${columnRedeemedAt}, ${columnLastRedeemedAt}, ${columnRefundedAt}, ${columnPerkDetails}, ${columnCountryCode}, ${columnVatRate}) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, [
+            order.id, order.payment.id, order.created.getTime(), order.status, order.payment.transactionId || null, order.payment.provider, order.reference.steamId || null, order.reference.discordId, order.reference.p.id, parseFloat(order.reference.p.price.amount), order.customMessage, order.firstRedeemed || null, order.lastRedeemed || null, order.refundedAt || null, JSON.stringify(Array.from(order.perkDetails.entries())), order.vat?.countryCode || null, order.vat?.rate || 0,
         ]);
         // @formatter:on
+    }
+
+    private async removeDuplicateSubscriptionOrders() {
+        this.logger.warn('Database requires migration, which will take some time and will be done in the background. Part of these migrations will remove orphaned or duplicated orders...');
+        let res = this.con
+            .table(tableName)
+            .select(columnId, columnTransactionId)
+            .where(columnStatus, '>=', OrderStatus.PAID)
+            .groupBy(columnTransactionId);
+
+        let counter = 0;
+        while (true) {
+            const o = await res.offset(counter).limit(25);
+            for (let k in o) {
+                const order = o[k];
+                if (order[columnTransactionId]) {
+                    await this.con.table(tableName)
+                        .where(columnTransactionId, order[columnTransactionId])
+                        .whereNot(columnId, order[columnId])
+                        .delete();
+                }
+            }
+            if (counter >= counter + o.length) break;
+            counter += o.length;
+        }
+        this.logger.warn('Database migration finished...');
+    }
+
+    private async hasIndex(name: string): Promise<boolean> {
+        const idx = await this.con.table('sqlite_master')
+            .where('type', 'index')
+            .where('name', name)
+            .where('tbl_name', tableName)
+            .count('name as count')
+            .first();
+
+        return idx.count === 1;
     }
 
     private toOrder(o: any): Order {
@@ -305,6 +315,7 @@ export class SQLiteOrderRepository implements OrderRepository {
             o[columnCustomMessage] || null,
             vat,
             o[columnRedeemedAt] ? new Date(o[columnRedeemedAt]) : null,
+            o[columnLastRedeemedAt] ? new Date(o[columnLastRedeemedAt]) : null,
             o[columnStatus],
             payment,
             new Map(JSON.parse(o[columnPerkDetails])),

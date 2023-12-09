@@ -44,6 +44,9 @@ export interface AppConfig {
         privacyPolicy: {
             partials: PathLike[]
         },
+        orders: {
+            redeemCooldownHours: number,
+        },
     },
     discord: {
         clientId: string,

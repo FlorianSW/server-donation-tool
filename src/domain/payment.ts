@@ -1,4 +1,4 @@
-import {Package, PerkDetails} from './package';
+import {Package, PerkDetails, RedeemError} from './package';
 import {v4} from 'uuid';
 import {AppConfig} from './app-config';
 import {User} from './user';
@@ -43,7 +43,8 @@ export class Order {
         public readonly reference: Reference,
         public readonly customMessage: string | null,
         public readonly vat: VATRate,
-        public redeemedAt: Date | null,
+        public firstRedeemed: Date | null,
+        public lastRedeemed: Date | null,
         public status: OrderStatus,
         public payment: OrderPayment,
         public perkDetails: Map<string, string>,
@@ -52,11 +53,11 @@ export class Order {
     }
 
     public static create(created: Date, payment: OrderPayment, reference: Reference, customMessage: string | null = null, vat: VATRate | undefined = undefined): Order {
-        return new Order(v4(), created, reference, customMessage, vat, null, OrderStatus.CREATED, payment, new Map(), null);
+        return new Order(v4(), created, reference, customMessage, vat, null, null, OrderStatus.CREATED, payment, new Map(), null);
     }
 
     public static createDeferred(created: Date, reference: Reference, customMessage: string | null = null, vat: VATRate | undefined = undefined): Order {
-        return new Order(v4(), created, reference, customMessage, vat, null, OrderStatus.CREATED, null, new Map(), null);
+        return new Order(v4(), created, reference, customMessage, vat, null, null, OrderStatus.CREATED, null, new Map(), null);
     }
 
     public paymentIntent(payment: OrderPayment) {
@@ -74,10 +75,25 @@ export class Order {
         this.status = OrderStatus.PAID;
     }
 
-    public redeem() {
-        if (this.redeemedAt === null) {
-            this.redeemedAt = new Date();
+    public redeem(cooldownHours: number): RedeemError | undefined {
+        if (this.lastRedeemed) {
+            const earliestNextRedeem = this.lastRedeemed.getTime() + cooldownHours * 60 * 60 * 1000;
+            if (this.lastRedeemed.getTime() <= earliestNextRedeem) {
+                return new RedeemError(['ERROR_ORDER_REDEEM_RATE_LIMITED', {
+                    params: {
+                        redeemAt: new Date(earliestNextRedeem).toLocaleString(),
+                    },
+                }]);
+            }
         }
+        if (this.status !== OrderStatus.PAID) {
+            return new RedeemError(['ERROR_ORDER_REDEEM_NOT_PAID', {params: {}}]);
+        }
+        if (this.firstRedeemed === null) {
+            this.firstRedeemed = new Date();
+        }
+        this.lastRedeemed = new Date();
+        return undefined;
     }
 
     public refund() {

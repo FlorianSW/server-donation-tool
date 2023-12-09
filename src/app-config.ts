@@ -104,7 +104,10 @@ class YamlAppConfig implements AppConfig {
             trackingId: string;
         };
         privacyPolicy: {
-            partials: PathLike[]
+            partials: PathLike[];
+        };
+        orders: {
+            redeemCooldownHours: number;
         };
     };
     cftools: { applicationId: string; secret: string };
@@ -228,6 +231,11 @@ class YamlAppConfig implements AppConfig {
             }
         }
         this.app.publicUrl = new URL(this.discord.redirectUrl.replace('/auth/discord/callback', ''));
+        if (!this.app.orders || !this.app.orders.redeemCooldownHours) {
+            this.app.orders = {
+                redeemCooldownHours: 1,
+            };
+        }
     }
 
     logoUrl(absolute?: boolean): string {
@@ -358,6 +366,9 @@ export async function parseConfig(logger: Logger): Promise<AppConfig> {
     }
     if (typeof intermediate.discord.roleMapping?.auditor === 'string') {
         intermediate.discord.roleMapping.auditor = [intermediate.discord.roleMapping.auditor];
+    }
+    if (intermediate.app.orders.redeemCooldownHours < 1 || intermediate.app.orders.redeemCooldownHours % 1 !== 0) {
+        throw new Error('orders.redeemCooldownHours need to be a positive number greater than 1.')
     }
     logger.info('Validating package and perk configuration');
     for (const p of intermediate.packages) {
