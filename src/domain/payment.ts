@@ -78,7 +78,7 @@ export class Order {
     public redeem(cooldownHours: number): RedeemError | undefined {
         if (this.lastRedeemed) {
             const earliestNextRedeem = this.lastRedeemed.getTime() + cooldownHours * 60 * 60 * 1000;
-            if (this.lastRedeemed.getTime() <= earliestNextRedeem) {
+            if (new Date().getTime() <= earliestNextRedeem) {
                 return new RedeemError(['ERROR_ORDER_REDEEM_RATE_LIMITED', {
                     params: {
                         redeemAt: new Date(earliestNextRedeem).toLocaleString(),
