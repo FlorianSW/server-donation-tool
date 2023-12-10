@@ -51,36 +51,6 @@ interface RequestWithContext<T> {
     context?: Record<string, unknown>,
 }
 
-class LogTokenExpiredGotHttpClient extends GotHttpClient {
-    constructor(private readonly authorization: AuthorizationProvider, private readonly logger: Logger) {
-        super(authorization);
-    }
-
-    protected async withErrorHandler<T>(requestFn: (newContext?: Record<string, unknown>) => RequestWithContext<T>): Promise<T> {
-        const r = requestFn(undefined);
-        try {
-            return await r.request;
-        } catch (error) {
-            const err = fromHttpError(error, r.context?.authorization as Authorization);
-            if (err instanceof TokenExpired) {
-                this.logger.error(err.message, err.info, err);
-
-                this.authorization?.reportExpired();
-                const authorization = await this.authorization?.provide();
-                try {
-                    return await requestFn({
-                        ...r.context,
-                        authorization: authorization,
-                    }).request;
-                } catch (e) {
-                    throw fromHttpError(e, authorization);
-                }
-            }
-            throw err;
-        }
-    }
-}
-
 class YamlAppConfig implements AppConfig {
     app: {
         port: number;
@@ -164,7 +134,6 @@ class YamlAppConfig implements AppConfig {
         container.registerInstance('CFToolsClient', new CFToolsClientBuilder()
             .withCredentials(this.cftools.applicationId, this.cftools.secret)
             .withCache()
-            .withHttpClient((auth?: AuthorizationProvider) => new LogTokenExpiredGotHttpClient(auth, this.logger))
             .build());
         container.register('DonationsDB', {
             useFactory: instanceCachingFactory((c) => {

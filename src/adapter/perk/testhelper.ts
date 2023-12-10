@@ -7,6 +7,7 @@ import {
     DeletePriorityQueueRequest,
     DeleteWhitelistRequest,
     DuplicateResourceCreation,
+    GameLabsActionRequest,
     GameServerItem,
     GameSession,
     GenericId,
@@ -16,6 +17,7 @@ import {
     GetPriorityQueueRequest,
     GetServerInfoRequest,
     GetWhitelistRequest,
+    HealPlayerRequest,
     LeaderboardItem,
     ListBansRequest,
     ListGameSessionsRequest,
@@ -33,6 +35,18 @@ import {
 export class InMemoryCFToolsClient implements CFToolsClient {
     private priorityQueueItems: Map<string, PriorityQueueItem> = new Map();
     private whitelistItems: Map<string, WhitelistItem> = new Map();
+
+    gameLabsAction(request: GameLabsActionRequest): Promise<void> {
+        return Promise.resolve(undefined);
+    }
+
+    healPlayer(request: HealPlayerRequest): Promise<void> {
+        return Promise.resolve(undefined);
+    }
+
+    killPlayer(request: HealPlayerRequest): Promise<void> {
+        return Promise.resolve(undefined);
+    }
 
     getServerInfo(request: GetServerInfoRequest): Promise<ServerInfo> {
         return Promise.resolve(undefined);
