@@ -53,10 +53,7 @@ export class RedeemPackage {
         if (success.length !== 0) {
             this.events.emit('successfulRedeem', target, order, perks);
         }
-
-        if (errors.length === 0) {
-            await this.repo.save(order);
-        }
+        await this.repo.save(order);
 
         return {
             success: success,
