@@ -12,8 +12,6 @@
 This server donation tool is meant to make it easier for gaming communities to allow their members to donate and earn differnet perks for their donation.
 It seamlessly integrates with different platforms in order to automatically provision and setup perks for donators to reduce manual efforts for community admins and moderators.
 
-A demo deployment of the tool can be found here: https://donate-demo.go2tech.de/
-
 ## Key Features
 
 - Self-services, guided donation on a modern website
