@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+  
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <meta name="author" content="Florian Schmidt">
+    
+    <link rel="shortcut icon" href="../../img/favicon.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+    <title>Stripe.com - Server Donation Tool</title>
+    <link href="../../css/bootstrap-3.3.7.min.css" rel="stylesheet">
+    <link href="../../css/font-awesome-4.7.0.css" rel="stylesheet">
+    <link href="../../css/base.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../css/highlight.css">
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+
+    <script src="../../js/jquery-3.2.1.min.js"></script>
+    <script src="../../js/bootstrap-3.3.7.min.js"></script>
+    <script src="../../js/highlight.pack.js"></script>
+    
+    <base target="_top">
+    <script>
+      var base_url = '../..';
+      var is_top_frame = false;
+        
+        var pageToc = [
+          {title: "Stripe.com", url: "#_top", children: [
+              {title: "Setup", url: "#setup" },
+              {title: "Configure Stripe.com", url: "#configure-stripecom" },
+          ]},
+        ];
+
+    </script>
+    <script src="../../js/base.js"></script> 
+</head>
+
+<body>
+<script>
+if (is_top_frame) { $('body').addClass('wm-top-page'); }
+</script>
+
+
+
+<div class="container-fluid wm-page-content">
+  <a name="_top"></a>
+    
+
+    
+    
+      
+    
+
+  <div class="row wm-article-nav-buttons" role="navigation" aria-label="navigation">
+    
+    <div class="wm-article-nav pull-right">
+      <a href="../../secure-connections/" class="btn btn-xs btn-default pull-right">
+        Next
+        <i class="fa fa-chevron-right" aria-hidden="true"></i>
+      </a>
+      <a href="../../secure-connections/" class="btn btn-xs btn-link">
+        Setup/Use https/secure connections
+      </a>
+    </div>
+    
+    <div class="wm-article-nav">
+      <a href="../paypal/" class="btn btn-xs btn-default pull-left">
+        <i class="fa fa-chevron-left" aria-hidden="true"></i>
+        Previous</a><a href="../paypal/" class="btn btn-xs btn-link">
+        PayPal
+      </a>
+    </div>
+    
+  </div>
+
+    
+
+    <h1 id="stripecom">Stripe.com</h1>
+<p>Stripe.com is a payment processor with a wide variety of payment options available.
+You can configure available payment options in the Stripe.com dashboard and activate and deactivate payment methods of your choice.</p>
+<p>However, while the payment processing should be the same for most of the payments, we suggest to use payment methods which allow an instant payment confirmation, only (such as credit card, giropay, SOFORT, etc.).
+While payment methods, where a confirmation might be pending for several hours or days might work just fine as well, they were not tested and may lead in a less optimal flow for your donators.
+They might need to refresh the <em>Donation payment pending</em> page multiple times throughout the time until a payment is confirmed.</p>
+<h2 id="setup">Setup</h2>
+<p>You need to register an account with stripe.com.
+Do so by following the registration form on their website: https://dashboard.stripe.com/</p>
+<p>You will need to give the account, you want to choose for the donation tool, an account name.
+This name will be displayed on the checkout page for the donator when they do a payment.</p>
+<p>After creating an account, you need to activate your account on the Stripe.com dashboard.
+The steps to complete the activation may be different depending on the country you reside in, but should be pretty straight forward.
+Keep in mind, that you can not transfer actual funds from donators as long as the account is not activated.</p>
+<h2 id="configure-stripecom">Configure Stripe.com</h2>
+<p>The Stripe.com configuration in the <code>config.yml</code> all reside in the <code>stripe</code> key:</p>
+<pre><code class="language-yaml">stripe:
+  # The secret key of your stripe.com account (Developers -&gt; API Keys -&gt; Secret Key).
+  secretKey: sk_...
+</code></pre>
+
+  <br>
+    
+
+    
+    
+      
+    
+
+  <div class="row wm-article-nav-buttons" role="navigation" aria-label="navigation">
+    
+    <div class="wm-article-nav pull-right">
+      <a href="../../secure-connections/" class="btn btn-xs btn-default pull-right">
+        Next
+        <i class="fa fa-chevron-right" aria-hidden="true"></i>
+      </a>
+      <a href="../../secure-connections/" class="btn btn-xs btn-link">
+        Setup/Use https/secure connections
+      </a>
+    </div>
+    
+    <div class="wm-article-nav">
+      <a href="../paypal/" class="btn btn-xs btn-default pull-left">
+        <i class="fa fa-chevron-left" aria-hidden="true"></i>
+        Previous</a><a href="../paypal/" class="btn btn-xs btn-link">
+        PayPal
+      </a>
+    </div>
+    
+  </div>
+
+    <br>
+</div>
+
+<footer class="container-fluid wm-page-content">
+      <p>
+        <a href="https://github.com/floriansw/server-donation-tool/edit/main/docs/payments/stripe.md"><i class="fa fa-github"></i>
+Edit on GitHub</a>
+      </p>
+  <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a> using <a href="https://github.com/gristlabs/mkdocs-windmill">Windmill</a> theme by Grist Labs.</p>
+</footer>
+
+</body>
+</html>
