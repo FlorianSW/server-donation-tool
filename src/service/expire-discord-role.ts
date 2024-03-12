@@ -31,10 +31,22 @@ export class ExpireDiscordRole implements Closeable {
                 if (e instanceof DiscordAPIError && e.code === 10007) {
                     this.log.info(`Discord member ${role.discordUser} does not exist in guild anymore. Role can not be expired`);
                     await this.repository.delete(role);
+                } else {
+                    this.log.error(`Error fetching discord member information of ${role.discordUser}. Continuing... (reach out to the discord of the donation tool to seek assistance, this error might repeat if it is not a persistent error)`)
                 }
                 continue;
             }
-            await guildMember.roles.remove(role.roleId);
+            try {
+                await guildMember.roles.remove(role.roleId);
+            } catch (e) {
+                if (e instanceof DiscordAPIError && e.code === 10011) {
+                    this.log.info(`Discord role ${role.roleId} does not exist in Discord anymore, removing from our records`);
+                    await this.repository.delete(role);
+                } else {
+                    this.log.error(`Error removing discord role ${role.roleId} from ${role.discordUser}. Continuing... (reach out to the discord of the donation tool to seek assistance, this error might repeat if it is not a persistent error)`)
+                }
+                continue;
+            }
             await this.repository.delete(role);
         }
     }
