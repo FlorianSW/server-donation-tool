@@ -46,16 +46,8 @@ export class NitradoPriorityQueuePerk implements Perk, Refundable {
             }
         }];
         try {
-            await this.createPriority(this.serverApiId(order), this.gameId(target), order);
+            await this.createPriority(this.serverApiId(order), this.gameId(target));
         } catch (e) {
-            if (e instanceof DuplicateResourceCreation) {
-                try {
-                    await this.replacePriorityIfOlder(serverId, this.gameId(target), order);
-                } catch (e) {
-                    this.throwRedeemError(serverId, e);
-                }
-                return successParams;
-            }
             this.throwRedeemError(serverId, e);
         }
         return successParams;
@@ -212,16 +204,6 @@ export class NitradoPriorityQueuePerk implements Perk, Refundable {
         }]);
     }
 
-    private async replacePriorityIfOlder(serverId: string, steamId: string, order: Order): Promise<void> {
-        const item = await this.client.priorityQueueMembers(serverId);
-        if (!item.includes(steamId)) {
-            return await this.createPriority(serverId, steamId, order);
-        }
-        await this.client.deletePriorityQueue(serverId, steamId);
-
-        return await this.createPriority(serverId, steamId, order);
-    }
-
     private expiration(order: Order): Date | 'Permanent' {
         if (this.permanent) {
             return 'Permanent';
@@ -232,7 +214,7 @@ export class NitradoPriorityQueuePerk implements Perk, Refundable {
         return expiration;
     }
 
-    private async createPriority(serverId: string, steamId: string, order: Order): Promise<void> {
+    private async createPriority(serverId: string, steamId: string): Promise<void> {
         await this.client.putPriorityQueue(serverId, steamId);
     }
 }
