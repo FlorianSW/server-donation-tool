@@ -43,7 +43,7 @@ export class LbMasterAdvancedGroupPrefixGroupPerk implements Perk, Refundable {
     async redeem(target: RedeemTarget, order: Order): Promise<TranslateParams> {
         const server = this.server(order);
         try {
-            await this.uidRequest(server, target.steamId, 'PUT');
+            await this.uidRequest(server, target.gameId.steam, 'PUT');
 
             return ['LB_AG_PG_REDEEM_COMPLETE', {
                 params: {
@@ -78,7 +78,7 @@ export class LbMasterAdvancedGroupPrefixGroupPerk implements Perk, Refundable {
     async refund(forUser: RedeemTarget, order: Order): Promise<void> {
         const server = this.server(order);
         try {
-            await this.uidRequest(server, forUser.steamId, 'DELETE');
+            await this.uidRequest(server, forUser.gameId.steam, 'DELETE');
         } catch (e) {
             this.log.error('Could not refund in-game tag. Error: ' + e);
             throw new RedeemError(['LB_AG_PG_REDEEM_ERROR', {
@@ -99,7 +99,7 @@ export class LbMasterAdvancedGroupPrefixGroupPerk implements Perk, Refundable {
                 continue;
             }
             try {
-                await this.uidRequest(server, target.steamId, 'GET');
+                await this.uidRequest(server, target.gameId.steam, 'GET');
                 result.push(new PrefixGroupMember(this.prefixGroup.name, server.serverName));
             } catch (e) {
                 if (e.status === 404) {

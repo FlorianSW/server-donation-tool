@@ -1,4 +1,4 @@
-import {Package, PerkDetails, RedeemError} from './package';
+import {GameId, Package, PerkDetails, RedeemError} from './package';
 import {v4} from 'uuid';
 import {AppConfig} from './app-config';
 import {User} from './user';
@@ -6,11 +6,15 @@ import {HATEOASLink} from '../adapter/paypal/types';
 import {VATRate} from './vat';
 
 export class Reference {
-    constructor(public steamId: string | null, public readonly discordId: string, public readonly p: Package) {
+    constructor(
+        public readonly gameId: GameId | null,
+        public readonly discordId: string,
+        public readonly p: Package
+    ) {
     }
 
     asString() {
-        return `${this.steamId || this.discordId}#${this.p.id}`
+        return `${this.gameId.steam || this.gameId.xbox || this.gameId.playstation || this.discordId}#${this.p.id}`
     }
 }
 
@@ -177,7 +181,7 @@ export class Subscription {
             id: this.payment.id,
             transactionId: transactionId,
             provider: provider,
-        }, new Reference(this.user.steamId, this.user.discordId, p), null, this.vat);
+        }, new Reference({steam: this.user.steamId}, this.user.discordId, p), null, this.vat);
         order.pay(transactionId);
 
         this.state = 'ACTIVE';
@@ -306,9 +310,9 @@ export class OrderNotFound extends Error {
     }
 }
 
-export class SteamIdMismatch extends Error {
+export class GameIdMismatch extends Error {
     constructor(public readonly expected: string, public readonly fromUser: string) {
         super('SteamIdMismatch');
-        Object.setPrototypeOf(this, SteamIdMismatch.prototype);
+        Object.setPrototypeOf(this, GameIdMismatch.prototype);
     }
 }

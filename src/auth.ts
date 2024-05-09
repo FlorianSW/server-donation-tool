@@ -12,7 +12,9 @@ import {Logger} from 'winston';
 import {UserData} from './service/user-data';
 
 export async function discordUserCallback(steamClient: SteamClient, accessToken: string, refreshToken: string, profile: Profile) {
-    const connection: ConnectionInfo | undefined = profile.connections.find((c) => c.type === 'steam');
+    const steamConnection: ConnectionInfo | undefined = profile.connections.find((c) => c.type === 'steam');
+    const xBoxConnection: ConnectionInfo | undefined = profile.connections.find((c) => c.type === 'xbox');
+    const playStationConnection: ConnectionInfo | undefined = profile.connections.find((c) => c.type === 'playstation');
     const user: User = {
         username: profile.username,
         discord: {
@@ -26,20 +28,32 @@ export async function discordUserCallback(steamClient: SteamClient, accessToken:
     if (profile.avatar) {
         user.discord.avatarUrl = `https://cdn.discordapp.com/avatars/${profile.id}/${profile.avatar}.png`;
     }
-    if (connection) {
+    if (steamConnection) {
         user.steam = {
-            id: connection.id,
-            name: connection.name,
+            id: steamConnection.id,
+            name: steamConnection.name,
             source: 'DISCORD'
         };
-        const p = await steamClient.playerProfile(connection.id);
+        const p = await steamClient.playerProfile(steamConnection.id);
         if (p) {
             user.steam.avatarUrl = p.avatar;
         }
-        return user;
-    } else {
-        return user;
     }
+    if (xBoxConnection) {
+        user.xbox = {
+            id: xBoxConnection.id,
+            name: xBoxConnection.name,
+            source: 'DISCORD',
+        }
+    }
+    if (playStationConnection) {
+        user.playstation = {
+            id: playStationConnection.id,
+            name: xBoxConnection.name,
+            source: 'DISCORD',
+        }
+    }
+    return user;
 }
 
 interface SteamProfile {

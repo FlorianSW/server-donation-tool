@@ -27,7 +27,7 @@ import {PrivacyPolicyController} from './adapter/controller/privacy-policy';
 import {PaypalWebhooksController} from './adapter/controller/paypal-webhooks';
 import {Package, PriceType} from './domain/package';
 import {SQLiteSubscriptionPlanRepository} from './adapter/subscription-plan-repository';
-import {SubscriptionPlanRepository} from './domain/repositories';
+import {NitradoPriorityPlayerRepository, SubscriptionPlanRepository} from './domain/repositories';
 import {Payment, SubscriptionPaymentProvider} from './domain/payment';
 import {SQLiteSubscriptionsRepository} from './adapter/subscriptions-repository';
 import {RedeemPackage} from './service/redeem-package';
@@ -42,6 +42,7 @@ import {Donations} from './adapter/discord/donations';
 import {HttpSteamClient} from './adapter/steam-client';
 import {SQLitePropertiesRepository} from './adapter/properties-repository';
 import {OrderOverviewController} from './adapter/controller/order-overview';
+import {SQLiteNitradoPriorityQueueRepository} from "./adapter/nitrado-priority-repository";
 
 export interface Closeable {
     close(): Promise<void>
@@ -66,6 +67,8 @@ container.registerSingleton('SubscriptionPlanRepository', SQLiteSubscriptionPlan
 container.registerSingleton('Closeable', 'SubscriptionPlanRepository');
 container.registerSingleton('SubscriptionsRepository', SQLiteSubscriptionsRepository);
 container.registerSingleton('Closeable', 'SubscriptionsRepository');
+container.registerSingleton('NitradoPriorityPlayerRepository', SQLiteNitradoPriorityQueueRepository);
+container.registerSingleton('Closeable', 'NitradoPriorityPlayerRepository');
 container.registerSingleton('Properties', SQLitePropertiesRepository);
 container.registerSingleton('Closeable', 'Properties');
 container.registerSingleton('SteamClient', HttpSteamClient);

@@ -16,6 +16,8 @@ const columnStatus = 'status';
 const columnCustomMessage = 'custom_message';
 const columnTransactionId = 'transaction_id';
 const columnSteamId = 'steam_id';
+const columnXboxId = 'xbox_id';
+const columnPlaystationId = 'psn_id';
 const columnDiscordId = 'discord_id';
 const columnPackageId = 'package_id';
 const columnPrice = 'price';
@@ -43,6 +45,8 @@ export class SQLiteOrderRepository implements OrderRepository {
                         b.integer(columnStatus).index('idx_' + columnStatus);
                         b.string(columnCustomMessage, 255).nullable().defaultTo(null);
                         b.string(columnSteamId).nullable().defaultTo(null);
+                        b.string(columnXboxId).nullable().defaultTo(null);
+                        b.string(columnPlaystationId).nullable().defaultTo(null);
                         b.string(columnDiscordId).index('idx_' + columnDiscordId);
                         b.bigInteger(columnPackageId);
                         b.float(columnPrice);
@@ -123,6 +127,16 @@ export class SQLiteOrderRepository implements OrderRepository {
                     if (!c.hasOwnProperty(columnVatRate)) {
                         await con.schema.alterTable(tableName, (b) => {
                             b.float(columnVatRate).defaultTo(0);
+                        });
+                    }
+                    if (!c.hasOwnProperty(columnXboxId)) {
+                        await con.schema.alterTable(tableName, (b) => {
+                            b.string(columnXboxId).nullable();
+                        });
+                    }
+                    if (!c.hasOwnProperty(columnPlaystationId)) {
+                        await con.schema.alterTable(tableName, (b) => {
+                            b.string(columnPlaystationId).nullable();
                         });
                     }
                     if (!(await this.hasIndex('uc_transaction_id'))) {
@@ -247,8 +261,8 @@ export class SQLiteOrderRepository implements OrderRepository {
     async save(order: Order): Promise<void> {
         await this.initialized;
         // @formatter:off
-        await this.con.raw(`REPLACE INTO ${tableName} (${columnId}, ${columnOrderId}, ${columnCreated}, ${columnStatus}, ${columnTransactionId}, ${columnPaymentProvider}, ${columnSteamId}, ${columnDiscordId}, ${columnPackageId}, ${columnPrice}, ${columnCustomMessage}, ${columnRedeemedAt}, ${columnLastRedeemedAt}, ${columnRefundedAt}, ${columnPerkDetails}, ${columnCountryCode}, ${columnVatRate}) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, [
-            order.id, order.payment.id, order.created.getTime(), order.status, order.payment.transactionId || null, order.payment.provider, order.reference.steamId || null, order.reference.discordId, order.reference.p.id, parseFloat(order.reference.p.price.amount), order.customMessage, order.firstRedeemed || null, order.lastRedeemed || null, order.refundedAt || null, JSON.stringify(Array.from(order.perkDetails.entries())), order.vat?.countryCode || null, order.vat?.rate || 0,
+        await this.con.raw(`REPLACE INTO ${tableName} (${columnId}, ${columnOrderId}, ${columnCreated}, ${columnStatus}, ${columnTransactionId}, ${columnPaymentProvider}, ${columnSteamId}, ${columnXboxId}, ${columnPlaystationId}, ${columnDiscordId}, ${columnPackageId}, ${columnPrice}, ${columnCustomMessage}, ${columnRedeemedAt}, ${columnLastRedeemedAt}, ${columnRefundedAt}, ${columnPerkDetails}, ${columnCountryCode}, ${columnVatRate}) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, [
+            order.id, order.payment.id, order.created.getTime(), order.status, order.payment.transactionId || null, order.payment.provider, order.reference.gameId.steam || null, order.reference.gameId.xbox || null, order.reference.gameId.playstation || null, order.reference, order.reference.discordId, order.reference.p.id, parseFloat(order.reference.p.price.amount), order.customMessage, order.firstRedeemed || null, order.lastRedeemed || null, order.refundedAt || null, JSON.stringify(Array.from(order.perkDetails.entries())), order.vat?.countryCode || null, order.vat?.rate || 0,
         ]);
         // @formatter:on
     }
@@ -292,13 +306,21 @@ export class SQLiteOrderRepository implements OrderRepository {
 
     private toOrder(o: any): Order {
         const p = this.packages.find((p) => p.id === o[columnPackageId]);
-        const reference = new Reference(o[columnSteamId] || null, o[columnDiscordId], {
-            ...p,
-            price: {
-                ...p.price,
-                amount: o[columnPrice].toFixed(2),
+        const reference = new Reference(
+            {
+                steam: o[columnSteamId] || null,
+                xbox: o[columnXboxId] || null,
+                playstation: o[columnPlaystationId] || null,
+            },
+            o[columnDiscordId],
+            {
+                ...p,
+                price: {
+                    ...p.price,
+                    amount: o[columnPrice].toFixed(2),
+                }
             }
-        });
+        );
         const payment: OrderPayment = {
             id: o[columnOrderId],
             transactionId: o[columnTransactionId],

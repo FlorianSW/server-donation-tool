@@ -39,3 +39,16 @@ export interface SubscriptionsRepository extends Closeable {
     findActive(user: User): Promise<Subscription[]>
     findByPayment(id: string): Promise<Subscription>
 }
+
+export interface NitradoPlayer {
+    discordUser: string,
+    player: string,
+    serverId: string,
+    expiresAt: Date,
+}
+
+export interface NitradoPriorityPlayerRepository extends Closeable {
+    save(role: NitradoPlayer): Promise<void>
+    find(expiresBefore: Date): Promise<NitradoPlayer[]>
+    delete(role: NitradoPlayer): Promise<void>
+}

@@ -27,7 +27,7 @@ export class WhitelistPerk implements Perk, Refundable {
     }
 
     async redeem(target: RedeemTarget, order: Order): Promise<TranslateParams> {
-        const steamId = SteamId64.of(target.steamId)
+        const steamId = SteamId64.of(target.gameId.steam)
 
         const successParams: TranslateParams = ['WHITELIST_REDEEM_COMPLETE', {
             params: {
@@ -52,7 +52,7 @@ export class WhitelistPerk implements Perk, Refundable {
     }
 
     async refund(forUser: RedeemTarget, order: Order): Promise<void> {
-        const steamId = SteamId64.of(forUser.steamId);
+        const steamId = SteamId64.of(forUser.gameId.steam);
         const request = {
             serverApiId: ServerApiId.of(this.cftools.serverApiId),
             playerId: steamId,
@@ -69,7 +69,7 @@ export class WhitelistPerk implements Perk, Refundable {
 
     async ownedBy(target: RedeemTarget): Promise<OwnedPerk[] | null> {
         try {
-            return [await this.fetchWhitelist(SteamId64.of(target.steamId), ServerApiId.of(this.cftools.serverApiId))];
+            return [await this.fetchWhitelist(SteamId64.of(target.gameId.steam), ServerApiId.of(this.cftools.serverApiId))];
         } catch (e) {
             this.log.error(`Could not request Whitelist entry information for server API ID: ${this.cftools.serverApiId}. Error: ` + e);
             return [new FailedToLoad()];

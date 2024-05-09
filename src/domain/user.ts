@@ -7,7 +7,7 @@ export class PriorityQueue implements OwnedPerk {
     }
 
     asString(): string {
-        return `${this.serverName} (${translate('PERKS_OWNED_PRIORITY_QUEUE_UNTIL')} ${this.expires.toLocaleString()})`;
+        return `${this.serverName}${this.expires ? ` (${translate('PERKS_OWNED_PRIORITY_QUEUE_UNTIL')} ${this.expires.toLocaleString()})` : ''}`;
     }
 
     equals(other: OwnedPerk): boolean {
@@ -99,10 +99,25 @@ export enum Role {
 
 export interface User {
     steam?: SteamConnection;
+    xbox?: XBoxConnection;
+    playstation?: PlayStationConnection;
     discord: DiscordConnection;
     username: string;
     subscribedPackages: { [packageId: number]: string };
     roles: Role[];
+}
+
+export interface XBoxConnection {
+    id: string;
+    name: string;
+    source: 'DISCORD' | 'LIVE';
+}
+
+
+export interface PlayStationConnection {
+    id: string;
+    name: string;
+    source: 'DISCORD' | 'PSN';
 }
 
 export interface SteamConnection {

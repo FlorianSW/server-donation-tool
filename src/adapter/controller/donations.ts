@@ -3,7 +3,7 @@ import {Request, Response, Router} from 'express';
 import {translate} from '../../translations';
 import {DonationType, Hints, Package, RedeemTarget} from '../../domain/package';
 import {AppConfig} from '../../domain/app-config';
-import {Order, OrderNotFound, OrderStatus, Payment, Reference, SteamIdMismatch} from '../../domain/payment';
+import {Order, OrderNotFound, OrderStatus, Payment, Reference, GameIdMismatch} from '../../domain/payment';
 import {Logger} from 'winston';
 import {SessionData} from 'express-session';
 import csrf from 'csurf';
@@ -73,11 +73,20 @@ export class DonationController {
             transactionId: order.payment.transactionId,
         };
 
-        if (order.reference.steamId !== null && order.reference.steamId !== req.user.steam.id) {
+        let gameId = '';
+        if (order.reference.gameId.steam !== null) {
+            gameId = order.reference.gameId.steam;
+        } else if (order.reference.gameId.playstation !== null) {
+            gameId = order.reference.gameId.playstation;
+        } else if (order.reference.gameId.xbox !== null) {
+            gameId = order.reference.gameId.xbox;
+        }
+
+        if ([req.user.steam.id, req.user.xbox.id, req.user.playstation.id].includes(gameId)) {
             res.render('payment_steam_mismatch', {
                 userSteamId: req.user.steam.id,
             });
-            throw new SteamIdMismatch(order.reference.steamId, req.user.steam.id);
+            throw new GameIdMismatch(gameId, req.user.steam.id);
         } else {
             return order;
         }
@@ -238,7 +247,7 @@ export class DonationController {
                 canShare: order.reference.discordId === req.user.discord.id,
                 shareLink: new URL(`/donate/${order.id}`, this.config.app.publicUrl).toString(),
                 redeemLink: `/donate/${order.id}/redeem`,
-                isUnclaimed: order.reference.steamId === null,
+                isUnclaimed: order.reference.gameId.steam === null && order.reference.gameId.xbox === null && order.reference.gameId.playstation === null,
                 perks: order.reference.p.perks,
                 csrfToken: req.csrfToken(),
                 redeemStatus: 'PENDING',
@@ -328,7 +337,7 @@ export class DonationController {
             return;
         }
 
-        const order = Order.createDeferred(new Date(), new Reference(null, req.user.discord.id, p), customMessage, req.session.vat);
+        const order = Order.createDeferred(new Date(), new Reference({}, req.user.discord.id, p), customMessage, req.session.vat);
         const paymentOrder = await payment.createPaymentOrder({
             candidateOrderId: order.id,
             successUrl: new URL('/donate/' + order.id + '?provider=' + payment.provider().branding.name, this.config.app.publicUrl),
@@ -382,7 +391,7 @@ export class DonationController {
             id: paymentOrder.id,
             transactionId: paymentOrder.transactionId,
             provider: payment.provider().branding.name,
-        }, new Reference(null, req.user.discord.id, p), customMessage, req.session.vat);
+        }, new Reference({}, req.user.discord.id, p), customMessage, req.session.vat);
         order.pushPerkDetails(req.session.selectedPackage.perkDetails);
         await this.repo.save(order);
 

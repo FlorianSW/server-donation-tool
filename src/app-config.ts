@@ -1,4 +1,4 @@
-import {Authorization, AuthorizationProvider, CFToolsClientBuilder, TokenExpired} from 'cftools-sdk';
+import {CFToolsClientBuilder} from 'cftools-sdk';
 import {Client, GatewayIntentBits} from 'discord.js';
 import {AppConfig, LbAgPgServer, ServerNames} from './domain/app-config';
 import {Package, PriceType} from './domain/package';
@@ -20,11 +20,14 @@ import {container, instanceCachingFactory} from 'tsyringe';
 import {DiscordDonationTarget} from './adapter/discord/discord-donation-target';
 import {CleanupOrder} from './service/cleanup-order';
 import {WhitelistPerk} from './adapter/perk/whitelist-perk';
-import {fromHttpError, GotHttpClient} from 'cftools-sdk/lib/internal/http';
 import {DiscordUserNotifier} from './adapter/discord/discord-user-notifier';
 import {ReservedSlotPerk} from './adapter/perk/reserved-slot';
 import {LbMasterAdvancedGroupPrefixGroupPerk} from './adapter/perk/lb-ag-pg-perk';
 import {NoOpVats, VATStack} from './adapter/vat_stack';
+import {NitradoPriorityQueuePerk} from "./adapter/perk/nitrado-priority-queue-perk";
+import {NitradoApi, NoopNitradoApi} from "./adapter/nitrado/api";
+import {ExpireNitradoPriority} from "./service/expire-nitrado-priority";
+import {NitradoPriorityRecorder} from "./service/nitrado-priority-recorder";
 
 const initSessionStore = require('connect-session-knex');
 const sessionStore = initSessionStore(session);
@@ -44,11 +47,6 @@ async function enableSqLiteWal(knex: Knex, log: Logger): Promise<void> {
     if (journalMode !== 'wal') {
         log.warn(`Could not set journal mode to WAL, which might decrease performance on multiple concurrent requests. Store runs in mode: ${journalMode}`);
     }
-}
-
-interface RequestWithContext<T> {
-    request: Promise<T>,
-    context?: Record<string, unknown>,
 }
 
 class YamlAppConfig implements AppConfig {
@@ -81,6 +79,7 @@ class YamlAppConfig implements AppConfig {
         };
     };
     cftools: { applicationId: string; secret: string };
+    nitrado: { token: string, expirePriorityEvery?: number };
     lb_ag_pg: { [serverId: string]: LbAgPgServer };
     discord: {
         clientId: string;
@@ -148,12 +147,18 @@ class YamlAppConfig implements AppConfig {
                 return client;
             })
         });
+        if (this.nitrado?.token) {
+            container.registerInstance('NitradoApi', new NitradoApi(this.nitrado.token));
+        } else {
+            container.registerInstance('NitradoApi', new NoopNitradoApi());
+        }
 
         this.assertValidPackages();
         await this.configureSessionStore();
         await this.configureDiscord();
         await this.configureVats();
         await this.configureExpiringDiscordRoles();
+        await this.configureExpiringNitradoPlayers();
         await this.configureOrders();
         container.resolve(DiscordDonationTarget);
 
@@ -305,6 +310,14 @@ class YamlAppConfig implements AppConfig {
         container.resolve(ExpireDiscordRole);
     }
 
+    private async configureExpiringNitradoPlayers(): Promise<void> {
+        container.register('nitrado.runEvery', {
+            useValue: this.nitrado.expirePriorityEvery || 60 * 60 * 1000,
+        });
+        container.resolve(NitradoPriorityRecorder);
+        container.resolve(ExpireNitradoPriority);
+    }
+
     private async configureOrders(): Promise<void> {
         container.register('packages', {
             useValue: this.packages,
@@ -348,6 +361,8 @@ export async function parseConfig(logger: Logger): Promise<AppConfig> {
             perk.inPackage = p;
             if (perk.type === 'PRIORITY_QUEUE') {
                 p.perks[i] = Object.assign(new PriorityQueuePerk(container.resolve('CFToolsClient'), intermediate.serverNames, logger), perk);
+            } else if (perk.type === 'NITRADO_PRIORITY_QUEUE') {
+                p.perks[i] = Object.assign(new NitradoPriorityQueuePerk(container.resolve('NitradoApi'), intermediate.serverNames, logger), perk);
             } else if (perk.type === 'DISCORD_ROLE') {
                 const discordPerk: DiscordRolePerk = Object.assign(new DiscordRolePerk(container.resolve('discord.Client'), intermediate.discord.bot.guildId, logger), perk);
                 discordPerk.roles.forEach((r) => {

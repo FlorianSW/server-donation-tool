@@ -134,7 +134,7 @@ export function withPerks(p: Perk[]): modifier {
             return c;
         }
         c.reference = new Reference(
-            c.reference.steamId,
+            {steam: c.reference.gameId.steam},
             c.reference.discordId,
             {
                 ...c.reference.p,
@@ -163,7 +163,7 @@ export function makeOrder(...m: modifier[]): Order {
             transactionId: 'SOME_TRANSACTION_ID',
             provider: FakePayment.NAME,
         },
-        reference: new Reference(aSteamId, 'A_DISCORD_ID', somePackages[0]),
+        reference: new Reference({steam: aSteamId}, 'A_DISCORD_ID', somePackages[0]),
         message: 'A_MESSAGE',
         vat: new VATRate('DE', 19),
     }

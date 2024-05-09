@@ -148,7 +148,7 @@ export class ReservedSlotPerk implements Perk {
                         expires: this.expiration(order)?.toISOString(),
                         identifiers: [{
                             type: 'steamID',
-                            identifier: target.steamId,
+                            identifier: target.gameId.steam,
                             manual: true
                         }]
                     },

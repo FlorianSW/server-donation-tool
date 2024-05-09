@@ -95,6 +95,10 @@ export interface AppConfig {
         applicationId: string,
         secret: string,
     },
+    nitrado: {
+        token: string,
+        expirePriorityEvery?: number,
+    },
     lb_ag_pg: { [serverId: string]: LbAgPgServer }
     serverNames: ServerNames,
 
