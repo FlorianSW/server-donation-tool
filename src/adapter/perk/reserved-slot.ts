@@ -1,5 +1,5 @@
 import {translate, TranslateParams} from '../../translations';
-import {Hints, Package, Perk, RedeemError, RedeemTarget} from '../../domain/package';
+import {Hints, Login, Package, Perk, RedeemError, RedeemTarget} from '../../domain/package';
 import {AppConfig, ServerNames} from '../../domain/app-config';
 import {Order} from '../../domain/payment';
 import * as https from 'https';
@@ -116,6 +116,10 @@ export class ReservedSlotPerk implements Perk {
             this.fingerprint = hash.digest('hex');
         }
         return this.fingerprint;
+    }
+
+    requiresLogins(): Login[] {
+        return ['steam'];
     }
 
     private createReservedSlot(target: RedeemTarget, order: Order): Promise<void> {

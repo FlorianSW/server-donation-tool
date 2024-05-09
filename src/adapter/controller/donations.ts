@@ -194,6 +194,21 @@ export class DonationController {
             res.redirect('/');
             return;
         }
+
+        new Set(selectedPackage.perks.flatMap((p) => p.requiresLogins())).forEach((l) => {
+            if (!req.user[l]) {
+                req.session.afterLoginTarget = {
+                    path: req.path,
+                    method: req.method,
+                    body: req.body,
+                };
+                res.render('missing_account_connection', {
+                    login: l,
+                });
+                return;
+            }
+        })
+
         req.user = await this.data.onRefresh(req.user);
         if (req.user.subscribedPackages[selectedPackage.id] !== undefined && req.session.selectedPackage.type === DonationType.Subscription) {
             res.redirect('/');
@@ -343,7 +358,6 @@ export class DonationController {
             successUrl: new URL('/donate/' + order.id + '?provider=' + payment.provider().branding.name, this.config.app.publicUrl),
             cancelUrl: new URL('/donate/' + order.id + '/cancel?&provider=' + payment.provider().branding.name, this.config.app.publicUrl),
             forPackage: p,
-            steamId: null,
             discordId: req.user.discord.id,
             vat: VATRate.fromValueObject(req.session.vat),
         });
@@ -382,7 +396,6 @@ export class DonationController {
         }
         const paymentOrder = await payment.createPaymentOrder({
             forPackage: p,
-            steamId: null,
             discordId: req.user.discord.id,
             vat: VATRate.fromValueObject(req.session.vat),
         });

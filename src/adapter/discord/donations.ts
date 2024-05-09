@@ -316,7 +316,6 @@ export class Donations {
             successUrl: new URL('/donate/' + order.id + '?provider=' + provider.provider().branding.name, this.config.app.publicUrl),
             cancelUrl: new URL('/donate/' + order.id + '/cancel?&provider=' + provider.provider().branding.name, this.config.app.publicUrl),
             forPackage: selectedPackage,
-            steamId: null,
             discordId: interaction.user.id,
         });
         order.paymentIntent({

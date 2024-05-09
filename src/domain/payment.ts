@@ -7,7 +7,7 @@ import {VATRate} from './vat';
 
 export class Reference {
     constructor(
-        public readonly gameId: GameId | null,
+        public gameId: GameId | null,
         public readonly discordId: string,
         public readonly p: Package
     ) {
@@ -224,7 +224,6 @@ export interface PaymentCapture {
 
 export interface CreatePaymentOrderRequest {
     forPackage: Package;
-    steamId: string;
     discordId: string;
     vat?: VATRate;
 }

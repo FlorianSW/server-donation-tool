@@ -61,7 +61,7 @@ describe('Subscriptions', () => {
         service.subscribe(somePackages[0], {SOME_ID: 'SOME_DATA'}, aUser).then((sub) => {
             events.on('subscriptionExecuted', (target: RedeemTarget, plan: SubscriptionPlan, sub: Subscription, order: Order) => {
                 expect(target.discordId).toEqual(aUser.discord.id);
-                expect(target.steamId).toEqual(aUser.steam.id);
+                expect(target.gameId.steam).toEqual(aUser.steam.id);
                 expect(order.payment.transactionId).toEqual(tId);
                 expect(order.status).toEqual(OrderStatus.PAID);
                 expect(order.perkDetails).toEqual(new Map([['SOME_ID', 'SOME_DATA']]));

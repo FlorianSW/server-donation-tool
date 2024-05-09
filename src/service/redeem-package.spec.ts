@@ -3,7 +3,7 @@ import {InMemoryOrderRepository} from '../adapter/order-repository';
 import {EventQueue} from '../adapter/event-queue';
 import winston from 'winston';
 import {anOrder, aUser, makeOrder, withPerks} from '../test-data.spec';
-import {Hints, Package, Perk, RedeemTarget, Refundable} from '../domain/package';
+import {Hints, Login, Package, Perk, RedeemTarget, Refundable} from '../domain/package';
 import {Order, OrderStatus} from '../domain/payment';
 import {OwnedPerk, User} from '../domain/user';
 import {TranslateParams} from '../translations';
@@ -107,6 +107,10 @@ class FakePerk implements Perk, Refundable {
 
     subjects(): Map<string, string> | null {
         return undefined;
+    }
+
+    requiresLogins(): Login[] {
+        return ['steam', 'discord'];
     }
 
     async refund(forUser: RedeemTarget, order: Order): Promise<void> {

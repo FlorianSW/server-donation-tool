@@ -1,0 +1,26 @@
+<% if (user.xbox) { %>
+<div class="card xbox">
+    <div class="card-image">
+        <img class="inverted" src="<%= imagePath('xbox_logo.png') %>">
+    </div>
+    <div class="card-content">
+        <span class="card-title"><%= translate('XBOX_ACCOUNT_TITLE') %></span>
+        <div class="status">
+            <% if (user.xbox.avatarUrl) { %>
+                <img class="avatar" src="<%= user.xbox.avatarUrl %>">
+            <% } %>
+            <%= user.xbox.name %> (<%= user.xbox.id %>)
+        </div>
+        <br>
+        <% if (user.xbox.source === 'DISCORD') { %>
+            <p>
+                <%- translate('XBOX_FROM_DISCORD') %>
+            </p>
+        <% } else if (user.xbox.source === 'STEAM') { %>
+            <p>
+                <%- translate('XBOX_FROM_LIVE') %>
+            </p>
+        <% } %>
+    </div>
+</div>
+<% } %>

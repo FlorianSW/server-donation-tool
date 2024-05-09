@@ -2,6 +2,8 @@ import {TranslateParams} from '../translations';
 import {Order, Reference} from './payment';
 import {OwnedPerk, User} from './user';
 
+export type Login = 'discord' | 'steam' | 'playstation' | 'xbox';
+
 export interface Perk {
     inPackage: Package;
     type: string;
@@ -19,6 +21,8 @@ export interface Perk {
     asShortString(context?: Order | undefined): string;
 
     id(): string;
+
+    requiresLogins(): Login[];
 }
 
 export interface Refundable {

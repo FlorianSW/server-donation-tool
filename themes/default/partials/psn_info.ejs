@@ -1,0 +1,26 @@
+<% if (user.playstation) { %>
+<div class="card xbox">
+    <div class="card-image">
+        <img src="<%= imagePath('psn.png') %>">
+    </div>
+    <div class="card-content">
+        <span class="card-title"><%= translate('PSN_ACCOUNT_TITLE') %></span>
+        <div class="status">
+            <% if (user.playstation.avatarUrl) { %>
+                <img class="avatar" src="<%= user.playstation.avatarUrl %>">
+            <% } %>
+            <%= user.playstation.name %> (<%= user.playstation.id %>)
+        </div>
+        <br>
+        <% if (user.playstation.source === 'DISCORD') { %>
+            <p>
+                <%- translate('PSN_FROM_DISCORD') %>
+            </p>
+        <% } else if (user.playstation.source === 'STEAM') { %>
+            <p>
+                <%- translate('PSN_FROM_PSN') %>
+            </p>
+        <% } %>
+    </div>
+</div>
+<% } %>

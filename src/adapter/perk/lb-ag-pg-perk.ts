@@ -1,5 +1,5 @@
 import {translate, TranslateParams} from '../../translations';
-import {Hints, Package, Perk, RedeemError, RedeemTarget, Refundable} from '../../domain/package';
+import {Hints, Login, Package, Perk, RedeemError, RedeemTarget, Refundable} from '../../domain/package';
 import {FailedToLoad, OwnedPerk, PrefixGroupMember, User} from '../../domain/user';
 import {Order} from '../../domain/payment';
 import {Logger} from 'winston';
@@ -161,6 +161,10 @@ export class LbMasterAdvancedGroupPrefixGroupPerk implements Perk, Refundable {
             this.fingerprint = hash.digest('hex');
         }
         return this.fingerprint;
+    }
+
+    requiresLogins(): Login[] {
+        return ['steam'];
     }
 
     private async uidRequest(server: LbAgPgServer, uid: string, method: 'GET' | 'PUT' | 'DELETE' = 'GET'): Promise<Response> {

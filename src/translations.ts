@@ -38,6 +38,16 @@ const messages: { [key: string]: string } = {
     STEAM_LOGIN_ANOTHER: 'Login with another account',
     STEAM_NOT_LOGGED_IN: 'Not logged in to Steam',
 
+    XBOX_ACCOUNT_TITLE: 'XBox Account',
+    XBOX_FROM_DISCORD: 'This XBox account is linked with your Discord user.',
+    XBOX_FROM_LIVE: 'You logged in with this XBox account.',
+    XBOX_LOGIN_ANOTHER: 'Login with another account',
+
+    PSN_ACCOUNT_TITLE: 'PlayStation Network',
+    PSN_FROM_DISCORD: 'This PlayStation Network account is linked with your Discord user.',
+    PSN_FROM_PSN: 'You logged in with this PlayStation Network account.',
+    PSN_LOGIN_ANOTHER: 'Login with another account',
+
     DISCORD_ACCOUNT_TITLE: 'Discord Account',
     DISCORD_LOGOUT: 'Login with another account',
 
@@ -239,6 +249,12 @@ const messages: { [key: string]: string } = {
     REFUNDED_PACKAGE_NAME: 'Package donated for',
     REFUNDED_DATE: 'Refunded at',
 
+    REQUIRED_ACCOUNTS: 'To fully profit from this package, you need these accounts:',
+    ACCOUNT_discord: 'Discord',
+    ACCOUNT_xbox: 'XBox profile',
+    ACCOUNT_playstation: 'PlayStation Network',
+    ACCOUNT_steam: 'Steam',
+
     STATISTICS_TITLE: 'Donation Statistics from {{startOfMonth}} to {{endOfMonth}}',
     STATISTICS_TOTAL_DONATIONS: 'Total Donations: {{donations}}',
     STATISTICS_TOTAL_REVENUE: 'Total Revenue: {{currency}} {{revenue}}',
@@ -264,8 +280,8 @@ const messages: { [key: string]: string } = {
     ERROR_GENERIC_DESCRIPTION: 'There was an error while processing your request from which we can not recover automatically. If the error persists, please contact the community support channel and report this error using the below additional error information.',
     ERROR_GENERIC_SUPPORT: 'Support information bundle:',
 
-    ERROR_MISSING_STEAM_TITLE: 'Discord profile has no Steam connection',
-    ERROR_MISSING_STEAM_DESCRIPTION: 'We offer perks to our donators, like Priority queue. In order for you to be able to redeem your donator perk, we need to know your Steam account you usually play with. Ideally we would like to get your Steam account connected to your Discord profile (which you used to login here). You can even hide the connection from the public in your Discord profile settings, it just need to exist.<br><br>Please go to your Discord, connect your Steam account and try again.',
+    ERROR_MISSING_STEAM_TITLE: 'Discord profile has no {{account}} connection',
+    ERROR_MISSING_STEAM_DESCRIPTION: 'We offer perks to our donators, like Priority queue. In order for you to be able to redeem your donator perk, we need to know your {{account}} details. We take the account information that is connected to your Discord profile (which you used to login here). You can even hide the connection from the public in your Discord profile settings, it just needs to exist.<br><br>Please go to your Discord, connect your {{account}} account and try again.',
     ERROR_MISSING_STEAM_TRY_AGAIN: 'Done! Try again',
     ERROR_MISSING_STEAM_LOGIN_TITLE: 'Alternatively login with steam',
     ERROR_MISSING_STEAM_LOGIN_DESCRIPTION: 'You do not necessarily need to link your Steam account with your Steam profile. As an alternative, you can login with your Steam account on this Website. To do so, click the login link.',

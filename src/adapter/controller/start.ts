@@ -1,6 +1,6 @@
 import {Request, Response, Router} from 'express';
 import {AppConfig} from '../../domain/app-config';
-import {DonationType, Package, Price, PriceType} from '../../domain/package';
+import {DonationType, Login, Package, Price, PriceType} from '../../domain/package';
 import {Logger} from 'winston';
 import csrf from 'csurf';
 import {inject, singleton} from 'tsyringe';
@@ -28,6 +28,9 @@ export class StartController {
         res.render('steps/package_selection', {
             withOpenGraph: true,
             csrfToken: req.csrfToken(),
+            requiredLogins: (p: Package): Login[] => {
+                return Array.from(new Set(p.perks.flatMap((p) => p.requiresLogins())));
+            },
             showDonationTarget: !!this.config.app.community?.donationTarget?.monthly,
             availablePackages: this.packages,
             subscribedPackages: req.user?.subscribedPackages || {},

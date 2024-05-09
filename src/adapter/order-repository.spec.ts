@@ -96,7 +96,7 @@ describe('OrderRepository', () => {
 
     it('finds orders for specific user', async () => {
         const secondOrder = Order.create(new Date('2025-05-17T18:25:49Z'), anOrder.payment, anOrder.reference);
-        const thirdOrder = Order.create(new Date('2025-05-18T18:25:49Z'), anOrder.payment, new Reference('A_STEAM_ID', 'ANOTHER_DISCORD_ID', somePackages[0]));
+        const thirdOrder = Order.create(new Date('2025-05-18T18:25:49Z'), anOrder.payment, new Reference({steam: 'A_STEAM_ID'}, 'ANOTHER_DISCORD_ID', somePackages[0]));
         anOrder.pay(anOrder.payment.transactionId);
         secondOrder.pay(secondOrder.payment.transactionId);
         thirdOrder.pay(thirdOrder.payment.transactionId);

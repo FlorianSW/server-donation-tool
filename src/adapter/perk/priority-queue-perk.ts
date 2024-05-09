@@ -7,7 +7,7 @@ import {
     TokenExpired
 } from 'cftools-sdk';
 import {translate, TranslateParams} from '../../translations';
-import {Hints, Package, Perk, RedeemError, RedeemTarget, Refundable} from '../../domain/package';
+import {Hints, Login, Package, Perk, RedeemError, RedeemTarget, Refundable} from '../../domain/package';
 import {ServerNames} from '../../domain/app-config';
 import {FailedToLoad, OwnedPerk, PriorityQueue, User} from '../../domain/user';
 import {Order} from '../../domain/payment';
@@ -185,6 +185,10 @@ export class PriorityQueuePerk implements Perk, Refundable {
             result.set(serverId, this.serverNames[serverId]);
         }
         return result;
+    }
+
+    requiresLogins(): Login[] {
+        return ['steam'];
     }
 
     async interfaceHints(forUser: User): Promise<Hints> {

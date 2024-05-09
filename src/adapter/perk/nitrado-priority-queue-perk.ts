@@ -1,5 +1,5 @@
 import {translate, TranslateParams} from '../../translations';
-import {Hints, Package, Perk, RedeemError, RedeemTarget, Refundable} from '../../domain/package';
+import {Hints, Login, Package, Perk, RedeemError, RedeemTarget, Refundable} from '../../domain/package';
 import {ServerNames} from '../../domain/app-config';
 import {FailedToLoad, OwnedPerk, PriorityQueue} from '../../domain/user';
 import {Order} from '../../domain/payment';
@@ -164,6 +164,10 @@ export class NitradoPriorityQueuePerk implements Perk, Refundable {
             this.fingerprint = hash.digest('hex');
         }
         return this.fingerprint;
+    }
+
+    requiresLogins(): Login[] {
+        return [this.nitrado.kind || 'playstation'];
     }
 
     subjects(): Map<string, string> | null {

@@ -232,7 +232,7 @@ export class DiscordNotifier {
                 inline: true
             },
             {name: translate('NOTIFICATIONS_REDEEM_SUCCESSFUL_DISCORD_ID'), value: target.discordId, inline: true},
-            {name: translate('NOTIFICATIONS_REDEEM_SUCCESSFUL_STEAM_ID'), value: target.steamId, inline: true}
+            {name: translate('NOTIFICATIONS_REDEEM_SUCCESSFUL_STEAM_ID'), value: target.gameId.steam, inline: true}
         ];
     }
 

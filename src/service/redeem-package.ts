@@ -23,8 +23,8 @@ export class RedeemPackage {
     }
 
     async redeem(order: Order, target: RedeemTarget, perks: Perk[]): Promise<RedeemResults> {
-        if (order.reference.steamId === null) {
-            order.reference.steamId = target.steamId;
+        if (order.reference.gameId !== target.gameId) {
+            order.reference.gameId = target.gameId;
         }
 
         const error = order.redeem(this.config.app.orders.redeemCooldownHours);

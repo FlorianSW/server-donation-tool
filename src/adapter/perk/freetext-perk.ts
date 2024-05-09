@@ -1,5 +1,5 @@
 import {TranslateParams} from '../../translations';
-import {Hints, Package, Perk, RedeemTarget} from '../../domain/package';
+import {Hints, Login, Package, Perk, RedeemTarget} from '../../domain/package';
 import {OwnedPerk, User} from '../../domain/user';
 import {Order} from '../../domain/payment';
 import {createHash} from 'crypto';
@@ -33,6 +33,10 @@ export class FreetextPerk implements Perk {
 
     asShortString(): string {
         return this.text;
+    }
+
+    requiresLogins(): Login[] {
+        return [];
     }
 
     id(): string {

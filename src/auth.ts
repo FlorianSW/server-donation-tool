@@ -49,7 +49,7 @@ export async function discordUserCallback(steamClient: SteamClient, accessToken:
     if (playStationConnection) {
         user.playstation = {
             id: playStationConnection.id,
-            name: xBoxConnection.name,
+            name: playStationConnection.name,
             source: 'DISCORD',
         }
     }
@@ -136,8 +136,13 @@ export class Authentication {
             res.render('login_error');
         });
         this.router.get('/auth/logout', (req, res) => {
+            const afterLoginTarget = req.session.afterLoginTarget;
             req.logout(() => {
-                res.redirect('/');
+                if (afterLoginTarget) {
+                    res.redirect(afterLoginTarget.path);
+                } else {
+                    res.redirect('/');
+                }
             });
         });
     }
@@ -195,15 +200,6 @@ export function requireAuthentication(req: Request, res: Response, next: NextFun
             body: req.body,
         };
         res.redirect('/login');
-        return;
-    }
-    if (!req.user.steam) {
-        req.session.afterLoginTarget = {
-            path: req.path,
-            method: req.method,
-            body: req.body,
-        };
-        res.render('missing_steam_connection');
         return;
     }
     return next();

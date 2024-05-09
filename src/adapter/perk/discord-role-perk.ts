@@ -1,6 +1,6 @@
 import {translate, TranslateParams} from '../../translations';
 import {Client, DiscordAPIError, Guild, RESTJSONErrorCodes} from 'discord.js';
-import {Hints, Package, Perk, RedeemError, RedeemTarget, Refundable} from '../../domain/package';
+import {Hints, Login, Package, Perk, RedeemError, RedeemTarget, Refundable} from '../../domain/package';
 import {DiscordRole, OwnedPerk, User} from '../../domain/user';
 import {Order} from '../../domain/payment';
 import {Logger} from 'winston';
@@ -42,7 +42,7 @@ export class DiscordRolePerk implements Perk, Refundable {
                 discriminator: forUser.discord.discriminator
             }
         });
-        const notices: string[] = [];
+        const notices: string[] = [unknownMember];
         const guild = await this.client.guilds.fetch(this.guildId);
         try {
             await guild.members.fetch(forUser.discord.id);
@@ -136,6 +136,10 @@ export class DiscordRolePerk implements Perk, Refundable {
             this.fingerprint = hash.digest('hex');
         }
         return this.fingerprint;
+    }
+
+    requiresLogins(): Login[] {
+        return ['discord'];
     }
 
     private asTranslatedString(key: string): string {

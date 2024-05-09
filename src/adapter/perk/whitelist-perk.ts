@@ -1,6 +1,6 @@
 import {CFToolsClient, DuplicateResourceCreation, PriorityQueueItem, ServerApiId, SteamId64} from 'cftools-sdk';
 import {translate, TranslateParams} from '../../translations';
-import {Hints, Package, Perk, RedeemError, RedeemTarget, Refundable} from '../../domain/package';
+import {Hints, Login, Package, Perk, RedeemError, RedeemTarget, Refundable} from '../../domain/package';
 import {ServerNames} from '../../domain/app-config';
 import {FailedToLoad, OwnedPerk, User, Whitelist} from '../../domain/user';
 import {Order} from '../../domain/payment';
@@ -117,6 +117,10 @@ export class WhitelistPerk implements Perk, Refundable {
             this.fingerprint = hash.digest('hex');
         }
         return this.fingerprint
+    }
+
+    requiresLogins(): Login[] {
+        return ['steam'];
     }
 
     private async fetchWhitelist(steamId: SteamId64, server: ServerApiId): Promise<Whitelist> {

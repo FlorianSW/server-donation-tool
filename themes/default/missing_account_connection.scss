@@ -1,6 +1,6 @@
 @import "partials/header_footer";
 
-.card.missing-steam-connection {
+.card.missing-account-connection {
   .card-image {
     display: flex;
     align-items: center;
@@ -8,6 +8,10 @@
     background-color: #424242;
 
     .image {
+      width: 88px;
+    }
+
+    .image.discord {
       width: 88px;
       height: 88px;
     }
