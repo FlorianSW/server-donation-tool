@@ -7,6 +7,8 @@ import {Logger} from 'winston';
 import {createHash} from 'crypto';
 import {NitradoApi} from "../nitrado/api";
 import {DuplicateResourceCreation} from "cftools-sdk";
+import {inject} from "tsyringe";
+import {NitradoPriorityPlayerRepository} from "../../domain/repositories";
 
 export class NitradoPriorityQueuePerk implements Perk, Refundable {
     inPackage: Package;
@@ -23,6 +25,7 @@ export class NitradoPriorityQueuePerk implements Perk, Refundable {
     constructor(
         private readonly client: NitradoApi,
         private readonly serverNames: ServerNames,
+        @inject("NitradoPriorityPlayerRepository") private readonly repo: NitradoPriorityPlayerRepository,
         private readonly log: Logger,
     ) {
     }
@@ -185,13 +188,15 @@ export class NitradoPriorityQueuePerk implements Perk, Refundable {
         return {};
     }
 
-    private async fetchPriorityQueue(steamId: string, server: string): Promise<PriorityQueue> {
+    private async fetchPriorityQueue(gameId: string, server: string): Promise<PriorityQueue> {
         try {
             const entry = await this.client.priorityQueueMembers(server);
-            if (!entry.includes(steamId)) {
+            if (!entry.includes(gameId)) {
                 return null;
             }
-            return new PriorityQueue(this.serverNames[server], null);
+            const e = await this.repo.findForPlayer(server, gameId);
+            e.sort((a, b) => a.expiresAt.getTime() - b.expiresAt.getTime());
+            return new PriorityQueue(this.serverNames[server], e[0]?.expiresAt || 'Permanent');
         } catch (e) {
             this.log.error(`Could not request Priority queue information for server API ID: ${server}. Error: ` + e);
             throw e;

@@ -362,7 +362,7 @@ export async function parseConfig(logger: Logger): Promise<AppConfig> {
             if (perk.type === 'PRIORITY_QUEUE') {
                 p.perks[i] = Object.assign(new PriorityQueuePerk(container.resolve('CFToolsClient'), intermediate.serverNames, logger), perk);
             } else if (perk.type === 'NITRADO_PRIORITY_QUEUE') {
-                p.perks[i] = Object.assign(new NitradoPriorityQueuePerk(container.resolve('NitradoApi'), intermediate.serverNames, logger), perk);
+                p.perks[i] = Object.assign(new NitradoPriorityQueuePerk(container.resolve('NitradoApi'), intermediate.serverNames, container.resolve('NitradoPriorityPlayerRepository'), logger), perk);
             } else if (perk.type === 'DISCORD_ROLE') {
                 const discordPerk: DiscordRolePerk = Object.assign(new DiscordRolePerk(container.resolve('discord.Client'), intermediate.discord.bot.guildId, logger), perk);
                 discordPerk.roles.forEach((r) => {

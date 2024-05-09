@@ -69,6 +69,24 @@ export class SQLiteNitradoPriorityQueueRepository implements NitradoPriorityPlay
             });
     }
 
+    async findForPlayer(server: string, player: string): Promise<NitradoPlayer[]> {
+        await this.initialized;
+        return this.con
+            .table(tableName)
+            .where(columnServerId, '=', server)
+            .where(columnNitradoPlayer, '=', player)
+            .then((result) => {
+                return result.map((v) => {
+                    return {
+                        discordUser: v[columnDiscordUser],
+                        player: v[columnNitradoPlayer],
+                        expiresAt: new Date(v[columnExpiresAt]),
+                        serverId: v[columnServerId],
+                    } as NitradoPlayer
+                });
+            });
+    }
+
     async clear(): Promise<void> {
         await this.initialized;
         await this.con.table(tableName).truncate();
@@ -88,6 +106,10 @@ export class InMemoryNitradoRepository implements NitradoPriorityPlayerRepositor
 
     async find(expiresBefore: Date): Promise<NitradoPlayer[]> {
         return Array.from(this.roles.values()).filter((r) => r.expiresAt.getTime() <= expiresBefore.getTime());
+    }
+
+    async findForPlayer(server: string, player: string): Promise<NitradoPlayer[]> {
+        return Array.from(this.roles.values()).filter((r) => r.player === player && r.serverId === server);
     }
 
     async save(role: NitradoPlayer): Promise<void> {

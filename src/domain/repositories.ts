@@ -50,5 +50,6 @@ export interface NitradoPlayer {
 export interface NitradoPriorityPlayerRepository extends Closeable {
     save(role: NitradoPlayer): Promise<void>
     find(expiresBefore: Date): Promise<NitradoPlayer[]>
+    findForPlayer(server: string, player: string): Promise<NitradoPlayer[]>
     delete(role: NitradoPlayer): Promise<void>
 }
