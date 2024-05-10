@@ -163,6 +163,16 @@ cftools:
   # order to allow the website to manage the priority queue entries.
   applicationId:
   secret:
+# The nitrado config is only needed for DayZ Console server priority queue management.
+nitrado:
+  token: ...
+  # Uncomment this option if you want to configure the interval in which the tool checks if given priority queue entries should be removed.
+  # The time is in milliseconds. Whenever the interval is reached, the tool will evaluate all temporarily given priority queue slots
+  # to your donators to remove the ones which are now expired. Given they are expired, they will be removed from the donator.
+  # You should not need to configure this interval and should avoid changing this configuration if not definitely needed.
+  # Changing this property may decrease the overall performance of the application.
+  # When this option is disabled (a comment), the default value (1 hours) is used.
+  # expireRolesEvery: 60000
 # Configuration for servers that support the lb_ag_pg perk. This is an object where the key is a server ID (which can be used
 # in the lb_ag_pg perk) and information about that server. That configuration is:
 # * apiUrl: the URL which the donation tool uses to reach the API (see the repository above), e.g. http://111.222.111.222:8080
@@ -255,6 +265,17 @@ serverNames:
 #   * index: the index of the prefix group (needs to match the group within your Advanced Groups config, starting at 0)
 # * servers: an array of server IDs. Each ID listed in this list needs to be configured in the lb_ag_pg config. The ID is the key of
 #   object in this configuration.
+# - NITRADO_PRIORITY_QUEUE
+# A perk that provides priority queue using the nitrado Setting `priority`, which is usually used for DayZ Console servers (XBox, PSN).
+# When you configure this perk, you _need_ to provide for which kind the priority queue will be used (XBox or PSN), as the tool will
+# automatically ensure that the donator, before being able to donate for a package with this perk, has the appropriate account linked
+# to their discord. This helps to prevent that people donate for perks they can then not use afterward.
+# The following configuration is offered by this perk:
+# * amountInDays: The amount of priority queue days the donator should get.
+# * nitrado: an object of:
+#   * serverId: The server ID of the server you want to manage (this ID can be taken from the URL bar in the webconsole of nitrado)
+#     It's an integer, which needs to be a string here, so wrap it in '' (e.g. '123456')
+#   * kind: For which console the server is used. Can be either 'xbox' or 'playstation'. Defaults to 'playstation'.
 packages:
   - name: Allpass
     id: 1
