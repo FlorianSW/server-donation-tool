@@ -21,7 +21,7 @@ export class NitradoApi {
     }
 
     public async putPriorityQueue(serverId: string, userId: string): Promise<void> {
-        await this.lock.acquire();
+        const release = await this.lock.acquire();
         try {
             const current = await this.priorityQueueMembers(serverId);
             if (!current.includes(userId)) {
@@ -29,12 +29,12 @@ export class NitradoApi {
             }
             await this.persistPriorityQueue(serverId, current);
         } finally {
-            this.lock.release();
+            release();
         }
     }
 
     public async deletePriorityQueue(serverId: string, userId: string): Promise<void> {
-        await this.lock.acquire();
+        const release= await this.lock.acquire();
         try {
             let current = await this.priorityQueueMembers(serverId);
             if (current.includes(userId)) {
@@ -42,7 +42,7 @@ export class NitradoApi {
             }
             await this.persistPriorityQueue(serverId, current);
         } finally {
-            this.lock.release();
+            release();
         }
     }
 
