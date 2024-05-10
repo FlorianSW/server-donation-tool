@@ -82,7 +82,7 @@ export class DonationController {
             gameId = order.reference.gameId.xbox;
         }
 
-        if ([req.user.steam?.id, req.user.xbox?.id, req.user.playstation?.id].includes(gameId)) {
+        if (![req.user.steam?.id, req.user.xbox?.id, req.user.playstation?.id].includes(gameId)) {
             res.render('payment_steam_mismatch', {
                 userSteamId: req.user.steam.id,
             });
