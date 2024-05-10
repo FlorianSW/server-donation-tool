@@ -9,12 +9,12 @@
         <label><%= translate('DONATE_SUMMARY_USER_LABEL') %></label>
         <span>
             <span><img class="image"
-                       src="<%= imagePath('steam_logo.png') %>"> <%= user.steam.name %> (<%= user.steam.id %>)</span>
+                       src="<%= imagePath('steam_logo.svg') %>"> <%= user.steam.name %> (<%= user.steam.id %>)</span>
             <% if (user.xbox) { %>
-                <span><img class="image" src="<%= imagePath('xbox_logo.png') %>"> <%= user.xbox.name %> (<%= user.xbox.id %>)</span>
+                <span><img class="image" src="<%= imagePath('xbox_logo.svg') %>"> <%= user.xbox.name %> (<%= user.xbox.id %>)</span>
             <% } %>
             <% if (user.xbox) { %>
-                <span><img class="image" src="<%= imagePath('playstation_logo.png') %>"> <%= user.playstation.name %> (<%= user.playstation.id %>)</span>
+                <span><img class="image" src="<%= imagePath('psn_logo.svg') %>"> <%= user.playstation.name %> (<%= user.playstation.id %>)</span>
             <% } %>
             <span><img class="image" src="<%= imagePath('discord.svg') %>"> <%= user.username %></span>
         </span>

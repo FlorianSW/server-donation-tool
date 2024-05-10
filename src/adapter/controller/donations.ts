@@ -82,7 +82,7 @@ export class DonationController {
             gameId = order.reference.gameId.xbox;
         }
 
-        if ([req.user.steam.id, req.user.xbox.id, req.user.playstation.id].includes(gameId)) {
+        if ([req.user.steam?.id, req.user.xbox?.id, req.user.playstation?.id].includes(gameId)) {
             res.render('payment_steam_mismatch', {
                 userSteamId: req.user.steam.id,
             });
@@ -195,7 +195,8 @@ export class DonationController {
             return;
         }
 
-        new Set(selectedPackage.perks.flatMap((p) => p.requiresLogins())).forEach((l) => {
+        const requiredLogins = new Set(selectedPackage.perks.flatMap((p) => p.requiresLogins()));
+        for (let l of requiredLogins) {
             if (!req.user[l]) {
                 req.session.afterLoginTarget = {
                     path: req.path,
@@ -207,7 +208,7 @@ export class DonationController {
                 });
                 return;
             }
-        })
+        }
 
         req.user = await this.data.onRefresh(req.user);
         if (req.user.subscribedPackages[selectedPackage.id] !== undefined && req.session.selectedPackage.type === DonationType.Subscription) {

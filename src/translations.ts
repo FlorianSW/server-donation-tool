@@ -281,7 +281,7 @@ const messages: { [key: string]: string } = {
     ERROR_GENERIC_SUPPORT: 'Support information bundle:',
 
     ERROR_MISSING_STEAM_TITLE: 'Discord profile has no {{account}} connection',
-    ERROR_MISSING_STEAM_DESCRIPTION: 'We offer perks to our donators, like Priority queue. In order for you to be able to redeem your donator perk, we need to know your {{account}} details. We take the account information that is connected to your Discord profile (which you used to login here). You can even hide the connection from the public in your Discord profile settings, it just needs to exist.<br><br>Please go to your Discord, connect your {{account}} account and try again.',
+    ERROR_MISSING_STEAM_DESCRIPTION: 'We offer perks to our donators, like Priority queue. In order for you to be able to redeem your donator perk, we need to know your {{account}} details. We take the account information that is connected to your Discord profile (which you used to login here). You can even hide the connection from the public in your Discord profile settings, it just needs to exist.<br><br>Please go to Discord, connect your {{account}} account and try again.',
     ERROR_MISSING_STEAM_TRY_AGAIN: 'Done! Try again',
     ERROR_MISSING_STEAM_LOGIN_TITLE: 'Alternatively login with steam',
     ERROR_MISSING_STEAM_LOGIN_DESCRIPTION: 'You do not necessarily need to link your Steam account with your Steam profile. As an alternative, you can login with your Steam account on this Website. To do so, click the login link.',
