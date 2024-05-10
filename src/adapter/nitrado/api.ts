@@ -1,5 +1,10 @@
+import {Mutex} from "async-mutex";
+
 export class NitradoApi {
+    lock: Mutex;
+
     constructor(private readonly token: string) {
+        this.lock = new Mutex();
     }
 
     public async priorityQueueMembers(serverId: string): Promise<string[]> {
@@ -16,19 +21,29 @@ export class NitradoApi {
     }
 
     public async putPriorityQueue(serverId: string, userId: string): Promise<void> {
-        const current = await this.priorityQueueMembers(serverId);
-        if (!current.includes(userId)) {
-            current.push(userId);
+        await this.lock.acquire();
+        try {
+            const current = await this.priorityQueueMembers(serverId);
+            if (!current.includes(userId)) {
+                current.push(userId);
+            }
+            await this.persistPriorityQueue(serverId, current);
+        } finally {
+            this.lock.release();
         }
-        await this.persistPriorityQueue(serverId, current);
     }
 
     public async deletePriorityQueue(serverId: string, userId: string): Promise<void> {
-        let current = await this.priorityQueueMembers(serverId);
-        if (current.includes(userId)) {
-            current.splice(current.indexOf(userId), 1);
+        await this.lock.acquire();
+        try {
+            let current = await this.priorityQueueMembers(serverId);
+            if (current.includes(userId)) {
+                current.splice(current.indexOf(userId), 1);
+            }
+            await this.persistPriorityQueue(serverId, current);
+        } finally {
+            this.lock.release();
         }
-        await this.persistPriorityQueue(serverId, current);
     }
 
     private async persistPriorityQueue(serverId: string, list: string[]): Promise<void> {
