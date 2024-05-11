@@ -200,6 +200,8 @@ serverNames:
 # - id: A unique id over the lifetime of the website. It needs to be unique even _after_ you want to remove the perk.
 #   Do not re-use an ID from a previous perk. The easiest thing would be to simply count up by one. Needs to be a number
 #   and will also be available in your PayPal dashboard in the 'custom' reference.
+# - image: An optional image name, which needs to be relative to the src/assets/custom/ directory. Put the image there and
+#   then name it here.
 # - price: The price of the perk, as an object of currency and amount. The currency needs to be a supported string from
 #   PayPal (see https://developer.paypal.com/docs/reports/reference/paypal-supported-currencies/). The amount is a
 #   string (make sure to quote the value) with a number with two decimals. Optionally, you can specify the type of the price.

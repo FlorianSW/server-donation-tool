@@ -94,6 +94,7 @@ export enum SubscriptionCycle {
 export class Package {
     name: string;
     description?: string;
+    image?: string;
     payment?: {
         name: string;
     }

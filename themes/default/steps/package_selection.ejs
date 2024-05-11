@@ -23,6 +23,11 @@
                     <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                     <input type="hidden" name="package" value="<%= pack.id %>">
                     <div class="card package">
+                        <% if (pack.image) { %>
+                        <div class="card-image">
+                            <img src="/assets/custom/<%= pack.image %>">
+                        </div>
+                        <% } %>
                         <div class="card-content">
                             <div>
                                 <span class="card-title">
