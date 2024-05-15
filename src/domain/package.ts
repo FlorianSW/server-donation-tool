@@ -55,9 +55,9 @@ export class RedeemTarget {
 
     public static fromUser(user: User): RedeemTarget {
         return new RedeemTarget({
-            steam: user.steam.id,
-            xbox: user.xbox.id,
-            playstation: user.playstation.id
+            steam: user.steam?.id,
+            xbox: user.xbox?.id,
+            playstation: user.playstation?.id
         }, user.discord.id, user.username);
     }
 
