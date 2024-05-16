@@ -65,7 +65,7 @@ export class DiscordRolePerk implements Perk, Refundable {
         const addedRoles: string[] = [];
         try {
             const guild = await this.client.guilds.fetch(this.guildId);
-            const guildMember = await guild.members.fetch(target.discordId);
+            const guildMember = await guild.members.fetch(target.gameId.discord);
             for (let roleId of this.roles) {
                 const alreadyAdded = guildMember.roles.cache.find((r) => r.id === roleId);
                 if (!alreadyAdded) {
@@ -92,7 +92,7 @@ export class DiscordRolePerk implements Perk, Refundable {
     async refund(forUser: RedeemTarget, order: Order): Promise<void> {
         try {
             const guild = await this.client.guilds.fetch(this.guildId);
-            const guildMember = await guild.members.fetch(forUser.discordId);
+            const guildMember = await guild.members.fetch(forUser.gameId.discord);
             for (let roleId of this.roles) {
                 await guildMember.roles.remove(roleId);
             }
@@ -107,7 +107,7 @@ export class DiscordRolePerk implements Perk, Refundable {
 
     async ownedBy(target: RedeemTarget): Promise<OwnedPerk[] | null> {
         try {
-            const guildMember = await this.guild.members.fetch(target.discordId);
+            const guildMember = await this.guild.members.fetch(target.gameId.discord);
             return guildMember.roles.cache
                 .filter((r) => this.roles.includes(r.id))
                 .map((r) => new DiscordRole(r.name));

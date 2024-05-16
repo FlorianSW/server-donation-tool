@@ -60,7 +60,7 @@ describe('Subscriptions', () => {
         const tId = randomUUID();
         service.subscribe(somePackages[0], {SOME_ID: 'SOME_DATA'}, aUser).then((sub) => {
             events.on('subscriptionExecuted', (target: RedeemTarget, plan: SubscriptionPlan, sub: Subscription, order: Order) => {
-                expect(target.discordId).toEqual(aUser.discord.id);
+                expect(target.gameId.discord).toEqual(aUser.discord.id);
                 expect(target.gameId.steam).toEqual(aUser.steam.id);
                 expect(order.payment.transactionId).toEqual(tId);
                 expect(order.status).toEqual(OrderStatus.PAID);

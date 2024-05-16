@@ -1,8 +1,6 @@
 import {inject, singleton} from 'tsyringe';
 import {Request, Response, Router} from 'express';
 import {requireAuthentication, requiresRole} from '../../auth';
-import {translate} from '../../translations';
-import {CalculateDonationTarget} from '../../service/donation-target';
 import {Role} from '../../domain/user';
 import {OrderOverview} from '../../service/order-overview';
 

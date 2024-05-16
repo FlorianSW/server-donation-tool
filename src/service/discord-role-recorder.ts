@@ -22,7 +22,7 @@ export class DiscordRoleRecorder implements Closeable {
             expires.setDate(expires.getDate() + p.amountInDays);
             for (const r of p.roles) {
                 await this.repository.save({
-                    discordUser: target.discordId,
+                    discordUser: target.gameId.discord,
                     roleId: r,
                     expiresAt: expires
                 });

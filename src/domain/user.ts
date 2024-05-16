@@ -1,4 +1,5 @@
 import {translate} from '../translations';
+import {GameId} from "./package";
 
 export class PriorityQueue implements OwnedPerk {
     type = 'PRIORITY_QUEUE';
@@ -73,7 +74,12 @@ export class PrefixGroupMember implements OwnedPerk {
     }
 
     asString(): string {
-        return translate('PERKS_OWNED_LB_AG_PREFIX_GROUP_MEMBER', {params: {pgName: this.pgName, serverName: this.serverName}});
+        return translate('PERKS_OWNED_LB_AG_PREFIX_GROUP_MEMBER', {
+            params: {
+                pgName: this.pgName,
+                serverName: this.serverName
+            }
+        });
     }
 
     equals(other: OwnedPerk): boolean {
@@ -105,6 +111,15 @@ export interface User {
     username: string;
     subscribedPackages: { [packageId: number]: string };
     roles: Role[];
+}
+
+export function toGameId(user: User): GameId {
+    return {
+        discord: user.discord.id,
+        playstation: user.playstation?.id,
+        xbox: user.xbox?.id,
+        steam: user.steam?.id,
+    };
 }
 
 export interface XBoxConnection {

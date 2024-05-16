@@ -310,7 +310,7 @@ export class Donations {
         const providerName = data[2];
         const provider = this.payments.find((p) => p.provider().branding.name === providerName);
 
-        const order = Order.createDeferred(new Date(), new Reference(null, interaction.user.id, selectedPackage), '');
+        const order = Order.createDeferred(new Date(), new Reference({discord: interaction.user.id}, selectedPackage), '');
         const paymentOrder = await provider.createPaymentOrder({
             candidateOrderId: order.id,
             successUrl: new URL('/donate/' + order.id + '?provider=' + provider.provider().branding.name, this.config.app.publicUrl),

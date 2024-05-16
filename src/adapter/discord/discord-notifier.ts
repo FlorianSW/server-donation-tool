@@ -77,9 +77,9 @@ export class DiscordNotifier {
                     .setFooter({text: 'Server Donation Tool by FlorianSW'})
                     .setDescription(translate('NOTIFICATIONS_PAYMENT_SUCCESSFUL_PUBLIC_DESCRIPTION', {
                         params: {
-                            user: `<@${target.discordId}> ${target.username ? `(${target.username})` : ''}`,
+                            user: `<@${target.gameId.discord}> ${target.username ? `(${target.username})` : ''}`,
                             username: target.username || '',
-                            userId: target.discordId,
+                            userId: target.gameId.discord,
                             package: order.reference.p.name,
                             price: `${order.reference.p.price.currency} ${order.reference.p.price.amount}`,
                         }
@@ -228,10 +228,10 @@ export class DiscordNotifier {
         return [
             {
                 name: translate('NOTIFICATIONS_REDEEM_SUCCESSFUL_USERNAME'),
-                value: `<@${target.discordId}> ${target.username ? `(${target.username})` : ''}`,
+                value: `<@${target.gameId.discord}> ${target.username ? `(${target.username})` : ''}`,
                 inline: true
             },
-            {name: translate('NOTIFICATIONS_REDEEM_SUCCESSFUL_DISCORD_ID'), value: target.discordId, inline: true},
+            {name: translate('NOTIFICATIONS_REDEEM_SUCCESSFUL_DISCORD_ID'), value: target.gameId.discord, inline: true},
             {name: translate('NOTIFICATIONS_REDEEM_SUCCESSFUL_STEAM_ID'), value: target.gameId.steam, inline: true}
         ];
     }

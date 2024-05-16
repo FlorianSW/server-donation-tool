@@ -262,7 +262,7 @@ export class SQLiteOrderRepository implements OrderRepository {
         await this.initialized;
         // @formatter:off
         await this.con.raw(`REPLACE INTO ${tableName} (${columnId}, ${columnOrderId}, ${columnCreated}, ${columnStatus}, ${columnTransactionId}, ${columnPaymentProvider}, ${columnSteamId}, ${columnXboxId}, ${columnPlaystationId}, ${columnDiscordId}, ${columnPackageId}, ${columnPrice}, ${columnCustomMessage}, ${columnRedeemedAt}, ${columnLastRedeemedAt}, ${columnRefundedAt}, ${columnPerkDetails}, ${columnCountryCode}, ${columnVatRate}) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, [
-            order.id, order.payment.id, order.created.getTime(), order.status, order.payment.transactionId || null, order.payment.provider, order.reference.gameId.steam || null, order.reference.gameId.xbox || null, order.reference.gameId.playstation || null, order.reference.discordId, order.reference.p.id, parseFloat(order.reference.p.price.amount), order.customMessage, order.firstRedeemed || null, order.lastRedeemed || null, order.refundedAt || null, JSON.stringify(Array.from(order.perkDetails.entries())), order.vat?.countryCode || null, order.vat?.rate || 0,
+            order.id, order.payment.id, order.created.getTime(), order.status, order.payment.transactionId || null, order.payment.provider, order.reference.gameId.steam || null, order.reference.gameId.xbox || null, order.reference.gameId.playstation || null, order.reference.gameId.discord, order.reference.p.id, parseFloat(order.reference.p.price.amount), order.customMessage, order.firstRedeemed || null, order.lastRedeemed || null, order.refundedAt || null, JSON.stringify(Array.from(order.perkDetails.entries())), order.vat?.countryCode || null, order.vat?.rate || 0,
         ]);
         // @formatter:on
     }
@@ -311,8 +311,8 @@ export class SQLiteOrderRepository implements OrderRepository {
                 steam: o[columnSteamId] || null,
                 xbox: o[columnXboxId] || null,
                 playstation: o[columnPlaystationId] || null,
+                discord: o[columnDiscordId],
             },
-            o[columnDiscordId],
             {
                 ...p,
                 price: {
@@ -388,7 +388,7 @@ export class InMemoryOrderRepository implements OrderRepository {
 
     async findLastFor(user: User, limit: number): Promise<Order[]> {
         return Array.from(this.orders.values())
-            .filter((o) => o.reference.discordId === user.discord.id)
+            .filter((o) => o.reference.gameId.discord === user.discord.id)
             .sort((o1, o2) => o1.created.getTime() - o2.created.getTime())
             .slice(0, limit - 1);
     }

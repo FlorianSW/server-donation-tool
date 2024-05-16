@@ -35,7 +35,7 @@ export class NitradoPriorityRecorder implements Closeable {
                     await this.repository.delete(nitradoPlayer);
                 }
                 await this.repository.save({
-                    discordUser: target.discordId,
+                    discordUser: target.gameId.discord,
                     player: gameId,
                     serverId: serverId,
                     expiresAt: expires

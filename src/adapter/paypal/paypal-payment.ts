@@ -117,7 +117,7 @@ export class PaypalPayment implements Payment, SubscriptionPaymentProvider {
                 user_action: 'PAY_NOW',
             },
             purchase_units: [{
-                custom_id: new Reference({}, request.discordId, request.forPackage).asString(),
+                custom_id: new Reference({discord: request.discordId}, request.forPackage).asString(),
                 description: translate('PAYPAL_ORDER_DESCRIPTION', {
                     params: {
                         communityName: communityTitle,
@@ -201,7 +201,12 @@ export class PaypalPayment implements Payment, SubscriptionPaymentProvider {
         const r = new CreateSubscriptionRequest();
         r.requestBody({
             plan_id: plan.payment.planId,
-            custom_id: new Reference({steam: user.steam.id, xbox: user.xbox.id, playstation: user.playstation.id}, user.discord.id, plan.basePackage).asString(),
+            custom_id: new Reference({
+                steam: user.steam.id,
+                xbox: user.xbox.id,
+                playstation: user.playstation.id,
+                discord: user.discord.id
+            }, plan.basePackage).asString(),
             application_context: {
                 brand_name: communityTitle,
                 shipping_preference: 'NO_SHIPPING',

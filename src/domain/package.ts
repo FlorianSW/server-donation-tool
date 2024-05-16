@@ -39,16 +39,13 @@ export interface Hints {
 
 export type PerkDetails = { [key: string]: string };
 
-export interface GameId {
-    steam?: string,
-    xbox?: string,
-    playstation?: string,
-}
+export type GameId = {
+    [loginType in Login]?: string | undefined;
+};
 
 export class RedeemTarget {
     constructor(
         public readonly gameId: GameId,
-        public readonly discordId: string,
         public readonly username?: string,
     ) {
     }
@@ -57,12 +54,13 @@ export class RedeemTarget {
         return new RedeemTarget({
             steam: user.steam?.id,
             xbox: user.xbox?.id,
-            playstation: user.playstation?.id
-        }, user.discord.id, user.username);
+            playstation: user.playstation?.id,
+            discord: user.discord.id,
+        }, user.username);
     }
 
     public static fromReference(ref: Reference): RedeemTarget {
-        return new RedeemTarget(ref.gameId, ref.discordId, '');
+        return new RedeemTarget(ref.gameId, '');
     }
 }
 

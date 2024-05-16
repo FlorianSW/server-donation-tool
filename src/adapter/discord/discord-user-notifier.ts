@@ -20,7 +20,7 @@ export class DiscordUserNotifier {
     }
 
     async onFailedRedeemPerk(target: RedeemTarget, order: Order): Promise<void> {
-        const discordUser = await this.client.users.fetch(order.reference.discordId);
+        const discordUser = await this.client.users.fetch(order.reference.gameId.discord);
         const embed = new EmbedBuilder()
             .setColor(Colors.DarkRed)
             .addFields(this.metaFields(target, order))
@@ -43,12 +43,12 @@ export class DiscordUserNotifier {
                 embeds: [embed],
             });
         } catch (e) {
-            this.logger.error('Could not send failed redeem message to ' + order.reference.discordId, e);
+            this.logger.error('Could not send failed redeem message to ' + order.reference.gameId.discord, e);
         }
     }
 
     async onSubscriptionExecuted(target: RedeemTarget, plan: SubscriptionPlan, sub: Subscription, order: Order): Promise<void> {
-        const discordUser = await this.client.users.fetch(order.reference.discordId);
+        const discordUser = await this.client.users.fetch(order.reference.gameId.discord);
         const embed = new EmbedBuilder()
             .setColor(Colors.DarkGreen)
             .addFields(this.metaFields(target, order))
@@ -68,7 +68,7 @@ export class DiscordUserNotifier {
                 embeds: [embed],
             });
         } catch (e) {
-            this.logger.error('Could not send subscription executed message to ' + order.reference.discordId, e);
+            this.logger.error('Could not send subscription executed message to ' + order.reference.gameId.discord, e);
         }
     }
 

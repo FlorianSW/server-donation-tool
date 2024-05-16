@@ -12,7 +12,7 @@ import {inject, injectAll, singleton} from 'tsyringe';
 import {OrderRepository} from '../../domain/repositories';
 import {Subscriptions} from '../../service/subscriptions';
 import {RedeemPackage} from '../../service/redeem-package';
-import {User} from '../../domain/user';
+import {toGameId, User} from '../../domain/user';
 import {VATRate, VATs} from '../../domain/vat';
 import {UserData} from '../../service/user-data';
 
@@ -73,20 +73,16 @@ export class DonationController {
             transactionId: order.payment.transactionId,
         };
 
-        let gameId = '';
-        if (order.reference.gameId.steam !== null) {
-            gameId = order.reference.gameId.steam;
-        } else if (order.reference.gameId.playstation !== null) {
-            gameId = order.reference.gameId.playstation;
-        } else if (order.reference.gameId.xbox !== null) {
-            gameId = order.reference.gameId.xbox;
-        }
+        const owned = toGameId(req.user);
+        const allAccountsOwned = Array.from(
+            new Set(order.reference.p.perks.flatMap((p) => p.requiresLogins()))
+        ).every((l) => !order.reference.gameId[l] || owned[l] === order.reference.gameId[l]);
 
-        if (![req.user.steam?.id, req.user.xbox?.id, req.user.playstation?.id].includes(gameId)) {
+        if (!allAccountsOwned) {
             res.render('payment_steam_mismatch', {
                 userSteamId: req.user.steam.id,
             });
-            throw new GameIdMismatch(gameId, req.user.steam.id);
+            throw new GameIdMismatch(order.reference.gameId, owned);
         } else {
             return order;
         }
@@ -260,10 +256,10 @@ export class DonationController {
         } else if (order.status === OrderStatus.PAID) {
             res.render('steps/redeem', {
                 order: order,
-                canShare: order.reference.discordId === req.user.discord.id,
+                canShare: order.reference.gameId.discord === req.user.discord.id,
                 shareLink: new URL(`/donate/${order.id}`, this.config.app.publicUrl).toString(),
                 redeemLink: `/donate/${order.id}/redeem`,
-                isUnclaimed: order.reference.gameId.steam === null && order.reference.gameId.xbox === null && order.reference.gameId.playstation === null,
+                isUnclaimed: Object.entries(order.reference.gameId).filter((e) => e[0] !== 'discord').every((a) => a[1] === null),
                 perks: order.reference.p.perks,
                 csrfToken: req.csrfToken(),
                 redeemStatus: 'PENDING',
@@ -353,7 +349,7 @@ export class DonationController {
             return;
         }
 
-        const order = Order.createDeferred(new Date(), new Reference({}, req.user.discord.id, p), customMessage, req.session.vat);
+        const order = Order.createDeferred(new Date(), new Reference({discord: req.user.discord.id}, p), customMessage, req.session.vat);
         const paymentOrder = await payment.createPaymentOrder({
             candidateOrderId: order.id,
             successUrl: new URL('/donate/' + order.id + '?provider=' + payment.provider().branding.name, this.config.app.publicUrl),
@@ -405,7 +401,7 @@ export class DonationController {
             id: paymentOrder.id,
             transactionId: paymentOrder.transactionId,
             provider: payment.provider().branding.name,
-        }, new Reference({}, req.user.discord.id, p), customMessage, req.session.vat);
+        }, new Reference({discord: req.user.discord.id}, p), customMessage, req.session.vat);
         order.pushPerkDetails(req.session.selectedPackage.perkDetails);
         await this.repo.save(order);
 
