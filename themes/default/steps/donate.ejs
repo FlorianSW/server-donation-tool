@@ -8,13 +8,17 @@
         <span><%= translate('DONATE_SUMMARY_PERKS_FOR_VALUE') %></span>
         <label><%= translate('DONATE_SUMMARY_USER_LABEL') %></label>
         <span>
-            <span><img class="image"
-                       src="<%= imagePath('steam_logo.svg') %>"> <%= user.steam.name %> (<%= user.steam.id %>)</span>
+            <% if (user.steam) { %>
+                <span><img class="image"
+                           src="<%= imagePath('steam_logo.svg') %>"> <%= user.steam.name %> (<%= user.steam.id %>)</span>
+            <% } %>
             <% if (user.xbox) { %>
-                <span><img class="image" src="<%= imagePath('xbox_logo.svg') %>"> <%= user.xbox.name %> (<%= user.xbox.id %>)</span>
+                <span><img class="image"
+                           src="<%= imagePath('xbox_logo.svg') %>"> <%= user.xbox.name %> (<%= user.xbox.id %>)</span>
             <% } %>
             <% if (user.playstation) { %>
-                <span><img class="image" src="<%= imagePath('psn_logo.svg') %>"> <%= user.playstation.name %> (<%= user.playstation.id %>)</span>
+                <span><img class="image"
+                           src="<%= imagePath('psn_logo.svg') %>"> <%= user.playstation.name %> (<%= user.playstation.id %>)</span>
             <% } %>
             <span><img class="image" src="<%= imagePath('discord.svg') %>"> <%= user.username %></span>
         </span>
