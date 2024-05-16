@@ -2,3 +2,13 @@ img.avatar {
   border-radius: 50%;
   width: 36px;
 }
+
+.account.card-image {
+  display: flex;
+  justify-content: center;
+}
+
+.account.card-image > img {
+  height: 48px;
+  width: inherit !important;
+}
