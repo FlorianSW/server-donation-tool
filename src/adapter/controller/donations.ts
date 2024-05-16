@@ -415,7 +415,12 @@ export class DonationController {
     }
 
     private async captureOrder(req: Request, res: Response) {
-        let order = (await this.repo.findByPaymentOrder(req.params.orderId))[0];
+        const orders = await this.repo.findByPaymentOrder(req.params.orderId);
+        if (orders.length === 0) {
+            res.status(404);
+            return
+        }
+        let order = orders[0];
         const payment = this.payments.find((provider) => provider.provider().branding.name === req.body.provider);
         if (!payment) {
             res.status(400).send();
@@ -437,7 +442,12 @@ export class DonationController {
     }
 
     private async dropOrder(req: Request, res: Response) {
-        const order = (await this.repo.findByPaymentOrder(req.params.orderId))[0];
+        const orders = await this.repo.findByPaymentOrder(req.params.orderId);
+        if (orders.length === 0) {
+            res.status(404);
+            return
+        }
+        const order = orders[0];
         if (order.status !== OrderStatus.CREATED) {
             res.status(403);
         } else {
