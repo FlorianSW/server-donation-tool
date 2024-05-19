@@ -88,14 +88,14 @@ export interface AppConfig {
     stripe?: {
         secretKey: string,
     },
-    battlemetrics: {
+    battlemetrics?: {
         access_token: string,
     },
     cftools: {
         applicationId: string,
         secret: string,
     },
-    nitrado: {
+    nitrado?: {
         token: string,
         expirePriorityEvery?: number,
     },

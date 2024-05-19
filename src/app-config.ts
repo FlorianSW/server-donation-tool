@@ -79,7 +79,7 @@ class YamlAppConfig implements AppConfig {
         };
     };
     cftools: { applicationId: string; secret: string };
-    nitrado: { token: string, expirePriorityEvery?: number };
+    nitrado?: { token: string, expirePriorityEvery?: number };
     lb_ag_pg: { [serverId: string]: LbAgPgServer };
     discord: {
         clientId: string;
@@ -112,7 +112,7 @@ class YamlAppConfig implements AppConfig {
         redirectUrl: string;
         realm: string;
     };
-    battlemetrics: {
+    battlemetrics?: {
         access_token: string;
     };
     packages: Package[];
@@ -312,7 +312,7 @@ class YamlAppConfig implements AppConfig {
 
     private async configureExpiringNitradoPlayers(): Promise<void> {
         container.register('nitrado.runEvery', {
-            useValue: this.nitrado.expirePriorityEvery || 60 * 60 * 1000,
+            useValue: this.nitrado?.expirePriorityEvery || 60 * 60 * 1000,
         });
         container.resolve(NitradoPriorityRecorder);
         container.resolve(ExpireNitradoPriority);
