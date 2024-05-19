@@ -1,6 +1,6 @@
 import {TranslateParams} from '../translations';
 import {Order, Reference} from './payment';
-import {OwnedPerk, User} from './user';
+import {OwnedPerk, toGameId, User} from './user';
 
 export type Login = 'discord' | 'steam' | 'playstation' | 'xbox';
 
@@ -51,12 +51,7 @@ export class RedeemTarget {
     }
 
     public static fromUser(user: User): RedeemTarget {
-        return new RedeemTarget({
-            steam: user.steam?.id,
-            xbox: user.xbox?.id,
-            playstation: user.playstation?.id,
-            discord: user.discord.id,
-        }, user.username);
+        return new RedeemTarget(toGameId(user), user.username);
     }
 
     public static fromReference(ref: Reference): RedeemTarget {

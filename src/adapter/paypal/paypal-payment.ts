@@ -203,8 +203,8 @@ export class PaypalPayment implements Payment, SubscriptionPaymentProvider {
             plan_id: plan.payment.planId,
             custom_id: new Reference({
                 steam: user.steam.id,
-                xbox: user.xbox.id,
-                playstation: user.playstation.id,
+                xbox: user.xbox.name,
+                playstation: user.playstation.name,
                 discord: user.discord.id
             }, plan.basePackage).asString(),
             application_context: {

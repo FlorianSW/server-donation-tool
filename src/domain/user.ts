@@ -116,8 +116,8 @@ export interface User {
 export function toGameId(user: User): GameId {
     return {
         discord: user.discord.id,
-        playstation: user.playstation?.id,
-        xbox: user.xbox?.id,
+        playstation: user.playstation?.name,
+        xbox: user.xbox?.name,
         steam: user.steam?.id,
     };
 }
