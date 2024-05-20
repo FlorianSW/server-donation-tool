@@ -43,7 +43,7 @@ export class DiscordUserNotifier {
                 embeds: [embed],
             });
         } catch (e) {
-            this.logger.error('Could not send failed redeem message to ' + order.reference.gameId.discord, e);
+            this.logger.warn('Could not send failed redeem message to ' + order.reference.gameId.discord, e);
         }
     }
 
