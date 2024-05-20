@@ -6,7 +6,6 @@ import {Order} from '../../domain/payment';
 import {Logger} from 'winston';
 import {createHash} from 'crypto';
 import {NitradoApi} from "../nitrado/api";
-import {DuplicateResourceCreation} from "cftools-sdk";
 import {inject} from "tsyringe";
 import {NitradoPriorityPlayerRepository} from "../../domain/repositories";
 
@@ -30,7 +29,7 @@ export class NitradoPriorityQueuePerk implements Perk, Refundable {
     ) {
     }
 
-    private gameId(target: RedeemTarget): string {
+    private gameId(target: RedeemTarget): string | undefined {
         if (this.nitrado.kind === 'xbox') {
             return target.gameId.xbox;
         }
@@ -78,14 +77,18 @@ export class NitradoPriorityQueuePerk implements Perk, Refundable {
     }
 
     async ownedBy(target: RedeemTarget): Promise<OwnedPerk[] | null> {
+        const gameId = this.gameId(target);
+        if (!gameId) {
+            return [];
+        }
         try {
             const result: OwnedPerk[] = [];
             if (Array.isArray(this.nitrado.serverId)) {
                 for (let id of this.nitrado.serverId) {
-                    result.push(await this.fetchPriorityQueue(this.gameId(target), id));
+                    result.push(await this.fetchPriorityQueue(gameId, id));
                 }
             } else {
-                result.push(await this.fetchPriorityQueue(this.gameId(target), this.nitrado.serverId));
+                result.push(await this.fetchPriorityQueue(gameId, this.nitrado.serverId));
             }
             return result;
         } catch (e) {

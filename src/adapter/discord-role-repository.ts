@@ -46,7 +46,7 @@ export class SQLiteDiscordRoleRepository implements DiscordRoleRepository {
 
     async find(expiresBefore: Date): Promise<ExpiringDiscordRole[]> {
         await this.initialized;
-        return this.con
+        return await this.con
             .table(tableName)
             .limit(100)
             .where(columnExpiresAt, '<=', expiresBefore.getTime())

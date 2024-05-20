@@ -265,10 +265,10 @@ const messages: { [key: string]: string } = {
     STATISTICS_VAT_BY_COUNTRY_COUNTRY_CODE: 'Country Code',
     STATISTICS_VAT_BY_COUNTRY_VAT: 'VAT',
 
-    ERROR_STEAM_ID_MISMATCH_TITLE: 'Steam ID mismatch',
-    ERROR_STEAM_ID_MISMATCH_DESCRIPTION: 'The Steam ID for this donation is different from the one connected with your profile.',
-    ERROR_STEAM_ID_MISMATCH_ORDER_LABEL: 'Steam ID of donation',
-    ERROR_STEAM_ID_MISMATCH_USER_LABEL: 'Your Steam ID',
+    ERROR_STEAM_ID_MISMATCH_TITLE: 'Game IDs mismatch',
+    ERROR_STEAM_ID_MISMATCH_DESCRIPTION: 'The Game IDs for this donation are different from the one connected with your profile.',
+    ERROR_STEAM_ID_MISMATCH_ORDER_LABEL: 'Game ID of donation',
+    ERROR_STEAM_ID_MISMATCH_USER_LABEL: 'Your Game IDs',
 
     ERROR_LOGIN: 'Login error',
     ERROR_LOGIN_DESCRIPTION: 'The login was not successful. Please make sure you complete the login on the Discord page.',

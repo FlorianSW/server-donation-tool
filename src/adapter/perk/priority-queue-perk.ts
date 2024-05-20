@@ -93,6 +93,9 @@ export class PriorityQueuePerk implements Perk, Refundable {
     }
 
     async ownedBy(target: RedeemTarget): Promise<OwnedPerk[] | null> {
+        if (!target.gameId.steam) {
+            return [];
+        }
         try {
             const result: OwnedPerk[] = [];
             if (Array.isArray(this.cftools.serverApiId)) {

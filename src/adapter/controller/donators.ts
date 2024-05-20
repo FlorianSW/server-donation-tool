@@ -5,6 +5,7 @@ import {AppConfig} from '../../domain/app-config';
 import {OwnedPerk} from '../../domain/user';
 import {DiscordAPIError, RESTJSONErrorCodes} from 'discord.js';
 import {inject, singleton} from 'tsyringe';
+import {Logger} from "winston";
 
 @singleton()
 export class DonatorsController {
@@ -13,6 +14,7 @@ export class DonatorsController {
     constructor(
         @inject('AppConfig') private readonly config: AppConfig,
         @inject('packages') private readonly packages: Package[],
+        @inject('Logger') private readonly logger: Logger,
     ) {
         this.router.get('/api/donators/@me/perks', requireAuthentication, this.listOwnedPerks.bind(this));
     }
@@ -38,7 +40,8 @@ export class DonatorsController {
                 res.redirect(this.config.app.community.discord);
                 return;
             }
-            throw e;
+            this.logger.error(e);
+            res.status(500).json({message: e.toString()});
         }
     }
 }

@@ -3,7 +3,7 @@ import {Request, Response, Router} from 'express';
 import {translate} from '../../translations';
 import {DonationType, Hints, Package, RedeemTarget} from '../../domain/package';
 import {AppConfig} from '../../domain/app-config';
-import {Order, OrderNotFound, OrderStatus, Payment, Reference, GameIdMismatch} from '../../domain/payment';
+import {GameIdMismatch, Order, OrderNotFound, OrderStatus, Payment, Reference} from '../../domain/payment';
 import {Logger} from 'winston';
 import {SessionData} from 'express-session';
 import csrf from 'csurf';
@@ -74,14 +74,12 @@ export class DonationController {
         };
 
         const owned = toGameId(req.user);
-        const allAccountsOwned = Array.from(
-            new Set(order.reference.p.perks.flatMap((p) => p.requiresLogins()))
-        ).every((l) => !order.reference.gameId[l] || owned[l] === order.reference.gameId[l]);
+        const allAccountsOwned = Array.from(new Set(order.reference.p.perks.flatMap((p) => p.requiresLogins())))
+            // discord ID is always set to the one who bought the donation
+            .filter((l) => l !== 'discord')
+            .every((l) => !order.reference.gameId[l] || owned[l] === order.reference.gameId[l]);
 
         if (!allAccountsOwned) {
-            res.render('payment_steam_mismatch', {
-                userSteamId: req.user.steam.id,
-            });
             throw new GameIdMismatch(order.reference.gameId, owned);
         } else {
             return order;
@@ -240,7 +238,19 @@ export class DonationController {
     }
 
     private async prepareRedeem(req: Request, res: Response) {
-        const order = await this.fetchOrderDetails(req, res);
+        let order: Order;
+        try {
+            order = await this.fetchOrderDetails(req, res);
+        } catch (e) {
+            if (e instanceof GameIdMismatch) {
+                res.render('payment_gameid_mismatch', {
+                    gameId: toGameId(req.user),
+                });
+            } else {
+                res.sendStatus(500).json({message: e.toString()});
+            }
+            return;
+        }
 
         if (!order.reference) {
             res.sendStatus(400);
@@ -249,7 +259,7 @@ export class DonationController {
 
         if (order.status === OrderStatus.CREATED) {
             res.render('steps/wait_for_payment');
-        } else if (order.status === OrderStatus.REFUNDED)  {
+        } else if (order.status === OrderStatus.REFUNDED) {
             res.render('steps/order_refunded', {
                 order: order,
             });
@@ -302,7 +312,19 @@ export class DonationController {
     }
 
     private async redeem(req: Request, res: Response) {
-        const order = await this.fetchOrderDetails(req, res);
+        let order: Order;
+        try {
+            order = await this.fetchOrderDetails(req, res);
+        } catch (e) {
+            if (e instanceof GameIdMismatch) {
+                res.render('payment_gameid_mismatch', {
+                    gameId: toGameId(req.user),
+                });
+            } else {
+                res.sendStatus(500).json({message: e.toString()});
+            }
+            return;
+        }
         if (order.status !== OrderStatus.PAID) {
             return this.redirectToPrepareRedeem(req, res);
         }

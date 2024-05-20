@@ -1,9 +1,4 @@
-import {
-    DiscordRoleRepository,
-    ExpiringDiscordRole,
-    NitradoPlayer,
-    NitradoPriorityPlayerRepository
-} from '../domain/repositories';
+import {NitradoPlayer, NitradoPriorityPlayerRepository} from '../domain/repositories';
 import {Knex} from 'knex';
 import {inject, singleton} from 'tsyringe';
 
@@ -53,7 +48,7 @@ export class SQLiteNitradoPriorityQueueRepository implements NitradoPriorityPlay
 
     async find(expiresBefore: Date): Promise<NitradoPlayer[]> {
         await this.initialized;
-        return this.con
+        return await this.con
             .table(tableName)
             .limit(100)
             .where(columnExpiresAt, '<=', expiresBefore.getTime())
@@ -71,7 +66,7 @@ export class SQLiteNitradoPriorityQueueRepository implements NitradoPriorityPlay
 
     async findForPlayer(server: string, player: string): Promise<NitradoPlayer[]> {
         await this.initialized;
-        return this.con
+        return await this.con
             .table(tableName)
             .where(columnServerId, '=', server)
             .where(columnNitradoPlayer, '=', player)
