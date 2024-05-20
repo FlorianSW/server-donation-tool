@@ -23,12 +23,22 @@ export class StripePayment implements Payment {
     }
 
     async details(paymentOrderId: string): Promise<PaymentOrder> {
-        const info = await this.client.paymentIntents.retrieve(paymentOrderId);
+        let transactionId: string;
+        if (paymentOrderId.startsWith('cs_')) {
+            const cs = await this.client.checkout.sessions.retrieve(paymentOrderId);
+            if (cs.lastResponse.statusCode === 404) {
+                throw new OrderNotFound();
+            }
+            transactionId = cs.payment_intent as string;
+        } else {
+            transactionId = paymentOrderId;
+        }
+        const info = await this.client.paymentIntents.retrieve(transactionId);
         if (info.lastResponse.statusCode === 404) {
             throw new OrderNotFound();
         }
         return {
-            transactionId: paymentOrderId,
+            transactionId: transactionId,
             id: paymentOrderId,
             created: new Date(info.created),
             status: info.status === 'succeeded' ? OrderStatus.PAID : OrderStatus.CREATED,
@@ -89,7 +99,7 @@ export class StripePayment implements Payment {
         });
 
         return {
-            id: sess.payment_intent as string,
+            id: sess.id as string,
             transactionId: '',
             created: new Date(),
             paymentUrl: sess.url,

@@ -141,7 +141,7 @@ export class Donations {
                 type: 1,
                 components: [{
                     type: 3,
-                    label: translate('CMD_DONATE_PACKAGE_LABEL'),
+                    placeholder: translate('CMD_DONATE_PACKAGE_LABEL'),
                     customId: SELECT_PACKAGE,
                     options: options,
                 }],

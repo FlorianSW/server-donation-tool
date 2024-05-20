@@ -20,7 +20,7 @@ async function clean() {
 }
 
 async function assets() {
-    return src('src/assets/**/*')
+    return src('src/assets/**/*', {encoding: false})
         .pipe(dest('dist/assets/'));
 }
 
@@ -51,7 +51,7 @@ async function themeCss() {
 }
 
 async function themeAssets() {
-    return src('themes/*/images/**/*')
+    return src('themes/*/images/**/*', {encoding: false})
         .pipe(removeDuplicateImagesPath())
         .pipe(dest('dist/assets/images/'));
 }

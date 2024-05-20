@@ -70,6 +70,10 @@ export class DiscordRolePerk implements Perk, Refundable {
                 const alreadyAdded = guildMember.roles.cache.find((r) => r.id === roleId);
                 if (!alreadyAdded) {
                     const role = await guild.roles.fetch(roleId);
+                    if (!role) {
+                        this.log.warn("Discord role " + roleId + " configured for discord role perk, but this role does not exist.")
+                        continue
+                    }
                     await guildMember.roles.add(role);
                     addedRoles.push(role.name);
                 } else {

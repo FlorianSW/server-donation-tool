@@ -6,7 +6,7 @@ import {Closeable} from '../index';
 
 @singleton()
 export class ExpireDiscordRole implements Closeable {
-    private readonly interval: NodeJS.Timer;
+    private readonly interval: ReturnType<typeof setInterval>;
 
     constructor(
         @inject('DiscordRoleRepository') private readonly repository: DiscordRoleRepository,

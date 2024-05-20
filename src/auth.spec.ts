@@ -1,8 +1,7 @@
 import {discordUserCallback} from './auth';
-import DoneCallback = jest.DoneCallback;
 import {ConnectionInfo, Profile} from 'passport-discord';
 import {PlayerProfile, SteamClient} from './domain/steam-client';
-import {Client} from 'discord.js';
+import DoneCallback = jest.DoneCallback;
 
 class FakeSteamClient implements SteamClient {
     playerProfile(steamId: string): Promise<PlayerProfile | null> {

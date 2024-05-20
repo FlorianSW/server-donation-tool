@@ -7,7 +7,7 @@ import {NitradoApi} from "../adapter/nitrado/api";
 
 @singleton()
 export class ExpireNitradoPriority implements Closeable {
-    private readonly interval: NodeJS.Timer;
+    private readonly interval: ReturnType<typeof setInterval>;
 
     constructor(
         @inject('NitradoPriorityPlayerRepository') private readonly repository: NitradoPriorityPlayerRepository,

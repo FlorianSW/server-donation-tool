@@ -47,13 +47,9 @@ export class DonationController {
         this.router.get('/donate/:orderId/redeem', requireAuthentication, this.redirectToPrepareRedeem.bind(this));
     }
 
-    private async fetchOrderDetails(req: Request, res: Response): Promise<Order> {
+    private async fetchOrderDetails(req: Request): Promise<Order> {
         const order = await this.repo.find(req.params.orderId);
         if (!order) {
-            res.status(404).render('error', {
-                status: '404',
-                supportInfo: translate('ERROR_ORDER_NOT_FOUND', {params: {orderId: req.params.orderId}}),
-            });
             throw new OrderNotFound();
         }
 
@@ -240,14 +236,20 @@ export class DonationController {
     private async prepareRedeem(req: Request, res: Response) {
         let order: Order;
         try {
-            order = await this.fetchOrderDetails(req, res);
+            order = await this.fetchOrderDetails(req);
         } catch (e) {
             if (e instanceof GameIdMismatch) {
                 res.render('payment_gameid_mismatch', {
                     gameId: toGameId(req.user),
                 });
+            } else if (e instanceof OrderNotFound) {
+                res.status(404).render('error', {
+                    status: '404',
+                    supportInfo: translate('ERROR_ORDER_NOT_FOUND', {params: {orderId: req.params.orderId}}),
+                });
             } else {
-                res.sendStatus(500).json({message: e.toString()});
+                this.logger.error(e);
+                res.status(500).json({message: e.toString()});
             }
             return;
         }
@@ -314,11 +316,16 @@ export class DonationController {
     private async redeem(req: Request, res: Response) {
         let order: Order;
         try {
-            order = await this.fetchOrderDetails(req, res);
+            order = await this.fetchOrderDetails(req);
         } catch (e) {
             if (e instanceof GameIdMismatch) {
                 res.render('payment_gameid_mismatch', {
                     gameId: toGameId(req.user),
+                });
+            } else if (e instanceof OrderNotFound) {
+                res.status(404).render('error', {
+                    status: '404',
+                    supportInfo: translate('ERROR_ORDER_NOT_FOUND', {params: {orderId: req.params.orderId}}),
                 });
             } else {
                 res.sendStatus(500).json({message: e.toString()});

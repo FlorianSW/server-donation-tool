@@ -162,7 +162,7 @@ export function makeOrder(...m: modifier[]): Order {
             transactionId: 'SOME_TRANSACTION_ID',
             provider: FakePayment.NAME,
         },
-        reference: new Reference({steam: aSteamId, discord: 'A_DISCORD_ID'}, somePackages[0]),
+        reference: new Reference({steam: aSteamId, discord: 'A_DISCORD_ID', playstation: null, xbox: null}, somePackages[0]),
         message: 'A_MESSAGE',
         vat: new VATRate('DE', 19),
     }
