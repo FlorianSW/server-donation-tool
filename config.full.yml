@@ -192,6 +192,12 @@ lb_ag_pg:
 # easily recognize.
 serverNames:
   aServerApiId: some name
+# An optional array of strings with the names of package categories. Package categories will be used to group similar packages
+# together. They will be shown in sections with this string as the title. The order of the names here will be the order
+# of the sections on the start page.
+# packageCategories:
+#   - PC
+#   - Console
 # Packages are the available prices and benefits a donator gets when donating that amount. Each package has the following information
 # - name: A human readable name, which is displayed in the perk selection screen as well as on the PayPal receipt (choose
 #   a name which is not too long, but still descriptive); do not put the price in it
@@ -202,6 +208,9 @@ serverNames:
 #   and will also be available in your PayPal dashboard in the 'custom' reference.
 # - image: An optional image name, which needs to be relative to the src/assets/custom/ directory. Put the image there and
 #   then name it here.
+# - category: An optional name of a category this package belongs to. If you omit this, the package will be shown in the
+#   default category without a name. Same will happen if the category you set here is not contained in the packageCategories
+#   list (exact match, case-sensitive).
 # - price: The price of the perk, as an object of currency and amount. The currency needs to be a supported string from
 #   PayPal (see https://developer.paypal.com/docs/reports/reference/paypal-supported-currencies/). The amount is a
 #   string (make sure to quote the value) with a number with two decimals. Optionally, you can specify the type of the price.

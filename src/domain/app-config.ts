@@ -101,6 +101,7 @@ export interface AppConfig {
     },
     lb_ag_pg: { [serverId: string]: LbAgPgServer }
     serverNames: ServerNames,
+    packageCategories: string[],
 
     logoUrl(absolute?: boolean): string;
 }

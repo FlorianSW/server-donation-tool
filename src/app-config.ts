@@ -126,6 +126,7 @@ class YamlAppConfig implements AppConfig {
         secretKey: string;
     };
     serverNames: ServerNames;
+    packageCategories: string[];
 
     private logger: Logger;
 
@@ -183,6 +184,9 @@ class YamlAppConfig implements AppConfig {
 
         if (this.app.language) {
             settings.language = this.app.language;
+        }
+        if (!this.packageCategories) {
+            this.packageCategories = [];
         }
         if (!this.app.privacyPolicy?.partials) {
             this.app.privacyPolicy = {

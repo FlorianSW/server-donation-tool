@@ -4,6 +4,10 @@
 @import "../partials/xbox_info";
 @import "../partials/discord_info";
 
+h4.package-category {
+  margin-top: 3rem;
+}
+
 .packages {
   display: flex;
   gap: 1em;

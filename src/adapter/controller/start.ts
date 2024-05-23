@@ -6,6 +6,11 @@ import csrf from 'csurf';
 import {inject, singleton} from 'tsyringe';
 import {UserData} from '../../service/user-data';
 
+interface categoryPackage {
+    category?: string | undefined,
+    packages: Package[],
+}
+
 @singleton()
 export class StartController {
     public readonly router: Router = Router();
@@ -25,6 +30,20 @@ export class StartController {
     private async startPage(req: Request, res: Response) {
         req.user = await this.data.onRefresh(req.user);
 
+        const packages: categoryPackage[] = [{
+            packages: this.packages.filter((p) => !this.config.packageCategories.includes(p.category)),
+        }];
+        for (let cat of this.config.packageCategories) {
+            const p = this.packages.filter((p) => p.category === cat);
+            if (p.length === 0) {
+                continue
+            }
+            packages.push({
+                category: cat,
+                packages: p,
+            });
+        }
+
         res.render('steps/package_selection', {
             withOpenGraph: true,
             csrfToken: req.csrfToken(),
@@ -32,7 +51,7 @@ export class StartController {
                 return Array.from(new Set(p.perks.flatMap((p) => p.requiresLogins())));
             },
             showDonationTarget: !!this.config.app.community?.donationTarget?.monthly,
-            availablePackages: this.packages,
+            availablePackages: packages,
             subscribedPackages: req.user?.subscribedPackages || {},
         });
     }
