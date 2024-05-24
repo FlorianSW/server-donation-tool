@@ -233,6 +233,8 @@ const messages: { [key: string]: string } = {
     USER_NOTIFICATIONS_FAILED_REDEEM_RETRY_TITLE: 'Retry link',
     USER_NOTIFICATIONS_FAILED_REDEEM_RETRY_LINK: 'Click me :smiley:',
     USER_NOTIFICATIONS_STEAM_ID: 'Steam ID',
+    USER_NOTIFICATIONS_XBOX: 'XBox',
+    USER_NOTIFICATIONS_PLAYSTATION: 'PlayStation Network',
     USER_NOTIFICATIONS_DISCORD_LINK: 'Link to our discord',
     USER_NOTIFICATIONS_PACKAGE: 'Package name',
     USER_NOTIFICATIONS_SUB_EXECUTED_TEXT: 'Hi :wave:,\n\nThanks again for donating to our community. We received a payment of your recurring subscription :pray:\nAs part of that subscription we automatically extended the included perks for you.\nIf you want to cancel this subscription, please go to your PayPal account -> Settings and cancel the subscription there.\n\nIf you have any questions, feel free to get in touch with us. Thanks again for your donation and have a good day :heart:',
