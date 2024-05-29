@@ -65,6 +65,9 @@ export class SQLiteNitradoPriorityQueueRepository implements NitradoPriorityPlay
     }
 
     async findForPlayer(server: string, player: string): Promise<NitradoPlayer[]> {
+        if (!server || !player) {
+            return [];
+        }
         await this.initialized;
         return await this.con
             .table(tableName)
