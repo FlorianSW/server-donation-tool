@@ -30,6 +30,9 @@ export class NitradoPriorityRecorder implements Closeable {
             }
             for (const serverId of serverIds) {
                 const gameId = p.nitrado.kind === 'xbox' ? target.gameId.xbox : target.gameId.playstation;
+                if (!gameId) {
+                    continue
+                }
                 const e = await this.repository.findForPlayer(serverId, gameId);
                 for (let nitradoPlayer of e) {
                     await this.repository.delete(nitradoPlayer);
