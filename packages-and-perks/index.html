@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+  
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <meta name="author" content="Florian Schmidt">
+    
+    <link rel="shortcut icon" href="../img/favicon.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+    <title>Packages and Perks - Server Donation Tool</title>
+    <link href="../css/bootstrap-3.3.7.min.css" rel="stylesheet">
+    <link href="../css/font-awesome-4.7.0.css" rel="stylesheet">
+    <link href="../css/base.css" rel="stylesheet">
+    <link rel="stylesheet" href="../css/highlight.css">
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+
+    <script src="../js/jquery-3.2.1.min.js"></script>
+    <script src="../js/bootstrap-3.3.7.min.js"></script>
+    <script src="../js/highlight.pack.js"></script>
+    
+    <base target="_top">
+    <script>
+      var base_url = '..';
+      var is_top_frame = false;
+        
+        var pageToc = [
+          {title: "Packages and Perks", url: "#_top", children: [
+              {title: "Understanding Packages and Perks", url: "#understanding-packages-and-perks" },
+              {title: "Configuring Packages", url: "#configuring-packages" },
+              {title: "Built-in available Perks", url: "#built-in-available-perks" },
+          ]},
+        ];
+
+    </script>
+    <script src="../js/base.js"></script> 
+</head>
+
+<body>
+<script>
+if (is_top_frame) { $('body').addClass('wm-top-page'); }
+</script>
+
+
+
+<div class="container-fluid wm-page-content">
+  <a name="_top"></a>
+    
+
+    
+    
+      
+    
+
+  <div class="row wm-article-nav-buttons" role="navigation" aria-label="navigation">
+    
+    <div class="wm-article-nav pull-right">
+      <a href="../subscriptions/" class="btn btn-xs btn-default pull-right">
+        Next
+        <i class="fa fa-chevron-right" aria-hidden="true"></i>
+      </a>
+      <a href="../subscriptions/" class="btn btn-xs btn-link">
+        Subscriptions
+      </a>
+    </div>
+    
+    <div class="wm-article-nav">
+      <a href="../getting-started/" class="btn btn-xs btn-default pull-left">
+        <i class="fa fa-chevron-left" aria-hidden="true"></i>
+        Previous</a><a href="../getting-started/" class="btn btn-xs btn-link">
+        Getting Strated
+      </a>
+    </div>
+    
+  </div>
+
+    
+
+    <h1 id="packages-and-perks">Packages and Perks</h1>
+<p>The donation tool is composed out of different package options, which grant a possible donator access to a variety of freely configurable perks.</p>
+<h2 id="understanding-packages-and-perks">Understanding Packages and Perks</h2>
+<p>The concept of packages and perks is a core concept of the donation tool.
+It is not only the main part the donator will interact with during the donation process.
+It is also the key element for server hosters to individualise what they offer to donators and what donation amount they expect.</p>
+<h3 id="package">Package</h3>
+<p>A package in the donation tool can be seen as a container.
+It holds the information of a unique ID, in order to reference the package during the donation process, as well as afterwards (e.g. in case of a refund or issue).
+The package will also has a price tag, which a donator will need to pay.
+The most important part of a package is a collection (0 or more) of perks, that a donator gets access to when a donation was successful.</p>
+<p><strong>Important</strong>: Never, ever, delete a package from your configuration or change the unique ID of a package, that you already had live at least once. If you want to disable a package, you can create a new one and <a href="#disabling-packages">disable</a> the old one.</p>
+<h4 id="packages-with-a-variable-price">Packages with a variable price</h4>
+<p>The default setting for a package is, that it has a fixed price tag.
+That means, a donator can select the package in order to earn the perks of it, but has to donate the fixed amount of money the server hoster defined as a price.
+Alternatively, the type of the package (with the <code>type</code> parameter in the price object) can be <code>VARIABLE</code>.
+Setting the price to variable allows your donators to donate an amount they see as appropriate, starting from any positive value greater than 0 (even 0.01).</p>
+<p>This feature is intended to support packages where you want your donators to donate less amounts then your pre-packages allow.
+However, keep in mind that the donators will still earn the perks configured for the package, for whatever price they choose, even one cent only.</p>
+<p>To configure a package with a variable price, which will grant the donator a role in the discord, use this example:</p>
+<pre><code class="language-yaml">packages:
+  - name: 'Perk #1'
+    id: 1
+    price:
+      type: VARIABLE
+      currency: USD
+      amount: '1.00'
+    perks:
+      - type: DISCORD_ROLE
+        roles:
+          # Donator
+          - '0000000000000'
+</code></pre>
+<p>The <code>amount</code> in the <code>price</code> object will be used as a default value in the tet field, which a donator can change.</p>
+<h3 id="perk">Perk</h3>
+<p>A perk is a single <em>item</em> a donator will be granted when a donation for a package was successful.
+The perk can grant access to basically everything, depending on if there is an integration/automation provided already.
+Built-in perks are listed down below in this help article for reference.</p>
+<p>Each perk, from a point of view of a server hoster, may require different configuration options.</p>
+<h2 id="configuring-packages">Configuring Packages</h2>
+<p>Donation Packages can be configured in the <code>config.yml</code> configuration file in the <code>packages</code> key.
+It is a list of objects, e.g.:</p>
+<pre><code class="language-yaml">packages:
+  - name: 'Perk #1'
+    id: 1
+    price:
+      currency: USD
+      amount: '1.00'
+    perks:
+      - tpye: FREETEXT_ONLY
+        text: Some text to show to the donator
+  - name: 'Perk #2'
+    id: 2
+    price:
+      currency: USD
+      amount: '1.00'
+    perks:
+      - type: PRIORITY_QUEUE
+        amountInDays: 30
+        cftools:
+          serverApiId:
+</code></pre>
+<p>Each package has the following metadata:</p>
+<ul>
+<li><strong>name</strong>: The name of the perk as shown to the donator in various views: The package selection view when a donation starts, as well as on the PayPal receipt.</li>
+<li><strong>description</strong>: An optional freetext field which may contain additional information for your donators about this package.</li>
+<li><strong>image</strong>: An optional image name, which needs to be relative to the src/assets/custom/ directory. Put the image there and then name it here.</li>
+<li><strong>subscription</strong>: When set, will enable this package to be subscribed to by a donator. See <a href="../subscriptions/">the subscriptions documentation</a> for more detailed information.</li>
+<li><strong>payment</strong>: An optional object with additional information for the payment provider (e.g. PayPal):<ul>
+<li><strong>name</strong>: Use this name instead of the package name (which is the default) on the payment providers statement and checkout pages.</li>
+</ul>
+</li>
+<li><strong>id</strong>: A numeric ID to uniquely identify the package in the list of packages <em>over time</em>.
+  This ID shall <em>not</em> be re-used for other packages in the future.
+  Simply count up this number by one whenever you create a new package, without repeating already used ones.</li>
+<li><strong>disabled</strong>: An optional boolean to indicate that this package is not available for donations anymore. See <a href="#disabling-packages">Disabling packages</a> for more information.</li>
+<li><strong>price</strong>: An object of price information, containing the <code>currency</code> and <code>amount</code>.
+  The <code>currency</code> must be one of <a href="https://developer.paypal.com/docs/reports/reference/paypal-supported-currencies/">the supported ones from PayPal</a>.
+  Donators will still be able to donate in their preferred currency, if supported by PayPal.
+  You will, however, get the amount exchanged to the currency listed here.</li>
+<li><strong>perks</strong>: A list of perks the package includes.
+  Each perk consists of a required <code>type</code> parameter and additional configuration, depending on the perk type (see the available perks in the list below)</li>
+</ul>
+<h3 id="disabling-packages"><a name="disabling-packages"></a>Disabling packages</h3>
+<p>Packages are a basic data model configuration of the donation tool.
+That means, once a package is configured and was out in the wild (potentially used for a donation already), it is not safe to delete the package again.
+Deleting a previously available package might result in bugs and undefined behaviour that can decrease the usability and functionality of the donation tool for your donators.</p>
+<p>Once you have a package configured, which you do not want to provide for donations anymore, you can disable it with the <code>disabled</code> configuration property of the package.
+Setting this configuration to <code>true</code> instead of deleting the package ensures, that the package is not available for new donations anymore, but the information of the package is still available in the system.
+Some features may rely on the existence of a package, even when it is not available for donations anymore.</p>
+<h2 id="built-in-available-perks">Built-in available Perks</h2>
+<p>The following perks are available built-in.</p>
+<h3 id="priority-queue">Priority Queue</h3>
+<p>The priority queue perk works together with CFTools Cloud.
+If included in a package and redeemed by a donator, the perk will setup a priority queue slot for a single configured CFTools Cloud server.
+The priority queue slot will last as long as configured.</p>
+<p>This perk, in order to work correctly, requires the CFTools Cloud application the be setup.
+Please see the Getting Started guide, section "Setup dependent accounts" -&gt; "CFTools", to get more information on how to do that.</p>
+<p>If you want to grant priority queue access to multiple servers for a package, you may want to configure multiple priority queue perks for that package.</p>
+<h4 id="available-configuration-options">Available configuration options</h4>
+<p><strong>Type</strong>: <code>PRIORITY_QUEUE</code></p>
+<p>This perk requires the following additional configuration options:</p>
+<ul>
+<li><strong>amountInDays</strong>: A number with the amount of days the priority queue slot should be setup for.
+  E.g. <code>30</code> for 30 days, or <code>14</code> for 14 days and so on.</li>
+<li><strong>permanent</strong>: When set to <code>true</code>, the priority queue slot will never expire (a permanent priority queue). This option
+  overrides the <code>amountInDays</code> option.</li>
+<li><strong>cftools</strong>: An object of required information to work with CFTools Cloud.
+  The only required parameter for now is <code>serverApiId</code> which is the <code>Server Id</code>.
+  You find this ID in the server you want the Priority Queue setup for.
+  Go to Manage -&gt; Settings and look into the <code>API Key</code> section.</li>
+</ul>
+<p>You may specify an array of multiple <code>Server Ids</code> in the <code>serverApiId</code> property. A donator then needs to select the server they
+  want to have the priority queue on, e.g.:</p>
+<pre><code class="language-yaml">- type: PRIORITY_QUEUE
+  amountInDays: 30
+  cftools:
+    serverApiId:
+      - A_SERVER_ID
+      - ANOTHER_SERVER_ID
+</code></pre>
+<h3 id="whitelist">Whitelist</h3>
+<p>The whitelist perk works together with CFTools Cloud.
+If included in a package and redeemed by a donator, the perk will setup a whitelist entry for a single configured CFTools Cloud server.
+The whitelist will last as long as configured.</p>
+<p>This perk, in order to work correctly, requires the CFTools Cloud application the be setup.
+Please see the Getting Started guide, section "Setup dependent accounts" -&gt; "CFTools", to get more information on how to do that.</p>
+<p>If you want the donator to be whitelisted on multiple servers for a package, you may want to configure multiple whitelist perks for that package.</p>
+<h4 id="available-configuration-options_1">Available configuration options</h4>
+<p><strong>Type</strong>: <code>WHITELIST</code></p>
+<p>This perk requires the following additional configuration options:</p>
+<ul>
+<li><strong>amountInDays</strong>: A number with the amount of days the whitelist should be setup for.
+  E.g. <code>30</code> for 30 days, or <code>14</code> for 14 days and so on.</li>
+<li><strong>permanent</strong>: When set to <code>true</code>, the whitelisting will never expire (a permanent whitelist entry). This option
+  overrides the <code>amountInDays</code> option.</li>
+<li><strong>cftools</strong>: An object of required information to work with CFTools Cloud.
+  The only required parameter for now is <code>serverApiId</code> which is the <code>Server Id</code>.
+  You find this ID in the server you want the Priority Queue setup for.
+  Go to Manage -&gt; Settings and look into the <code>API Key</code> section.</li>
+</ul>
+<h3 id="discord-role-assignment">Discord role assignment</h3>
+<p>This perk will assign a set of Discord roles to the logged in discord user when a donation was successful.</p>
+<p>To get the required Discord role ID of the roles you want to get manager, you need to enable the developer mode in your discord app.
+Then, right-click on the role you want to grant in the role management of the server settings and click copy.</p>
+<h4 id="available-configuration-options_2">Available configuration options</h4>
+<p><strong>Type</strong>: <code>DISCORD_ROLE</code></p>
+<p>This perk requires the following additional configuration options:</p>
+<ul>
+<li><strong>roles</strong>: A list of strings (not numbers, so please quote the IDs from Discord with ') of the Discord roles you want to give to the donator.</li>
+<li><strong>amountInDays</strong>: <em>(Optional)</em> A number with the amount of days the priority queue slot should be setup for.
+  E.g. <code>30</code> for 30 days, or <code>14</code> for 14 days and so on.
+  If you omit this option, the roles will be assigned permanently (you can still remove them manually, though).</li>
+</ul>
+<h3 id="free-text">Free text</h3>
+<p>This perk is intended to cover cases, where your donators will receive perks in other, maybe even non-automated, ways.
+In order to still advertise that donators will get these perks when they donate, you can use this free text perk.</p>
+<p>When a donator redeems this perk, it will basically do nothing.</p>
+<h4 id="available-configuration-options_3">Available configuration options</h4>
+<p><strong>Type</strong>: <code>FREETEXT_ONLY</code></p>
+<p>This perk requires the following additional configuration options:</p>
+<ul>
+<li><strong>text</strong>: The text to show to the donator on the package selection page.</li>
+</ul>
+
+  <br>
+    
+
+    
+    
+      
+    
+
+  <div class="row wm-article-nav-buttons" role="navigation" aria-label="navigation">
+    
+    <div class="wm-article-nav pull-right">
+      <a href="../subscriptions/" class="btn btn-xs btn-default pull-right">
+        Next
+        <i class="fa fa-chevron-right" aria-hidden="true"></i>
+      </a>
+      <a href="../subscriptions/" class="btn btn-xs btn-link">
+        Subscriptions
+      </a>
+    </div>
+    
+    <div class="wm-article-nav">
+      <a href="../getting-started/" class="btn btn-xs btn-default pull-left">
+        <i class="fa fa-chevron-left" aria-hidden="true"></i>
+        Previous</a><a href="../getting-started/" class="btn btn-xs btn-link">
+        Getting Strated
+      </a>
+    </div>
+    
+  </div>
+
+    <br>
+</div>
+
+<footer class="container-fluid wm-page-content">
+      <p>
+        <a href="https://github.com/floriansw/server-donation-tool/edit/main/docs/packages-and-perks.md"><i class="fa fa-github"></i>
+Edit on GitHub</a>
+      </p>
+  <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a> using <a href="https://github.com/gristlabs/mkdocs-windmill">Windmill</a> theme by Grist Labs.</p>
+</footer>
+
+</body>
+</html>
