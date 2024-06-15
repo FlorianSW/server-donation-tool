@@ -1,7 +1,7 @@
 import {requireAuthentication} from '../../auth';
 import {Request, Response, Router} from 'express';
 import {translate} from '../../translations';
-import {DonationType, Hints, Package, RedeemTarget} from '../../domain/package';
+import {DonationType, Hints, Package, Perk, RedeemTarget} from '../../domain/package';
 import {AppConfig} from '../../domain/app-config';
 import {GameIdMismatch, Order, OrderNotFound, OrderStatus, Payment, Reference} from '../../domain/payment';
 import {Logger} from 'winston';
@@ -178,14 +178,8 @@ export class DonationController {
         return true;
     }
 
-    private async prepareDonation(req: Request, res: Response) {
-        const selectedPackage = this.selectedPackage(req.session);
-        if (!selectedPackage) {
-            res.redirect('/');
-            return;
-        }
-
-        const requiredLogins = new Set(selectedPackage.perks.flatMap((p) => p.requiresLogins()));
+    private hasMissingConnection(perks: Perk[], req: Request, res: Response): boolean {
+        const requiredLogins = new Set(perks.flatMap((p) => p.requiresLogins()));
         for (let l of requiredLogins) {
             if (!req.user[l]) {
                 req.session.afterLoginTarget = {
@@ -196,8 +190,21 @@ export class DonationController {
                 res.render('missing_account_connection', {
                     login: l,
                 });
-                return;
+                return true;
             }
+        }
+        return false;
+    }
+
+    private async prepareDonation(req: Request, res: Response) {
+        const selectedPackage = this.selectedPackage(req.session);
+        if (!selectedPackage) {
+            res.redirect('/');
+            return;
+        }
+
+        if (this.hasMissingConnection(selectedPackage.perks, req, res)) {
+            return;
         }
 
         req.user = await this.data.onRefresh(req.user);
@@ -261,24 +268,30 @@ export class DonationController {
 
         if (order.status === OrderStatus.CREATED) {
             res.render('steps/wait_for_payment');
+            return;
         } else if (order.status === OrderStatus.REFUNDED) {
             res.render('steps/order_refunded', {
                 order: order,
             });
-        } else if (order.status === OrderStatus.PAID) {
-            res.render('steps/redeem', {
-                order: order,
-                canShare: order.reference.gameId.discord === req.user.discord.id,
-                shareLink: new URL(`/donate/${order.id}`, this.config.app.publicUrl).toString(),
-                redeemLink: `/donate/${order.id}/redeem`,
-                isUnclaimed: Object.entries(order.reference.gameId).filter((e) => e[0] !== 'discord').every((a) => a[1] === null),
-                perks: order.reference.p.perks,
-                csrfToken: req.csrfToken(),
-                redeemStatus: 'PENDING',
-                hasPerks: order.reference.p.perks.length !== 0,
-                errors: []
-            });
+            return;
         }
+
+        if (this.hasMissingConnection(order.reference.p.perks, req, res)) {
+            return;
+        }
+
+        res.render('steps/redeem', {
+            order: order,
+            canShare: order.reference.gameId.discord === req.user.discord.id,
+            shareLink: new URL(`/donate/${order.id}`, this.config.app.publicUrl).toString(),
+            redeemLink: `/donate/${order.id}/redeem`,
+            isUnclaimed: Object.entries(order.reference.gameId).filter((e) => e[0] !== 'discord').every((a) => a[1] === null),
+            perks: order.reference.p.perks,
+            csrfToken: req.csrfToken(),
+            redeemStatus: 'PENDING',
+            hasPerks: order.reference.p.perks.length !== 0,
+            errors: []
+        });
     }
 
     private async subscribe(req: Request, res: Response) {
@@ -345,6 +358,9 @@ export class DonationController {
             if (req.body[perk.id()]) {
                 perks.push(perk);
             }
+        }
+        if (this.hasMissingConnection(perks, req, res)) {
+            return;
         }
         const result = await this.redeemPackage.redeem(order, RedeemTarget.fromUser(req.user), perks);
         res.render('steps/redeem_success', {
