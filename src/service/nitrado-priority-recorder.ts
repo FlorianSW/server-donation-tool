@@ -1,7 +1,6 @@
 import {DonationEvents} from '../domain/events';
 import {Order} from '../domain/payment';
-import {DiscordRolePerk} from '../adapter/perk/discord-role-perk';
-import {DiscordRoleRepository, NitradoPriorityPlayerRepository} from '../domain/repositories';
+import {NitradoPriorityPlayerRepository} from '../domain/repositories';
 import {inject, singleton} from 'tsyringe';
 import {Closeable} from '../index';
 import {RedeemTarget} from '../domain/package';
