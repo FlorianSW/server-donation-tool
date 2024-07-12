@@ -1,11 +1,12 @@
 <%- include('../partials/header.ejs') %>
 <div class="donate col s12 m7 l7">
+    <% if (!locals.selectedMethod) { %>
+        <form action="/donate" method="post">
+    <% } %>
     <% let index = 1; %>
     <h3><%= translate('DONATE_TITLE') %></h3>
     <h5><%= translate('DONATE_SUMMARY_TITLE', {params: {index: index++}}) %></h5>
     <div class="summary">
-        <label><%= translate('DONATE_SUMMARY_PERKS_FOR_LABEL') %></label>
-        <span><%= translate('DONATE_SUMMARY_PERKS_FOR_VALUE') %></span>
         <label><%= translate('DONATE_SUMMARY_USER_LABEL') %></label>
         <span>
             <% if (user.steam) { %>
@@ -22,6 +23,19 @@
             <% } %>
             <span><img class="image" src="<%= imagePath('discord.svg') %>"> <%= user.username %></span>
         </span>
+        <% if (locals.gift) { %>
+            <label><%= translate('DONATE_SUMMARY_PERKS_GIFT_LABEL') %></label>
+            <input type="hidden" name="gift">
+            <span><%= translate('DONATE_SUMMARY_PERKS_GIFT_CHECKBOX_LABEL') %></span>
+        <% } else if (!locals.selectedMethod) { %>
+            <label><%= translate('DONATE_SUMMARY_PERKS_GIFT_LABEL') %></label>
+            <div>
+                <label>
+                    <input type="checkbox" class="filled-in" name="gift" />
+                    <span><%= translate('DONATE_SUMMARY_PERKS_GIFT_CHECKBOX_LABEL') %></span>
+                </label>
+            </div>
+        <% } %>
     </div>
     <%- script('steps/donate.js') %>
 
@@ -34,7 +48,6 @@
         <h5><%= translate('DONATE_PAYMENT_TITLE', {params: {index: index++}}) %></h5>
         <%- include('../' + selectedMethod.template, {data: selectedMethod.data}) %>
     <% } else { %>
-        <form action="/donate" method="post">
             <%- include('../partials/perk_details.ejs', {index: index}) %>
             <%- include('../partials/vats.ejs', {index: index}) %>
 
@@ -62,6 +75,8 @@
                     </div>
                 <% }); %>
             </div>
+    <% } %>
+    <% if (!locals.selectedMethod) { %>
         </form>
     <% } %>
 </div>

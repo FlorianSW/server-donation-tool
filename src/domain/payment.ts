@@ -63,6 +63,10 @@ export class Order {
         return new Order(v4(), created, reference, customMessage, vat, null, null, OrderStatus.CREATED, null, new Map(), null);
     }
 
+    public isUnclaimed(): boolean {
+        return Object.entries(this.reference.gameId).filter((e) => e[0] !== 'discord').every((a) => a[1] === null);
+    }
+
     public paymentIntent(payment: OrderPayment) {
         if (this.payment !== null) {
             throw new Error('can not intent to pay an order with an active payment intent');

@@ -75,7 +75,7 @@ export class DiscordUserNotifier {
     private metaFields(target: RedeemTarget, order: Order): APIEmbedField[] {
         return [
             {name: translate('USER_NOTIFICATIONS_STEAM_ID'), value: target.gameId.steam || 'Not defined', inline: true},
-            {name: translate('USER_NOTIFICATIONS_STEAM_PLAYSTATION'), value: target.gameId.playstation || 'Not defined', inline: true},
+            {name: translate('USER_NOTIFICATIONS_PLAYSTATION'), value: target.gameId.playstation || 'Not defined', inline: true},
             {name: translate('USER_NOTIFICATIONS_XBOX'), value: target.gameId.xbox || 'Not defined', inline: true},
             {name: translate('USER_NOTIFICATIONS_PACKAGE'), value: order.reference.p.name, inline: true},
         ]

@@ -28,7 +28,11 @@ function initPayPalButton() {
             }).then(function (res) {
                 return res.json();
             }).then(function (details) {
-                window.location.href = `/donate/${details.orderId}/`;
+                let query = '';
+                if (document.querySelectorAll('input[name="gift"]').length === 0) {
+                    query = '?redeem=true';
+                }
+                window.location.href = `/donate/${details.orderId}${query}`;
             });
         },
         onCancel: function (data) {

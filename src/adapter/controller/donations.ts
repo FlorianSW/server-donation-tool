@@ -141,6 +141,7 @@ export class DonationController {
                 csrfToken: req.csrfToken(),
                 currency: req.session.selectedPackage.price.currency,
                 customMessage: customMessage || '',
+                gift: !!req.body.gift,
                 selectedPackage: {
                     name: selectedPackage.name,
                     price: req.session.selectedPackage.price,
@@ -280,18 +281,25 @@ export class DonationController {
             return;
         }
 
-        res.render('steps/redeem', {
-            order: order,
-            canShare: order.reference.gameId.discord === req.user.discord.id,
-            shareLink: new URL(`/donate/${order.id}`, this.config.app.publicUrl).toString(),
-            redeemLink: `/donate/${order.id}/redeem`,
-            isUnclaimed: Object.entries(order.reference.gameId).filter((e) => e[0] !== 'discord').every((a) => a[1] === null),
-            perks: order.reference.p.perks,
-            csrfToken: req.csrfToken(),
-            redeemStatus: 'PENDING',
-            hasPerks: order.reference.p.perks.length !== 0,
-            errors: []
-        });
+        if (order.isUnclaimed() && req.query.redeem) {
+            for (let perk of order.reference.p.perks) {
+                req.body[perk.id()] = 'checked';
+            }
+            return this.redeem(req, res)
+        } else {
+            res.render('steps/redeem', {
+                order: order,
+                canShare: order.reference.gameId.discord === req.user.discord.id,
+                shareLink: new URL(`/donate/${order.id}`, this.config.app.publicUrl).toString(),
+                redeemLink: `/donate/${order.id}/redeem`,
+                isUnclaimed: order.isUnclaimed(),
+                perks: order.reference.p.perks,
+                csrfToken: req.csrfToken(),
+                redeemStatus: 'PENDING',
+                hasPerks: order.reference.p.perks.length !== 0,
+                errors: []
+            });
+        }
     }
 
     private async subscribe(req: Request, res: Response) {
@@ -395,9 +403,13 @@ export class DonationController {
         }
 
         const order = Order.createDeferred(new Date(), new Reference({discord: req.user.discord.id}, p), customMessage, req.session.vat);
+        let query = '?provider=' + payment.provider().branding.name;
+        if (req.body.gift === undefined) {
+            query += '&redeem=true';
+        }
         const paymentOrder = await payment.createPaymentOrder({
             candidateOrderId: order.id,
-            successUrl: new URL('/donate/' + order.id + '?provider=' + payment.provider().branding.name, this.config.app.publicUrl),
+            successUrl: new URL('/donate/' + order.id + query, this.config.app.publicUrl),
             cancelUrl: new URL('/donate/' + order.id + '/cancel?&provider=' + payment.provider().branding.name, this.config.app.publicUrl),
             forPackage: p,
             discordId: req.user.discord.id,

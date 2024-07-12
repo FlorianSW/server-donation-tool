@@ -97,8 +97,8 @@ const messages: { [key: string]: string } = {
 
     DONATE_TITLE: 'Donate',
     DONATE_SUMMARY_TITLE: '{{index}}. Summary',
-    DONATE_SUMMARY_PERKS_FOR_LABEL: 'Perks for:',
-    DONATE_SUMMARY_PERKS_FOR_VALUE: 'Yourself or as a gift',
+    DONATE_SUMMARY_PERKS_GIFT_LABEL: 'Gift Perks:',
+    DONATE_SUMMARY_PERKS_GIFT_CHECKBOX_LABEL: 'I want to gift the perks to someone else',
     DONATE_SUMMARY_USER_LABEL: 'Your information:',
     DONATE_CUSTOM_MESSAGE_TITLE: '{{index}}. Leave an optional comment',
     DONATE_CUSTOM_MESSAGE_LABEL: 'Custom message',
