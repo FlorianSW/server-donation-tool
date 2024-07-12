@@ -122,7 +122,7 @@ export class Authentication {
                 });
             });
         }));
-        this.router.get('/auth/discord/redirect', passport.authenticate('discord', {keepSessionInfo: true}));
+        this.router.get('/auth/discord/redirect', passport.authenticate('discord', {keepSessionInfo: true, prompt: 'none'}));
         this.router.get('/auth/discord/callback', passport.authenticate('discord', {
             failureRedirect: '/auth/error',
             keepSessionInfo: true

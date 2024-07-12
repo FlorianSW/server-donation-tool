@@ -1,10 +1,8 @@
-import {DiscordRoleRepository, NitradoPriorityPlayerRepository} from '../domain/repositories';
-import {Client, DiscordAPIError, GuildMember} from 'discord.js';
+import {NitradoPriorityPlayerRepository} from '../domain/repositories';
 import {Logger} from 'winston';
 import {inject, singleton} from 'tsyringe';
 import {Closeable} from '../index';
 import {NitradoApi} from "../adapter/nitrado/api";
-import {CalculateDonationTarget} from "./donation-target";
 
 @singleton()
 export class ExpireNitradoPriority implements Closeable {
@@ -25,7 +23,7 @@ export class ExpireNitradoPriority implements Closeable {
         for (const player of players) {
             this.log.info(`Nitrado priority of ${player.player} for server ${player.serverId} is expired. Removing...`);
             try {
-            await this.client.deletePriorityQueue(player.serverId, player.player);
+                await this.client.deletePriorityQueue(player.serverId, player.player);
             } catch (e) {
                 this.log.error(`Deleting nitrado priority queue failed. This will be retried indefinitely if not handled manually.`, e);
                 continue
