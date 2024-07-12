@@ -111,10 +111,15 @@ export class PaypalPayment implements Payment, SubscriptionPaymentProvider {
         }
         const body: { [key: string]: any } = {
             intent: 'CAPTURE',
-            application_context: {
-                brand_name: communityTitle,
-                shipping_preference: 'NO_SHIPPING',
-                user_action: 'PAY_NOW',
+            payment_source: {
+                paypal: {
+                    experience_context: {
+                        brand_name: communityTitle,
+                        shipping_preference: 'NO_SHIPPING',
+                        user_action: 'PAY_NOW',
+                        payment_method_preference: 'IMMEDIATE_PAYMENT_REQUIRED',
+                    }
+                }
             },
             purchase_units: [{
                 custom_id: new Reference({discord: request.discordId}, request.forPackage).asString(),
