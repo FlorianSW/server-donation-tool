@@ -217,7 +217,7 @@ export class SQLiteOrderRepository implements OrderRepository {
         const maxResults = await res.clone().count('id as count').first().then((t) => t.count);
         let counter = 0;
         while (true) {
-            const o = await res.offset(counter).limit(25).then((result) => {
+            const o = await res.clone().offset(counter).limit(25).then((result) => {
                 return result.map((o) => this.toOrder(o));
             });
             counter += o.length;
