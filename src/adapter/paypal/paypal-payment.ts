@@ -70,7 +70,7 @@ export class PaypalPayment implements Payment, SubscriptionPaymentProvider {
             order = await this.client.execute<Order>(r);
         }
         return {
-            created: new Date(order.result.create_time),
+            created: new Date(),
             id: order.result.id,
             transactionId: order.result.purchase_units[0]?.payments?.captures[0]?.id,
             status: order.result.status === 'COMPLETED' ? OrderStatus.PAID : OrderStatus.CREATED,
@@ -165,7 +165,7 @@ export class PaypalPayment implements Payment, SubscriptionPaymentProvider {
 
         const order = await this.client.execute<Order>(r);
         const result: PaymentOrder = {
-            created: new Date(order.result.create_time),
+            created: new Date(),
             id: order.result.id,
             transactionId: order.result.purchase_units[0]?.payments?.captures[0]?.id,
         };

@@ -37,8 +37,6 @@ export interface CaptureOrderResponse {
 export interface Order {
     id: string,
     status: string,
-    create_time?: string,
-    update_time: string,
     purchase_units: PurchaseUnit[],
     links: HATEOASLink[],
 }
