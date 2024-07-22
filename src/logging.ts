@@ -28,7 +28,11 @@ const log = winston.createLogger({
         }),
         new winston.transports.File({
             format: winston.format.combine(
-                winston.format.metadata()
+                winston.format.timestamp({
+                    format: 'YY-MM-DD HH:MM:SS',
+                }),
+                winston.format.metadata(),
+                winston.format.json(),
             ),
             level: level,
             filename: 'server.log',

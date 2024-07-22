@@ -388,6 +388,12 @@ export class InMemoryOrderRepository implements OrderRepository {
         this.orders.delete(order.id);
     }
 
+    async deleteAll(orders: Order[]): Promise<void> {
+        for (let order of orders) {
+            await this.delete(order);
+        }
+    }
+
     async close(): Promise<void> {
     }
 
