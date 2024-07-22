@@ -480,22 +480,30 @@ export class DonationController {
         let order = orders[0];
         const payment = this.payments.find((provider) => provider.provider().branding.name === req.body.provider);
         if (!payment) {
-            res.status(400).send();
+            res.status(400).send({
+                error: 'the requested payment provider does not exist: ' + req.body.provider,
+            });
             return;
         }
-        const capture = await payment.capturePayment({
-            orderId: order.payment.id,
-        });
-        req.session.lastOrder = {
-            id: order.id,
-            transactionId: capture.transactionId,
-        };
+        try {
+            const capture = await payment.capturePayment({
+                orderId: order.payment.id,
+            });
+            req.session.lastOrder = {
+                id: order.id,
+                transactionId: capture.transactionId,
+            };
 
-        order = await this.markOrderPaid(req.user, order, capture.transactionId);
+            order = await this.markOrderPaid(req.user, order, capture.transactionId);
 
-        res.status(200).json({
-            orderId: order.id,
-        });
+            res.status(200).json({
+                orderId: order.id,
+            });
+        } catch (e) {
+            res.status(400).send({
+                error: 'the payment could not be captured: ' + e.message,
+            });
+        }
     }
 
     private async dropOrder(req: Request, res: Response) {

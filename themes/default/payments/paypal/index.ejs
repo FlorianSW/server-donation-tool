@@ -1,3 +1,6 @@
 <script src="https://www.paypal.com/sdk/js?client-id=<%= data.clientId %>&currency=<%= currency %>"></script>
+<div class="error-container">
+    <span id="error-text"></span>
+</div>
 <div id="paypal-button-container"></div>
 <%- script('payments/paypal/index.js') %>

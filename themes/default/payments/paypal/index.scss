@@ -1,3 +1,14 @@
 #paypal-button-container {
   margin-top: 1rem;
 }
+
+.error-container {
+  display: none;
+
+  padding: 1rem;
+  margin: 1.5rem 0;
+  border: 1px solid red;
+  border-radius: 2px;
+  background-color: rgba(255, 0, 0, 0.05);
+  word-wrap: break-word;
+}

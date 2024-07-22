@@ -96,6 +96,9 @@ export class PaypalPayment implements Payment, SubscriptionPaymentProvider {
         const r = new paypal.orders.OrdersCaptureRequest(request.orderId);
 
         const capture = await this.client.execute<CaptureOrderResponse>(r);
+        if (capture.statusCode !== 201) {
+            throw Error(`capturing payments did not work. Reach out to the support, providing the following details: Order ID ${request.orderId}; Response: ${JSON.stringify(capture.result)}`);
+        }
         return {
             transactionId: capture.result.purchase_units[0]?.payments?.captures[0]?.id,
         };
