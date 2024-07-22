@@ -247,6 +247,11 @@ export class SQLiteOrderRepository implements OrderRepository {
         await this.con.table(tableName).where(columnId, order.id).delete();
     }
 
+    async deleteAll(orders: Order[]): Promise<void> {
+        await this.initialized;
+        await this.con.table(tableName).whereIn(columnId, orders.map((o) => o.id)).delete();
+    }
+
     async findUnpaidBefore(after: Date): Promise<Order[]> {
         await this.initialized;
         return this.con

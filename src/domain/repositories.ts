@@ -24,6 +24,7 @@ export interface OrderRepository extends Closeable {
     findLastFor(user: User, limit: number): Promise<Order[]>
     findUnpaidBefore(after: Date): Promise<Order[]>
     delete(order: Order): Promise<void>
+    deleteAll(orders: Order[]): Promise<void>
 }
 
 export interface SubscriptionPlanRepository extends Closeable {

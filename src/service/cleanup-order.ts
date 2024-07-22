@@ -13,9 +13,7 @@ export class CleanupOrder {
         const yesterday = new Date();
         yesterday.setDate(yesterday.getDate() - 1);
         const orders = await this.repository.findUnpaidBefore(yesterday);
-        for (const order of orders) {
-            await this.repository.delete(order);
-        }
+        await this.repository.deleteAll(orders);
     }
 
     async close(): Promise<void> {
