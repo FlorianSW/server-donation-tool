@@ -48,7 +48,7 @@ export class SQLiteDiscordRoleRepository implements DiscordRoleRepository {
         await this.initialized;
         return await this.con
             .table(tableName)
-            .limit(100)
+            .limit(25)
             .where(columnExpiresAt, '<=', expiresBefore.getTime())
             .then((result) => {
                 return result.map((v) => {
