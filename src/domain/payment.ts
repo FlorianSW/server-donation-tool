@@ -64,6 +64,9 @@ export class Order {
     }
 
     public isUnclaimed(): boolean {
+        if (this.firstRedeemed) {
+            return false;
+        }
         return Object.entries(this.reference.gameId).filter((e) => e[0] !== 'discord').every((a) => a[1] === null);
     }
 

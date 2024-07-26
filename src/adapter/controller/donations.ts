@@ -289,10 +289,9 @@ export class DonationController {
         } else {
             res.render('steps/redeem', {
                 order: order,
-                canShare: order.reference.gameId.discord === req.user.discord.id,
+                canShare: order.reference.gameId.discord === req.user.discord.id && order.isUnclaimed(),
                 shareLink: new URL(`/donate/${order.id}`, this.config.app.publicUrl).toString(),
                 redeemLink: `/donate/${order.id}/redeem`,
-                isUnclaimed: order.isUnclaimed(),
                 perks: order.reference.p.perks,
                 csrfToken: req.csrfToken(),
                 redeemStatus: 'PENDING',
