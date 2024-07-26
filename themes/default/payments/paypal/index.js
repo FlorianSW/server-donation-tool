@@ -51,6 +51,8 @@ function initPayPalButton() {
             });
         },
         onCancel: function (data) {
+            document.querySelector('.error-container').style.display = 'block';
+            document.querySelector('#error-text').innerText = 'The payment was cancelled. You can restart the payment by clicking the pay button again.';
             return fetch('/api/donations/' + data.orderID, {
                 method: 'delete',
                 credentials: 'same-origin',
