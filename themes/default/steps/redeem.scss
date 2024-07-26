@@ -12,3 +12,11 @@
     margin-bottom: 0;
   }
 }
+
+.order-details {
+  display: flex;
+  color: grey;
+  flex-direction: column;
+  font-size: 0.6rem;
+  margin: 4rem 0;
+}

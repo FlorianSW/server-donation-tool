@@ -47,5 +47,11 @@
             </div>
         </div>
     <% } %>
+    <div class="order-details">
+        <span>Order ID:<br><%= order.id %></span>
+        <span>Payment ID:<br><%= order.payment.id %></span>
+        <span>Transaction ID:<br><%= order.payment.transactionId || 'Not provided'%></span>
+        <span>Payment Provider:<br><%= order.payment.provider %></span>
+    </div>
 </div>
 <%- include('../partials/footer.ejs') %>
