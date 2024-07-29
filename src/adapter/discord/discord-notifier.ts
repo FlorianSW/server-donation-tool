@@ -246,6 +246,7 @@ export class DiscordNotifier {
         return [
             {name: translate('NOTIFICATIONS_REDEEM_SUCCESSFUL_PACKAGE'), value: order.reference.p.name, inline: true},
             {name: translate('NOTIFICATIONS_REDEEM_SUCCESSFUL_PAYED_PRICE'), value: `${order.reference.p.price.amount} ${order.reference.p.price.currency}`, inline: true},
+            {name: translate('NOTIFICATIONS_REDEEM_SUCCESSFUL_TYPE'), value: order.reference.type, inline: true},
             {
                 name: translate('NOTIFICATIONS_REDEEM_SUCCESSFUL_TRANSACTION'), value: `Order ID: ${order.id}
 Payment Order ID: ${order.payment.id}
