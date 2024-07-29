@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+  
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <meta name="author" content="Florian Schmidt">
+    
+    <link rel="shortcut icon" href="../img/favicon.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+    <title>Getting Strated - Server Donation Tool</title>
+    <link href="../css/bootstrap-3.3.7.min.css" rel="stylesheet">
+    <link href="../css/font-awesome-4.7.0.css" rel="stylesheet">
+    <link href="../css/base.css" rel="stylesheet">
+    <link rel="stylesheet" href="../css/highlight.css">
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+
+    <script src="../js/jquery-3.2.1.min.js"></script>
+    <script src="../js/bootstrap-3.3.7.min.js"></script>
+    <script src="../js/highlight.pack.js"></script>
+    
+    <base target="_top">
+    <script>
+      var base_url = '..';
+      var is_top_frame = false;
+        
+        var pageToc = [
+          {title: "Getting Started Guide", url: "#_top", children: [
+              {title: "Pre-requisites", url: "#pre-requisites" },
+              {title: "Installation", url: "#installation" },
+              {title: "Setup dependent accounts", url: "#setup-dependent-accounts" },
+              {title: "Configuration", url: "#configuration" },
+              {title: "Start the tool", url: "#start-the-tool" },
+          ]},
+        ];
+
+    </script>
+    <script src="../js/base.js"></script> 
+</head>
+
+<body>
+<script>
+if (is_top_frame) { $('body').addClass('wm-top-page'); }
+</script>
+
+
+
+<div class="container-fluid wm-page-content">
+  <a name="_top"></a>
+    
+
+    
+    
+      
+    
+
+  <div class="row wm-article-nav-buttons" role="navigation" aria-label="navigation">
+    
+    <div class="wm-article-nav pull-right">
+      <a href="../packages-and-perks/" class="btn btn-xs btn-default pull-right">
+        Next
+        <i class="fa fa-chevron-right" aria-hidden="true"></i>
+      </a>
+      <a href="../packages-and-perks/" class="btn btn-xs btn-link">
+        Packages and Perks
+      </a>
+    </div>
+    
+    <div class="wm-article-nav">
+      <a href=".." class="btn btn-xs btn-default pull-left">
+        <i class="fa fa-chevron-left" aria-hidden="true"></i>
+        Previous</a><a href=".." class="btn btn-xs btn-link">
+        Home
+      </a>
+    </div>
+    
+  </div>
+
+    
+
+    <h1 id="getting-started-guide">Getting Started Guide</h1>
+<p>Using this tool to convert a manual donation process to a self-service experience requires some steps.
+This guide aims to translate the documentation of the single configuration options in the <code>config.example.yml</code> configuration file to an actionable step-by-step guide to get started with an initial setup.</p>
+<p>This guide sets up the donation website in a basic, working fashion.
+You still might want to take a look into more advanced setup scenarios (see more documentation pieces in the docs folder).</p>
+<h2 id="pre-requisites">Pre-requisites</h2>
+<p>To install this donation tool has the following minimum requirements:</p>
+<ul>
+<li>A Windows, MacOS or Linux operating system</li>
+<li>some basic knowledge using a terminal/shell</li>
+<li>some basic knowledge using yaml/a text editor</li>
+<li><a href="https://nodejs.org/en/download/">NodeJS + npm</a> (NodeJS 16.6 or higher) installed</li>
+<li>One of the supported payment providers: (to process payments)</li>
+<li><a href="https://developer.paypal.com/developer/accountStatus">PayPal business account</a></li>
+<li><a href="https://dashboard.stripe.com/">Stripe.com</a></li>
+<li>a <a href="https://discord.com/">Discord account</a></li>
+<li>(Optional) a <a href="https://cftools.cloud/">CFTools Cloud</a> account and registered server (needed when offering a priority queue perk)</li>
+<li>(Optional) a <a href="https://discord.com/">Discord server</a> (needed when offering a Discord roles perk)</li>
+<li>A domain is highly recommended, however, opening the website using the computers/servers IP address works fine as well</li>
+</ul>
+<h2 id="installation">Installation</h2>
+<p><strong>Note</strong>: The guide will use command syntax as it is used on Windows operating systems.
+You may need to translate/convert the commands to be used on MacOS or Linux systems.</p>
+<p>Installing the donation tool is the first step you should do.
+For that, you need to download the source code of the application itself.
+You can either use <a href="https://git-scm.com/">git</a> to clone the repository, or alternatively download the <a href="https://github.com/FlorianSW/cftools-server-donation/archive/refs/heads/main.zip">latest version</a> as a zip file.
+Clone or unzip the files to a directory of your choice.
+As of in this guide, the location of the source code will be referred as <code>C:\apps\cftools-server-donation</code>.</p>
+<h3 id="installing-dependencies">Installing dependencies</h3>
+<p>After downloading the source code, you need to get the dependencies used by the donation tool.
+For that, open a new Terminal window:</p>
+<ul>
+<li>press [WIN] + [R]</li>
+<li>type <code>cmd</code></li>
+<li>hit [ENTER]</li>
+<li>Navigate to the downloaded source code: <code>cd C:\apps\cftools-server-donation</code></li>
+<li>Install dependencies: <code>npm ci</code> (this may take a bit of time depending on your internet connection)</li>
+</ul>
+<h2 id="setup-dependent-accounts">Setup dependent accounts</h2>
+<h3 id="payment-processor">Payment processor</h3>
+<p>See the respective documentation for the payment processor of your choice on how to setup an account.</p>
+<ul>
+<li><a href="../payments/paypal/">PayPal</a></li>
+<li><a href="../payments/stripe/">Stripe.com</a></li>
+</ul>
+<h3 id="discord-login">Discord login</h3>
+<p>The donation tool requires a login through discord.
+I choose this login method, as most gaming communities will already have a discord server, which is connected to their community and therefore accepted the most.
+To setup this loign through Discord, you'll need to create an application in the developer portal of Discord.
+To do so, follow these steps:</p>
+<ul>
+<li>Open the <a href="https://discord.com/developers/applications">Discord developer portal</a> in your internet browser</li>
+<li>Create a new or open an existing application</li>
+<li>Navigate to the application by clicking on the name</li>
+<li>On the left side, open the <code>OAuth2</code> section</li>
+<li>Note down the <code>CLIENT ID</code> and <code>CLIENT SECRET</code> values, you'll need these values in the "Configuration" section</li>
+<li>In the Redirects list of URLs, add a new URL and put in your redirect URL</li>
+<li>The redirect URL consists of the Domain you own (e.g. example.com), or the IP address of the server, whatever you choose</li>
+<li>It needs to be the domain/URL your donators will use to access the donation tool website later on (including the correct protocol, like http/https)</li>
+<li>Additionally, add <code>/auth/discord/callback</code> to it</li>
+<li>The full redirect URL might look like: <code>https://example.com/auth/discord/callback</code></li>
+<li>Save the changes and continue</li>
+</ul>
+<h3 id="cftools">CFTools</h3>
+<p><strong>Note</strong>: If you do not want to offer a Priority Queue perk, you can skip this section.</p>
+<p>You may use CFTools Cloud to manage and grant priority queue access to your donators and want to use this donation tool to make the whole process of donating and setting up the priority queue an automatic self-service experience.
+For that, this donation tool requires some grants to manage the priority queue entries on your behalf.
+As for Discord and PayPal, this is done by setting up a developer application, which you can setup using the following steps:</p>
+<ul>
+<li>Open the <a href="https://developer.cftools.cloud/applications">CFTools developer portal</a></li>
+<li>Create a new application (or use an existing one)</li>
+<li>Open the application by clicking on it</li>
+<li>Note down the <code>Application Id</code> and <code>Secret</code> value, you'll need these values in the "Configuration" section</li>
+<li>Copy the <code>Grant URL</code> and open it in a new browser tab/window</li>
+<li>Login to your CFTools account if requested</li>
+<li>You'll see a list of resources you have access to, which you can grant access to for the new application</li>
+<li>Select at least the server resources where you want to offer priority queue perks for</li>
+<li>Click the <code>Grant access</code> button to grant the access</li>
+</ul>
+<h3 id="discord-bot-user">Discord Bot user</h3>
+<p><strong>Note</strong>: If you do not want to offer a Discord role perk, you can skip this section.</p>
+<p>In order for this donation tool to be able to redeem discord role related perks (granting the donator a specific role in your discord sever), it needs additional permissions and setup.
+You need to create a bot user, which is invited into the discord server you want to have the roles assigned to donators.
+You can setup the bot by following these steps:</p>
+<ul>
+<li>Open the <a href="https://discord.com/developers/applications">Discord developer portal</a> in your internet browser</li>
+<li>Open the app you created in the "Discord login" step</li>
+<li>You could also create a new application to separate the login from the role management if you want to</li>
+<li>Click on the <code>Bot</code> section in the left side navigation</li>
+<li>If not already done: Add a bot user to your application by clicking the <code>Add Bot</code> button</li>
+<li>Copy the value <code>TOKEN</code> and note it down, you'll need this value in the "Configuration" section</li>
+<li>Scroll down to the <code>Privileged Gateway Intents</code> section</li>
+<li>Enable the <code>SERVER MEMBER INTENT</code> by switching the toggle to on</li>
+<li>Click on the <code>OAuth2</code> section in the left side navigation</li>
+<li>Scroll down to the <code>OAuth2 URL Generator</code> section on that page</li>
+<li>Select the <code>bot</code> scope in the <code>SCOPES</code> selection list</li>
+<li>In the <code>BOT PERMISSIONS</code> list under the <code>SCOPES</code> list, select at least the <code>Manage Roles</code></li>
+<li>You may also choose to grant the <code>Administrator</code> permission if you like, however, this is not really needed and you should avoid granting permissions to bots and identifies when they do not need them</li>
+<li>Copy the URL at the bottom of the <code>SCOPES</code> list and open it in a new browser tab/window</li>
+<li>Select the Discord server where you want to have roles managed by the donation tool and click <code>Authorize</code></li>
+</ul>
+<p>In addition to the bot setup itself, you'll need the Guild ID of the Discord server where you just added your Discord bot to.
+To retrieve this ID, follow these steps:</p>
+<ul>
+<li>Open your Discord app click on the little cog item next to your user in the bottom left</li>
+<li>Go to the App Settings -&gt; Advanced section</li>
+<li>Enable the developer mode</li>
+<li>Go back to the main Discord view (with all your servers)</li>
+<li>Right-click on the server you want to have managed by this donation tool</li>
+<li>Click <code>Copy ID</code></li>
+<li>Paste this ID somewhere and note it down, you'll need it in the "Configuration" section</li>
+</ul>
+<h2 id="configuration">Configuration</h2>
+<p>You're now set and should have all the required information to configure the donation tool and start it up the first time.
+To configure the tool, follow these steps:</p>
+<ul>
+<li>Copy the <code>config.example.yml</code> file to <code>config.yml</code> in the root directory of your source code (<code>C:\apps\cftools-server-donation</code>)</li>
+<li>Open the <code>config.yml</code> file in your favourite text editor (preferably one which supports YAML syntax highlighting which will greatly improve your ability to change the config)</li>
+<li>You should now go through each of the configuration options and fill them out with the information you gathered above</li>
+<li>If you do not have a value for one of the configuration, remove it, or keep the default value, if it has one</li>
+<li>Also, take a look into the comments of the configuration option, which may give additional details and context to what this option does and if you should change it</li>
+</ul>
+<h2 id="start-the-tool">Start the tool</h2>
+<p>Once you've done the above setup and steps, you can go ahead and start the donation tool.
+For that:</p>
+<ul>
+<li>press [WIN] + [R]</li>
+<li>type <code>cmd</code></li>
+<li>hit [ENTER]</li>
+<li>Navigate to the downloaded source code: <code>cd C:\apps\cftools-server-donation</code></li>
+<li>Start the tool: <code>npm start</code></li>
+<li>It will now be served from the configured port :)</li>
+</ul>
+
+  <br>
+    
+
+    
+    
+      
+    
+
+  <div class="row wm-article-nav-buttons" role="navigation" aria-label="navigation">
+    
+    <div class="wm-article-nav pull-right">
+      <a href="../packages-and-perks/" class="btn btn-xs btn-default pull-right">
+        Next
+        <i class="fa fa-chevron-right" aria-hidden="true"></i>
+      </a>
+      <a href="../packages-and-perks/" class="btn btn-xs btn-link">
+        Packages and Perks
+      </a>
+    </div>
+    
+    <div class="wm-article-nav">
+      <a href=".." class="btn btn-xs btn-default pull-left">
+        <i class="fa fa-chevron-left" aria-hidden="true"></i>
+        Previous</a><a href=".." class="btn btn-xs btn-link">
+        Home
+      </a>
+    </div>
+    
+  </div>
+
+    <br>
+</div>
+
+<footer class="container-fluid wm-page-content">
+      <p>
+        <a href="https://github.com/floriansw/server-donation-tool/edit/main/docs/getting-started.md"><i class="fa fa-github"></i>
+Edit on GitHub</a>
+      </p>
+  <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a> using <a href="https://github.com/gristlabs/mkdocs-windmill">Windmill</a> theme by Grist Labs.</p>
+</footer>
+
+</body>
+</html>

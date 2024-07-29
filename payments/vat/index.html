@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+  
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <meta name="author" content="Florian Schmidt">
+    
+    <link rel="shortcut icon" href="../../img/favicon.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+    <title>Taxes - Server Donation Tool</title>
+    <link href="../../css/bootstrap-3.3.7.min.css" rel="stylesheet">
+    <link href="../../css/font-awesome-4.7.0.css" rel="stylesheet">
+    <link href="../../css/base.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../css/highlight.css">
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+
+    <script src="../../js/jquery-3.2.1.min.js"></script>
+    <script src="../../js/bootstrap-3.3.7.min.js"></script>
+    <script src="../../js/highlight.pack.js"></script>
+    
+    <base target="_top">
+    <script>
+      var base_url = '../..';
+      var is_top_frame = false;
+        
+        var pageToc = [
+          {title: "Value-added tax (VAT)", url: "#_top", children: [
+          ]},
+        ];
+
+    </script>
+    <script src="../../js/base.js"></script> 
+</head>
+
+<body>
+<script>
+if (is_top_frame) { $('body').addClass('wm-top-page'); }
+</script>
+
+
+
+<div class="container-fluid wm-page-content">
+  <a name="_top"></a>
+    
+
+    
+    
+      
+    
+
+  <div class="row wm-article-nav-buttons" role="navigation" aria-label="navigation">
+    
+    <div class="wm-article-nav pull-right">
+      <a href="../paypal/" class="btn btn-xs btn-default pull-right">
+        Next
+        <i class="fa fa-chevron-right" aria-hidden="true"></i>
+      </a>
+      <a href="../paypal/" class="btn btn-xs btn-link">
+        PayPal
+      </a>
+    </div>
+    
+    <div class="wm-article-nav">
+      <a href="../refunds/" class="btn btn-xs btn-default pull-left">
+        <i class="fa fa-chevron-left" aria-hidden="true"></i>
+        Previous</a><a href="../refunds/" class="btn btn-xs btn-link">
+        Refunds
+      </a>
+    </div>
+    
+  </div>
+
+    
+
+    <h1 id="value-added-tax-vat">Value-added tax (VAT)</h1>
+<p>Depending on your country of residency, your own tax model and other factors, you may be required to pay taxes for donations you receive through the donation tool website.
+Please consult with your tax consultant in order to check your requirement to collect taxes for donations.
+It is out of scope of this documentation to elaborate on the need to collecting taxes.</p>
+<p>The server donation tool supports collecting taxes for european countries as of now.
+To get the current tax rates for EU countries, the tool uses <a href="https://vatstack.com/">VATStack</a>.
+You need to register with them before you can enable tax support in the donation tool.
+The developer plan should generally be enough, however, check for individual requirements before selecting the plan.</p>
+<p>Once done, simply enable tax support in the configuration:</p>
+<pre><code class="language-yaml">vats:
+  enabled: true
+  vatStack:
+    publicKey: pk_...
+</code></pre>
+<p>While the value of <code>publicKey</code> is the value of your public API key from the <a href="https://dashboard.vatstack.com/keys">VATStack dashboard</a>.
+Restart the server donation tool, and it will start collecting taxes for your european donators.</p>
+<p>In order to collect the correct tax rate from your donators, the donation tool will ask the donator about where they live.</p>
+
+  <br>
+    
+
+    
+    
+      
+    
+
+  <div class="row wm-article-nav-buttons" role="navigation" aria-label="navigation">
+    
+    <div class="wm-article-nav pull-right">
+      <a href="../paypal/" class="btn btn-xs btn-default pull-right">
+        Next
+        <i class="fa fa-chevron-right" aria-hidden="true"></i>
+      </a>
+      <a href="../paypal/" class="btn btn-xs btn-link">
+        PayPal
+      </a>
+    </div>
+    
+    <div class="wm-article-nav">
+      <a href="../refunds/" class="btn btn-xs btn-default pull-left">
+        <i class="fa fa-chevron-left" aria-hidden="true"></i>
+        Previous</a><a href="../refunds/" class="btn btn-xs btn-link">
+        Refunds
+      </a>
+    </div>
+    
+  </div>
+
+    <br>
+</div>
+
+<footer class="container-fluid wm-page-content">
+      <p>
+        <a href="https://github.com/floriansw/server-donation-tool/edit/main/docs/payments/vat.md"><i class="fa fa-github"></i>
+Edit on GitHub</a>
+      </p>
+  <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a> using <a href="https://github.com/gristlabs/mkdocs-windmill">Windmill</a> theme by Grist Labs.</p>
+</footer>
+
+</body>
+</html>
