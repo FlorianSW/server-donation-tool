@@ -79,6 +79,8 @@ export class StartController {
         let type = DonationType.OneTime;
         if (req.body['perks-for'] === 'subscribe') {
             type = DonationType.Subscription;
+        } else if (req.body['perks-for'] === 'gift') {
+            type = DonationType.Gift;
         } else if (req.body['perks-for'] !== 'donate') {
             res.redirect('/');
         }

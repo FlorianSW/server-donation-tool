@@ -23,7 +23,7 @@ import {
 } from 'discord.js';
 import {AppConfig} from '../../domain/app-config';
 import {translate} from '../../translations';
-import {Package, PriceType} from '../../domain/package';
+import {DonationType, Package, PriceType} from '../../domain/package';
 import {DeferredPaymentOrder, Order, Payment, PaymentOrder, Reference} from '../../domain/payment';
 import {OrderRepository} from '../../domain/repositories';
 
@@ -310,7 +310,7 @@ export class Donations {
         const providerName = data[2];
         const provider = this.payments.find((p) => p.provider().branding.name === providerName);
 
-        const order = Order.createDeferred(new Date(), new Reference({discord: interaction.user.id}, selectedPackage), '');
+        const order = Order.createDeferred(new Date(), new Reference({discord: interaction.user.id}, selectedPackage, DonationType.OneTime), '');
         const paymentOrder = await provider.createPaymentOrder({
             candidateOrderId: order.id,
             successUrl: new URL('/donate/' + order.id + '?provider=' + provider.provider().branding.name, this.config.app.publicUrl),

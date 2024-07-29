@@ -17,7 +17,7 @@ import {
 } from '../../domain/payment';
 import {AppConfig} from '../../domain/app-config';
 import {inject, singleton} from 'tsyringe';
-import {Package} from '../../domain/package';
+import {DonationType, Package} from '../../domain/package';
 import {translate} from '../../translations';
 import {User} from '../../domain/user';
 import {v4} from 'uuid';
@@ -125,7 +125,7 @@ export class PaypalPayment implements Payment, SubscriptionPaymentProvider {
                 }
             },
             purchase_units: [{
-                custom_id: new Reference({discord: request.discordId}, request.forPackage).asString(),
+                custom_id: new Reference({discord: request.discordId}, request.forPackage, DonationType.OneTime).asString(),
                 description: translate('PAYPAL_ORDER_DESCRIPTION', {
                     params: {
                         communityName: communityTitle,
@@ -214,7 +214,7 @@ export class PaypalPayment implements Payment, SubscriptionPaymentProvider {
                 xbox: user.xbox.name,
                 playstation: user.playstation.name,
                 discord: user.discord.id
-            }, plan.basePackage).asString(),
+            }, plan.basePackage, DonationType.Subscription).asString(),
             application_context: {
                 brand_name: communityTitle,
                 shipping_preference: 'NO_SHIPPING',

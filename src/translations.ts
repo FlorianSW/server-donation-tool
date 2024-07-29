@@ -57,6 +57,7 @@ const messages: { [key: string]: string } = {
     PERK_SELECTION_TITLE: 'Select package',
     PERK_SELECTION_WHO_DESCRIPTION: 'Do you want to redeem the donation perks by your self of should this be a gift to someone else? Please select one option to proceed with the donation.',
     PERK_SELECTION_DONATE: 'Donate',
+    PERK_SELECTION_GIFT: 'Gift',
     PERK_SELECTION_SUBSCRIBE: 'Subscribe',
     PERK_SELECTION_VIEW_SUBSCRIPTION: 'View Subscription',
     PERK_SELECTION_VARIABLE_LABEL: 'Choose your desired amount in {{currency}}',
@@ -97,8 +98,7 @@ const messages: { [key: string]: string } = {
 
     DONATE_TITLE: 'Donate',
     DONATE_SUMMARY_TITLE: '{{index}}. Summary',
-    DONATE_SUMMARY_PERKS_GIFT_LABEL: 'Gift Perks:',
-    DONATE_SUMMARY_PERKS_GIFT_CHECKBOX_LABEL: 'I want to gift the perks to someone else',
+    DONATE_SUMMARY_PERKS_GIFT_LABEL: 'Donation perks can be gifted to someone else after payment succeeded.',
     DONATE_SUMMARY_USER_LABEL: 'Your information:',
     DONATE_CUSTOM_MESSAGE_TITLE: '{{index}}. Leave an optional comment',
     DONATE_CUSTOM_MESSAGE_LABEL: 'Custom message',

@@ -70,7 +70,7 @@ export interface Price {
 }
 
 export enum DonationType {
-    OneTime = 'one-time', Subscription = 'subscription'
+    OneTime = 'one-time', Subscription = 'subscription', Gift = 'gift'
 }
 
 export class RedeemError extends Error {

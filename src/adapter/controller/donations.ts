@@ -281,7 +281,7 @@ export class DonationController {
             return;
         }
 
-        if (order.isUnclaimed() && req.query.redeem) {
+        if (order.isUnclaimed() && order.reference.type === DonationType.OneTime) {
             for (let perk of order.reference.p.perks) {
                 req.body[perk.id()] = 'checked';
             }
@@ -401,11 +401,8 @@ export class DonationController {
             return;
         }
 
-        const order = Order.createDeferred(new Date(), new Reference({discord: req.user.discord.id}, p), customMessage, req.session.vat);
+        const order = Order.createDeferred(new Date(), new Reference({discord: req.user.discord.id}, p, req.session.selectedPackage.type), customMessage, req.session.vat);
         let query = '?provider=' + payment.provider().branding.name;
-        if (req.body.gift === undefined) {
-            query += '&redeem=true';
-        }
         const paymentOrder = await payment.createPaymentOrder({
             candidateOrderId: order.id,
             successUrl: new URL('/donate/' + order.id + query, this.config.app.publicUrl),
@@ -457,7 +454,7 @@ export class DonationController {
             id: paymentOrder.id,
             transactionId: paymentOrder.transactionId,
             provider: payment.provider().branding.name,
-        }, new Reference({discord: req.user.discord.id}, p), customMessage, req.session.vat);
+        }, new Reference({discord: req.user.discord.id}, p, req.session.selectedPackage.type), customMessage, req.session.vat);
         order.pushPerkDetails(req.session.selectedPackage.perkDetails);
         await this.repo.save(order);
 

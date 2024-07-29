@@ -82,10 +82,16 @@
                                 <% } %>
                             </div>
                             <div class="card-action">
-                                <button class="btn waves-effect waves-light" name="perks-for" value="donate"
-                                        type="submit">
-                                    <%= translate('PERK_SELECTION_DONATE') %>
-                                </button>
+                                <div class="donation-action">
+                                    <button class="btn waves-effect waves-light" name="perks-for" value="donate"
+                                            type="submit">
+                                        <%= translate('PERK_SELECTION_DONATE') %>
+                                    </button>
+                                    <button class="btn waves-effect waves-light" name="perks-for" value="gift"
+                                            type="submit">
+                                        <img src="<%= imagePath('gift.svg') %>">
+                                    </button>
+                                </div>
                                 <% if (subscribedPackages[pack.id] === undefined) { %>
                                     <% if (pack.subscription) { %>
                                         <button class="btn waves-effect waves-light" name="perks-for" value="subscribe"

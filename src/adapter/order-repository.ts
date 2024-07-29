@@ -28,6 +28,7 @@ const columnPaymentProvider = 'payment_provider';
 const columnPerkDetails = 'perk_details';
 const columnCountryCode = 'country_code';
 const columnVatRate = 'vat_rate';
+const columnDonationType = 'donation_type';
 
 @singleton()
 export class SQLiteOrderRepository implements OrderRepository {
@@ -57,6 +58,7 @@ export class SQLiteOrderRepository implements OrderRepository {
                         b.text(columnPerkDetails).nullable().defaultTo(null);
                         b.string(columnCountryCode, 5).defaultTo('XX');
                         b.float(columnVatRate).defaultTo(0);
+                        b.string(columnDonationType).defaultTo('one-time');
                     }).then(() => {
                         resolve(true);
                     });
@@ -137,6 +139,11 @@ export class SQLiteOrderRepository implements OrderRepository {
                     if (!c.hasOwnProperty(columnPlaystationId)) {
                         await con.schema.alterTable(tableName, (b) => {
                             b.string(columnPlaystationId).nullable();
+                        });
+                    }
+                    if (!c.hasOwnProperty(columnDonationType)) {
+                        await con.schema.alterTable(tableName, (b) => {
+                            b.string(columnDonationType).defaultTo('one-time');
                         });
                     }
                     if (!(await this.hasIndex('uc_transaction_id'))) {
@@ -266,8 +273,8 @@ export class SQLiteOrderRepository implements OrderRepository {
     async save(order: Order): Promise<void> {
         await this.initialized;
         // @formatter:off
-        await this.con.raw(`REPLACE INTO ${tableName} (${columnId}, ${columnOrderId}, ${columnCreated}, ${columnStatus}, ${columnTransactionId}, ${columnPaymentProvider}, ${columnSteamId}, ${columnXboxId}, ${columnPlaystationId}, ${columnDiscordId}, ${columnPackageId}, ${columnPrice}, ${columnCustomMessage}, ${columnRedeemedAt}, ${columnLastRedeemedAt}, ${columnRefundedAt}, ${columnPerkDetails}, ${columnCountryCode}, ${columnVatRate}) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, [
-            order.id, order.payment.id, order.created.getTime(), order.status, order.payment.transactionId || null, order.payment.provider, order.reference.gameId.steam || null, order.reference.gameId.xbox || null, order.reference.gameId.playstation || null, order.reference.gameId.discord, order.reference.p.id, parseFloat(order.reference.p.price.amount), order.customMessage, order.firstRedeemed?.getTime() || null, order.lastRedeemed?.getTime() || null, order.refundedAt?.getTime() || null, JSON.stringify(Array.from(order.perkDetails.entries())), order.vat?.countryCode || null, order.vat?.rate || 0,
+        await this.con.raw(`REPLACE INTO ${tableName} (${columnId}, ${columnOrderId}, ${columnCreated}, ${columnStatus}, ${columnTransactionId}, ${columnPaymentProvider}, ${columnSteamId}, ${columnXboxId}, ${columnPlaystationId}, ${columnDiscordId}, ${columnPackageId}, ${columnDonationType}, ${columnPrice}, ${columnCustomMessage}, ${columnRedeemedAt}, ${columnLastRedeemedAt}, ${columnRefundedAt}, ${columnPerkDetails}, ${columnCountryCode}, ${columnVatRate}) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, [
+            order.id, order.payment.id, order.created.getTime(), order.status, order.payment.transactionId || null, order.payment.provider, order.reference.gameId.steam || null, order.reference.gameId.xbox || null, order.reference.gameId.playstation || null, order.reference.gameId.discord, order.reference.p.id, order.reference.type, parseFloat(order.reference.p.price.amount), order.customMessage, order.firstRedeemed?.getTime() || null, order.lastRedeemed?.getTime() || null, order.refundedAt?.getTime() || null, JSON.stringify(Array.from(order.perkDetails.entries())), order.vat?.countryCode || null, order.vat?.rate || 0,
         ]);
         // @formatter:on
     }
@@ -324,7 +331,8 @@ export class SQLiteOrderRepository implements OrderRepository {
                     ...p.price,
                     amount: o[columnPrice].toFixed(2),
                 }
-            }
+            },
+            o[columnDonationType],
         );
         const payment: OrderPayment = {
             id: o[columnOrderId],

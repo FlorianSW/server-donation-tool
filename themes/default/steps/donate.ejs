@@ -9,33 +9,24 @@
     <div class="summary">
         <label><%= translate('DONATE_SUMMARY_USER_LABEL') %></label>
         <span>
-            <% if (user.steam) { %>
-                <span><img class="image"
-                           src="<%= imagePath('steam_logo.svg') %>"> <%= user.steam.name %> (<%= user.steam.id %>)</span>
+            <% if (selectedPackage.type === 'one-time') { %>
+                <% if (user.steam) { %>
+                    <span><img class="image"
+                               src="<%= imagePath('steam_logo.svg') %>"> <%= user.steam.name %> (<%= user.steam.id %>)</span>
+                <% } %>
+                <% if (user.xbox) { %>
+                    <span><img class="image"
+                               src="<%= imagePath('xbox_logo.svg') %>"> <%= user.xbox.name %> (<%= user.xbox.id %>)</span>
+                <% } %>
+                <% if (user.playstation) { %>
+                    <span><img class="image"
+                               src="<%= imagePath('psn_logo.svg') %>"> <%= user.playstation.name %> (<%= user.playstation.id %>)</span>
+                <% } %>
+                <span><img class="image" src="<%= imagePath('discord.svg') %>"> <%= user.username %></span>
+            <% } else { %>
+                    <span><%= translate('DONATE_SUMMARY_PERKS_GIFT_LABEL') %></span>
             <% } %>
-            <% if (user.xbox) { %>
-                <span><img class="image"
-                           src="<%= imagePath('xbox_logo.svg') %>"> <%= user.xbox.name %> (<%= user.xbox.id %>)</span>
-            <% } %>
-            <% if (user.playstation) { %>
-                <span><img class="image"
-                           src="<%= imagePath('psn_logo.svg') %>"> <%= user.playstation.name %> (<%= user.playstation.id %>)</span>
-            <% } %>
-            <span><img class="image" src="<%= imagePath('discord.svg') %>"> <%= user.username %></span>
         </span>
-        <% if (locals.gift) { %>
-            <label><%= translate('DONATE_SUMMARY_PERKS_GIFT_LABEL') %></label>
-            <input type="hidden" name="gift">
-            <span><%= translate('DONATE_SUMMARY_PERKS_GIFT_CHECKBOX_LABEL') %></span>
-        <% } else if (!locals.selectedMethod) { %>
-            <label><%= translate('DONATE_SUMMARY_PERKS_GIFT_LABEL') %></label>
-            <div>
-                <label>
-                    <input type="checkbox" class="filled-in" name="gift" />
-                    <span><%= translate('DONATE_SUMMARY_PERKS_GIFT_CHECKBOX_LABEL') %></span>
-                </label>
-            </div>
-        <% } %>
     </div>
     <%- script('steps/donate.js') %>
 

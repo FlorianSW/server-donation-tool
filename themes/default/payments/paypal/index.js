@@ -40,11 +40,7 @@ function initPayPalButton() {
                     return await res.json();
                 }
             }).then(function (details) {
-                let query = '';
-                if (document.querySelectorAll('input[name="gift"]').length === 0) {
-                    query = '?redeem=true';
-                }
-                window.location.href = `/donate/${details.orderId}${query}`;
+                window.location.href = `/donate/${details.orderId}`;
             }).catch((msg) => {
                 document.querySelector('.error-container').style.display = 'block';
                 document.querySelector('#error-text').innerText = msg;

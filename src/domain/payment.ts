@@ -1,4 +1,4 @@
-import {GameId, Package, PerkDetails, RedeemError} from './package';
+import {DonationType, GameId, Package, PerkDetails, RedeemError} from './package';
 import {v4} from 'uuid';
 import {AppConfig} from './app-config';
 import {User} from './user';
@@ -8,7 +8,8 @@ import {VATRate} from './vat';
 export class Reference {
     constructor(
         public gameId: GameId | null,
-        public readonly p: Package
+        public readonly p: Package,
+        public readonly type: DonationType,
     ) {
     }
 
@@ -187,7 +188,7 @@ export class Subscription {
             id: this.payment.id,
             transactionId: transactionId,
             provider: provider,
-        }, new Reference({steam: this.user.steamId, discord: this.user.discordId}, p), null, this.vat);
+        }, new Reference({steam: this.user.steamId, discord: this.user.discordId}, p, DonationType.Subscription), null, this.vat);
         order.pay(transactionId);
 
         this.state = 'ACTIVE';

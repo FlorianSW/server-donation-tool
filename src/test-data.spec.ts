@@ -1,4 +1,4 @@
-import {Package, Perk, PriceType} from './domain/package';
+import {DonationType, Package, Perk, PriceType} from './domain/package';
 import {FreetextPerk} from './adapter/perk/freetext-perk';
 import {Order, OrderPayment, Reference, SubscriptionPlan} from './domain/payment';
 import {FakePayment} from './adapter/paypal/paypal-payment';
@@ -138,7 +138,8 @@ export function withPerks(p: Perk[]): modifier {
             {
                 ...c.reference.p,
                 perks: p,
-            }
+            },
+            DonationType.OneTime
         );
         return c;
     }
@@ -162,7 +163,7 @@ export function makeOrder(...m: modifier[]): Order {
             transactionId: 'SOME_TRANSACTION_ID',
             provider: FakePayment.NAME,
         },
-        reference: new Reference({steam: aSteamId, discord: 'A_DISCORD_ID', playstation: null, xbox: null}, somePackages[0]),
+        reference: new Reference({steam: aSteamId, discord: 'A_DISCORD_ID', playstation: null, xbox: null}, somePackages[0], DonationType.Gift),
         message: 'A_MESSAGE',
         vat: new VATRate('DE', 19),
     }

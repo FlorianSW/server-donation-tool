@@ -5,6 +5,7 @@ import {SQLiteOrderRepository} from './order-repository';
 import {Order, Reference} from '../domain/payment';
 import {anOrder, asRedeemed, asRefunded, makeOrder, somePackages, withCreatedDate} from '../test-data.spec';
 import winston from 'winston';
+import {DonationType} from "../domain/package";
 
 const testDbPath = __dirname + '/order-repository.spec.sqlite';
 
@@ -96,7 +97,7 @@ describe('OrderRepository', () => {
 
     it('finds orders for specific user', async () => {
         const secondOrder = Order.create(new Date('2025-05-17T18:25:49Z'), anOrder.payment, anOrder.reference);
-        const thirdOrder = Order.create(new Date('2025-05-18T18:25:49Z'), anOrder.payment, new Reference({steam: 'A_STEAM_ID', discord: 'ANOTHER_DISCORD_ID'}, somePackages[0]));
+        const thirdOrder = Order.create(new Date('2025-05-18T18:25:49Z'), anOrder.payment, new Reference({steam: 'A_STEAM_ID', discord: 'ANOTHER_DISCORD_ID'}, somePackages[0], DonationType.Gift));
         anOrder.pay(anOrder.payment.transactionId);
         secondOrder.pay(secondOrder.payment.transactionId);
         thirdOrder.pay(thirdOrder.payment.transactionId);

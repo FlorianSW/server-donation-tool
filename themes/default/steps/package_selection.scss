@@ -47,7 +47,34 @@ h4.package-category {
   }
 
   .card-action {
-    button, a {
+    .donation-action {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+
+      > button:first-of-type {
+        flex: 4;
+      }
+
+      > button:last-of-type {
+        &:hover, &:active {
+          background-color: #1ee2ff;
+        }
+
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+
+        background-color: #1e9dff;
+        flex: 1;
+
+        img {
+          height: 1.75rem;
+        }
+      }
+    }
+
+    > button, > a {
       width: 100%;
 
       &:not(:first-child) {
