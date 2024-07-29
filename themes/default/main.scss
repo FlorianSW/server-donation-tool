@@ -14,8 +14,8 @@ body {
   }
 
   [type=checkbox].filled-in:checked+span:not(.lever):after {
-    border: 2px solid #8b4107;
-    background-color: #8b4107;
+    border: 2px solid colors.$primary;
+    background-color: colors.$primary;
   }
 
   [type=checkbox].filled-in:not(:checked)+span:not(.lever):after {
