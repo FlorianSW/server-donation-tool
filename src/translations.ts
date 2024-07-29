@@ -161,6 +161,9 @@ const messages: { [key: string]: string } = {
     REDEEM_DESCRIPTION_WITHOUT_PERKS: 'We appreciate your support to our community.',
     REDEEM_SHARE_TITLE: 'Share the earned perks',
     REDEEM_SHARE_DESCRIPTION: 'You can share this link with someone you want to gift the perks to. Perks can only be redeemed by one person.',
+    REDEEM_SHARE_REDEEM_ANYWAY: 'I want to redeem the perks for me',
+    REDEEM_SHARE_REDEEM_ANYWAY_DESCRIPTION: 'Should you choose to gift the donation perks during the payment process by accident, you can still redeem the perks for yourself. Click the following button to redeem the donation perks for your user. Keep in mind that the share link will not work for other accounts then.',
+    REDEEM_SHARE_REDEEM_ANYWAY_SUBMIT: 'Redeem perks for my account',
     REDEEM_BACK: 'Back to Start',
 
     SUBSCRIPTION_TITLE: 'Subscriptions',
