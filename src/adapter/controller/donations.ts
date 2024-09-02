@@ -277,7 +277,8 @@ export class DonationController {
             return;
         }
 
-        if (this.hasMissingConnection(order.reference.p.perks, req, res)) {
+        const canShare = order.isUnclaimed() && order.reference.type === DonationType.Gift && req.query['subject'] !== 'self'
+        if (!canShare && this.hasMissingConnection(order.reference.p.perks, req, res)) {
             return;
         }
 
@@ -289,7 +290,7 @@ export class DonationController {
         } else {
             res.render('steps/redeem', {
                 order: order,
-                canShare: order.isUnclaimed() && order.reference.type === DonationType.Gift && req.query['subject'] !== 'self',
+                canShare: canShare,
                 shareLink: new URL(`/donate/${order.id}`, this.config.app.publicUrl).toString(),
                 redeemLink: `/donate/${order.id}/redeem`,
                 perks: order.reference.p.perks,
