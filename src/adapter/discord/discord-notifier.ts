@@ -249,7 +249,7 @@ export class DiscordNotifier {
             {name: translate('NOTIFICATIONS_REDEEM_SUCCESSFUL_TYPE'), value: order.reference.type, inline: true},
             {
                 name: translate('NOTIFICATIONS_REDEEM_SUCCESSFUL_TRANSACTION'), value: `Order ID: ${order.id}
-Payment Order ID: ${order.payment.id}
+Payment Order ID: ${order.payment.id} (${order.payment.provider})
 Transaction ID: ${order.payment.transactionId}
 Order created at: ${order.created}
 Perks: ${order.reference.p.perks.map((p) => p.asShortString(order)).join(', ')}
