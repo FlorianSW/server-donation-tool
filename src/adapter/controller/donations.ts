@@ -204,7 +204,7 @@ export class DonationController {
             return;
         }
 
-        if (req.session.selectedPackage.type === DonationType.Gift && this.hasMissingConnection(selectedPackage.perks, req, res)) {
+        if (req.session.selectedPackage.type !== DonationType.Gift && this.hasMissingConnection(selectedPackage.perks, req, res)) {
             return;
         }
 
