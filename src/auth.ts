@@ -11,7 +11,7 @@ import {Client, DiscordAPIError, RESTJSONErrorCodes} from 'discord.js';
 import {Logger} from 'winston';
 import {UserData} from './service/user-data';
 
-export async function discordUserCallback(steamClient: SteamClient, accessToken: string, refreshToken: string, profile: Profile) {
+export async function discordUserCallback(steamClient: SteamClient, accessToken: string, refreshToken: string, profile: Profile, logger: Logger) {
     const steamConnection: ConnectionInfo | undefined = profile.connections.find((c) => c.type === 'steam');
     const xBoxConnection: ConnectionInfo | undefined = profile.connections.find((c) => c.type === 'xbox');
     const playStationConnection: ConnectionInfo | undefined = profile.connections.find((c) => c.type === 'playstation');
@@ -34,9 +34,13 @@ export async function discordUserCallback(steamClient: SteamClient, accessToken:
             name: steamConnection.name,
             source: 'DISCORD'
         };
-        const p = await steamClient.playerProfile(steamConnection.id);
-        if (p) {
-            user.steam.avatarUrl = p.avatar;
+        try {
+            const p = await steamClient.playerProfile(steamConnection.id);
+            if (p) {
+                user.steam.avatarUrl = p.avatar;
+            }
+        } catch (e) {
+            logger.error("Could not fetch steam profile information", e);
         }
     }
     if (xBoxConnection) {
@@ -91,7 +95,7 @@ export class Authentication {
             callbackURL: config.discord.redirectUrl,
             scope: ['identify', 'connections'],
         }, (accessToken: string, refreshToken: string, profile: Profile, done: VerifyCallback) => {
-            discordUserCallback(steamClient, accessToken, refreshToken, profile).then((u) => {
+            discordUserCallback(steamClient, accessToken, refreshToken, profile, logger).then((u) => {
                 client.guilds.fetch(config.discord.bot.guildId).then((g) => {
                     function next(next: any) {
                         data.onRefresh(u).then((uu: User | undefined) => {
