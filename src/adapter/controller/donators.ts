@@ -28,7 +28,8 @@ export class DonatorsController {
             const owned = await Promise.all(this.perks().map((p) => p.ownedBy(RedeemTarget.fromUser(req.user))));
 
             res.status(200).json(owned
-                .reduce((l, p) => l.concat(p))
+                .filter((o) => !!o)
+                .reduce((l, p) => l.concat(p), [])
                 .filter((o) => !!o)
                 .filter((p, idx, self) => self.findIndex((o) => p.equals(o)) === idx)
                 .map((p: OwnedPerk) => ({
