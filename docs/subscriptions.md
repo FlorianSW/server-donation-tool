@@ -9,6 +9,9 @@ Subscriptions are currently supported by the following payment providers:
 * PayPal
 * Stripe
 
+Subscriptions **do not work** with packages that have perks requiring any other Game ID other than Steam (PlayStation network, XBox).
+Enabling subscriptions on such packages will result in errors when the subscription is redeemed once paid.
+
 ## Setup of Subscriptions
 
 To enable the subscriptions feature for a specific package, you simply need to set the billing cycle for that package, using the `subscription` configuration key, e.g.:
