@@ -1,3 +1,4 @@
+@use "payment_methods" as paymentMethods;
 @import "../partials/header_footer";
 @import "../partials/package-information";
 @import "../partials/perk_details";
@@ -29,40 +30,6 @@
   }
 
   .payment-methods {
-    display: flex;
-    flex-direction: column;
-    gap: 1em;
-
-    > div {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 1px solid grey;
-      padding: 0.75em 0;
-
-      .name {
-        display: flex;
-        flex: 1;
-        align-items: center;
-        gap: 1rem;
-
-        img {
-          max-width: 130px;
-        }
-      }
-
-      button {
-        padding-left: 10px;
-
-        div {
-          height: 14px;
-          width: 14px;
-
-          border-top: 2px solid white;
-          border-right: 2px solid white;
-          transform: rotate(45deg);
-        }
-      }
-    }
+    @include paymentMethods.paymentMethods;
   }
 }

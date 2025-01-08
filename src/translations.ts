@@ -69,7 +69,7 @@ const messages: { [key: string]: string } = {
     PAYPAL_DONATION_TITLE: 'PayPal Donation',
     PAYPAL_SUBSCRIPTION_TITLE: 'PayPal Subscription',
     PAYPAL_DESCRIPTION: 'We use PayPal to process your donation. Proceed to PayPal in order to complete the transaction.',
-    PAYPAL_SUBSCRIPTION_DESCRIPTION: 'When clicking the Subscribe button, you will be redirected to PayPal in order to setup the subscription. Once we receive the first payment of that Subscription (which may take some minutes), we will automatically setup the perks included in your selected donation package.',
+    PAYPAL_SUBSCRIPTION_DESCRIPTION: 'When continuing, you will be redirected to the payment provider in order to setup the subscription. Once we receive the first payment of that Subscription (which may take some minutes), we will automatically setup the perks included in your selected donation package.',
     PAYPAL_SUBSCRIPTION_BILLED: 'Billed {{cycle}}',
     PAYPAL_ORDER_DESCRIPTION: 'Donation for {{communityName}}',
     PAYPAL_DEFAULT_COMMUNITY_NAME: 'our community',
