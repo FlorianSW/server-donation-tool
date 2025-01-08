@@ -63,7 +63,7 @@ export const anOrder: Order = makeOrder(withCreatedDate(new Date('2025-05-16T18:
 
 export const aRedeemedOrder = makeOrder(asRedeemed());
 
-export const aPlan = SubscriptionPlan.create(somePackages[0], 'SOME_PRODUCT_ID', 'SOME_PLAN_ID');
+export const aPlan = SubscriptionPlan.create(new FakePayment().provider(), somePackages[0], 'SOME_PRODUCT_ID', 'SOME_PLAN_ID');
 
 interface CreateOrderRequest {
     createdAt: Date,

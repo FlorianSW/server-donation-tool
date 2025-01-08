@@ -10,7 +10,7 @@ import {VATRate} from '../domain/vat';
 const testDbPath = __dirname + '/subscriptions-repository.spec.sqlite';
 
 describe('SubscriptionsRepository', () => {
-    const aPlan = SubscriptionPlan.create(somePackages[0], 'A_PRODUCT_ID', 'A_PLAN_ID')
+    const aPlan = SubscriptionPlan.create(new FakePayment().provider(), somePackages[0], 'A_PRODUCT_ID', 'A_PLAN_ID')
     let repository: SubscriptionsRepository;
 
     beforeEach(() => {

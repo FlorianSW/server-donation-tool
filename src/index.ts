@@ -100,6 +100,7 @@ function setupConditionalDependencies(config: AppConfig) {
             useFactory: (c) => stripeClient(c.resolve('AppConfig'))
         });
         container.registerType('Payment', StripePayment);
+        container.registerType('SubscriptionPaymentProvider', StripePayment);
     }
 }
 
@@ -193,7 +194,7 @@ parseConfig(log).then(async (config) => {
 
 async function initSubscriptions(app: Express) {
     const packages: Package[] = container.resolve('availablePackages');
-    const payment: SubscriptionPaymentProvider = container.resolve('SubscriptionPaymentProvider');
+    const payments: SubscriptionPaymentProvider[] = container.resolveAll('SubscriptionPaymentProvider');
     const subscriptions: SubscriptionPlanRepository = container.resolve('SubscriptionPlanRepository');
     const subscriptionPackages = packages.filter((p) => p.subscription !== undefined);
     log.debug('Found ' + subscriptionPackages.length + ' packages that support subscriptions');
@@ -212,8 +213,10 @@ async function initSubscriptions(app: Express) {
             p.subscription = undefined;
             continue;
         }
-        const plan = await subscriptions.findByPackage(p);
-        await subscriptions.save(await payment.persistSubscription(p, plan));
+        for (let payment of payments) {
+            const plan = await subscriptions.findByPackage(payment.provider(), p);
+            await subscriptions.save(await payment.persistSubscription(p, plan));
+        }
     }
 }
 

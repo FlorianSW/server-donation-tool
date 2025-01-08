@@ -30,7 +30,7 @@ export class Subscriptions {
     }
 
     async subscribe(p: Package, perkDetails: PerkDetails, user: User, vat?: VATRate): Promise<PendingSubscription> {
-        const plan = await this.subscriptionPlans.findByPackage(p);
+        const plan = await this.subscriptionPlans.findByPackage(this.payment.provider(), p);
         const sub = Subscription.create(plan, user, vat);
         sub.pushPerkDetails(perkDetails);
         const result = await this.payment.subscribe(sub, plan, user, vat);

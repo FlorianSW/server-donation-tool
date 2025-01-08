@@ -1,4 +1,4 @@
-import {Order, Subscription, SubscriptionPlan} from './payment';
+import {Order, PaymentProvider, Subscription, SubscriptionPlan} from './payment';
 import {Closeable} from '../index';
 import {Package} from './package';
 import {User} from './user';
@@ -30,7 +30,7 @@ export interface OrderRepository extends Closeable {
 export interface SubscriptionPlanRepository extends Closeable {
     save(subscriptionPlan: SubscriptionPlan): Promise<void>
     find(id: string): Promise<SubscriptionPlan>
-    findByPackage(p: Package): Promise<SubscriptionPlan>
+    findByPackage(provider: PaymentProvider, p: Package): Promise<SubscriptionPlan>
 }
 
 export interface SubscriptionsRepository extends Closeable {

@@ -79,6 +79,7 @@ export class PaypalPayment implements Payment, SubscriptionPaymentProvider {
 
     provider(): PaymentProvider {
         return {
+            id: PaypalPayment.NAME,
             branding: {
                 logo: 'paypal.svg',
                 name: PaypalPayment.NAME,
@@ -194,13 +195,13 @@ export class PaypalPayment implements Payment, SubscriptionPaymentProvider {
         let plan: Response<Plan>;
         if (sp?.payment.planId) {
             plan = await this.updatePlan((await this.plan(sp.payment.planId)).result, p);
-            return new SubscriptionPlan(sp.id, p, {
+            return new SubscriptionPlan(sp.id, p, this.provider().id, {
                 productId: product.result.id,
                 planId: plan.result.id,
             });
         } else {
             plan = await this.createPlan(p);
-            return SubscriptionPlan.create(p, product.result.id, plan.result.id);
+            return SubscriptionPlan.create( this.provider(), p, product.result.id, plan.result.id);
         }
     }
 
@@ -422,7 +423,7 @@ export class FakePayment implements Payment, SubscriptionPaymentProvider {
     }
 
     persistSubscription(p: Package, plan?: SubscriptionPlan): Promise<SubscriptionPlan> {
-        return Promise.resolve(SubscriptionPlan.create(p, v4(), v4()));
+        return Promise.resolve(SubscriptionPlan.create(this.provider(), p, v4(), v4()));
     }
 
     subscribe(sub: Subscription, plan: SubscriptionPlan, user: User): Promise<PendingSubscription> {
@@ -445,6 +446,7 @@ export class FakePayment implements Payment, SubscriptionPaymentProvider {
 
     provider(): PaymentProvider {
         return {
+            id: FakePayment.NAME,
             branding: {
                 name: FakePayment.NAME,
             },

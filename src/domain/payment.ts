@@ -130,6 +130,7 @@ export class SubscriptionPlan {
     constructor(
         public readonly id: string,
         public readonly basePackage: Package,
+        public readonly provider: string,
         public readonly payment: {
             productId: string,
             planId: string,
@@ -137,8 +138,8 @@ export class SubscriptionPlan {
     ) {
     }
 
-    public static create(basePackage: Package, productId: string, planId: string): SubscriptionPlan {
-        return new SubscriptionPlan(v4(), basePackage, {productId: productId, planId: planId});
+    public static create(provider: PaymentProvider, basePackage: Package, productId: string, planId: string): SubscriptionPlan {
+        return new SubscriptionPlan(v4(), basePackage, provider.id, {productId: productId, planId: planId});
     }
 }
 
@@ -276,6 +277,7 @@ export interface CaptureRefunded {
 }
 
 export interface PaymentProvider {
+    id: string,
     branding: {
         logo?: string;
         name: string;

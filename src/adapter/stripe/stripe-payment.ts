@@ -8,13 +8,25 @@ import {
     Payment,
     PaymentCapture,
     PaymentOrder,
-    PaymentProvider
+    PaymentProvider,
+    PendingSubscription,
+    Subscription,
+    SubscriptionPayment,
+    SubscriptionPaymentProvider,
+    SubscriptionPlan
 } from '../../domain/payment';
 import {inject, singleton} from 'tsyringe';
 import Stripe from 'stripe';
+import {Package} from "../../domain/package";
+import {VATRate} from "../../domain/vat";
+import {User} from "../../domain/user";
+
+function unitAmount(v: string): number {
+    return Math.round(parseFloat(v) * 100)
+}
 
 @singleton()
-export class StripePayment implements Payment {
+export class StripePayment implements Payment, SubscriptionPaymentProvider {
     public static readonly NAME = 'stripe';
 
     constructor(
@@ -47,6 +59,7 @@ export class StripePayment implements Payment {
 
     provider(): PaymentProvider {
         return {
+            id: StripePayment.NAME,
             branding: {
                 logo: 'stripe.svg',
                 name: StripePayment.NAME,
@@ -88,7 +101,7 @@ export class StripePayment implements Payment {
                     product_data: {
                         name: request.forPackage.payment?.name || request.forPackage.name,
                     },
-                    unit_amount: parseFloat(request.forPackage.price.amount) * 100,
+                    unit_amount: unitAmount(request.forPackage.price.amount),
                     tax_behavior: 'exclusive',
                 },
                 tax_rates: rate ? [rate.id] : [],
@@ -107,5 +120,50 @@ export class StripePayment implements Payment {
                 provider: StripePayment.NAME,
             },
         };
+    }
+
+    cancelSubscription(subscription: Subscription): Promise<void> {
+        return Promise.resolve(undefined);
+    }
+
+    async persistSubscription(p: Package, plan?: SubscriptionPlan): Promise<SubscriptionPlan> {
+        let product: Stripe.Product, price: Stripe.Price;
+        if (plan?.payment.planId) {
+            product = await this.client.products.retrieve(plan.payment.productId);
+        } else {
+            product = await this.client.products.create({
+                name: p.name,
+                description: p.description,
+                shippable: false,
+            });
+        }
+        if (plan?.payment.planId) {
+            price = await this.client.prices.retrieve(plan.payment.planId);
+        } else {
+            price = await this.client.prices.create({
+                product: product.id,
+                currency: p.price.currency,
+                tax_behavior: "exclusive",
+                unit_amount: unitAmount(p.price.amount),
+                recurring: {
+                  interval: "month",
+                },
+            });
+        }
+        if (!plan) {
+            return SubscriptionPlan.create(this.provider(), p, product.id, price.id);
+        } else {
+            plan.payment.productId = product.id;
+            plan.payment.planId = price.id;
+            return plan;
+        }
+    }
+
+    subscribe(sub: Subscription, plan: SubscriptionPlan, user: User, vat?: VATRate): Promise<PendingSubscription> {
+        return Promise.resolve(undefined);
+    }
+
+    subscriptionDetails(sub: Subscription): Promise<SubscriptionPayment | undefined> {
+        return Promise.resolve(undefined);
     }
 }
