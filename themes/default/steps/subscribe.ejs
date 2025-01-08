@@ -25,9 +25,20 @@
             <%= translate('PAYPAL_SUBSCRIPTION_DESCRIPTION') %>
         </p>
         <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-        <button class="btn waves-effect waves-light" name="subscribe" type="submit">
-            <%= translate('PAYPAL_SUBSCRIBE') %>
-        </button>
+
+        <% paymentMethods.forEach((p) => { %>
+            <div>
+                <div class="name">
+                    <% if (p.logo) { %>
+                        <img src="<%= imagePath('payments/' + p.logo) %>">
+                    <% } %>
+                    <%= translate('PAYMENT_METHOD_' + p.name.toUpperCase()); %>
+                </div>
+                <button class="btn waves-effect waves-light" name="method" value="<%= p.name %>" type="submit">
+                    <div></div>
+                </button>
+            </div>
+        <% }); %>
     </form>
 </div>
 <%- include('../partials/package-information.ejs') %>

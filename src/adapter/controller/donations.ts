@@ -3,7 +3,15 @@ import {Request, Response, Router} from 'express';
 import {translate} from '../../translations';
 import {DonationType, Hints, Package, Perk, RedeemTarget} from '../../domain/package';
 import {AppConfig} from '../../domain/app-config';
-import {GameIdMismatch, Order, OrderNotFound, OrderStatus, Payment, Reference} from '../../domain/payment';
+import {
+    GameIdMismatch,
+    Order,
+    OrderNotFound,
+    OrderStatus,
+    Payment, PaymentProvider,
+    Reference,
+    SubscriptionPaymentProvider
+} from '../../domain/payment';
 import {Logger} from 'winston';
 import {SessionData} from 'express-session';
 import csrf from 'csurf';
@@ -25,6 +33,7 @@ export class DonationController {
         @inject('availablePackages') private readonly packages: Package[],
         @inject('VATs') private readonly vats: VATs,
         @injectAll('Payment') private readonly payments: Payment[],
+        @injectAll('SubscriptionPaymentProvider') private readonly subPayments: SubscriptionPaymentProvider[],
         @inject('OrderRepository') private readonly repo: OrderRepository,
         @inject('Subscriptions') private readonly subscriptions: Subscriptions,
         @inject('RedeemPackage') private readonly redeemPackage: RedeemPackage,
@@ -214,9 +223,11 @@ export class DonationController {
             return;
         }
         const rates = await this.vats.countries(selectedPackage.price);
+        let paymentProviders: PaymentProvider[] = this.payments.map((p) => p.provider());
         let template = 'steps/donate';
         if (req.session.selectedPackage.type === DonationType.Subscription) {
             template = 'steps/subscribe';
+            paymentProviders = this.subPayments.map((p) => p.provider());
         }
 
         const hints: (readonly [string, Hints])[] = await Promise.all(selectedPackage.perks.map(async (p) => {
@@ -237,7 +248,7 @@ export class DonationController {
             vatRates: rates,
             needsFurtherSelection: selectedPackage.perks.some((p) => p.subjects() !== null),
             interfaceHints: perkHints,
-            paymentMethods: this.payments.map((p) => p.provider().branding),
+            paymentMethods: paymentProviders.map((p) => p.branding),
         });
     }
 
@@ -312,6 +323,11 @@ export class DonationController {
             res.redirect('/');
             return;
         }
+        const paymentProvider = this.subPayments.find((p) => p.provider().branding.name === req.body.method);
+        if (!paymentProvider) {
+            res.redirect('/');
+            return;
+        }
         const rates = await this.vats.countries(selectedPackage.price);
         if (rates.length !== 0) {
             const selectedCountry = req.body['vat-country'];
@@ -326,7 +342,7 @@ export class DonationController {
             }
         }
 
-        const result = await this.subscriptions.subscribe(selectedPackage, req.session.selectedPackage.perkDetails, req.user, req.session.vat);
+        const result = await this.subscriptions.subscribe(paymentProvider, selectedPackage, req.session.selectedPackage.perkDetails, req.user, req.session.vat);
         res.redirect(result.approvalLink);
     }
 

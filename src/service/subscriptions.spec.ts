@@ -41,11 +41,11 @@ describe('Subscriptions', () => {
         await plansRepository.save(aPlan);
 
         const logger = winston.createLogger();
-        service = new Subscriptions(plansRepository, subRepository, orders, events, payment, new RedeemPackage(orders, events, logger, {orders: {redeemCooldownHours: 1}} as any as AppConfig), logger);
+        service = new Subscriptions(plansRepository, subRepository, orders, events, [payment], new RedeemPackage(orders, events, logger, {orders: {redeemCooldownHours: 1}} as any as AppConfig), logger);
     });
 
     it('creates a new subscription for a donator', async () => {
-        const result = await service.subscribe(somePackages[0], {}, aUser);
+        const result = await service.subscribe(payment, somePackages[0], {}, aUser);
 
         const subscription = await subRepository.findByPayment(result.id);
         expect(result.approvalLink).not.toBe('');
@@ -58,7 +58,7 @@ describe('Subscriptions', () => {
 
     it('redeems perks for a subscription payment', (done: DoneCallback) => {
         const tId = randomUUID();
-        service.subscribe(somePackages[0], {SOME_ID: 'SOME_DATA'}, aUser).then((sub) => {
+        service.subscribe(payment, somePackages[0], {SOME_ID: 'SOME_DATA'}, aUser).then((sub) => {
             events.on('subscriptionExecuted', (target: RedeemTarget, plan: SubscriptionPlan, sub: Subscription, order: Order) => {
                 expect(target.gameId.discord).toEqual(aUser.discord.id);
                 expect(target.gameId.steam).toEqual(aUser.steam.id);
@@ -80,7 +80,7 @@ describe('Subscriptions', () => {
 
     it('does not redeem duplicated webhook message', async () => {
         const tId = randomUUID();
-        const sub = await service.subscribe(somePackages[0], {SOME_ID: 'SOME_DATA'}, aUser)
+        const sub = await service.subscribe(payment, somePackages[0], {SOME_ID: 'SOME_DATA'}, aUser)
 
         await service.redeemSubscriptionPayment(sub.id, tId);
         const r = await orders.findByPaymentOrder(sub.id);
@@ -92,7 +92,7 @@ describe('Subscriptions', () => {
     });
 
     it('cancels subscription', async () => {
-        const ps = await service.subscribe(somePackages[0], {}, aUser);
+        const ps = await service.subscribe(payment, somePackages[0], {}, aUser);
         const sub = await subRepository.findByPayment(ps.id);
 
         await service.cancel(sub.id, aUser);
@@ -102,7 +102,7 @@ describe('Subscriptions', () => {
     });
 
     it('notifies subscription about cancellation', async () => {
-        const ps = await service.subscribe(somePackages[0], {}, aUser);
+        const ps = await service.subscribe(payment, somePackages[0], {}, aUser);
         const sub = await subRepository.findByPayment(ps.id);
 
         await service.notifyCancel(ps.id);
@@ -112,7 +112,7 @@ describe('Subscriptions', () => {
     });
 
     it('errors when other\'s subscription cancelled', async () => {
-        const ps = await service.subscribe(somePackages[0], {}, aUser);
+        const ps = await service.subscribe(payment, somePackages[0], {}, aUser);
         const sub = await subRepository.findByPayment(ps.id);
 
         await expect(() => service.cancel(sub.id, {
@@ -122,7 +122,7 @@ describe('Subscriptions', () => {
     });
 
     it('views subscriptions details and history', async () => {
-        const ps = await service.subscribe(somePackages[0], {}, aUser);
+        const ps = await service.subscribe(payment, somePackages[0], {}, aUser);
         const sub = await subRepository.findByPayment(ps.id);
         const first = await service.redeemSubscriptionPayment(sub.payment.id, randomUUID());
         const second = await service.redeemSubscriptionPayment(sub.payment.id, randomUUID());

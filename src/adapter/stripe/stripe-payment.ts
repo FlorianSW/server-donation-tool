@@ -20,6 +20,7 @@ import Stripe from 'stripe';
 import {Package} from "../../domain/package";
 import {VATRate} from "../../domain/vat";
 import {User} from "../../domain/user";
+import {AppConfig} from "../../domain/app-config";
 
 function unitAmount(v: string): number {
     return Math.round(parseFloat(v) * 100)
@@ -30,6 +31,7 @@ export class StripePayment implements Payment, SubscriptionPaymentProvider {
     public static readonly NAME = 'stripe';
 
     constructor(
+        @inject('AppConfig') private readonly config: AppConfig,
         @inject('StripeClient') private readonly client: Stripe,
     ) {
     }
@@ -72,25 +74,30 @@ export class StripePayment implements Payment, SubscriptionPaymentProvider {
         throw Error('not supported');
     }
 
-    async createPaymentOrder(request: CreatePaymentOrderRequest & DeferredPaymentOrderRequest): Promise<PaymentOrder & DeferredPaymentOrder> {
+    private async findTaxRate(vat?: VATRate): Promise<Stripe.TaxRate | undefined> {
         let rate: Stripe.TaxRate;
-        if (request.vat) {
+        if (vat) {
             const rates = await this.client.taxRates.list({
                 active: true,
             });
-            rate = rates.data.find((r) => r.country === request.vat.countryCode);
+            rate = rates.data.find((r) => r.country === vat.countryCode);
             if (!rate) {
                 rate = await this.client.taxRates.create({
                     active: true,
-                    display_name: request.vat.displayName,
-                    country: request.vat.countryCode,
+                    display_name: vat.displayName,
+                    country: vat.countryCode,
                     description: 'Added by Server Donation Tool',
                     inclusive: false,
-                    percentage: request.vat.rate,
+                    percentage: vat.rate,
                     tax_type: 'vat',
                 });
             }
         }
+        return rate;
+    }
+
+    async createPaymentOrder(request: CreatePaymentOrderRequest & DeferredPaymentOrderRequest): Promise<PaymentOrder & DeferredPaymentOrder> {
+        const rate = await this.findTaxRate(request.vat);
 
         const sess = await this.client.checkout.sessions.create({
             mode: 'payment',
@@ -122,8 +129,17 @@ export class StripePayment implements Payment, SubscriptionPaymentProvider {
         };
     }
 
-    cancelSubscription(subscription: Subscription): Promise<void> {
-        return Promise.resolve(undefined);
+    async cancelSubscription(sub: Subscription): Promise<void> {
+        let subId = sub.payment.id;
+        if (sub.payment.id.startsWith('cs_')) {
+            const session = await this.client.checkout.sessions.retrieve(sub.payment.id);
+            subId = session.subscription as string;
+        }
+        await this.client.subscriptions.cancel(subId, {
+            cancellation_details: {
+                comment: 'Cancelled in Server Donation Tool',
+            },
+        });
     }
 
     async persistSubscription(p: Package, plan?: SubscriptionPlan): Promise<SubscriptionPlan> {
@@ -159,11 +175,54 @@ export class StripePayment implements Payment, SubscriptionPaymentProvider {
         }
     }
 
-    subscribe(sub: Subscription, plan: SubscriptionPlan, user: User, vat?: VATRate): Promise<PendingSubscription> {
-        return Promise.resolve(undefined);
+    async subscribe(sub: Subscription, plan: SubscriptionPlan, user: User, vat?: VATRate): Promise<PendingSubscription> {
+        const rate = await this.findTaxRate(vat);
+
+        const result = await this.client.checkout.sessions.create({
+            success_url: sub.asLink(this.config).toString(),
+            cancel_url: sub.abortLink(this.config).toString(),
+            mode: "subscription",
+            line_items: [{
+                quantity: 1,
+                price: plan.payment.planId,
+                tax_rates: rate ? [rate.id] : [],
+            }],
+        });
+        return {
+            id: result.id,
+            approvalLink: result.url,
+        };
     }
 
-    subscriptionDetails(sub: Subscription): Promise<SubscriptionPayment | undefined> {
-        return Promise.resolve(undefined);
+    async subscriptionDetails(sub: Subscription): Promise<SubscriptionPayment | undefined> {
+        let subId = sub.payment.id;
+        let updatePayment: SubscriptionPayment['updatePayment'];
+        if (sub.payment.id.startsWith('cs_')) {
+            const session = await this.client.checkout.sessions.retrieve(sub.payment.id);
+            subId = session.subscription as string;
+            updatePayment = {
+                id: subId,
+            };
+        }
+        const s = await this.client.subscriptions.retrieve(subId);
+        let status: SubscriptionPayment['state'];
+        switch (s.status) {
+            case 'incomplete':
+                status = 'APPROVAL_PENDING';
+                break;
+            case 'active':
+                status = 'ACTIVE';
+                break;
+            case 'past_due':
+                status = 'APPROVED';
+                break;
+            default:
+                status = 'CANCELLED'
+        }
+        return {
+            state: status,
+            approvalLink: undefined,
+            updatePayment: updatePayment,
+        };
     }
 }

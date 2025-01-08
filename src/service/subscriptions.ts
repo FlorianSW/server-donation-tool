@@ -1,6 +1,6 @@
-import {inject, singleton} from 'tsyringe';
+import {inject, injectAll, singleton} from 'tsyringe';
 import {
-    Order,
+    Order, Payment,
     PendingSubscription,
     Subscription,
     SubscriptionNotFound,
@@ -23,17 +23,17 @@ export class Subscriptions {
         @inject('SubscriptionsRepository') private readonly subscriptions: SubscriptionsRepository,
         @inject('OrderRepository') private readonly orders: OrderRepository,
         @inject('EventSource') private readonly events: EventSource,
-        @inject('SubscriptionPaymentProvider') private readonly payment: SubscriptionPaymentProvider,
+        @injectAll('SubscriptionPaymentProvider') private readonly payments: SubscriptionPaymentProvider[],
         @inject('RedeemPackage') private readonly redeem: RedeemPackage,
         @inject('Logger') private readonly logger: Logger,
     ) {
     }
 
-    async subscribe(p: Package, perkDetails: PerkDetails, user: User, vat?: VATRate): Promise<PendingSubscription> {
-        const plan = await this.subscriptionPlans.findByPackage(this.payment.provider(), p);
+    async subscribe(paymentProvider: SubscriptionPaymentProvider, p: Package, perkDetails: PerkDetails, user: User, vat?: VATRate): Promise<PendingSubscription> {
+        const plan = await this.subscriptionPlans.findByPackage(paymentProvider.provider(), p);
         const sub = Subscription.create(plan, user, vat);
         sub.pushPerkDetails(perkDetails);
-        const result = await this.payment.subscribe(sub, plan, user, vat);
+        const result = await paymentProvider.subscribe(sub, plan, user, vat);
         sub.agreeBilling(result.id);
         await this.subscriptions.save(sub);
 
@@ -53,7 +53,12 @@ export class Subscriptions {
             return;
         }
 
-        const order = sub.pay(transactionId, this.payment.provider().branding.name, plan.basePackage);
+        const provider = this.payments.find((p) => p.provider().id === plan.provider);
+        if (!provider) {
+            this.logger.error('Payment provider does not exist anymore or does not support subscriptions', {provider: plan.provider});
+            return;
+        }
+        const order = sub.pay(transactionId, provider.provider().branding.name, plan.basePackage);
         order.pushPerkDetails(Object.fromEntries(sub.perkDetails.entries()));
         await this.subscriptions.save(sub);
         await this.orders.save(order);
@@ -68,9 +73,18 @@ export class Subscriptions {
         const orders = await this.orders.findByPaymentOrder(subscription.payment.id);
         const plan = await this.subscriptionPlans.find(subscription.planId);
 
+        const provider = this.payments.find((p) => p.provider().id === plan.provider);
+        if (!provider) {
+            this.logger.error('Payment provider does not exist anymore or does not support subscriptions', {provider: plan.provider});
+            return;
+        }
         let pending: PendingSubscription | null;
         if (subscription.state !== 'CANCELLED') {
-            const paymentStatus = await this.payment.subscriptionDetails(subscription);
+            const paymentStatus = await provider.subscriptionDetails(subscription);
+            if (paymentStatus.updatePayment) {
+                subscription.payment.id = paymentStatus.updatePayment.id;
+                await this.subscriptions.save(subscription);
+            }
             if (!paymentStatus) {
                 await this.cancel(subscription.id, forUser);
                 subscription = await this.subscription(id, forUser);
@@ -93,9 +107,15 @@ export class Subscriptions {
 
     async cancel(id: string, forUser: User): Promise<void> {
         const subscription = await this.subscription(id, forUser);
-        const paymentStatus = await this.payment.subscriptionDetails(subscription);
+        const plan = await this.subscriptionPlans.find(subscription.planId);
+        const provider = this.payments.find((p) => p.provider().id === plan.provider);
+        if (!provider) {
+            this.logger.error('Payment provider does not exist anymore or does not support subscriptions', {provider: plan.provider});
+            return;
+        }
+        const paymentStatus = await provider.subscriptionDetails(subscription);
         if (paymentStatus && (paymentStatus.state === 'APPROVED' || paymentStatus.state === 'ACTIVE')) {
-            await this.payment.cancelSubscription(subscription);
+            await provider.cancelSubscription(subscription);
         }
         subscription.cancel();
         await this.subscriptions.save(subscription);

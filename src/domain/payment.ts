@@ -254,6 +254,7 @@ export interface PendingSubscription {
 export interface SubscriptionPayment {
     state: 'APPROVAL_PENDING' | 'APPROVED' | 'ACTIVE' | 'CANCELLED';
     approvalLink: string | null;
+    updatePayment?: Subscription['payment'],
 }
 
 export interface SaleCompleted {
