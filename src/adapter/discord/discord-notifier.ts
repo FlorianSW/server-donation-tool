@@ -30,7 +30,7 @@ function webhookClient(notification: DiscordNotification): WebhookClient {
 
 @singleton()
 export class DiscordNotifier {
-    constructor(@inject('DonationEvents') private readonly events: DonationEvents, @inject('AppConfig') private readonly config: AppConfig) {
+    constructor(@inject('DonationEvents') readonly events: DonationEvents, @inject('AppConfig') private readonly config: AppConfig) {
         events.on('successfulPayment', this.onSuccessfulPayment.bind(this));
         events.on('successfulRefund', this.onSuccessfulRefund.bind(this));
         events.on('subscriptionCreated', this.onSubscriptionCreated.bind(this));

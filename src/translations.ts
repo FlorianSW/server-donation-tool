@@ -167,7 +167,7 @@ const messages: { [key: string]: string } = {
     REDEEM_BACK: 'Back to Start',
 
     SUBSCRIPTION_TITLE: 'Subscriptions',
-    SUBSCRIPTION_DESCRIPTION: 'With subscriptions you can opt into automatically donating for your favourite package on a recurring basis. The subscription will automatically debit the price from your PayPal account and setup the perks included in the package for you. On this page you can manage your subscription.',
+    SUBSCRIPTION_DESCRIPTION: 'With subscriptions you can opt into automatically donating for your favourite package on a recurring basis. The subscription will automatically debit the price from your payment provider account and setup the perks included in the package for you. On this page you can manage your subscription.',
     SUBSCRIPTION_DETAILS_TITLE: 'Details',
     SUBSCRIPTION_DETAILS_STATUS: 'Status',
     SUBSCRIPTION_DETAILS_STATUS_PENDING: 'Pending',
@@ -241,8 +241,8 @@ const messages: { [key: string]: string } = {
     USER_NOTIFICATIONS_PLAYSTATION: 'PlayStation Network',
     USER_NOTIFICATIONS_DISCORD_LINK: 'Link to our discord',
     USER_NOTIFICATIONS_PACKAGE: 'Package name',
-    USER_NOTIFICATIONS_SUB_EXECUTED_TEXT: 'Hi :wave:,\n\nThanks again for donating to our community. We received a payment of your recurring subscription :pray:\nAs part of that subscription we automatically extended the included perks for you.\nIf you want to cancel this subscription, please go to your PayPal account -> Settings and cancel the subscription there.\n\nIf you have any questions, feel free to get in touch with us. Thanks again for your donation and have a good day :heart:',
-    USER_NOTIFICATIONS_SUB_TRANSACTION_ID: 'This payment will show in your PayPal activity with this Transaction ID',
+    USER_NOTIFICATIONS_SUB_EXECUTED_TEXT: 'Hi :wave:,\n\nThanks again for donating to our community. We received a payment of your recurring subscription :pray:\nAs part of that subscription we automatically extended the included perks for you.\nIf you want to cancel this subscription, please go to the subscription details or your payment provider and cancel the subscription there.\n\nIf you have any questions, feel free to get in touch with us. Thanks again for your donation and have a good day :heart:',
+    USER_NOTIFICATIONS_SUB_TRANSACTION_ID: 'This payment will show in your payment provider activity with the following Transaction ID',
 
     PAYMENT_METHOD_PAYPAL: 'PayPal',
     PAYMENT_METHOD_STRIPE: 'Other (Credit Card, Klarna, etc.)',
