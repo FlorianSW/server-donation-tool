@@ -1,5 +1,5 @@
 import 'reflect-metadata';
-import express, {Express} from 'express';
+import express, {Express, NextFunction, Request} from 'express';
 import session from 'express-session';
 import bodyParser from 'body-parser';
 import {Authentication} from './auth';
@@ -43,6 +43,7 @@ import {HttpSteamClient} from './adapter/steam-client';
 import {SQLitePropertiesRepository} from './adapter/properties-repository';
 import {OrderOverviewController} from './adapter/controller/order-overview';
 import {SQLiteNitradoPriorityQueueRepository} from "./adapter/nitrado-priority-repository";
+import {StripeWebhooksController} from "./adapter/controller/stripe-webhooks";
 
 export interface Closeable {
     close(): Promise<void>
@@ -132,7 +133,11 @@ parseConfig(log).then(async (config) => {
         log.warn('Compression disabled as configured');
     }
     app.use('/assets', express.static(__dirname + '/assets'));
-    app.use(bodyParser.json());
+    app.use(bodyParser.json({
+        verify: (req, res, buf, encoding) => {
+            req.rawBody = buf;
+        }
+    }));
     app.use(bodyParser.urlencoded({
         extended: false,
     }));
@@ -204,8 +209,10 @@ async function initSubscriptions(app: Express) {
     log.info('Initializing subscriptions');
     const controller = container.resolve(SubscriptionsController);
     const paypalWebhooks = container.resolve(PaypalWebhooksController);
+    const stripeWebhooks = container.resolve(StripeWebhooksController);
     app.use('/', controller.router);
     app.use('/', paypalWebhooks.router);
+    app.use('/', stripeWebhooks.router);
 
     for (const p of subscriptionPackages) {
         if (p.price.type === PriceType.VARIABLE) {

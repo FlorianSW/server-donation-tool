@@ -152,11 +152,18 @@ paypal:
   # You can create these in the PayPal developer portal: https://developer.paypal.com/developer/applications/
   clientId:
   clientSecret:
+  # If you want to manage the webhook necessary for Subscriptions to work on your own, set this to true. This is only
+  # recommended for users who know what they are doing. Otherwise, keep this value to false or omit it completely.
+  manageWebhook: false
 # (Conditional) Configure when you want to accept payments with stripe.com.
 # When using stripe.com, you need to setup an account and set an account name.
 stripe:
   # The secret key of your stripe.com account (Developers -> API Keys -> Secret Key).
   secretKey: sk_...
+  # If you want to manage the webhook necessary for Subscriptions to work on your own, set this to true. This is only
+  # recommended for users who know what they are doing. Otherwise, keep this value to false or omit it completely.
+  # If you disable this, subscriptions with stripe cannot work, as there is no way to supply the necessary secret for it.
+  manageWebhook: false
 cftools:
   # Credentials of a CFTools application from https://developer.cftools.cloud/applications
   # Make sure you have granted this app permission to all servers listed in the perks section (cftools.serverApiId) in

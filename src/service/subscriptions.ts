@@ -43,7 +43,7 @@ export class Subscriptions {
     async redeemSubscriptionPayment(paymentId: string, transactionId: string): Promise<Order | undefined> {
         const sub = await this.subscriptions.findByPayment(paymentId);
         const plan = await this.subscriptionPlans.find(sub.planId);
-        const target = new RedeemTarget({steam: sub.user.steamId}, sub.user.discordId);
+        const target = new RedeemTarget({steam: sub.user.steamId, discord: sub.user.discordId}, sub.user.discordId);
         if (sub.state === 'PENDING') {
             this.events.emit('subscriptionCreated', target, plan, sub);
         }
@@ -129,7 +129,7 @@ export class Subscriptions {
         }
         subscription.cancel();
         await this.subscriptions.save(subscription);
-        this.events.emit('subscriptionCancelled', new RedeemTarget({steam: subscription.user.steamId}, subscription.user.discordId), plan, subscription);
+        this.events.emit('subscriptionCancelled', new RedeemTarget({steam: subscription.user.steamId, discord: subscription.user.discordId}, subscription.user.discordId), plan, subscription);
     }
 
     async abort(id: string, forUser: User): Promise<void> {

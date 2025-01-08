@@ -24,7 +24,9 @@ const readFile = promisify(fs.readFile);
 const unlinkFile = promisify(fs.unlink);
 
 enum EventType {
-    SaleCompleted = 'PAYMENT.SALE.COMPLETED', SubscriptionCancelled = 'BILLING.SUBSCRIPTION.CANCELLED', CaptureRefunded = 'PAYMENT.CAPTURE.REFUNDED',
+    SaleCompleted = 'PAYMENT.SALE.COMPLETED',
+    SubscriptionCancelled = 'BILLING.SUBSCRIPTION.CANCELLED',
+    CaptureRefunded = 'PAYMENT.CAPTURE.REFUNDED',
 }
 
 interface WebhookEvent {

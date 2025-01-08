@@ -124,6 +124,7 @@ class YamlAppConfig implements AppConfig {
     };
     stripe?: {
         secretKey: string;
+        manageWebhook: boolean;
     };
     serverNames: ServerNames;
     packageCategories: string[];
