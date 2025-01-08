@@ -7,6 +7,7 @@ Also, the perks included in the package will automatically be redeemed on the be
 
 Subscriptions are currently supported by the following payment providers:
 * PayPal
+* Stripe
 
 ## Setup of Subscriptions
 
