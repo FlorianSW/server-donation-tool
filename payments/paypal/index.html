@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+  
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <meta name="author" content="Florian Schmidt">
+    
+    <link rel="shortcut icon" href="../../img/favicon.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+    <title>PayPal - Server Donation Tool</title>
+    <link href="../../css/bootstrap-3.3.7.min.css" rel="stylesheet">
+    <link href="../../css/font-awesome-4.7.0.css" rel="stylesheet">
+    <link href="../../css/base.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../css/highlight.css">
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+
+    <script src="../../js/jquery-3.2.1.min.js"></script>
+    <script src="../../js/bootstrap-3.3.7.min.js"></script>
+    <script src="../../js/highlight.pack.js"></script>
+    
+    <base target="_top">
+    <script>
+      var base_url = '../..';
+      var is_top_frame = false;
+        
+        var pageToc = [
+          {title: "PayPal", url: "#_top", children: [
+              {title: "Setup PayPal account", url: "#setup-paypal-account" },
+              {title: "Configure PayPal", url: "#configure-paypal" },
+          ]},
+        ];
+
+    </script>
+    <script src="../../js/base.js"></script> 
+</head>
+
+<body>
+<script>
+if (is_top_frame) { $('body').addClass('wm-top-page'); }
+</script>
+
+
+
+<div class="container-fluid wm-page-content">
+  <a name="_top"></a>
+    
+
+    
+    
+      
+    
+
+  <div class="row wm-article-nav-buttons" role="navigation" aria-label="navigation">
+    
+    <div class="wm-article-nav pull-right">
+      <a href="../stripe/" class="btn btn-xs btn-default pull-right">
+        Next
+        <i class="fa fa-chevron-right" aria-hidden="true"></i>
+      </a>
+      <a href="../stripe/" class="btn btn-xs btn-link">
+        Stripe.com
+      </a>
+    </div>
+    
+    <div class="wm-article-nav">
+      <a href="../vat/" class="btn btn-xs btn-default pull-left">
+        <i class="fa fa-chevron-left" aria-hidden="true"></i>
+        Previous</a><a href="../vat/" class="btn btn-xs btn-link">
+        Taxes
+      </a>
+    </div>
+    
+  </div>
+
+    
+
+    <h1 id="paypal">PayPal</h1>
+<p>PayPal.com is a supported payment processor for the donation tool. It is used to process a donation payment to transfer funds from the donator to your community.</p>
+<h2 id="setup-paypal-account">Setup PayPal account</h2>
+<p>To automatically process a transaction from a donator, you need to register a REST Api app in the PayPal developer portal.
+Do so by following these steps:</p>
+<ul>
+<li>Open the <a href="https://developer.paypal.com/">developer.paypal.com</a> page in your internet browser</li>
+<li>Login by clicking the top right <code>Login to dashboard</code> link and use your PayPal login credentials</li>
+<li>You should see your dashboard with an overview of your apps and credentials</li>
+<li>In the <code>REST Api apps</code> section, click the <code>Create App</code> button<ul>
+<li>You can choose between an app on the sandbox partition of PayPal, in order to test out this tool before using it</li>
+<li>In order to process donations of your donators, you need an app in the <code>Live</code> partition of PayPal (you can switch with the buttons under the <code>My apps &amp; credentials</code> title)</li>
+</ul>
+</li>
+<li>Open the apps overview page by clicking on the apps name</li>
+<li>Note down the <code>Client ID</code> and the Secret value, you'll need these values in the "Configuration"</li>
+</ul>
+<h2 id="configure-paypal">Configure PayPal</h2>
+<p>The PayPal configuration in the <code>config.yml</code> all reside in the <code>paypal</code> key:</p>
+<pre><code class="language-yaml">paypal:
+  # The environment of PayPal which match to the credentials you configure in the next settings. If you use sandbox
+  # credentials, use 'sandbox', if you use live credentials, use 'production'.
+  # Allowed values: sandbox, production
+  environment: sandbox
+  # The access credentials of your PayPal application to process payments. You can either use the sandbox credentials
+  # to test the application. In order to process real funds, you need to have a paypal business account and use
+  # credentials of a live app.
+  # You can create these in the PayPal developer portal: https://developer.paypal.com/developer/applications/
+  clientId:
+  clientSecret:
+</code></pre>
+
+  <br>
+    
+
+    
+    
+      
+    
+
+  <div class="row wm-article-nav-buttons" role="navigation" aria-label="navigation">
+    
+    <div class="wm-article-nav pull-right">
+      <a href="../stripe/" class="btn btn-xs btn-default pull-right">
+        Next
+        <i class="fa fa-chevron-right" aria-hidden="true"></i>
+      </a>
+      <a href="../stripe/" class="btn btn-xs btn-link">
+        Stripe.com
+      </a>
+    </div>
+    
+    <div class="wm-article-nav">
+      <a href="../vat/" class="btn btn-xs btn-default pull-left">
+        <i class="fa fa-chevron-left" aria-hidden="true"></i>
+        Previous</a><a href="../vat/" class="btn btn-xs btn-link">
+        Taxes
+      </a>
+    </div>
+    
+  </div>
+
+    <br>
+</div>
+
+<footer class="container-fluid wm-page-content">
+      <p>
+        <a href="https://github.com/floriansw/server-donation-tool/edit/main/docs/payments/paypal.md"><i class="fa fa-github"></i>
+Edit on GitHub</a>
+      </p>
+  <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a> using <a href="https://github.com/gristlabs/mkdocs-windmill">Windmill</a> theme by Grist Labs.</p>
+</footer>
+
+</body>
+</html>

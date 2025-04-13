@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+  
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <meta name="author" content="Florian Schmidt">
+    
+    <link rel="shortcut icon" href="../img/favicon.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+    <title>Roles - Server Donation Tool</title>
+    <link href="../css/bootstrap-3.3.7.min.css" rel="stylesheet">
+    <link href="../css/font-awesome-4.7.0.css" rel="stylesheet">
+    <link href="../css/base.css" rel="stylesheet">
+    <link rel="stylesheet" href="../css/highlight.css">
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+
+    <script src="../js/jquery-3.2.1.min.js"></script>
+    <script src="../js/bootstrap-3.3.7.min.js"></script>
+    <script src="../js/highlight.pack.js"></script>
+    
+    <base target="_top">
+    <script>
+      var base_url = '..';
+      var is_top_frame = false;
+        
+        var pageToc = [
+          {title: "Roles", url: "#_top", children: [
+              {title: "Auditor", url: "#auditor" },
+          ]},
+        ];
+
+    </script>
+    <script src="../js/base.js"></script> 
+</head>
+
+<body>
+<script>
+if (is_top_frame) { $('body').addClass('wm-top-page'); }
+</script>
+
+
+
+<div class="container-fluid wm-page-content">
+  <a name="_top"></a>
+    
+
+    
+    
+      
+    
+
+  <div class="row wm-article-nav-buttons" role="navigation" aria-label="navigation">
+    
+    <div class="wm-article-nav pull-right">
+      <a href="../payments/refunds/" class="btn btn-xs btn-default pull-right">
+        Next
+        <i class="fa fa-chevron-right" aria-hidden="true"></i>
+      </a>
+      <a href="../payments/refunds/" class="btn btn-xs btn-link">
+        Refunds
+      </a>
+    </div>
+    
+    <div class="wm-article-nav">
+      <a href="../discord-notifications/" class="btn btn-xs btn-default pull-left">
+        <i class="fa fa-chevron-left" aria-hidden="true"></i>
+        Previous</a><a href="../discord-notifications/" class="btn btn-xs btn-link">
+        Discord Notifications
+      </a>
+    </div>
+    
+  </div>
+
+    
+
+    <h1 id="roles">Roles</h1>
+<p>Every user in the donation tool implicitly gets the Donator role, which allows them to:
+- Make a new donation
+- Subscribe to a package
+- Inspect their own donation
+- View their own subscriptions
+- Cancel their own subscriptions</p>
+<p>Additionally, to this implicit role, the donation tool has the following other roles.
+Role membership is granted based on membership to a specific Discord role within the Discord guild you configure in the <code>discord.bot.guildId</code> configuration option.
+In order to map a specific Discord role to a donation tool role, add the <code>roleMapping</code> configuration option to the <code>discord</code> option.
+Then add the role name as a key and the Discord role ID as the value (make sure the role ID is escaped to avoid yaml number encoding issues), like in this example:</p>
+<pre><code class="language-yaml">discord:
+  clientId: '123456789'
+  # ...
+  roleMapping:
+    roleName: '987654321'
+</code></pre>
+<p>Following you find a list of roles defined in the donation tool.
+Only roles that you define in the <code>roleMapping</code> configuration are used in the tool.
+If you do not define the mapping, then no user will get this role.</p>
+<h2 id="auditor">Auditor</h2>
+<p>To enable this role, use this key in <code>roleMapping</code>: <code>auditor</code>.</p>
+<p>Members of this role are able to see a statistics of donations made on a monthly basis (<code>/statistics</code>).</p>
+
+  <br>
+    
+
+    
+    
+      
+    
+
+  <div class="row wm-article-nav-buttons" role="navigation" aria-label="navigation">
+    
+    <div class="wm-article-nav pull-right">
+      <a href="../payments/refunds/" class="btn btn-xs btn-default pull-right">
+        Next
+        <i class="fa fa-chevron-right" aria-hidden="true"></i>
+      </a>
+      <a href="../payments/refunds/" class="btn btn-xs btn-link">
+        Refunds
+      </a>
+    </div>
+    
+    <div class="wm-article-nav">
+      <a href="../discord-notifications/" class="btn btn-xs btn-default pull-left">
+        <i class="fa fa-chevron-left" aria-hidden="true"></i>
+        Previous</a><a href="../discord-notifications/" class="btn btn-xs btn-link">
+        Discord Notifications
+      </a>
+    </div>
+    
+  </div>
+
+    <br>
+</div>
+
+<footer class="container-fluid wm-page-content">
+      <p>
+        <a href="https://github.com/floriansw/server-donation-tool/edit/main/docs/roles.md"><i class="fa fa-github"></i>
+Edit on GitHub</a>
+      </p>
+  <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a> using <a href="https://github.com/gristlabs/mkdocs-windmill">Windmill</a> theme by Grist Labs.</p>
+</footer>
+
+</body>
+</html>

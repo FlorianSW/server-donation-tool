@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+  
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <meta name="author" content="Florian Schmidt">
+    
+    <link rel="shortcut icon" href="../img/favicon.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+    <title>Setup/Use https/secure connections - Server Donation Tool</title>
+    <link href="../css/bootstrap-3.3.7.min.css" rel="stylesheet">
+    <link href="../css/font-awesome-4.7.0.css" rel="stylesheet">
+    <link href="../css/base.css" rel="stylesheet">
+    <link rel="stylesheet" href="../css/highlight.css">
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+
+    <script src="../js/jquery-3.2.1.min.js"></script>
+    <script src="../js/bootstrap-3.3.7.min.js"></script>
+    <script src="../js/highlight.pack.js"></script>
+    
+    <base target="_top">
+    <script>
+      var base_url = '..';
+      var is_top_frame = false;
+        
+        var pageToc = [
+          {title: "Serving the donation tool website using a secure connection (https)", url: "#_top", children: [
+              {title: "Setup of nginx (the reverse proxy webserver)", url: "#setup-of-nginx-the-reverse-proxy-webserver" },
+              {title: "Setup of certbot for issuing a certificate", url: "#setup-of-certbot-for-issuing-a-certificate" },
+              {title: "Configure automatic certificate renewal", url: "#configure-automatic-certificate-renewal" },
+          ]},
+        ];
+
+    </script>
+    <script src="../js/base.js"></script> 
+</head>
+
+<body>
+<script>
+if (is_top_frame) { $('body').addClass('wm-top-page'); }
+</script>
+
+
+
+<div class="container-fluid wm-page-content">
+  <a name="_top"></a>
+    
+
+    
+    
+      
+    
+
+  <div class="row wm-article-nav-buttons" role="navigation" aria-label="navigation">
+    
+    <div class="wm-article-nav pull-right">
+      <a href="../message-overrides/" class="btn btn-xs btn-default pull-right">
+        Next
+        <i class="fa fa-chevron-right" aria-hidden="true"></i>
+      </a>
+      <a href="../message-overrides/" class="btn btn-xs btn-link">
+        Overwrite messages
+      </a>
+    </div>
+    
+    <div class="wm-article-nav">
+      <a href="../payments/stripe/" class="btn btn-xs btn-default pull-left">
+        <i class="fa fa-chevron-left" aria-hidden="true"></i>
+        Previous</a><a href="../payments/stripe/" class="btn btn-xs btn-link">
+        Stripe.com
+      </a>
+    </div>
+    
+  </div>
+
+    
+
+    <h1 id="serving-the-donation-tool-website-using-a-secure-connection-https">Serving the donation tool website using a secure connection (https)</h1>
+<p>The donation tool handles some sensitive information, like personal data from your donators, and more importantly, your donators are asked to use PayPal to process a payment.
+Even though these information are not send directly from the client to the server, some identifiers are, and, of course, the fact that your donators are using the website.
+It therefore makes sense to protect this information when they get transferred to your server.
+When you do not configure serving traffic via https, browser may also mark your website as "Not secure" when donators open it.
+To do so, you may want to setup to serve the donation tool website with https using a reverse proxy.</p>
+<p>As of this guide, we will use the following components:</p>
+<ul>
+<li>nginx as a reverse proxy web-server</li>
+<li><a href="https://letsencrypt.org/">Let's Encrypt</a> to automatically obtain and renew a free certificate for your domain</li>
+<li>Windows as an operating system, it should not differ much when using a Linux/MacOS operating system, though</li>
+</ul>
+<p>However, you can use whatever webserver or certificate provider you are most familiar with.
+You may even buy a certificate from a certificate authority of your choice.</p>
+<p>When using nginx as a webserver and following this guide, please make sure you stop all existing and still listening webservers that listen on port 80 or 443 (or make them listen on other ports).</p>
+<h2 id="setup-of-nginx-the-reverse-proxy-webserver">Setup of nginx (the reverse proxy webserver)</h2>
+<ul>
+<li>First, make sure you configure the donation tool to listen on another port than 80 or 443, usually you would take 8080, if this one is still unused on your server</li>
+<li>You do not (and <em>should</em> not) whitelist this port in your firewall, it is expected to be not reachable from the internet in this configuration scenario, nginx will serve traffic from the donation tool via traffic through localhost</li>
+<li>If you choose another port than 8080, make sure you change the port in the <code>nginx.conf</code> (see later)</li>
+<li>Download mainline for Windows from <a href="http://nginx.org/en/download.html">nginx.org</a></li>
+<li>Extract the contents (conf, contrib, etc) into the directory of your choice, for this guide we'll use <code>D:\nginx</code></li>
+<li>Open a terminal window ([Win] + [R] -&gt; <code>cmd</code> -&gt; [Enter])</li>
+<li>Navigate to the directory <code>D:\nginx</code>: <code>cd D:\nginx</code></li>
+<li>Start nginx: <code>start nginx.exe</code></li>
+<li>Copy the example config <code>nginx.conf</code> (within the directory of this guide) to the <code>conf</code> directory inside the extracted nginx directory</li>
+<li>Open the configuration file and change the <code>server_name</code> property by replacing <code>localhost</code> with your domain name</li>
+<li>Reload the configuration of nginx: <code>.\nginx.exe -s reload</code></li>
+<li>Verify that you can open your domain name in the browser, e.g.: http://example.com/.well-known/ (it should respond with a 404 - Not Found)</li>
+</ul>
+<h2 id="setup-of-certbot-for-issuing-a-certificate">Setup of certbot for issuing a certificate</h2>
+<p>Certbot is a tool that interacts with Let's Encrypts ACME procotol to automatically:
+* Create a private key
+* Create a certificate request (CSR) for your domain
+* Let Let's Encrypt validate that you own your domain
+* Issue the certificate</p>
+<p>In order to do that and to <em>install</em> the certificate into nginx, follow these steps:</p>
+<ul>
+<li>Download certbot from <a href="https://certbot.eff.org/lets-encrypt/windows-nginx">their website</a></li>
+<li>Open a new command line window with administrator privileges ([Win] + [R] -&gt; <code>cmd</code> -&gt; right click on command line -&gt; Run with administrator privileges)</li>
+<li>Run the following command: <code>certbot certonly --webroot</code> and follow the questions on the screen</li>
+<li>Enter an e-mail address (it does not be one of the domain you want to have a certificate for)</li>
+<li>Read and accept the terms of service (by pressing Y)</li>
+<li>Decide if you want to share data with the EFF, which is not a requirement for the certificate creation process</li>
+<li>Enter the domain name for which you want to run the donation tool, e.g.: donate.example.com</li>
+<li>Enter the following path for the webroot: <code>D:\nginx\html\</code></li>
+<li>The certificate should be created successfully</li>
+<li>You can now close this administrator command line</li>
+<li>Open the directory <code>C:\Certbot\live\yourdomain</code> (replacing <code>yourdomain</code> with your domain), it should contain some files like <code>cert.pem</code></li>
+<li>Go back to the configuration file of nginx (<code>nginx.conf</code>) and uncomment the last server block (the lines with <code>#</code>), remove only the hashtags from the beginning of the line</li>
+<li>Locate the configuration option <code>ssl_certificate</code> and replace <code>cert.pem</code> with the following value: <code>C:/Certbot/live/yourdomain/fullchain.pem</code>, replacing <code>yourdomain</code> with your domain</li>
+<li>Locate the configuration option <code>ssl_certificate_key</code> and replace <code>key.pem</code> with the following value: <code>C:/Certbot/live/yourdomain/privkey.pem</code>, replacing <code>yourdomain</code> with your domain</li>
+<li>Go back to the command line and execute the following command: <code>.\nginx.exe -s reload</code></li>
+<li>Open the domain name in your browser, it should automatically redirect to https:// and serve the donation tool</li>
+</ul>
+<h2 id="configure-automatic-certificate-renewal">Configure automatic certificate renewal</h2>
+<p>Certificates from Let's Encrypt expire after a short period of time, currently 90 days.
+This is an intended short lifetime, in order to ensure that certificates rotate often <a href="https://letsencrypt.org/2015/11/09/why-90-days.html">for several reasons</a>.</p>
+<p>Certbot will automatically install a scheduled task to renew your certificates before they expire.
+However, it can not know what to do in order to <em>install</em> the certificates correctly, after they get renewed.
+For that, you need to adjust the command so that it will automatically reload the configuration of nginx:</p>
+<ul>
+<li>Open the "Scheduled task" manager of Windows</li>
+<li>Locate the "Certbot Renew Task" scheduled task</li>
+<li>Open it by double clicking on it</li>
+<li>Navigate to the "Actions" tab</li>
+<li>Select the only action inside there and press "Edit"</li>
+<li>In the "Arguments" input field, add the following content <em>after</em> <code>certbot renew</code> but before the last <code>"</code>: <code>--deploy-hook 'D:\nginx\nginx.exe -s reload'</code></li>
+<li>Save the changes by clicking on OK</li>
+</ul>
+
+  <br>
+    
+
+    
+    
+      
+    
+
+  <div class="row wm-article-nav-buttons" role="navigation" aria-label="navigation">
+    
+    <div class="wm-article-nav pull-right">
+      <a href="../message-overrides/" class="btn btn-xs btn-default pull-right">
+        Next
+        <i class="fa fa-chevron-right" aria-hidden="true"></i>
+      </a>
+      <a href="../message-overrides/" class="btn btn-xs btn-link">
+        Overwrite messages
+      </a>
+    </div>
+    
+    <div class="wm-article-nav">
+      <a href="../payments/stripe/" class="btn btn-xs btn-default pull-left">
+        <i class="fa fa-chevron-left" aria-hidden="true"></i>
+        Previous</a><a href="../payments/stripe/" class="btn btn-xs btn-link">
+        Stripe.com
+      </a>
+    </div>
+    
+  </div>
+
+    <br>
+</div>
+
+<footer class="container-fluid wm-page-content">
+      <p>
+        <a href="https://github.com/floriansw/server-donation-tool/edit/main/docs/secure-connections.md"><i class="fa fa-github"></i>
+Edit on GitHub</a>
+      </p>
+  <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a> using <a href="https://github.com/gristlabs/mkdocs-windmill">Windmill</a> theme by Grist Labs.</p>
+</footer>
+
+</body>
+</html>

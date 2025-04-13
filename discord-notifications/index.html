@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+  
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <meta name="author" content="Florian Schmidt">
+    
+    <link rel="shortcut icon" href="../img/favicon.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+    <title>Discord Notifications - Server Donation Tool</title>
+    <link href="../css/bootstrap-3.3.7.min.css" rel="stylesheet">
+    <link href="../css/font-awesome-4.7.0.css" rel="stylesheet">
+    <link href="../css/base.css" rel="stylesheet">
+    <link rel="stylesheet" href="../css/highlight.css">
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+
+    <script src="../js/jquery-3.2.1.min.js"></script>
+    <script src="../js/bootstrap-3.3.7.min.js"></script>
+    <script src="../js/highlight.pack.js"></script>
+    
+    <base target="_top">
+    <script>
+      var base_url = '..';
+      var is_top_frame = false;
+        
+        var pageToc = [
+          {title: "Discord notifications", url: "#_top", children: [
+              {title: "Core concept", url: "#core-concept" },
+              {title: "Setup", url: "#setup" },
+          ]},
+        ];
+
+    </script>
+    <script src="../js/base.js"></script> 
+</head>
+
+<body>
+<script>
+if (is_top_frame) { $('body').addClass('wm-top-page'); }
+</script>
+
+
+
+<div class="container-fluid wm-page-content">
+  <a name="_top"></a>
+    
+
+    
+    
+      
+    
+
+  <div class="row wm-article-nav-buttons" role="navigation" aria-label="navigation">
+    
+    <div class="wm-article-nav pull-right">
+      <a href="../roles/" class="btn btn-xs btn-default pull-right">
+        Next
+        <i class="fa fa-chevron-right" aria-hidden="true"></i>
+      </a>
+      <a href="../roles/" class="btn btn-xs btn-link">
+        Roles
+      </a>
+    </div>
+    
+    <div class="wm-article-nav">
+      <a href="../steam-login/" class="btn btn-xs btn-default pull-left">
+        <i class="fa fa-chevron-left" aria-hidden="true"></i>
+        Previous</a><a href="../steam-login/" class="btn btn-xs btn-link">
+        Setup Additional Steam Login
+      </a>
+    </div>
+    
+  </div>
+
+    
+
+    <h1 id="discord-notifications">Discord notifications</h1>
+<p>The server donation tool is helping your donators to donate to your community and get rewards for that quicker and in a
+self service without you getting involved in this process. However, that also means, that you loose insights in what
+packages your donators like to donate for and how many donations you get. You could use the PayPal transaction history
+for that, however, it might contain donation-unrelated charges and incoming funds as well, which makes this approach not
+feasible. Additionally, a pure transaction history does not give you insights into possible problems that may occur when
+a donator redeems the perks of a package.</p>
+<p>Discord notifications is an optional functionality of the server donation tool to help you gather all these insights
+easily.</p>
+<h2 id="core-concept">Core concept</h2>
+<p>You can configure the server donation tool to send a notification to one or more discord channels with all required
+information for the specified event. The notification is sent to the configured Discord webhook. Webhooks are an easy to
+setup way to send arbitrary messages to a Discord channel. See the
+official <a href="https://support.discord.com/hc/en-us/articles/228383668-Einleitung-in-Webhooks">webhook documentation</a> in the
+Discord documentation to find out more.</p>
+<h2 id="setup">Setup</h2>
+<h3 id="available-notification-types">Available notification types</h3>
+<p>The following notification types are currently available in the tool. Please also ensure you send the message contents
+to appropriate channels. For example, notification types that contain personal identifiable information are most likely
+not supposed to be published into a public channel.</p>
+<p>You can configure multiple notifications, which take different (or even the same) notification types.</p>
+<table>
+    <thead>
+        <tr>
+            <th>Type</th>
+            <th>Event</th>
+            <th>Information</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>DONATED_PUBLIC</td>
+            <td>Same as `DONATED` with the difference that it is aimed to be send to a public discord channel.</td>
+            <td>By default only the Discord username (and tag) is used. Server owners can overwrite the `NOTIFICATIONS_PAYMENT_SUCCESSFUL_PUBLIC_DESCRIPTION` message and use the following variables additionally: `username`, `userId`, `package`, `price`.</td>
+        </tr>
+        <tr>
+            <td>DONATED</td>
+            <td>A donator successfully donated (donation is processed and confirmed by PayPal).</td>
+            <td rowspan="3">Order ID, PayPal Order ID, PayPal Transaction ID, Donator Discord and Steam ID, Donated for package, Order creation date</td>
+        </tr>
+        <tr>
+            <td>SUCCESSFUL_REDEEM</td>
+            <td>A donator redeemed the perks of a package. This notification can be sent multiple times for a single donation.</td>
+        </tr>
+        <tr>
+            <td>SUCCESSFUL_REFUND</td>
+            <td>A donation was refunded by the payment provider. Perks granted by the donation were rolled back if possible.</td>
+        </tr>
+        <tr>
+            <td>REDEEM_ERROR</td>
+            <td>A donator tried to redeem perks for their package and there was an error. This notification might occur multiple times for the same donation, one for each errored perk.</td>
+        </tr>
+        <tr>
+            <td>REFUND_ERROR</td>
+            <td>It was tried to rollback a perk granted to a donator after the donation was refunded, but the refund of that perk failed.</td>
+        </tr>
+        <tr>
+            <td>SUBSCRIPTION_ACTIVATED</td>
+            <td>A donator subscribed to a package.</td>
+            <td rowspan="2">Subscription ID, Subscription Plan ID, PayPal Subscription ID, PayPal Plan ID, PayPal Product ID, Donator Discord and Steam ID, Package the donator subscribed to</td>
+        </tr>
+        <tr>
+            <td>SUBSCRIPTION_CANCELLED</td>
+            <td>A donator cancelled a subscription.</td>
+        </tr>
+        <tr>
+            <td>SUBSCRIPTION_EXECUTED</td>
+            <td>A payment was made as part of a recurring subscription. This event will come together with the `SUCCESSFUL_REDEEM` event.</td>
+            <td>Subscription ID, Subscription Plan ID, PayPal Subscription ID, PayPal Plan ID, PayPal Product ID, Order ID, PayPal Order ID, PayPal Transaction ID, Donator Discord and Steam ID, Package the donator subscribed to</td>
+        </tr>
+    </tbody>
+</table>
+
+<h3 id="preparation">Preparation</h3>
+<p>In order to configure the notifications, you need to first create an incoming webhook URL for the channel(s) where you want to receive discord notifications.
+See the discord <a href="https://support.discord.com/hc/en-us/articles/228383668-Einleitung-in-Webhooks">webhook documentation</a> to find more info on how to do that.
+Write down the webhook URL(s) for the next steps.</p>
+<h3 id="configure-the-notifications">Configure the notifications</h3>
+<p>Open the <code>config.yml</code> file in your favourite text editor.
+Find the configuration key <code>discord</code> and check if there is a child-key named <code>notifications</code> already.
+If not, create one.
+Your configuration should now look similar to this one (unnecessary parts are removed):</p>
+<pre><code class="language-yaml"># ...
+discord:
+  # ...
+  notifications:
+# ...
+</code></pre>
+<p>You can now add one configuration block per unique webhook URL (one webhook URL per channel) with the following options:
+- <strong>webhookUrl</strong>: The Discord webhook URL where the notifications should be sent
+- <strong>types</strong>: A list of notification types to sent to this channel (see the list above)</p>
+<p>For example, you may want to configure something similar to:</p>
+<pre><code class="language-yaml"># ...
+discord:
+  # ...
+  notifications:
+    # Might go to #donation-feed
+    - webhookUrl: https://discord.com/webhook/...
+      types:
+        - DONATED
+        - SUCCESSFUL_REDEEM
+    # might go to #donation-errors
+    - webhookUrl: https://discord.com/webhook/...
+      types:
+        - REDEEM_ERROR
+# ...
+</code></pre>
+
+  <br>
+    
+
+    
+    
+      
+    
+
+  <div class="row wm-article-nav-buttons" role="navigation" aria-label="navigation">
+    
+    <div class="wm-article-nav pull-right">
+      <a href="../roles/" class="btn btn-xs btn-default pull-right">
+        Next
+        <i class="fa fa-chevron-right" aria-hidden="true"></i>
+      </a>
+      <a href="../roles/" class="btn btn-xs btn-link">
+        Roles
+      </a>
+    </div>
+    
+    <div class="wm-article-nav">
+      <a href="../steam-login/" class="btn btn-xs btn-default pull-left">
+        <i class="fa fa-chevron-left" aria-hidden="true"></i>
+        Previous</a><a href="../steam-login/" class="btn btn-xs btn-link">
+        Setup Additional Steam Login
+      </a>
+    </div>
+    
+  </div>
+
+    <br>
+</div>
+
+<footer class="container-fluid wm-page-content">
+      <p>
+        <a href="https://github.com/floriansw/server-donation-tool/edit/main/docs/discord-notifications.md"><i class="fa fa-github"></i>
+Edit on GitHub</a>
+      </p>
+  <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a> using <a href="https://github.com/gristlabs/mkdocs-windmill">Windmill</a> theme by Grist Labs.</p>
+</footer>
+
+</body>
+</html>

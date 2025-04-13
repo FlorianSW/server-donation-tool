@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+  
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <meta name="author" content="Florian Schmidt">
+    
+    <link rel="shortcut icon" href="../../img/favicon.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+    <title>Refunds - Server Donation Tool</title>
+    <link href="../../css/bootstrap-3.3.7.min.css" rel="stylesheet">
+    <link href="../../css/font-awesome-4.7.0.css" rel="stylesheet">
+    <link href="../../css/base.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../css/highlight.css">
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+
+    <script src="../../js/jquery-3.2.1.min.js"></script>
+    <script src="../../js/bootstrap-3.3.7.min.js"></script>
+    <script src="../../js/highlight.pack.js"></script>
+    
+    <base target="_top">
+    <script>
+      var base_url = '../..';
+      var is_top_frame = false;
+        
+        var pageToc = [
+          {title: "Refunds", url: "#_top", children: [
+          ]},
+        ];
+
+    </script>
+    <script src="../../js/base.js"></script> 
+</head>
+
+<body>
+<script>
+if (is_top_frame) { $('body').addClass('wm-top-page'); }
+</script>
+
+
+
+<div class="container-fluid wm-page-content">
+  <a name="_top"></a>
+    
+
+    
+    
+      
+    
+
+  <div class="row wm-article-nav-buttons" role="navigation" aria-label="navigation">
+    
+    <div class="wm-article-nav pull-right">
+      <a href="../vat/" class="btn btn-xs btn-default pull-right">
+        Next
+        <i class="fa fa-chevron-right" aria-hidden="true"></i>
+      </a>
+      <a href="../vat/" class="btn btn-xs btn-link">
+        Taxes
+      </a>
+    </div>
+    
+    <div class="wm-article-nav">
+      <a href="../../roles/" class="btn btn-xs btn-default pull-left">
+        <i class="fa fa-chevron-left" aria-hidden="true"></i>
+        Previous</a><a href="../../roles/" class="btn btn-xs btn-link">
+        Roles
+      </a>
+    </div>
+    
+  </div>
+
+    
+
+    <h1 id="refunds">Refunds</h1>
+<p>Completed payments may be refunded by the payment provider (either by an action of the payment receiver/payment account owner, or by a technical reason).
+The donation tool, once it gets the notification about a donation being refunded, will try to refund the perks assigned to the donator automatically.</p>
+<p>However, refunding needs to be supported by the perk and might be done on a best-guess basis, depending on if the perk can identify that a specific allowed advantage was setup as a result of this donation.
+For example, the priority queue perk can, with a pretty good confidence, evaluate if a priority queue for a specific user was created by a specific donation or not.
+Only, if the donation which setup the priority queue, is also the one which is refunded, the donation tool will remove the priority queue.
+Otherwise, the priority queue slot will be kept untouched.
+This might be the case when the donator donated a second time some days after the first time, and when the first donation got refunded by the payment provider.</p>
+<p>On the other hand, the discord role perk is not able to evaluate if a role of a user was setup by a specific donation.
+In this case, the role will be removed from the user when any donation (which contains the discord role perk) gets refunded.
+The donator may, in this case, open the still valid donation in their donation history and redeem the perks again in order to gain the role again.</p>
+<blockquote>
+<p>Note that refunds are currently <em>only</em> supported by the payment Provider <strong>PayPal</strong></p>
+</blockquote>
+
+  <br>
+    
+
+    
+    
+      
+    
+
+  <div class="row wm-article-nav-buttons" role="navigation" aria-label="navigation">
+    
+    <div class="wm-article-nav pull-right">
+      <a href="../vat/" class="btn btn-xs btn-default pull-right">
+        Next
+        <i class="fa fa-chevron-right" aria-hidden="true"></i>
+      </a>
+      <a href="../vat/" class="btn btn-xs btn-link">
+        Taxes
+      </a>
+    </div>
+    
+    <div class="wm-article-nav">
+      <a href="../../roles/" class="btn btn-xs btn-default pull-left">
+        <i class="fa fa-chevron-left" aria-hidden="true"></i>
+        Previous</a><a href="../../roles/" class="btn btn-xs btn-link">
+        Roles
+      </a>
+    </div>
+    
+  </div>
+
+    <br>
+</div>
+
+<footer class="container-fluid wm-page-content">
+      <p>
+        <a href="https://github.com/floriansw/server-donation-tool/edit/main/docs/payments/refunds.md"><i class="fa fa-github"></i>
+Edit on GitHub</a>
+      </p>
+  <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a> using <a href="https://github.com/gristlabs/mkdocs-windmill">Windmill</a> theme by Grist Labs.</p>
+</footer>
+
+</body>
+</html>

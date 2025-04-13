@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+  
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <meta name="author" content="Florian Schmidt">
+    
+    <link rel="shortcut icon" href="../img/favicon.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+    <title>Subscriptions - Server Donation Tool</title>
+    <link href="../css/bootstrap-3.3.7.min.css" rel="stylesheet">
+    <link href="../css/font-awesome-4.7.0.css" rel="stylesheet">
+    <link href="../css/base.css" rel="stylesheet">
+    <link rel="stylesheet" href="../css/highlight.css">
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+
+    <script src="../js/jquery-3.2.1.min.js"></script>
+    <script src="../js/bootstrap-3.3.7.min.js"></script>
+    <script src="../js/highlight.pack.js"></script>
+    
+    <base target="_top">
+    <script>
+      var base_url = '..';
+      var is_top_frame = false;
+        
+        var pageToc = [
+          {title: "Subscriptions", url: "#_top", children: [
+              {title: "Setup of Subscriptions", url: "#setup-of-subscriptions" },
+              {title: "Detailed information", url: "#detailed-information" },
+          ]},
+        ];
+
+    </script>
+    <script src="../js/base.js"></script> 
+</head>
+
+<body>
+<script>
+if (is_top_frame) { $('body').addClass('wm-top-page'); }
+</script>
+
+
+
+<div class="container-fluid wm-page-content">
+  <a name="_top"></a>
+    
+
+    
+    
+      
+    
+
+  <div class="row wm-article-nav-buttons" role="navigation" aria-label="navigation">
+    
+    <div class="wm-article-nav pull-right">
+      <a href="../steam-login/" class="btn btn-xs btn-default pull-right">
+        Next
+        <i class="fa fa-chevron-right" aria-hidden="true"></i>
+      </a>
+      <a href="../steam-login/" class="btn btn-xs btn-link">
+        Setup Additional Steam Login
+      </a>
+    </div>
+    
+    <div class="wm-article-nav">
+      <a href="../packages-and-perks/" class="btn btn-xs btn-default pull-left">
+        <i class="fa fa-chevron-left" aria-hidden="true"></i>
+        Previous</a><a href="../packages-and-perks/" class="btn btn-xs btn-link">
+        Packages and Perks
+      </a>
+    </div>
+    
+  </div>
+
+    
+
+    <h1 id="subscriptions">Subscriptions</h1>
+<p>Subscriptions is a feature of donation packages, which help donators to donate to a community in a regular, automated manner.
+When enabled for a package, a donator can subscribe to that package.
+The price of the package will then be charged to the PayPal account of the donator (which was used to subscribe to the package).
+Also, the perks included in the package will automatically be redeemed on the behalf of the donator.</p>
+<p>Subscriptions are currently supported by the following payment providers:
+* PayPal
+* Stripe</p>
+<p>Subscriptions <strong>do not work</strong> with packages that have perks requiring any other Game ID other than Steam (PlayStation network, XBox).
+Enabling subscriptions on such packages will result in errors when the subscription is redeemed once paid.</p>
+<h2 id="setup-of-subscriptions">Setup of Subscriptions</h2>
+<p>To enable the subscriptions feature for a specific package, you simply need to set the billing cycle for that package, using the <code>subscription</code> configuration key, e.g.:</p>
+<pre><code class="language-yaml">packages:
+  - name: 'Perk #1'
+    subscription: monthly
+    id: 1
+    # ...
+</code></pre>
+<p>As of now, the only available billing cycle for package subscriptions is <code>monthly</code>.</p>
+<p>Once you restarted the donation tool, it will automatically do the one-time setup.
+Once this process is finished, the packages with the <code>subscription</code> property set will be available for donators to subscribe to.</p>
+<h2 id="detailed-information">Detailed information</h2>
+<p>The subscriptions feature heavily relies on the PayPal Webhook feature.
+For that feature to work, the donation tool needs to be registered as a Webhook target within the PayPal developer portal.
+The donation tool will attempt to automatically setup this webhook on your behalf.
+In order for this Webhook to work, the donation tool requires to run with https enabled, as well as on the default port for https websites (443).</p>
+
+  <br>
+    
+
+    
+    
+      
+    
+
+  <div class="row wm-article-nav-buttons" role="navigation" aria-label="navigation">
+    
+    <div class="wm-article-nav pull-right">
+      <a href="../steam-login/" class="btn btn-xs btn-default pull-right">
+        Next
+        <i class="fa fa-chevron-right" aria-hidden="true"></i>
+      </a>
+      <a href="../steam-login/" class="btn btn-xs btn-link">
+        Setup Additional Steam Login
+      </a>
+    </div>
+    
+    <div class="wm-article-nav">
+      <a href="../packages-and-perks/" class="btn btn-xs btn-default pull-left">
+        <i class="fa fa-chevron-left" aria-hidden="true"></i>
+        Previous</a><a href="../packages-and-perks/" class="btn btn-xs btn-link">
+        Packages and Perks
+      </a>
+    </div>
+    
+  </div>
+
+    <br>
+</div>
+
+<footer class="container-fluid wm-page-content">
+      <p>
+        <a href="https://github.com/floriansw/server-donation-tool/edit/main/docs/subscriptions.md"><i class="fa fa-github"></i>
+Edit on GitHub</a>
+      </p>
+  <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a> using <a href="https://github.com/gristlabs/mkdocs-windmill">Windmill</a> theme by Grist Labs.</p>
+</footer>
+
+</body>
+</html>

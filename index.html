@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+  
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="A tool to transform your game-server donations into a self-service experience for your donators.">
+    <meta name="author" content="Florian Schmidt">
+    
+    <link rel="shortcut icon" href="./img/favicon.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+    <title>Server Donation Tool</title>
+    <link href="./css/bootstrap-3.3.7.min.css" rel="stylesheet">
+    <link href="./css/font-awesome-4.7.0.css" rel="stylesheet">
+    <link href="./css/base.css" rel="stylesheet">
+    <link rel="stylesheet" href="./css/highlight.css">
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+
+    <script src="./js/jquery-3.2.1.min.js"></script>
+    <script src="./js/bootstrap-3.3.7.min.js"></script>
+    <script src="./js/highlight.pack.js"></script>
+    
+      <script src="./js/elasticlunr.min.js"></script>
+    
+    <base target="_top">
+    <script>
+      var base_url = '.';
+      var is_top_frame = (window === window.parent);
+        
+        var pageToc = [
+          {title: "Server donation tool", url: "#_top", children: [
+              {title: "Key Features", url: "#key-features" },
+              {title: "Installation \u0026amp; Configuration", url: "#installation-configuration" },
+              {title: "Support and Collaboration", url: "#support-and-collaboration" },
+          ]},
+        ];
+
+    </script>
+    <script src="./js/base.js"></script> 
+</head>
+
+<body>
+<script>
+if (is_top_frame) { $('body').addClass('wm-top-page'); }
+</script>
+
+<nav class="navbar wm-page-top-frame">
+  <div class="container-fluid wm-top-container">
+    
+    <div class="wm-top-tool pull-right wm-vcenter">
+      <form class="dropdown wm-vcentered" id="wm-search-form" action="./search.html">
+        
+        <button id="wm-search-show" class="btn btn-sm btn-default" type="submit"
+          ><i class="fa fa-search" aria-hidden="true"></i></button>
+
+        <div class="input-group input-group-sm wm-top-search">
+          <input type="text" name="q" class="form-control" id="mkdocs-search-query" placeholder="Search" autocomplete="off">
+          <span class="input-group-btn" role="search">
+            
+            <button class="btn btn-default dropdown-toggle collapse" data-toggle="dropdown" type="button"><span class="caret"></span></button>
+            <ul id="mkdocs-search-results" class="dropdown-menu dropdown-menu-right"></ul>
+            <button id="wm-search-go" class="btn btn-default" type="submit"><i class="fa fa-search" aria-hidden="true"></i></button>
+          </span>
+        </div>
+      </form>
+    </div>
+
+    
+    <div class="wm-top-tool wm-vcenter pull-right wm-small-left">
+      <button id="wm-toc-button" type="button" class="btn btn-sm btn-default wm-vcentered"><i class="fa fa-th-list" aria-hidden="true"></i></button>
+    </div>
+
+    
+    
+
+    
+    <a href="" class="wm-top-brand wm-top-link wm-vcenter">
+      
+      <div class="wm-top-title">
+        Server Donation Tool<br>
+        
+      </div>
+    </a>
+  </div>
+</nav>
+
+  <div id="main-content" class="wm-page-top-frame">
+    
+<nav class="wm-toc-pane">
+  
+    <ul class="wm-toctree wm-toc-repo">
+      <li class="wm-toc-li wm-toc-lev1">
+      <a class="wm-article-link wm-toc-text" href="https://github.com/floriansw/server-donation-tool">
+        <i class="fa fa-github"></i>
+
+        GitHub
+      </a>
+      </li>
+    </ul>
+  <ul class="wm-toctree">
+        <li class="wm-toc-li wm-toc-lev1 "><a href="" class="wm-article-link wm-toc-text">Home</a>
+</li>
+        <li class="wm-toc-li wm-toc-lev1 "><a href="getting-started/" class="wm-article-link wm-toc-text">Getting Strated</a>
+</li>
+        <li class="wm-toc-li wm-toc-lev1 wm-toc-opener"><span class="wm-toc-text">Configuration</span>
+</li>
+<li class="wm-toc-li-nested collapse">
+  <ul class="wm-toctree">
+      <li class="wm-toc-li wm-toc-lev2 "><a href="packages-and-perks/" class="wm-article-link wm-toc-text">Packages and Perks</a>
+</li>
+      <li class="wm-toc-li wm-toc-lev2 "><a href="subscriptions/" class="wm-article-link wm-toc-text">Subscriptions</a>
+</li>
+      <li class="wm-toc-li wm-toc-lev2 "><a href="steam-login/" class="wm-article-link wm-toc-text">Setup Additional Steam Login</a>
+</li>
+      <li class="wm-toc-li wm-toc-lev2 "><a href="discord-notifications/" class="wm-article-link wm-toc-text">Discord Notifications</a>
+</li>
+      <li class="wm-toc-li wm-toc-lev2 "><a href="roles/" class="wm-article-link wm-toc-text">Roles</a>
+</li>
+  </ul>
+</li>
+
+        <li class="wm-toc-li wm-toc-lev1 wm-toc-opener"><span class="wm-toc-text">Payments</span>
+</li>
+<li class="wm-toc-li-nested collapse">
+  <ul class="wm-toctree">
+      <li class="wm-toc-li wm-toc-lev2 "><a href="payments/refunds/" class="wm-article-link wm-toc-text">Refunds</a>
+</li>
+      <li class="wm-toc-li wm-toc-lev2 "><a href="payments/vat/" class="wm-article-link wm-toc-text">Taxes</a>
+</li>
+      <li class="wm-toc-li wm-toc-lev2 wm-toc-opener"><span class="wm-toc-text">Providers</span>
+</li>
+<li class="wm-toc-li-nested collapse">
+  <ul class="wm-toctree">
+      <li class="wm-toc-li wm-toc-lev3 "><a href="payments/paypal/" class="wm-article-link wm-toc-text">PayPal</a>
+</li>
+      <li class="wm-toc-li wm-toc-lev3 "><a href="payments/stripe/" class="wm-article-link wm-toc-text">Stripe.com</a>
+</li>
+  </ul>
+</li>
+
+  </ul>
+</li>
+
+        <li class="wm-toc-li wm-toc-lev1 wm-toc-opener"><span class="wm-toc-text">Security</span>
+</li>
+<li class="wm-toc-li-nested collapse">
+  <ul class="wm-toctree">
+      <li class="wm-toc-li wm-toc-lev2 "><a href="secure-connections/" class="wm-article-link wm-toc-text">Setup/Use https/secure connections</a>
+</li>
+  </ul>
+</li>
+
+        <li class="wm-toc-li wm-toc-lev1 wm-toc-opener"><span class="wm-toc-text">Customizations</span>
+</li>
+<li class="wm-toc-li-nested collapse">
+  <ul class="wm-toctree">
+      <li class="wm-toc-li wm-toc-lev2 "><a href="message-overrides/" class="wm-article-link wm-toc-text">Overwrite messages</a>
+</li>
+      <li class="wm-toc-li wm-toc-lev2 "><a href="server-names/" class="wm-article-link wm-toc-text">Human-readable server names (CFTools)</a>
+</li>
+      <li class="wm-toc-li wm-toc-lev2 "><a href="donation-targets/" class="wm-article-link wm-toc-text">Donation Targets</a>
+</li>
+  </ul>
+</li>
+
+  </ul>
+</nav>
+
+    <div class="wm-content-pane">
+      <iframe class="wm-article" name="article"></iframe>
+    </div>
+  </div>
+
+<div class="container-fluid wm-page-content">
+  <a name="_top"></a>
+    
+
+    
+    
+      
+    
+
+  <div class="row wm-article-nav-buttons" role="navigation" aria-label="navigation">
+    
+    <div class="wm-article-nav pull-right">
+      <a href="getting-started/" class="btn btn-xs btn-default pull-right">
+        Next
+        <i class="fa fa-chevron-right" aria-hidden="true"></i>
+      </a>
+      <a href="getting-started/" class="btn btn-xs btn-link">
+        Getting Strated
+      </a>
+    </div>
+    
+  </div>
+
+    
+
+    <h1 id="server-donation-tool">Server donation tool</h1>
+<p><a href="https://go2tech.de/discord"><img alt="Discord" src="https://img.shields.io/discord/729467994832371813?color=7289da&amp;label=Discord&amp;logo=discord&amp;logoColor=ffffff&amp;style=flat-square" /></a>
+<a href="https://hub.docker.com/r/droidwiki/server-donation-tool"><img alt="Docker Pulls" src="https://img.shields.io/docker/pulls/droidwiki/server-donation-tool?style=flat-square" /></a>
+<a href="https://floriansw.github.io/server-donation-tool/"><img alt="Documentation" src="https://img.shields.io/badge/docs-deployed-success?style=flat-square&amp;logo=readthedocs" /></a></p>
+<p align="center">
+    <img src="https://github.com/FlorianSW/cftools-server-donation/raw/main/.github/screenshot.png" alt="Main view of the website" width="420px">
+</p>
+
+<p>This server donation tool is meant to make it easier for gaming communities to allow their members to donate and earn differnet perks for their donation.
+It seamlessly integrates with different platforms in order to automatically provision and setup perks for donators to reduce manual efforts for community admins and moderators.</p>
+<p>A demo deployment of the tool can be found here: https://donate-demo.go2tech.de/</p>
+<h2 id="key-features">Key Features</h2>
+<ul>
+<li>Self-services, guided donation on a modern website</li>
+<li>Integrated with PayPal for easy, self-service and secure payments</li>
+<li>Fully configurable packages, including configuring perks a donator earns, and the amount one needs to donate</li>
+<li>Perks available: Priority Queue (based on CFTools Cloud), Discord roles</li>
+<li>Discord notifications</li>
+</ul>
+<h2 id="installation-configuration">Installation &amp; Configuration</h2>
+<p>The <code>config.full.yml</code> provides extensive documentation for each configuration option.
+With the <code>config.example.yml</code>, there is a minimum configuration file, where you just need to replace the placeholder values to get started (it does not contain all the possible configuration values).</p>
+<p>Additionally, the <a href="getting-started/">Getting Started Guide</a> will provide an easy-to-use step-by-step guide for a first-time setup.</p>
+<h2 id="support-and-collaboration">Support and Collaboration</h2>
+<p>If you have a question regarding the use or the setup of this tool, feel free to <a href="https://go2tech.de/discord">join my Discord</a> and get the <code>Tools</code> role in the #get-your-roles-here channel.
+I'll be happy to assist you if I can with your question there :)</p>
+<p>The initial configuration of the tool might look a bit overwhelming, but I'm happy to help you with whatever problem you're facing, just contact me.</p>
+<p>Given you think you found a bug, a missing feature or something that can be improved, I encourage you to open an issue in <a href="https://github.com/FlorianSW/cftools-server-donation">this Github repository</a>.
+Please, do not use issues for your questions or for getting support.</p>
+<p>Given you're a developer and want to contribute code to this project, feel free to do so.
+Simply fork the project, make your code changes and open a pull request against this repository.
+I appreciate your help and support and will try to review your pull request as soon as I can.</p>
+
+  <br>
+    
+
+    
+    
+      
+    
+
+  <div class="row wm-article-nav-buttons" role="navigation" aria-label="navigation">
+    
+    <div class="wm-article-nav pull-right">
+      <a href="getting-started/" class="btn btn-xs btn-default pull-right">
+        Next
+        <i class="fa fa-chevron-right" aria-hidden="true"></i>
+      </a>
+      <a href="getting-started/" class="btn btn-xs btn-link">
+        Getting Strated
+      </a>
+    </div>
+    
+  </div>
+
+    <br>
+</div>
+
+<footer class="container-fluid wm-page-content">
+      <p>
+        <a href="https://github.com/floriansw/server-donation-tool/edit/main/docs/index.md"><i class="fa fa-github"></i>
+Edit on GitHub</a>
+      </p>
+  <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a> using <a href="https://github.com/gristlabs/mkdocs-windmill">Windmill</a> theme by Grist Labs.</p>
+</footer>
+
+</body>
+</html>
+<!--
+MkDocs version : 1.6.1
+Build Date UTC : 2025-04-13 21:33:47.175350+00:00
+-->

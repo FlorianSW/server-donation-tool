@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+  
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <meta name="author" content="Florian Schmidt">
+    
+    <link rel="shortcut icon" href="../img/favicon.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+    <title>Overwrite messages - Server Donation Tool</title>
+    <link href="../css/bootstrap-3.3.7.min.css" rel="stylesheet">
+    <link href="../css/font-awesome-4.7.0.css" rel="stylesheet">
+    <link href="../css/base.css" rel="stylesheet">
+    <link rel="stylesheet" href="../css/highlight.css">
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+
+    <script src="../js/jquery-3.2.1.min.js"></script>
+    <script src="../js/bootstrap-3.3.7.min.js"></script>
+    <script src="../js/highlight.pack.js"></script>
+    
+    <base target="_top">
+    <script>
+      var base_url = '..';
+      var is_top_frame = false;
+        
+        var pageToc = [
+          {title: "Customising messages", url: "#_top", children: [
+              {title: "Overwriting message keys", url: "#overwriting-message-keys" },
+              {title: "Identifying the message key", url: "#identifying-the-message-key" },
+          ]},
+        ];
+
+    </script>
+    <script src="../js/base.js"></script> 
+</head>
+
+<body>
+<script>
+if (is_top_frame) { $('body').addClass('wm-top-page'); }
+</script>
+
+
+
+<div class="container-fluid wm-page-content">
+  <a name="_top"></a>
+    
+
+    
+    
+      
+    
+
+  <div class="row wm-article-nav-buttons" role="navigation" aria-label="navigation">
+    
+    <div class="wm-article-nav pull-right">
+      <a href="../server-names/" class="btn btn-xs btn-default pull-right">
+        Next
+        <i class="fa fa-chevron-right" aria-hidden="true"></i>
+      </a>
+      <a href="../server-names/" class="btn btn-xs btn-link">
+        Human-readable server names (CFTools)
+      </a>
+    </div>
+    
+    <div class="wm-article-nav">
+      <a href="../secure-connections/" class="btn btn-xs btn-default pull-left">
+        <i class="fa fa-chevron-left" aria-hidden="true"></i>
+        Previous</a><a href="../secure-connections/" class="btn btn-xs btn-link">
+        Setup/Use https/secure connections
+      </a>
+    </div>
+    
+  </div>
+
+    
+
+    <h1 id="customising-messages">Customising messages</h1>
+<p>The donation tool is prepared to use translations instead of english texts, only.
+The same system, that allows these translations in the future, can be used to overwrite specific texts in the tool with your own text.
+This comes in useful, when you have the requirement to show specific information at specific steps, or want to further customise the UI to your community.</p>
+<h2 id="overwriting-message-keys">Overwriting message keys</h2>
+<p>The donation tool uses a system of unique message keys, that are assigned to an individual place within the application.
+This key has a default message assigned, which will then presented to the user as the visible text.
+In order to customise/change a specific message in the tool, you simply overwrite the corresponding message key.</p>
+<h3 id="prepare-overwriting-message-keys-one-time-only">Prepare overwriting message keys (one-time only)</h3>
+<p>Follow these steps to enable message overwriting:</p>
+<ol>
+<li>Copy the <code>string_overrides.example.yml</code> file (in the root of the donation tool)</li>
+<li>Paste it to the root of the donation tool (next to the example file)</li>
+<li>Rename the file to <code>string_overrides.yml</code></li>
+</ol>
+<p>That's it.
+When you restart the tool the next time, it will use the defined overrides.</p>
+<h3 id="specifying-an-override">Specifying an override</h3>
+<p>To override a specific key, e.g. the one which shows the title when the donator opens the website (<code>Donate</code>), do the following:</p>
+<ol>
+<li>Identify the key to overwrite (more details below), in this case, the key is <code>INFO_TITLE</code></li>
+<li>Add this key to the <code>messages</code> object of the <code>string_overrides.yml</code> file</li>
+<li>Define the new value, e.g. <code>My own text</code></li>
+<li>Save the file and restart the tool</li>
+</ol>
+<p>The resulting file should look like this:</p>
+<pre><code class="language-yaml">messages:
+  INFO_TITLE: My own text
+</code></pre>
+<h2 id="identifying-the-message-key">Identifying the message key</h2>
+<p>You can find all available/used message keys in the <code>src/translations.ts</code> file (see the <code>messages</code> object).
+Alternatively, given you know exactly the position/place of the message you want to edit, do the following:</p>
+<ol>
+<li>Open the <code>config.yml</code> file</li>
+<li>Add the <code>language</code> key to the app object and use the value <code>qqx</code> (see a full example below)</li>
+<li>Restart the application</li>
+<li>Open the website</li>
+<li>All messages should now, instead of showing their assigned texts, the message keys</li>
+<li>Navigate to the position of the message you want to overwrite and use the message key (inside the curly brackets)</li>
+<li>Once you're done, don't forget to delete the <code>language</code> configuration option and restart the app again</li>
+</ol>
+<p>Example config with the <code>language</code> property:</p>
+<pre><code class="language-yaml">app:
+  port: 8080
+  sessionSecret: SOME_SECRET
+  sessionStore:
+    filename: ./sessions.sqlite
+  compressResponse: true
+  language: qqx # &lt;- This is what you're looking for
+</code></pre>
+<p>The message key you see will also optionally contain a list of parameter names passed to the message.
+When overwriting the message key, you can use these parameters as well, simply put them at the position you want them with: <code>{{paramName}}</code>.
+Where <code>paramName</code> is the name of the parameter you want to reference.</p>
+
+  <br>
+    
+
+    
+    
+      
+    
+
+  <div class="row wm-article-nav-buttons" role="navigation" aria-label="navigation">
+    
+    <div class="wm-article-nav pull-right">
+      <a href="../server-names/" class="btn btn-xs btn-default pull-right">
+        Next
+        <i class="fa fa-chevron-right" aria-hidden="true"></i>
+      </a>
+      <a href="../server-names/" class="btn btn-xs btn-link">
+        Human-readable server names (CFTools)
+      </a>
+    </div>
+    
+    <div class="wm-article-nav">
+      <a href="../secure-connections/" class="btn btn-xs btn-default pull-left">
+        <i class="fa fa-chevron-left" aria-hidden="true"></i>
+        Previous</a><a href="../secure-connections/" class="btn btn-xs btn-link">
+        Setup/Use https/secure connections
+      </a>
+    </div>
+    
+  </div>
+
+    <br>
+</div>
+
+<footer class="container-fluid wm-page-content">
+      <p>
+        <a href="https://github.com/floriansw/server-donation-tool/edit/main/docs/message-overrides.md"><i class="fa fa-github"></i>
+Edit on GitHub</a>
+      </p>
+  <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a> using <a href="https://github.com/gristlabs/mkdocs-windmill">Windmill</a> theme by Grist Labs.</p>
+</footer>
+
+</body>
+</html>
