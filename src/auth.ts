@@ -12,9 +12,15 @@ import {Logger} from 'winston';
 import {UserData} from './service/user-data';
 
 export async function discordUserCallback(steamClient: SteamClient, accessToken: string, refreshToken: string, profile: Profile, logger: Logger) {
-    const steamConnection: ConnectionInfo | undefined = profile.connections.find((c) => c.type === 'steam');
-    const xBoxConnection: ConnectionInfo | undefined = profile.connections.find((c) => c.type === 'xbox');
-    const playStationConnection: ConnectionInfo | undefined = profile.connections.find((c) => c.type === 'playstation');
+    let steamConnection: ConnectionInfo | undefined;
+    let xBoxConnection: ConnectionInfo | undefined;
+    let playStationConnection: ConnectionInfo | undefined;
+
+    if (profile.connections) {
+        steamConnection = profile.connections.find((c) => c.type === 'steam');
+        xBoxConnection = profile.connections.find((c) => c.type === 'xbox');
+        playStationConnection = profile.connections.find((c) => c.type === 'playstation');
+    }
     const user: User = {
         username: profile.username,
         discord: {
@@ -126,7 +132,10 @@ export class Authentication {
                 });
             });
         }));
-        this.router.get('/auth/discord/redirect', passport.authenticate('discord', {keepSessionInfo: true, prompt: 'none'}));
+        this.router.get('/auth/discord/redirect', passport.authenticate('discord', {
+            keepSessionInfo: true,
+            prompt: 'none'
+        }));
         this.router.get('/auth/discord/callback', passport.authenticate('discord', {
             failureRedirect: '/auth/error',
             keepSessionInfo: true
